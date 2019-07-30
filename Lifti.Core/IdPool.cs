@@ -2,7 +2,7 @@
 
 namespace Lifti
 {
-    public class IdPool<T>
+    public class IdPool<T> : IIdPool<T>
     {
         private readonly Queue<int> reusableIds = new Queue<int>();
         private readonly Dictionary<T, int> itemIdIndex = new Dictionary<T, int>();
@@ -11,18 +11,34 @@ namespace Lifti
 
         public int CreateIdFor(T item)
         {
+            if (this.itemIdIndex.ContainsKey(item))
+            {
+                throw new LiftiException("Item already indexed");
+            }
+
             var id = reusableIds.Count == 0 ? nextId++ : reusableIds.Dequeue();
             itemIdIndex[item] = id;
             itemIdLookup[id] = item;
             return id;
         }
 
-        public void Release(T item)
+        public T GetItemForId(int id)
+        {
+            if (!this.itemIdLookup.TryGetValue(id, out var item))
+            {
+                throw new LiftiException("Item not found");
+            }
+
+            return item;
+        }
+
+        public int ReleaseItem(T item)
         {
             var id = this.itemIdIndex[item];
             this.itemIdIndex.Remove(item);
             this.itemIdLookup.Remove(id);
             this.reusableIds.Enqueue(id);
+            return id;
         }
     }
 }

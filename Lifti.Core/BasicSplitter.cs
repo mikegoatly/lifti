@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Lifti
 {
-    public class BasicSplitter
+    public class BasicSplitter : IWordSplitter
     {
         public IEnumerable<SplitWord> Process(string input)
         {
