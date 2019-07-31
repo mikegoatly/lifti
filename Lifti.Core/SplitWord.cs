@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Lifti
@@ -13,7 +14,13 @@ namespace Lifti
 
         public SplitWord(ReadOnlySpan<char> word, params Range[] locations)
         {
-            this.Locations = ImmutableList<Range>.Empty.AddRange(locations);
+            this.Locations = locations.ToImmutableList();
+            this.Word = word.ToArray();
+        }
+
+        public SplitWord(ReadOnlySpan<char> word, IReadOnlyList<Range> locations)
+        {
+            this.Locations = locations.ToImmutableList();
             this.Word = word.ToArray();
         }
 

@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Moq;
-using Lifti;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,19 +9,28 @@ namespace Lifti.Tests
 {
     public class IndexNodeTests
     {
-        private Mock<IIndexNodeFactory> indexNodeFactoryMock;
-        private IndexNode sut;
-        private List<IndexNode> createdChildNodes = new List<IndexNode>();
+        private readonly Mock<IIndexNodeFactory> indexNodeFactoryMock;
+        private readonly IndexNode sut;
+        private readonly List<IndexNode> createdChildNodes = new List<IndexNode>();
+        private readonly IndexedWordLocation locations1 = CreateLocations(0, (1, 2), (5, 8));
+        private readonly IndexedWordLocation locations2 = CreateLocations(0, (9, 2));
+        private readonly IndexedWordLocation locations3 = CreateLocations(0, (14, 5));
+        private readonly IndexedWordLocation locations4 = CreateLocations(0, (4, 5));
+        private const int item1 = 1;
+        private const int item2 = 2;
+        private const int item3 = 3;
+        private const int item4 = 4;
+        private const byte fieldId1 = 0;
 
         public IndexNodeTests()
         {
             this.indexNodeFactoryMock = new Mock<IIndexNodeFactory>();
             this.sut = new IndexNode(this.indexNodeFactoryMock.Object);
             this.indexNodeFactoryMock.Setup(
-                x => x.CreateChildNodeFor(It.IsAny<IndexNode>()))
-                    .Returns((IndexNode i) =>
+                x => x.CreateNode())
+                    .Returns(() =>
                     {
-                        var node = new IndexNode(this.indexNodeFactoryMock.Object, i);
+                        var node = new IndexNode(this.indexNodeFactoryMock.Object);
                         this.createdChildNodes.Add(node);
                         return node;
                     });
@@ -31,54 +39,63 @@ namespace Lifti.Tests
         [Fact]
         public void IndexingEmptyNode_ShouldResultInItemsDirectlyIndexedAtNode()
         {
-            var locations = CreateLocations((1, 2), (5, 8));
-            this.sut.Index(4, new SplitWord("test".AsSpan(), locations));
+            this.sut.Index(item1, fieldId1, new SplitWord("test".AsSpan(), this.locations1.Locations));
 
-            VerifySutState(this.sut, null, "test", new[] { (4, locations) });
+            VerifySutState(this.sut, "test", new[] { (item1, this.locations1) });
+        }
+
+        [Theory]
+        [InlineData("test")]
+        [InlineData("a")]
+        public void IndexingAtNodeWithSameTextForDifferentItem_ShouldResultInItemsDirectlyIndexedAtNode(string word)
+        {
+            this.sut.Index(item1, fieldId1, new SplitWord(word.AsSpan(), this.locations1.Locations));
+            this.sut.Index(item2, fieldId1, new SplitWord(word.AsSpan(), this.locations2.Locations));
+
+            VerifySutState(this.sut, word, new[] { (item1, this.locations1), (item2, this.locations2) });
         }
 
         [Fact]
-        public void IndexingAtNodeWithSameTextForDifferentItem_ShouldResultInItemsDirectlyIndexedAtNode()
+        public void IndexingWordEndingAtSplit_ShouldResultInItemIndexedWhereSplitOccurs()
         {
-            var locations1 = CreateLocations((1, 2), (5, 8));
-            this.sut.Index(1, new SplitWord("test".AsSpan(), locations1));
-            var locations2 = CreateLocations((9, 2));
-            this.sut.Index(2, new SplitWord("test".AsSpan(), locations2));
+            this.sut.Index(item1, fieldId1, new SplitWord("apple", this.locations1.Locations));
+            this.sut.Index(item2, fieldId1, new SplitWord("able", this.locations2.Locations));
+            this.sut.Index(item3, fieldId1, new SplitWord("banana", this.locations3.Locations));
+            this.sut.Index(item4, fieldId1, new SplitWord("a", this.locations4.Locations));
 
-            VerifySutState(this.sut, null, "test", new[] { (1, locations1), (2, locations2) });
+            this.createdChildNodes.Should().HaveCount(4);
+            VerifySutState(this.sut, null, expectedChildNodes: new[] { ('a', this.createdChildNodes[2]), ('b', this.createdChildNodes[3]) });
+            VerifySutState(this.createdChildNodes[2], null, new[] { (item4, this.locations4) }, new[] { ('p', this.createdChildNodes[0]), ('b', this.createdChildNodes[1]) });
+            VerifySutState(this.createdChildNodes[3], "anana", new[] { (item3, this.locations3) });
+            VerifySutState(this.createdChildNodes[1], "le", new[] { (item2, this.locations2) });
+            VerifySutState(this.createdChildNodes[0], "ple", new[] { (item1, this.locations1) });
         }
 
         [Fact]
         public void IndexingWhenChildNodeAlreadyExists_ShouldContinueIndexingAtExistingChild()
         {
-            var locations1 = CreateLocations((1, 2), (5, 8));
-            this.sut.Index(1, new SplitWord("freedom".AsSpan(), locations1));
-            var locations2 = CreateLocations((9, 2));
-            this.sut.Index(2, new SplitWord("fred".AsSpan(), locations2));
-            var locations3 = CreateLocations((14, 5));
-            this.sut.Index(3, new SplitWord("freddy".AsSpan(), locations3));
+            this.sut.Index(item1, fieldId1, new SplitWord("freedom".AsSpan(), this.locations1.Locations));
+            this.sut.Index(item2, fieldId1, new SplitWord("fred".AsSpan(), this.locations2.Locations));
+            this.sut.Index(item3, fieldId1, new SplitWord("freddy".AsSpan(), this.locations3.Locations));
 
             this.createdChildNodes.Should().HaveCount(3);
-            VerifySutState(this.sut, null, "fre", expectedChildNodes: new[] { ('e', createdChildNodes[0]), ('d', createdChildNodes[1]) });
-            VerifySutState(createdChildNodes[0], this.sut, "dom", new[] { (1, locations1) });
-            VerifySutState(createdChildNodes[1], this.sut, null, new[] { (2, locations2) }, new[] { ('d', createdChildNodes[2]) });
-            VerifySutState(createdChildNodes[2], createdChildNodes[1], "y", new[] { (3, locations3) });
+            VerifySutState(this.sut, "fre", expectedChildNodes: new[] { ('e', this.createdChildNodes[0]), ('d', this.createdChildNodes[1]) });
+            VerifySutState(this.createdChildNodes[0], "dom", new[] { (item1, this.locations1) });
+            VerifySutState(this.createdChildNodes[1], null, new[] { (item2, this.locations2) }, new[] { ('d', this.createdChildNodes[2]) });
+            VerifySutState(this.createdChildNodes[2], "y", new[] { (item3, this.locations3) });
         }
 
         [Fact]
         public void IndexingAtNodeWithTextWithSameSuffix_ShouldCreateNewChildNode()
         {
-            var locations1 = CreateLocations((1, 2), (5, 8));
-            this.sut.Index(1, new SplitWord("test".AsSpan(), locations1));
-            var locations2 = CreateLocations((9, 2));
-            this.sut.Index(2, new SplitWord("testing".AsSpan(), locations2));
-            var locations3 = CreateLocations((10, 2));
-            this.sut.Index(3, new SplitWord("tester".AsSpan(), locations3));
+            this.sut.Index(item1, fieldId1, new SplitWord("test".AsSpan(), this.locations1.Locations));
+            this.sut.Index(item2, fieldId1, new SplitWord("testing".AsSpan(), this.locations2.Locations));
+            this.sut.Index(item3, fieldId1, new SplitWord("tester".AsSpan(), this.locations3.Locations));
 
             this.createdChildNodes.Should().HaveCount(2);
-            VerifySutState(this.sut, null, "test", new[] { (1, locations1) }, new[] { ('i', createdChildNodes[0]), ('e', createdChildNodes[1]) });
-            VerifySutState(this.createdChildNodes[0], this.sut, "ng", new[] { (2, locations2) });
-            VerifySutState(this.createdChildNodes[1], this.sut, "r", new[] { (3, locations3) });
+            VerifySutState(this.sut, "test", new[] { (item1, this.locations1) }, new[] { ('i', this.createdChildNodes[0]), ('e', this.createdChildNodes[1]) });
+            VerifySutState(this.createdChildNodes[0], "ng", new[] { (item2, this.locations2) });
+            VerifySutState(this.createdChildNodes[1], "r", new[] { (item3, this.locations3) });
         }
 
         [Theory]
@@ -93,33 +110,30 @@ namespace Lifti.Tests
             string splitIntraText,
             string newIntraText)
         {
-            var locations1 = CreateLocations((1, 2), (5, 8));
-            this.sut.Index(1, new SplitWord("test".AsSpan(), locations1));
-            var locations2 = CreateLocations((9, 2));
-            this.sut.Index(2, new SplitWord(indexText.AsSpan(), locations2));
+            this.sut.Index(item1, fieldId1, new SplitWord("test".AsSpan(), this.locations1.Locations));
+            this.sut.Index(item2, fieldId1, new SplitWord(indexText.AsSpan(), this.locations2.Locations));
 
-            createdChildNodes.Should().HaveCount(2);
-            VerifySutState(this.sut, null, remainingIntraText, expectedChildNodes: new[] { (originalSplitChar, createdChildNodes[0]), (newSplitChar, createdChildNodes[1]) });
-            VerifySutState(createdChildNodes[0], this.sut, splitIntraText, new[] { (1, locations1) });
-            VerifySutState(createdChildNodes[1], this.sut, newIntraText, new[] { (2, locations2) });
+            this.createdChildNodes.Should().HaveCount(2);
+            VerifySutState(this.sut, remainingIntraText, expectedChildNodes: new[] { (originalSplitChar, this.createdChildNodes[0]), (newSplitChar, this.createdChildNodes[1]) });
+            VerifySutState(this.createdChildNodes[0], splitIntraText, new[] { (item1, this.locations1) });
+            VerifySutState(this.createdChildNodes[1], newIntraText, new[] { (item2, this.locations2) });
         }
 
-        private static Lifti.Range[] CreateLocations(params (int, int)[] locations)
+        private static IndexedWordLocation CreateLocations(byte fieldId, params (int, int)[] locations)
         {
-            return locations.Select(r => new Lifti.Range(r.Item1, r.Item2)).ToArray();
+            return new IndexedWordLocation(fieldId, locations.Select(r => new Range(r.Item1, r.Item2)).ToArray());
         }
 
         private static void VerifySutState(
             IndexNode node,
-            IndexNode expectedParentNode,
             string intraNodeText,
-            (int, Lifti.Range[])[] expectedMatches = null,
+            (int, IndexedWordLocation)[] expectedMatches = null,
             (char, IndexNode)[] expectedChildNodes = null)
         {
-            node.ParentNode.Should().BeEquivalentTo(expectedParentNode);
             node.IntraNodeText.Should().BeEquivalentTo(intraNodeText?.ToCharArray());
             node.ChildNodes.Should().BeEquivalentTo(expectedChildNodes?.ToDictionary(x => x.Item1, x => x.Item2));
-            node.Matches.Should().BeEquivalentTo(expectedMatches?.ToDictionary(x => x.Item1, x => x.Item2));
+
+            node.Matches.Should().BeEquivalentTo(expectedMatches?.ToDictionary(x => x.Item1, x => new[] { x.Item2 }));
         }
     }
 }

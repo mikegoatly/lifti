@@ -5,46 +5,76 @@ using System.Text;
 
 namespace Lifti
 {
+    public struct IndexedWordLocation
+    {
+        public IndexedWordLocation(byte fieldId, IReadOnlyList<Range> locations)
+        {
+            this.FieldId = fieldId;
+            this.Locations = locations;
+        }
+
+        public byte FieldId { get; }
+        public IReadOnlyList<Range> Locations { get; }
+
+        public override bool Equals(object obj)
+        {
+            return obj is IndexedWordLocation location &&
+                   this.FieldId == location.FieldId &&
+                   this.Locations.SequenceEqual(location.Locations);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = HashCode.Combine(this.FieldId);
+            foreach (var location in this.Locations)
+            {
+                hashCode = HashCode.Combine(hashCode, location);
+            }
+
+            return hashCode;
+        }
+    }
+
     public class IndexNode
     {
-        private Dictionary<int, IReadOnlyList<Range>> matches;
+        private Dictionary<int, List<IndexedWordLocation>> matches;
         private Dictionary<char, IndexNode> childNodes;
         private readonly IIndexNodeFactory indexNodeFactory;
 
-        internal IndexNode ParentNode { get; }
         internal char[] IntraNodeText { get; private set; }
         internal IReadOnlyDictionary<char, IndexNode> ChildNodes => this.childNodes;
-        internal IReadOnlyDictionary<int, IReadOnlyList<Range>> Matches => this.matches;
+        internal IReadOnlyDictionary<int, List<IndexedWordLocation>> Matches => this.matches;
 
         public IndexNode(IIndexNodeFactory indexNodeFactory)
         {
             this.indexNodeFactory = indexNodeFactory;
         }
 
-        public IndexNode(IIndexNodeFactory indexNodeFactory, IndexNode parent)
+        public void Index(int itemId, byte fieldId, SplitWord word)
         {
-            this.indexNodeFactory = indexNodeFactory;
-            this.ParentNode = parent;
+            this.Index(itemId, fieldId, word.Locations, word.Word);
         }
 
-        public void Index(int itemId, SplitWord word)
-        {
-            this.Index(itemId, word.Locations, word.Word);
-        }
-
-        private void Index(int itemId, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText)
+        private void Index(int itemId, byte fieldId, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText)
         {
             if (this.IntraNodeText == null)
             {
                 if (this.childNodes == null && this.matches == null)
                 {
                     // Currently a leaf node
-                    IntraNodeText = remainingWordText.Length == 0 ? null : remainingWordText.ToArray();
-                    AddMatchedItem(itemId, locations);
+                    this.IntraNodeText = remainingWordText.Length == 0 ? null : remainingWordText.ToArray();
+                    this.AddMatchedItem(itemId, fieldId, locations);
                 }
                 else
                 {
-                    this.ContinueIndexingAtChild(itemId, locations, remainingWordText, 0);
+                    if (remainingWordText.Length == 0)
+                    {
+                        this.AddMatchedItem(itemId, fieldId, locations);
+                    }
+                    else
+                    {
+                        this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingWordText, 0);
+                    }
                 }
             }
             else
@@ -59,8 +89,8 @@ namespace Lifti
                 {
                     if (remainingWordText[i] != this.IntraNodeText[i])
                     {
-                        this.SplitIntraNodeText(itemId, i, locations, remainingWordText);
-                        ContinueIndexingAtChild(itemId, locations, remainingWordText, i);
+                        this.SplitIntraNodeText(i);
+                        this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingWordText, i);
                         return;
                     }
                 }
@@ -68,28 +98,28 @@ namespace Lifti
                 // No split occurred
                 if (remainingWordText.Length > testLength)
                 {
-                    this.ContinueIndexingAtChild(itemId, locations, remainingWordText, testLength);
+                    this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingWordText, testLength);
                 }
                 else
                 {
                     // Remaining text == intraNodeText
-                    AddMatchedItem(itemId, locations);
+                    this.AddMatchedItem(itemId, fieldId, locations);
                 }
             }
         }
 
-        private void ContinueIndexingAtChild(int itemId, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText, int remainingTextSplitPosition)
+        private void ContinueIndexingAtChild(int itemId, byte fieldId, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText, int remainingTextSplitPosition)
         {
-            EnsureChildNodesLookupCreated();
+            this.EnsureChildNodesLookupCreated();
 
             var indexChar = remainingWordText[remainingTextSplitPosition];
             if (!this.childNodes.TryGetValue(indexChar, out var childNode))
             {
-                childNode = this.indexNodeFactory.CreateChildNodeFor(this);
+                childNode = this.indexNodeFactory.CreateNode();
                 this.childNodes.Add(indexChar, childNode);
             }
 
-            childNode.Index(itemId, locations, remainingWordText.Slice(remainingTextSplitPosition + 1));
+            childNode.Index(itemId, fieldId, locations, remainingWordText.Slice(remainingTextSplitPosition + 1));
         }
 
         private void EnsureChildNodesLookupCreated()
@@ -100,10 +130,10 @@ namespace Lifti
             }
         }
 
-        private void SplitIntraNodeText(int itemId, int splitIndex, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText)
+        private void SplitIntraNodeText(int splitIndex)
         {
             var intraTextSpan = this.IntraNodeText.AsSpan();
-            var splitChildNode = this.indexNodeFactory.CreateChildNodeFor(this);
+            var splitChildNode = this.indexNodeFactory.CreateNode();
             splitChildNode.IntraNodeText = splitIndex + 1 == intraTextSpan.Length ? null : intraTextSpan.Slice(splitIndex + 1).ToArray();
             splitChildNode.childNodes = this.childNodes;
             splitChildNode.matches = this.matches;
@@ -122,14 +152,20 @@ namespace Lifti
             this.childNodes.Add(intraTextSpan[splitIndex], splitChildNode);
         }
 
-        private void AddMatchedItem(int itemId, IReadOnlyList<Range> locations)
+        private void AddMatchedItem(int itemId, byte fieldId, IReadOnlyList<Range> locations)
         {
             if (this.matches == null)
             {
-                this.matches = new Dictionary<int, IReadOnlyList<Range>>();
+                this.matches = new Dictionary<int, List<IndexedWordLocation>>();
             }
 
-            this.matches.Add(itemId, locations);
+            if (!this.matches.TryGetValue(itemId, out var itemFieldLocations))
+            {
+                itemFieldLocations = new List<IndexedWordLocation>(); // TODO Constrain list to size == number of fields for index?
+                this.matches[itemId] = itemFieldLocations;
+            }
+
+            itemFieldLocations.Add(new IndexedWordLocation(fieldId, locations));
         }
 
         public override string ToString()

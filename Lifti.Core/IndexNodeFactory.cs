@@ -2,14 +2,9 @@
 {
     public class IndexNodeFactory : IIndexNodeFactory
     {
-        public IndexNode CreateRootNode()
+        public IndexNode CreateNode()
         {
             return new IndexNode(this);
-        }
-
-        public IndexNode CreateChildNodeFor(IndexNode parent)
-        {
-            return new IndexNode(this, parent);
         }
     }
 }

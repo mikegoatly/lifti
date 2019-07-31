@@ -2,7 +2,6 @@
 {
     public interface IIndexNodeFactory
     {
-        IndexNode CreateChildNodeFor(IndexNode parent);
-        IndexNode CreateRootNode();
+        IndexNode CreateNode();
     }
 }
