@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace Lifti
 {
-    public partial class FullTextIndex<T>
+    public partial class FullTextIndex<TKey>
     {
         internal class SearchContext
         {
-            private readonly FullTextIndex<T> index;
+            private readonly FullTextIndex<TKey> index;
             private readonly Dictionary<int, List<IndexedWordLocation>> results = new Dictionary<int, List<IndexedWordLocation>>(); // TODO ugly - helper class?
 
-            public SearchContext(FullTextIndex<T> index)
+            public SearchContext(FullTextIndex<TKey> index)
             {
                 this.index = index;
             }
@@ -83,12 +83,12 @@ namespace Lifti
                 }
             }
 
-            public IEnumerable<SearchResult<T>> Results()
+            public IEnumerable<SearchResult<TKey>> Results()
             {
                 foreach (var itemResults in this.results)
                 {
                     var item = this.index.idPool.GetItemForId(itemResults.Key);
-                    yield return new SearchResult<T>(
+                    yield return new SearchResult<TKey>(
                         item,
                         itemResults.Value.Select(m => new MatchedLocation(this.index.GetFieldName(m.FieldId), m.Locations)).ToList());
                 }

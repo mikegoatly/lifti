@@ -6,5 +6,9 @@
         {
             return new IndexNode(this);
         }
+
+        public virtual void ConfigureWith(FullTextIndexOptions options)
+        {
+        }
     }
 }

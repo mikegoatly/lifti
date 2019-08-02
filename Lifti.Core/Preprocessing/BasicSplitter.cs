@@ -3,11 +3,20 @@ using System.Collections.Generic;
 
 namespace Lifti
 {
+
     public class BasicSplitter : IWordSplitter
     {
+        private readonly ITextPreprocessor textPreprocessor;
+        private WordSplitOptions wordSplitOptions = new WordSplitOptions();
+
+        public BasicSplitter(ITextPreprocessor textPreprocessor)
+        {
+            this.textPreprocessor = textPreprocessor;
+        }
+
         public IEnumerable<SplitWord> Process(string input)
         {
-            input = input.ToLowerInvariant();
+            input = this.textPreprocessor.Preprocess(input);
 
             var processedWords = new SplitWordStore(); // TODO Pool?
 
@@ -18,7 +27,7 @@ namespace Lifti
             for (var i = 0; i < inputData.Length; i++)
             {
                 var current = input[i];
-                if (current == ' ')
+                if (this.IsWordSplitCharacter(current))
                 {
                     if (foundCharacter)
                     {
@@ -48,12 +57,23 @@ namespace Lifti
             return processedWords.ToList();
         }
 
+        private bool IsWordSplitCharacter(char current)
+        {
+            return char.IsSeparator(current) ||
+                (this.wordSplitOptions.SplitWordsOnPunctuation && char.IsPunctuation(current));
+        }
+
         private static void CaptureWord(SplitWordStore processedWords, ReadOnlySpan<char> inputData, int start, int end, SplitWordHash hash)
         {
             var length = end - start;
             var span = inputData.Slice(start, length);
 
             processedWords.MergeOrAdd(hash, span, new Range(start, length));
+        }
+
+        public virtual void ConfigureWith(FullTextIndexOptions options)
+        {
+            this.wordSplitOptions = options.WordSplitOptions ?? throw new ArgumentNullException(nameof(options.WordSplitOptions));
         }
     }
 }

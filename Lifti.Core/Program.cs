@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Lifti
 {
@@ -6,9 +7,9 @@ namespace Lifti
     {
         private static void Main(string[] args)
         {
-            var input = "This is a test This is a test This is a test  This is a test some other words that might a b c d e make a collision but are unlikely";
+            var input = "This is a test This is a test This is a test ŠĐĆŽ.šđčćž This is a test some other words that might a b c d e make a collision but are unlikely";
 
-            var index = new FullTextIndex<string>();
+            var index = new FullTextIndex<string>(new FullTextIndexOptions<string>() { WordSplitOptions = { SplitWordsOnPunctuation = false } });
 
             index.Index("1", input);
 
@@ -18,10 +19,11 @@ namespace Lifti
 
             Console.WriteLine(index.Root.ToString());
 
-            foreach (var result in index.Search("test"))
+            foreach (var result in index.Search("ŠĐĆŽ"))
             {
                 Console.WriteLine(result);
             }
         }
     }
 }
+ 

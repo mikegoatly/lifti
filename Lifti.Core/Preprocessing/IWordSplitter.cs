@@ -2,7 +2,7 @@
 
 namespace Lifti
 {
-    public interface IWordSplitter
+    public interface IWordSplitter : IConfiguredByOptions
     {
         IEnumerable<SplitWord> Process(string input);
     }

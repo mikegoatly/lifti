@@ -1,6 +1,6 @@
 ﻿namespace Lifti
 {
-    public interface IIndexNodeFactory
+    public interface IIndexNodeFactory : IConfiguredByOptions
     {
         IndexNode CreateNode();
     }

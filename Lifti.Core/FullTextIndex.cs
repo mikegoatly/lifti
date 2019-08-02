@@ -3,20 +3,39 @@ using System.Collections.Generic;
 
 namespace Lifti
 {
-    public partial class FullTextIndex<T>
+    public partial class FullTextIndex<TKey>
     {
-        private readonly IIndexNodeFactory indexNodeFactory = new IndexNodeFactory(); // TODO DI
-        private readonly IIdPool<T> idPool = new IdPool<T>();
-        private readonly IWordSplitter splitter = new BasicSplitter();
+        private readonly IIndexNodeFactory indexNodeFactory;
+        private readonly IIdPool<TKey> idPool = new IdPool<TKey>();
+        private readonly IWordSplitter splitter;
 
         public FullTextIndex()
+            : this(new FullTextIndexOptions<TKey>())
         {
+        }
+
+        public FullTextIndex(FullTextIndexOptions<TKey> options)
+            : this(
+                  options,
+                  new BasicSplitter(new CaseInsensitiveAccentInsensitivePreprocessor()),
+                  new IndexNodeFactory())
+        {
+        }
+
+        public FullTextIndex(
+            FullTextIndexOptions<TKey> options,
+            IWordSplitter wordSplitter,
+            IIndexNodeFactory indexNodeFactory)
+        {
+            this.ConfigureWith(options, wordSplitter, indexNodeFactory);
+            this.splitter = wordSplitter;
+            this.indexNodeFactory = indexNodeFactory;
             this.Root = this.indexNodeFactory.CreateNode();
         }
 
         public IndexNode Root { get; }
 
-        public void Index(T item, string text)
+        public void Index(TKey item, string text)
         {
             var itemId = this.idPool.CreateIdFor(item);
             foreach (var word in this.splitter.Process(text))
@@ -35,7 +54,7 @@ namespace Lifti
             return string.Empty;
         }
 
-        public IEnumerable<SearchResult<T>> Search(string searchText)
+        public IEnumerable<SearchResult<TKey>> Search(string searchText)
         {
             var searchContext = new SearchContext(this);
 
@@ -45,6 +64,14 @@ namespace Lifti
             }
 
             return searchContext.Results();
+        }
+
+        private void ConfigureWith(FullTextIndexOptions<TKey> options, params IConfiguredByOptions[] configurable)
+        {
+            foreach (var item in configurable)
+            {
+                item.ConfigureWith(options);
+            }
         }
     }
 }
