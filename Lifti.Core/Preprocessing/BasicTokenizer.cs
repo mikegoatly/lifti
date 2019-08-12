@@ -7,19 +7,19 @@ using System.Text;
 
 namespace Lifti
 {
-    public class BasicSplitter : IWordSplitter
+    public class BasicTokenizer : ITokenizer
     {
         private readonly IInputPreprocessorPipeline inputPreprocessorPipeline;
-        private WordSplitOptions wordSplitOptions = new WordSplitOptions();
+        private TokenizationOptions tokenizationOptions = new TokenizationOptions();
 
-        public BasicSplitter(IInputPreprocessorPipeline inputPreprocessorPipeline)
+        public BasicTokenizer(IInputPreprocessorPipeline inputPreprocessorPipeline)
         {
             this.inputPreprocessorPipeline = inputPreprocessorPipeline;
         }
 
-        public IEnumerable<SplitWord> Process(string input)
+        public IEnumerable<Token> Process(string input)
         {
-            var processedWords = new SplitWordStore(); // TODO Pool?
+            var processedWords = new TokenStore(); // TODO Pool?
 
             var inputData = input.AsSpan();
             var start = 0;
@@ -53,15 +53,15 @@ namespace Lifti
         private bool IsWordSplitCharacter(char current)
         {
             return char.IsSeparator(current) ||
-                (this.wordSplitOptions.SplitWordsOnPunctuation && char.IsPunctuation(current));
+                (this.tokenizationOptions.SplitOnPunctuation && char.IsPunctuation(current));
         }
 
-        private static void CaptureWord(SplitWordStore processedWords, ReadOnlySpan<char> inputData, int start, int end, StringBuilder wordBuilder)
+        private static void CaptureWord(TokenStore processedWords, ReadOnlySpan<char> inputData, int start, int end, StringBuilder wordBuilder)
         {
             var length = end - start;
             var span = inputData.Slice(start, length);
 
-            var hash = new SplitWordHash();
+            var hash = new TokenHash();
             for (var i = 0; i < wordBuilder.Length; i++)
             {
                 hash.Combine(wordBuilder[i]);
@@ -72,7 +72,7 @@ namespace Lifti
 
         public virtual void ConfigureWith(FullTextIndexOptions options)
         {
-            this.wordSplitOptions = options.WordSplitOptions ?? throw new ArgumentNullException(nameof(options.WordSplitOptions));
+            this.tokenizationOptions = options.TokenizationOptions ?? throw new ArgumentNullException(nameof(options.TokenizationOptions));
         }
     }
 }

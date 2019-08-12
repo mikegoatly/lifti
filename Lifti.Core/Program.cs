@@ -9,7 +9,7 @@ namespace Lifti
         {
             var input = "This is a test This is a test This is a test ŠĐĆŽ.šđčćž This is a test some other words that might a b c d e make a collision but are unlikely";
 
-            var index = new FullTextIndex<string>(new FullTextIndexOptions<string>() { WordSplitOptions = { SplitWordsOnPunctuation = false } });
+            var index = new FullTextIndex<string>(new FullTextIndexOptions<string>() { TokenizationOptions = { SplitOnPunctuation = false } });
 
             index.Index("1", input);
 

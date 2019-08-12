@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FluentAssertions;
 using System.Linq;
-using System.Text;
-using FluentAssertions;
-using Lifti;
 using Xunit;
 
 namespace Lifti.Tests
 {
-    public class SplitWordHashTests
+    public class TokenHashTests
     {
         [Fact]
         public void ShouldGenerateUniqueHashForDifferentStrings()
@@ -26,7 +22,7 @@ namespace Lifti.Tests
                 "loo"
             };
 
-            tests.Select(t => new SplitWordHash(t).HashValue).ToHashSet()
+            tests.Select(t => new TokenHash(t).HashValue).ToHashSet()
                 .Should().HaveCount(tests.Length);
         }
 
@@ -35,9 +31,9 @@ namespace Lifti.Tests
         {
             var testString = "lifti";
 
-            var constructorHash = new SplitWordHash(testString);
+            var constructorHash = new TokenHash(testString);
 
-            var combinedHash = new SplitWordHash();
+            var combinedHash = new TokenHash();
             foreach (var character in testString)
             {
                 combinedHash = combinedHash.Combine(character);
@@ -49,8 +45,8 @@ namespace Lifti.Tests
         [Fact]
         public void EqualsForHashesWithSameValueReturnsTrue()
         {
-            var first = new SplitWordHash("test");
-            var second = new SplitWordHash("test");
+            var first = new TokenHash("test");
+            var second = new TokenHash("test");
 
             first.Equals(second).Should().BeTrue();
         }
@@ -58,8 +54,8 @@ namespace Lifti.Tests
         [Fact]
         public void EqualsForHashesWithDifferentValueReturnsFalse()
         {
-            var first = new SplitWordHash("test");
-            var second = new SplitWordHash("tesf");
+            var first = new TokenHash("test");
+            var second = new TokenHash("tesf");
 
             first.Equals(second).Should().BeFalse();
         }
@@ -67,7 +63,7 @@ namespace Lifti.Tests
         [Fact]
         public void GetHashCodeShouldJustReturnHashValue()
         {
-            var sut = new SplitWordHash("test");
+            var sut = new TokenHash("test");
 
             sut.HashValue.Should().Be(sut.GetHashCode());
         }

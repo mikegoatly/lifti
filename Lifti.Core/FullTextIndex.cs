@@ -7,7 +7,7 @@ namespace Lifti
     {
         private readonly IIndexNodeFactory indexNodeFactory;
         private readonly IIdPool<TKey> idPool = new IdPool<TKey>();
-        private readonly IWordSplitter splitter;
+        private readonly ITokenizer splitter;
 
         public FullTextIndex()
             : this(new FullTextIndexOptions<TKey>())
@@ -17,14 +17,14 @@ namespace Lifti
         public FullTextIndex(FullTextIndexOptions<TKey> options)
             : this(
                   options,
-                  new BasicSplitter(new InputPreprocessorPipeline(Array.Empty<IInputPreprocessor>())),
+                  new BasicTokenizer(new InputPreprocessorPipeline(Array.Empty<IInputPreprocessor>())),
                   new IndexNodeFactory())
         {
         }
 
         public FullTextIndex(
             FullTextIndexOptions<TKey> options,
-            IWordSplitter wordSplitter,
+            ITokenizer wordSplitter,
             IIndexNodeFactory indexNodeFactory)
         {
             this.ConfigureWith(options, wordSplitter, indexNodeFactory);
@@ -60,7 +60,7 @@ namespace Lifti
 
             foreach (var searchWord in this.splitter.Process(searchText))
             {
-                searchContext.Match(searchWord.Word.AsSpan());
+                searchContext.Match(searchWord.Token.AsSpan());
             }
 
             return searchContext.Results();

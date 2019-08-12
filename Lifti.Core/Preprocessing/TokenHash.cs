@@ -2,9 +2,9 @@
 
 namespace Lifti
 {
-    public struct SplitWordHash
+    public struct TokenHash
     {
-        public SplitWordHash(ReadOnlySpan<char> word)
+        public TokenHash(ReadOnlySpan<char> word)
         {
             var hash = 0;
             for (var i = 0; i < word.Length; i++)
@@ -15,16 +15,16 @@ namespace Lifti
             this.HashValue = hash;
         }
 
-        public SplitWordHash(int hashValue)
+        public TokenHash(int hashValue)
         {
             this.HashValue = hashValue;
         }
 
         public int HashValue { get; }
 
-        public SplitWordHash Combine(char next)
+        public TokenHash Combine(char next)
         {
-            return new SplitWordHash(CalculateNext(this.HashValue, next));
+            return new TokenHash(CalculateNext(this.HashValue, next));
         }
 
         private static int CalculateNext(int current, char next)
@@ -34,7 +34,7 @@ namespace Lifti
 
         public override bool Equals(object obj)
         {
-            return obj is SplitWordHash hash &&
+            return obj is TokenHash hash &&
                    this.HashValue == hash.HashValue;
         }
 

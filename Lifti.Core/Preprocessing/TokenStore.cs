@@ -4,37 +4,37 @@ using System.Linq;
 
 namespace Lifti
 {
-    public class SplitWordStore
+    public class TokenStore
     {
-        private readonly Dictionary<int, List<SplitWord>> materializedWords = new Dictionary<int, List<SplitWord>>(); // Pooling? Configuration for expected unique words per document?
+        private readonly Dictionary<int, List<Token>> materializedWords = new Dictionary<int, List<Token>>(); // Pooling? Configuration for expected unique words per document?
 
-        public void MergeOrAdd(SplitWordHash hash, ReadOnlySpan<char> word, Range location)
+        public void MergeOrAdd(TokenHash hash, ReadOnlySpan<char> word, Range location)
         {
             if (this.materializedWords.TryGetValue(hash.HashValue, out var existingEntries))
             {
                 foreach (var existingEntry in existingEntries)
                 {
-                    if (word.SequenceEqual(existingEntry.Word))
+                    if (word.SequenceEqual(existingEntry.Token))
                     {
                         existingEntry.AddLocation(location);
                         return;
                     }
                 }
 
-                existingEntries.Add(new SplitWord(word, location));
+                existingEntries.Add(new Token(word, location));
             }
             else
             {
                 this.materializedWords.Add(
                     hash.HashValue,
-                    new List<SplitWord>()
+                    new List<Token>()
                     {
-                        new SplitWord(word, location)
+                        new Token(word, location)
                     });
             }
         }
 
-        public IList<SplitWord> ToList()
+        public IList<Token> ToList()
         {
             return materializedWords.Values.SelectMany(v => v).ToList();
         }

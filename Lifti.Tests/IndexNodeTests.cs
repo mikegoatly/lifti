@@ -39,7 +39,7 @@ namespace Lifti.Tests
         [Fact]
         public void IndexingEmptyNode_ShouldResultInItemsDirectlyIndexedAtNode()
         {
-            this.sut.Index(item1, fieldId1, new SplitWord("test".AsSpan(), this.locations1.Locations));
+            this.sut.Index(item1, fieldId1, new Token("test".AsSpan(), this.locations1.Locations));
 
             VerifySutState(this.sut, "test", new[] { (item1, this.locations1) });
         }
@@ -49,8 +49,8 @@ namespace Lifti.Tests
         [InlineData("a")]
         public void IndexingAtNodeWithSameTextForDifferentItem_ShouldResultInItemsDirectlyIndexedAtNode(string word)
         {
-            this.sut.Index(item1, fieldId1, new SplitWord(word.AsSpan(), this.locations1.Locations));
-            this.sut.Index(item2, fieldId1, new SplitWord(word.AsSpan(), this.locations2.Locations));
+            this.sut.Index(item1, fieldId1, new Token(word.AsSpan(), this.locations1.Locations));
+            this.sut.Index(item2, fieldId1, new Token(word.AsSpan(), this.locations2.Locations));
 
             VerifySutState(this.sut, word, new[] { (item1, this.locations1), (item2, this.locations2) });
         }
@@ -58,10 +58,10 @@ namespace Lifti.Tests
         [Fact]
         public void IndexingWordEndingAtSplit_ShouldResultInItemIndexedWhereSplitOccurs()
         {
-            this.sut.Index(item1, fieldId1, new SplitWord("apple", this.locations1.Locations));
-            this.sut.Index(item2, fieldId1, new SplitWord("able", this.locations2.Locations));
-            this.sut.Index(item3, fieldId1, new SplitWord("banana", this.locations3.Locations));
-            this.sut.Index(item4, fieldId1, new SplitWord("a", this.locations4.Locations));
+            this.sut.Index(item1, fieldId1, new Token("apple", this.locations1.Locations));
+            this.sut.Index(item2, fieldId1, new Token("able", this.locations2.Locations));
+            this.sut.Index(item3, fieldId1, new Token("banana", this.locations3.Locations));
+            this.sut.Index(item4, fieldId1, new Token("a", this.locations4.Locations));
 
             this.createdChildNodes.Should().HaveCount(4);
             VerifySutState(this.sut, null, expectedChildNodes: new[] { ('a', this.createdChildNodes[2]), ('b', this.createdChildNodes[3]) });
@@ -74,9 +74,9 @@ namespace Lifti.Tests
         [Fact]
         public void IndexingWhenChildNodeAlreadyExists_ShouldContinueIndexingAtExistingChild()
         {
-            this.sut.Index(item1, fieldId1, new SplitWord("freedom".AsSpan(), this.locations1.Locations));
-            this.sut.Index(item2, fieldId1, new SplitWord("fred".AsSpan(), this.locations2.Locations));
-            this.sut.Index(item3, fieldId1, new SplitWord("freddy".AsSpan(), this.locations3.Locations));
+            this.sut.Index(item1, fieldId1, new Token("freedom".AsSpan(), this.locations1.Locations));
+            this.sut.Index(item2, fieldId1, new Token("fred".AsSpan(), this.locations2.Locations));
+            this.sut.Index(item3, fieldId1, new Token("freddy".AsSpan(), this.locations3.Locations));
 
             this.createdChildNodes.Should().HaveCount(3);
             VerifySutState(this.sut, "fre", expectedChildNodes: new[] { ('e', this.createdChildNodes[0]), ('d', this.createdChildNodes[1]) });
@@ -88,9 +88,9 @@ namespace Lifti.Tests
         [Fact]
         public void IndexingAtNodeWithTextWithSameSuffix_ShouldCreateNewChildNode()
         {
-            this.sut.Index(item1, fieldId1, new SplitWord("test".AsSpan(), this.locations1.Locations));
-            this.sut.Index(item2, fieldId1, new SplitWord("testing".AsSpan(), this.locations2.Locations));
-            this.sut.Index(item3, fieldId1, new SplitWord("tester".AsSpan(), this.locations3.Locations));
+            this.sut.Index(item1, fieldId1, new Token("test".AsSpan(), this.locations1.Locations));
+            this.sut.Index(item2, fieldId1, new Token("testing".AsSpan(), this.locations2.Locations));
+            this.sut.Index(item3, fieldId1, new Token("tester".AsSpan(), this.locations3.Locations));
 
             this.createdChildNodes.Should().HaveCount(2);
             VerifySutState(this.sut, "test", new[] { (item1, this.locations1) }, new[] { ('i', this.createdChildNodes[0]), ('e', this.createdChildNodes[1]) });
@@ -110,8 +110,8 @@ namespace Lifti.Tests
             string splitIntraText,
             string newIntraText)
         {
-            this.sut.Index(item1, fieldId1, new SplitWord("test".AsSpan(), this.locations1.Locations));
-            this.sut.Index(item2, fieldId1, new SplitWord(indexText.AsSpan(), this.locations2.Locations));
+            this.sut.Index(item1, fieldId1, new Token("test".AsSpan(), this.locations1.Locations));
+            this.sut.Index(item2, fieldId1, new Token(indexText.AsSpan(), this.locations2.Locations));
 
             this.createdChildNodes.Should().HaveCount(2);
             VerifySutState(this.sut, remainingIntraText, expectedChildNodes: new[] { (originalSplitChar, this.createdChildNodes[0]), (newSplitChar, this.createdChildNodes[1]) });

@@ -50,9 +50,9 @@ namespace Lifti
             this.indexNodeFactory = indexNodeFactory;
         }
 
-        public void Index(int itemId, byte fieldId, SplitWord word)
+        public void Index(int itemId, byte fieldId, Token word)
         {
-            this.Index(itemId, fieldId, word.Locations, word.Word);
+            this.Index(itemId, fieldId, word.Locations, word.Token);
         }
 
         private void Index(int itemId, byte fieldId, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText)

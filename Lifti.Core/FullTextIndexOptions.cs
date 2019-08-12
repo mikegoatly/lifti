@@ -2,7 +2,7 @@
 {
     public class FullTextIndexOptions
     {
-        public WordSplitOptions WordSplitOptions { get; set; } = new WordSplitOptions();
+        public TokenizationOptions TokenizationOptions { get; set; } = new TokenizationOptions();
     }
 
     public class FullTextIndexOptions<TKey> : FullTextIndexOptions

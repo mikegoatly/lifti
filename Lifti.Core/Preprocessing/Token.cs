@@ -4,28 +4,28 @@ using System.Collections.Immutable;
 
 namespace Lifti
 {
-    public class SplitWord
+    public class Token
     {
-        public SplitWord(ReadOnlySpan<char> word, Range location)
+        public Token(ReadOnlySpan<char> token, Range location)
         {
             this.Locations = ImmutableList<Range>.Empty.Add(location);
-            this.Word = word.ToArray();
+            this.Token = token.ToArray();
         }
 
-        public SplitWord(ReadOnlySpan<char> word, params Range[] locations)
+        public Token(ReadOnlySpan<char> token, params Range[] locations)
         {
             this.Locations = locations.ToImmutableList();
-            this.Word = word.ToArray();
+            this.Token = token.ToArray();
         }
 
-        public SplitWord(ReadOnlySpan<char> word, IReadOnlyList<Range> locations)
+        public Token(ReadOnlySpan<char> token, IReadOnlyList<Range> locations)
         {
             this.Locations = locations.ToImmutableList();
-            this.Word = word.ToArray();
+            this.Token = token.ToArray();
         }
 
         public ImmutableList<Range> Locations { get; set; }
-        public char[] Word { get; }
+        public char[] Token { get; }
 
         public void AddLocation(Range location)
         {
