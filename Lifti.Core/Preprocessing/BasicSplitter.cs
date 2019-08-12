@@ -1,57 +1,50 @@
-﻿using System;
+﻿using FluentAssertions;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Text;
 
 namespace Lifti
 {
-
     public class BasicSplitter : IWordSplitter
     {
-        private readonly ITextPreprocessor textPreprocessor;
+        private readonly IInputPreprocessorPipeline inputPreprocessorPipeline;
         private WordSplitOptions wordSplitOptions = new WordSplitOptions();
 
-        public BasicSplitter(ITextPreprocessor textPreprocessor)
+        public BasicSplitter(IInputPreprocessorPipeline inputPreprocessorPipeline)
         {
-            this.textPreprocessor = textPreprocessor;
+            this.inputPreprocessorPipeline = inputPreprocessorPipeline;
         }
 
         public IEnumerable<SplitWord> Process(string input)
         {
-            input = this.textPreprocessor.Preprocess(input);
-
             var processedWords = new SplitWordStore(); // TODO Pool?
 
             var inputData = input.AsSpan();
             var start = 0;
-            var foundCharacter = false;
-            var hash = new SplitWordHash();
+            var wordBuilder = new StringBuilder();
             for (var i = 0; i < inputData.Length; i++)
             {
                 var current = input[i];
                 if (this.IsWordSplitCharacter(current))
                 {
-                    if (foundCharacter)
+                    if (wordBuilder.Length > 0)
                     {
-                        CaptureWord(processedWords, inputData, start, i, hash);
-
-                        foundCharacter = false;
-                        hash = new SplitWordHash();
+                        CaptureWord(processedWords, inputData, start, i, wordBuilder);
                     }
 
                     start = i + 1;
                 }
                 else
                 {
-                    foundCharacter = true;
-                    unchecked
-                    {
-                        hash = hash.Combine(current);
-                    }
+                    wordBuilder.Append(this.inputPreprocessorPipeline.Process(current));
                 }
             }
 
-            if (foundCharacter)
+            if (wordBuilder.Length > 0)
             {
-                CaptureWord(processedWords, inputData, start, inputData.Length, hash);
+                CaptureWord(processedWords, inputData, start, inputData.Length, wordBuilder);
             }
 
             return processedWords.ToList();
@@ -63,10 +56,16 @@ namespace Lifti
                 (this.wordSplitOptions.SplitWordsOnPunctuation && char.IsPunctuation(current));
         }
 
-        private static void CaptureWord(SplitWordStore processedWords, ReadOnlySpan<char> inputData, int start, int end, SplitWordHash hash)
+        private static void CaptureWord(SplitWordStore processedWords, ReadOnlySpan<char> inputData, int start, int end, StringBuilder wordBuilder)
         {
             var length = end - start;
             var span = inputData.Slice(start, length);
+
+            var hash = new SplitWordHash();
+            for (var i = 0; i < wordBuilder.Length; i++)
+            {
+                hash.Combine(wordBuilder[i]);
+            }
 
             processedWords.MergeOrAdd(hash, span, new Range(start, length));
         }

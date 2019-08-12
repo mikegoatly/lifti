@@ -17,7 +17,7 @@ namespace Lifti
         public FullTextIndex(FullTextIndexOptions<TKey> options)
             : this(
                   options,
-                  new BasicSplitter(new CaseInsensitiveAccentInsensitivePreprocessor()),
+                  new BasicSplitter(new InputPreprocessorPipeline(Array.Empty<IInputPreprocessor>())),
                   new IndexNodeFactory())
         {
         }

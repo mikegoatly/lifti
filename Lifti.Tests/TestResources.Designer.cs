@@ -59,32 +59,5 @@ namespace Lifti.Tests {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Test šđčćž.
-        /// </summary>
-        internal static string StringWithDiacritics {
-            get {
-                return ResourceManager.GetString("StringWithDiacritics", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to TEST SDCCZ.
-        /// </summary>
-        internal static string StringWithoutDiacriticsCaseInsensitive {
-            get {
-                return ResourceManager.GetString("StringWithoutDiacriticsCaseInsensitive", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Test sdccz.
-        /// </summary>
-        internal static string StringWithoutDiacriticsCaseSensitive {
-            get {
-                return ResourceManager.GetString("StringWithoutDiacriticsCaseSensitive", resourceCulture);
-            }
-        }
     }
 }

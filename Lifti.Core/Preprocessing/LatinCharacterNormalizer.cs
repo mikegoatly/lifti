@@ -1,0 +1,541 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Lifti.Preprocessing
+{
+    public class LatinCharacterNormalizer : IInputPreprocessor
+    {
+        public PreprocessedInput Preprocess(char input)
+        {
+            if (input < '\u0080')
+            {
+                return input;
+            }
+
+            switch (input)
+            {
+                case 'æ':
+                case 'ǽ':
+                    return "ae";
+                case 'œ':
+                    return "oe";
+                case 'Ü':
+                    return "Ue";
+                case 'Ö':
+                    return "Oe";
+                case 'À':
+                case 'Á':
+                case 'Â':
+                case 'Ã':
+                case 'Ä':
+                case 'Å':
+                case 'Ǻ':
+                case 'Ā':
+                case 'Ă':
+                case 'Ą':
+                case 'Ǎ':
+                case 'Α':
+                case 'Ά':
+                case 'Ả':
+                case 'Ạ':
+                case 'Ầ':
+                case 'Ẫ':
+                case 'Ẩ':
+                case 'Ậ':
+                case 'Ằ':
+                case 'Ắ':
+                case 'Ẵ':
+                case 'Ẳ':
+                case 'Ặ':
+                case 'А':
+                case 'Ъ':
+                case 'Ь':
+                    return 'A';
+                case 'à':
+                case 'á':
+                case 'â':
+                case 'ã':
+                case 'å':
+                case 'ǻ':
+                case 'ā':
+                case 'ă':
+                case 'ą':
+                case 'ǎ':
+                case 'ª':
+                case 'α':
+                case 'ά':
+                case 'ả':
+                case 'ạ':
+                case 'ầ':
+                case 'ấ':
+                case 'ẫ':
+                case 'ẩ':
+                case 'ậ':
+                case 'ằ':
+                case 'ắ':
+                case 'ẵ':
+                case 'ẳ':
+                case 'ặ':
+                case 'а':
+                case 'ъ':
+                case 'ь':
+                    return 'a';
+                case 'Б':
+                    return 'B';
+                case 'б':
+                case 'β':
+                    return 'b';
+                case 'Ç':
+                case 'Ć':
+                case 'Ĉ':
+                case 'Ċ':
+                case 'Č':
+                    return 'C';
+                case 'ç':
+                case 'ć':
+                case 'ĉ':
+                case 'ċ':
+                case 'č':
+                    return 'c';
+                case 'Д':
+                    return 'D';
+                case 'д':
+                    return 'd';
+                case 'Ð':
+                case 'Ď':
+                case 'Đ':
+                case 'Δ':
+                    return "D";
+                case 'ð':
+                case 'ď':
+                case 'đ':
+                case 'δ':
+                    return "d";
+                case 'È':
+                case 'É':
+                case 'Ê':
+                case 'Ë':
+                case 'Ē':
+                case 'Ĕ':
+                case 'Ė':
+                case 'Ę':
+                case 'Ě':
+                case 'Ε':
+                case 'Έ':
+                case 'Ẽ':
+                case 'Ẻ':
+                case 'Ẹ':
+                case 'Ề':
+                case 'Ế':
+                case 'Ễ':
+                case 'Ể':
+                case 'Ệ':
+                case 'Е':
+                case 'Э':
+                    return 'E';
+                case 'è':
+                case 'é':
+                case 'ê':
+                case 'ë':
+                case 'ē':
+                case 'ĕ':
+                case 'ė':
+                case 'ę':
+                case 'ě':
+                case 'έ':
+                case 'ε':
+                case 'ẽ':
+                case 'ẻ':
+                case 'ẹ':
+                case 'ề':
+                case 'ế':
+                case 'ễ':
+                case 'ể':
+                case 'ệ':
+                case 'е':
+                case 'э':
+                    return 'e';
+                case 'Ф':
+                    return 'F';
+                case 'ф':
+                    return 'f';
+                case 'Ĝ':
+                case 'Ğ':
+                case 'Ġ':
+                case 'Ģ':
+                case 'Γ':
+                case 'Г': // Could be H https://en.wikipedia.org/wiki/Ge_(Cyrillic)
+                    return 'G';
+                case 'Ґ':
+                    return "Ge";
+                case 'ĝ':
+                case 'ğ':
+                case 'ġ':
+                case 'ģ':
+                case 'γ':
+                case 'г': // Could be h https://en.wikipedia.org/wiki/Ge_(Cyrillic)
+                    return 'g';
+                case 'ґ':
+                    return "ge";
+                case 'Ĥ':
+                case 'Ħ':
+                case 'Η': // Eta https://en.wikipedia.org/wiki/Eta
+                case 'Ή':
+                    return 'H';
+                case 'ĥ':
+                case 'ħ':
+                case 'ή':
+                case 'η': // Eta https://en.wikipedia.org/wiki/Eta
+                    return 'h';
+                case 'Ì':
+                case 'Í':
+                case 'Î':
+                case 'Ï':
+                case 'Ĩ':
+                case 'Ī':
+                case 'Ĭ':
+                case 'Ǐ':
+                case 'Į':
+                case 'İ':
+                case 'Ί':
+                case 'Ι':
+                case 'Ϊ':
+                case 'Ỉ':
+                case 'Ị':
+                case 'И': // https://en.wikipedia.org/wiki/I_(Cyrillic)
+                    return 'I';
+                case 'ì':
+                case 'í':
+                case 'î':
+                case 'ï':
+                case 'ĩ':
+                case 'ī':
+                case 'ĭ':
+                case 'ǐ':
+                case 'į':
+                case 'ı':
+                case 'ί':
+                case 'ι':
+                case 'ϊ':
+                case 'ỉ':
+                case 'ị':
+                case 'и': // https://en.wikipedia.org/wiki/I_(Cyrillic)
+                case 'ї':
+                    return 'i';
+                case 'Ĵ':
+                    return 'J';
+                case 'ĵ':
+                    return 'j';
+                case 'Ķ':
+                case 'Κ':
+                case 'К':
+                    return 'K';
+                case 'ķ':
+                case 'κ':
+                case 'к':
+                    return 'k';
+                case 'Ĺ':
+                case 'Ļ':
+                case 'Ľ':
+                case 'Ŀ':
+                case 'Ł':
+                case 'Λ':
+                case 'Л':
+                    return 'L';
+                case 'ĺ':
+                case 'ļ':
+                case 'ľ':
+                case 'ŀ':
+                case 'ł':
+                case 'λ':
+                case 'л':
+                    return 'l';
+                case 'М':
+                    return 'M';
+                case 'м':
+                case 'μ': // https://en.wikipedia.org/wiki/Mu_(letter)
+                    return 'm';
+                case 'Ñ':
+                case 'Ń':
+                case 'Ņ':
+                case 'Ň':
+                case 'Ν':
+                case 'Н': // https://en.wikipedia.org/wiki/En_(Cyrillic)
+                    return 'N';
+                case 'ñ':
+                case 'ń':
+                case 'ņ':
+                case 'ň':
+                case 'ŉ':
+                case 'ν':
+                case 'н': // https://en.wikipedia.org/wiki/En_(Cyrillic)
+                    return 'n';
+                case 'Ò':
+                case 'Ó':
+                case 'Ô':
+                case 'Õ':
+                case 'Ō':
+                case 'Ŏ':
+                case 'Ǒ':
+                case 'Ő':
+                case 'Ơ':
+                case 'Ø':
+                case 'Ǿ':
+                case 'Ο':
+                case 'Ό':
+                case 'Ω':
+                case 'Ώ':
+                case 'Ỏ':
+                case 'Ọ':
+                case 'Ồ':
+                case 'Ố':
+                case 'Ỗ':
+                case 'Ổ':
+                case 'Ộ':
+                case 'Ờ':
+                case 'Ớ':
+                case 'Ỡ':
+                case 'Ở':
+                case 'Ợ':
+                case 'О':
+                    return 'O';
+                case 'ò':
+                case 'ó':
+                case 'ô':
+                case 'õ':
+                case 'ō':
+                case 'ŏ':
+                case 'ǒ':
+                case 'ő':
+                case 'ơ':
+                case 'ø':
+                case 'ǿ':
+                case 'º':
+                case 'ο':
+                case 'ό':
+                case 'ω':
+                case 'ώ':
+                case 'ỏ':
+                case 'ọ':
+                case 'ồ':
+                case 'ố':
+                case 'ỗ':
+                case 'ổ':
+                case 'ộ':
+                case 'ờ':
+                case 'ớ':
+                case 'ỡ':
+                case 'ở':
+                case 'ợ':
+                case 'о':
+                    return 'o';
+                case 'П': // https://en.wikipedia.org/wiki/Pe_(Cyrillic)
+                    return 'P';
+                case 'п': // https://en.wikipedia.org/wiki/Pe_(Cyrillic)
+                case 'π': // https://en.wikipedia.org/wiki/Pi_(letter)
+                    return 'p';
+                case 'Ŕ':
+                case 'Ŗ':
+                case 'Ř':
+                case 'Ρ': // https://en.wikipedia.org/wiki/Rho
+                case 'Р': // https://en.wikipedia.org/wiki/Er_(Cyrillic)
+                    return 'R';
+                case 'ŕ':
+                case 'ŗ':
+                case 'ř':
+                case 'ρ': // https://en.wikipedia.org/wiki/Rho
+                case 'р': // https://en.wikipedia.org/wiki/Er_(Cyrillic)
+                    return 'r';
+                case 'Ś':
+                case 'Ŝ':
+                case 'Ş':
+                case 'Ș':
+                case 'Š':
+                case 'Σ': // https://en.wikipedia.org/wiki/Sigma
+                case 'С': // https://en.wikipedia.org/wiki/Es_(Cyrillic)
+                    return 'S';
+                case 'ś':
+                case 'ŝ':
+                case 'ş':
+                case 'ș':
+                case 'š':
+                case 'ſ':
+                case 'σ': // https://en.wikipedia.org/wiki/Sigma
+                case 'ς': // https://en.wikipedia.org/wiki/Sigma
+                case 'с': // https://en.wikipedia.org/wiki/Es_(Cyrillic)
+                    return 's';
+                case 'Ț':
+                case 'Ţ':
+                case 'Ť':
+                case 'Ŧ':
+                case 'τ':
+                case 'Т':
+                    return 'T';
+                case 'ț':
+                case 'ţ':
+                case 'ť':
+                case 'ŧ':
+                case 'т':
+                    return 't';
+                case 'Ù':
+                case 'Ú':
+                case 'Û':
+                case 'Ũ':
+                case 'Ū':
+                case 'Ŭ':
+                case 'Ů':
+                case 'Ű':
+                case 'Ų':
+                case 'Ư':
+                case 'Ǔ':
+                case 'Ǖ':
+                case 'Ǘ':
+                case 'Ǚ':
+                case 'Ǜ':
+                case 'Ủ':
+                case 'Ụ':
+                case 'Ừ':
+                case 'Ứ':
+                case 'Ữ':
+                case 'Ử':
+                case 'Ự':
+                case 'У': // https://en.wikipedia.org/wiki/U_(Cyrillic)
+                    return 'U';
+                case 'ù':
+                case 'ú':
+                case 'û':
+                case 'ũ':
+                case 'ū':
+                case 'ŭ':
+                case 'ů':
+                case 'ű':
+                case 'ų':
+                case 'ư':
+                case 'ǔ':
+                case 'ǖ':
+                case 'ǘ':
+                case 'ǚ':
+                case 'ǜ':
+                case 'υ':
+                case 'ύ':
+                case 'ϋ':
+                case 'ủ':
+                case 'ụ':
+                case 'ừ':
+                case 'ứ':
+                case 'ữ':
+                case 'ử':
+                case 'ự':
+                case 'у': // https://en.wikipedia.org/wiki/U_(Cyrillic)
+                    return 'u';
+                case 'Ý':
+                case 'Ÿ':
+                case 'Ŷ':
+                case 'Υ':
+                case 'Ύ':
+                case 'Ϋ':
+                case 'Ỳ':
+                case 'Ỹ':
+                case 'Ỷ':
+                case 'Ỵ':
+                case 'Й': // https://en.wikipedia.org/wiki/Short_I
+                    return 'Y';
+                case 'ý':
+                case 'ÿ':
+                case 'ŷ':
+                case 'ỳ':
+                case 'ỹ':
+                case 'ỷ':
+                case 'ỵ':
+                case 'й': // https://en.wikipedia.org/wiki/Short_I
+                    return 'y';
+                case 'В': // https://en.wikipedia.org/wiki/Ve_(Cyrillic)
+                    return 'V';
+                case 'в': // https://en.wikipedia.org/wiki/Ve_(Cyrillic)
+                    return 'v';
+                case 'Ŵ':
+                    return 'W';
+                case 'ŵ':
+                    return 'w';
+                case 'Ы':
+                    return 'Y';
+                case 'ы':
+                    return 'y';
+                case 'Ź':
+                case 'Ż':
+                case 'Ž':
+                case 'Ζ':
+                case 'З': // https://en.wikipedia.org/wiki/Ze_(Cyrillic)
+                    return 'Z';
+                case 'ź':
+                case 'ż':
+                case 'ž':
+                case 'ζ':
+                case 'з': // https://en.wikipedia.org/wiki/Ze_(Cyrillic)
+                    return 'z';
+                case 'Æ':
+                case 'Ǽ':
+                    return "AE";
+                case 'ß':
+                    return "ss";
+                case 'Ĳ':
+                    return "IJ";
+                case 'ĳ':
+                    return "ij";
+                case 'Œ':
+                    return "OE";
+                case 'ƒ':
+                    return 'f';
+                case 'ξ':
+                    return "ks";
+                case 'ψ':
+                    return "ps";
+                case 'Ё': // https://en.wikipedia.org/wiki/Yo_(Cyrillic)
+                    return "Yo";
+                case 'ё': // https://en.wikipedia.org/wiki/Yo_(Cyrillic)
+                    return "yo";
+                case 'Є':
+                    return "Ye";
+                case 'є':
+                    return "ye";
+                case 'Ї': // https://en.wikipedia.org/wiki/Yi_(Cyrillic)
+                    return "Yi";
+                case 'Ж':
+                    return "Zh";
+                case 'ж':
+                    return "zh";
+                case 'Х': // https://en.wikipedia.org/wiki/Kha_(Cyrillic)
+                    return "Kh";
+                case 'х': // https://en.wikipedia.org/wiki/Kha_(Cyrillic)
+                    return "kh";
+                case 'Ц':
+                    return "Ts";
+                case 'ц':
+                    return "ts";
+                case 'Ч':
+                    return "Ch";
+                case 'ч':
+                    return "ch";
+                case 'Ш':
+                    return "Sh";
+                case 'ш':
+                    return "sh";
+                case 'Щ':
+                    return "Shch";
+                case 'щ':
+                    return "shch";
+                case 'Ю':
+                    return "Yu";
+                case 'ю':
+                    return "yu";
+                case 'Я':
+                    return "Ya";
+                case 'я':
+                    return "ya";
+                default:
+                    return input;
+            }
+        }
+    }
+}
