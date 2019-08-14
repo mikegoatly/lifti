@@ -14,7 +14,7 @@ namespace Lifti
             {
                 foreach (var existingEntry in existingEntries)
                 {
-                    if (word.SequenceEqual(existingEntry.Token))
+                    if (word.SequenceEqual(existingEntry.Value))
                     {
                         existingEntry.AddLocation(location);
                         return;

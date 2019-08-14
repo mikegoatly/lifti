@@ -1,8 +1,6 @@
-﻿using FluentAssertions;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Linq;
 using System.Text;
 
 namespace Lifti
@@ -11,6 +9,7 @@ namespace Lifti
     {
         private readonly IInputPreprocessorPipeline inputPreprocessorPipeline;
         private TokenizationOptions tokenizationOptions = new TokenizationOptions();
+        private HashSet<char> additionalSplitChars;
 
         public BasicTokenizer(IInputPreprocessorPipeline inputPreprocessorPipeline)
         {
@@ -32,6 +31,7 @@ namespace Lifti
                     if (wordBuilder.Length > 0)
                     {
                         CaptureWord(processedWords, inputData, start, i, wordBuilder);
+                        wordBuilder.Length = 0;
                     }
 
                     start = i + 1;
@@ -52,8 +52,10 @@ namespace Lifti
 
         private bool IsWordSplitCharacter(char current)
         {
-            return char.IsSeparator(current) ||
-                (this.tokenizationOptions.SplitOnPunctuation && char.IsPunctuation(current));
+            return char.IsSeparator(current) || 
+                char.IsControl(current) ||
+                (this.tokenizationOptions.SplitOnPunctuation && char.IsPunctuation(current)) ||
+                (this.additionalSplitChars?.Contains(current) == true);
         }
 
         private static void CaptureWord(TokenStore processedWords, ReadOnlySpan<char> inputData, int start, int end, StringBuilder wordBuilder)
@@ -73,6 +75,9 @@ namespace Lifti
         public virtual void ConfigureWith(FullTextIndexOptions options)
         {
             this.tokenizationOptions = options.TokenizationOptions ?? throw new ArgumentNullException(nameof(options.TokenizationOptions));
+            this.additionalSplitChars = this.tokenizationOptions.AdditionalSplitCharacters?.Length > 0
+                ? this.tokenizationOptions.AdditionalSplitCharacters.ToHashSet()
+                : null;
         }
     }
 }

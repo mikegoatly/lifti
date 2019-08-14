@@ -9,23 +9,23 @@ namespace Lifti
         public Token(ReadOnlySpan<char> token, Range location)
         {
             this.Locations = ImmutableList<Range>.Empty.Add(location);
-            this.Token = token.ToArray();
+            this.Value = token.ToArray();
         }
 
         public Token(ReadOnlySpan<char> token, params Range[] locations)
         {
             this.Locations = locations.ToImmutableList();
-            this.Token = token.ToArray();
+            this.Value = token.ToArray();
         }
 
         public Token(ReadOnlySpan<char> token, IReadOnlyList<Range> locations)
         {
             this.Locations = locations.ToImmutableList();
-            this.Token = token.ToArray();
+            this.Value = token.ToArray();
         }
 
         public ImmutableList<Range> Locations { get; set; }
-        public char[] Token { get; }
+        public char[] Value { get; }
 
         public void AddLocation(Range location)
         {

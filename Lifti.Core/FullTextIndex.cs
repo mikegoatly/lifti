@@ -60,7 +60,7 @@ namespace Lifti
 
             foreach (var searchWord in this.splitter.Process(searchText))
             {
-                searchContext.Match(searchWord.Token.AsSpan());
+                searchContext.Match(searchWord.Value.AsSpan());
             }
 
             return searchContext.Results();

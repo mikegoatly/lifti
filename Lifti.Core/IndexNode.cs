@@ -52,7 +52,7 @@ namespace Lifti
 
         public void Index(int itemId, byte fieldId, Token word)
         {
-            this.Index(itemId, fieldId, word.Locations, word.Token);
+            this.Index(itemId, fieldId, word.Locations, word.Value);
         }
 
         private void Index(int itemId, byte fieldId, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText)
