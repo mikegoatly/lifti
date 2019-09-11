@@ -38,7 +38,10 @@ namespace Lifti
                 }
                 else
                 {
-                    wordBuilder.Append(this.inputPreprocessorPipeline.Process(current));
+                    foreach (var processed in this.inputPreprocessorPipeline.Process(current))
+                    {
+                        wordBuilder.Append(processed);
+                    }
                 }
             }
 
@@ -52,7 +55,7 @@ namespace Lifti
 
         private bool IsWordSplitCharacter(char current)
         {
-            return char.IsSeparator(current) || 
+            return char.IsSeparator(current) ||
                 char.IsControl(current) ||
                 (this.tokenizationOptions.SplitOnPunctuation && char.IsPunctuation(current)) ||
                 (this.additionalSplitChars?.Contains(current) == true);
@@ -61,7 +64,6 @@ namespace Lifti
         private static void CaptureWord(TokenStore processedWords, ReadOnlySpan<char> inputData, int start, int end, StringBuilder wordBuilder)
         {
             var length = end - start;
-            var span = inputData.Slice(start, length);
 
             var hash = new TokenHash();
             for (var i = 0; i < wordBuilder.Length; i++)
@@ -69,7 +71,7 @@ namespace Lifti
                 hash.Combine(wordBuilder[i]);
             }
 
-            processedWords.MergeOrAdd(hash, span, new Range(start, length));
+            processedWords.MergeOrAdd(hash, wordBuilder, new Range(start, length));
         }
 
         public virtual void ConfigureWith(FullTextIndexOptions options)

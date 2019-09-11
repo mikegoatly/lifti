@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Lifti.Preprocessing;
 using System;
 using System.Linq;
 using Xunit;
@@ -25,33 +26,33 @@ namespace Lifti.Tests.Preprocessing
             output.Should().BeEmpty();
         }
 
-        [Fact]
-        public void ShouldReturnSingleTokenForStringContainingOnlyOneWord()
-        {
-            var output = this.sut.Process("test").ToList();
-
-            output.Should().BeEquivalentTo(new[] 
-            {
-                new Token("test", new Range(0, 4))
-            });
-        }
-
-        [Fact]
-        public void ShouldReturnSingleTokenForStringContainingOnlyOneWordEnclosedWithWordBreaks()
-        {
-            var output = this.sut.Process(" test\r\n").ToList();
-
-            output.Should().BeEquivalentTo(new[]
-            {
-                new Token("test", new Range(1, 4))
-            });
-        }
-
         public class WithNoPreprocessors : BasicTokenizerTests
         {
             public WithNoPreprocessors()
             {
                 this.sut = new BasicTokenizer(new InputPreprocessorPipeline(Array.Empty<IInputPreprocessor>()));
+            }
+
+            [Fact]
+            public void ShouldReturnSingleTokenForStringContainingOnlyOneWord()
+            {
+                var output = this.sut.Process("test").ToList();
+
+                output.Should().BeEquivalentTo(new[]
+                {
+                new Token("test", new Range(0, 4))
+            });
+            }
+
+            [Fact]
+            public void ShouldReturnSingleTokenForStringContainingOnlyOneWordEnclosedWithWordBreaks()
+            {
+                var output = this.sut.Process(" test\r\n").ToList();
+
+                output.Should().BeEquivalentTo(new[]
+                {
+                new Token("test", new Range(1, 4))
+            });
             }
 
             [Fact]
@@ -93,6 +94,84 @@ namespace Lifti.Tests.Preprocessing
                     new Token("test", new Range(36, 4)),
                     new Token("spaces", new Range(41, 6))
                 });
+            }
+
+            [Fact]
+            public void WhenSplittingOnAdditionalCharacters_ShouldTokenizeAtWordBreaksAndAdditionalCharacters()
+            {
+                this.sut.ConfigureWith(new FullTextIndexOptions
+                {
+                    TokenizationOptions =
+                    {
+                        SplitOnPunctuation = false,
+                        AdditionalSplitCharacters = new[] { '@', '¬' }
+                    }
+                });
+
+                var input = "Test@string¬with custom\tsplits";
+
+                var output = this.sut.Process(input).ToList();
+
+                output.Should().BeEquivalentTo(new[]
+                {
+                    new Token("Test", new Range(0, 4)),
+                    new Token("string", new Range(5, 6)),
+                    new Token("with", new Range(12, 4)),
+                    new Token("custom", new Range(17, 6)),
+                    new Token("splits", new Range(24, 6))
+                });
+            }
+
+            public class WithAllInsensitivityProcessors : BasicTokenizerTests
+            {
+                public WithAllInsensitivityProcessors()
+                {
+                    this.sut = new BasicTokenizer(
+                        new InputPreprocessorPipeline(
+                            new IInputPreprocessor[]
+                            {
+                                new LatinCharacterNormalizer(),
+                                new CaseInsensitiveNormalizer()
+                            }));
+                }
+
+                [Fact]
+                public void ShouldReturnSingleTokenForStringContainingOnlyOneWord()
+                {
+                    var output = this.sut.Process("test").ToList();
+
+                    output.Should().BeEquivalentTo(new[]
+                    {
+                        new Token("TEST", new Range(0, 4))
+                    });
+                }
+
+                [Fact]
+                public void ShouldReturnSingleTokenForStringContainingOnlyOneWordEnclosedWithWordBreaks()
+                {
+                    var output = this.sut.Process(" test\r\n").ToList();
+
+                    output.Should().BeEquivalentTo(new[]
+                    {
+                        new Token("TEST", new Range(1, 4))
+                    });
+                }
+
+                [Fact]
+                public void WhenSplittingAtPunctuation_ShouldTokenizeAtWordBreaksAndPunctuation()
+                {
+                    this.sut.ConfigureWith(new FullTextIndexOptions { TokenizationOptions = { SplitOnPunctuation = true } });
+
+                    var input = "Træ træ moo moǑ";
+
+                    var output = this.sut.Process(input).ToList();
+
+                    output.OrderBy(o => o.Value[0]).Should().BeEquivalentTo(new[]
+                    {
+                        new Token("MOO", new Range(8, 3), new Range(12, 3)),
+                        new Token("TRAE", new Range(0, 3), new Range(4, 3))
+                    });
+                }
             }
         }
     }

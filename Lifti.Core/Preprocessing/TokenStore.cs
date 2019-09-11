@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Lifti
 {
@@ -8,7 +8,7 @@ namespace Lifti
     {
         private readonly Dictionary<int, List<Token>> materializedWords = new Dictionary<int, List<Token>>(); // Pooling? Configuration for expected unique words per document?
 
-        public void MergeOrAdd(TokenHash hash, ReadOnlySpan<char> word, Range location)
+        public void MergeOrAdd(TokenHash hash, StringBuilder word, Range location)
         {
             if (this.materializedWords.TryGetValue(hash.HashValue, out var existingEntries))
             {
@@ -21,7 +21,7 @@ namespace Lifti
                     }
                 }
 
-                existingEntries.Add(new Token(word, location));
+                existingEntries.Add(new Token(word.ToString(), location));
             }
             else
             {
@@ -29,14 +29,14 @@ namespace Lifti
                     hash.HashValue,
                     new List<Token>()
                     {
-                        new Token(word, location)
+                        new Token(word.ToString(), location)
                     });
             }
         }
 
         public IList<Token> ToList()
         {
-            return materializedWords.Values.SelectMany(v => v).ToList();
+            return this.materializedWords.Values.SelectMany(v => v).ToList();
         }
     }
 }
