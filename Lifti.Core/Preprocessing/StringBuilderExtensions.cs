@@ -18,7 +18,7 @@ namespace Lifti
             return builder;
         }
 
-        public static bool SequenceEqual(this StringBuilder builder, char[] chars)
+        public static bool SequenceEqual(this StringBuilder builder, string chars)
         {
             if (chars.Length != builder.Length)
             {

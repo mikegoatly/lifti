@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>netcoreapp2.2;net472</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="WikipediaPages.dat" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="WikipediaPages.dat" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
+    <PackageReference Include="LIFTI" Version="1.1.6-beta" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lifti.Core\Lifti.Core.csproj">
+      <Aliases>LiftiNew</Aliases>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

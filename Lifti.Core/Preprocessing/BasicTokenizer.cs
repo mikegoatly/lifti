@@ -78,7 +78,7 @@ namespace Lifti
         {
             this.tokenizationOptions = options.TokenizationOptions ?? throw new ArgumentNullException(nameof(options.TokenizationOptions));
             this.additionalSplitChars = this.tokenizationOptions.AdditionalSplitCharacters?.Length > 0
-                ? this.tokenizationOptions.AdditionalSplitCharacters.ToHashSet()
+                ? new HashSet<char>(this.tokenizationOptions.AdditionalSplitCharacters)
                 : null;
         }
     }

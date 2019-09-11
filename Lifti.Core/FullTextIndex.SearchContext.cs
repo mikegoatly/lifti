@@ -17,7 +17,7 @@ namespace Lifti
             }
 
             // Exact match only for now
-            public void Match(Span<char> remainingMatchText)
+            public void Match(ReadOnlySpan<char> remainingMatchText)
             {
                 var currentNode = this.index.Root;
                 while (currentNode != null)

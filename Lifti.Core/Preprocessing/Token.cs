@@ -1,31 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Lifti
 {
     public class Token
     {
-        public Token(ReadOnlySpan<char> token, Range location)
+        public Token(string token, Range location)
         {
             this.Locations = ImmutableList<Range>.Empty.Add(location);
-            this.Value = token.ToArray();
+            this.Value = token;
         }
 
-        public Token(ReadOnlySpan<char> token, params Range[] locations)
+        public Token(string token, params Range[] locations)
         {
             this.Locations = locations.ToImmutableList();
-            this.Value = token.ToArray();
+            this.Value = token;
         }
 
-        public Token(ReadOnlySpan<char> token, IReadOnlyList<Range> locations)
+        public Token(string token, IReadOnlyList<Range> locations)
         {
             this.Locations = locations.ToImmutableList();
-            this.Value = token.ToArray();
+            this.Value = token;
         }
 
         public ImmutableList<Range> Locations { get; set; }
-        public char[] Value { get; }
+        public string Value { get; }
 
         public void AddLocation(Range location)
         {

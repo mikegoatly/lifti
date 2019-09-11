@@ -52,7 +52,7 @@ namespace Lifti
 
         public void Index(int itemId, byte fieldId, Token word)
         {
-            this.Index(itemId, fieldId, word.Locations, word.Value);
+            this.Index(itemId, fieldId, word.Locations, word.Value.AsSpan());
         }
 
         private void Index(int itemId, byte fieldId, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText)
@@ -81,7 +81,10 @@ namespace Lifti
             {
                 if (remainingWordText.Length == 0)
                 {
-                    throw new InvalidOperationException("Remaining word text should not be empty at a leaf node that is not empty");
+                    // The indexing ends before the start of the intranode text so we need to split
+                    this.SplitIntraNodeText(0);
+                    this.AddMatchedItem(itemId, fieldId, locations);
+                    return;
                 }
 
                 var testLength = Math.Min(remainingWordText.Length, this.IntraNodeText.Length);

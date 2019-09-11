@@ -31,8 +31,9 @@ namespace Lifti
 
             foreach (var preprocessor in this.inputPreprocessors)
             {
-                while (processQueue.TryDequeue(out var toProcess))
+                while (processQueue.Count > 0)
                 {
+                    var toProcess = processQueue.Dequeue();
                     if (toProcess.Replacement != null)
                     {
                         foreach (var toProcessChar in toProcess.Replacement)

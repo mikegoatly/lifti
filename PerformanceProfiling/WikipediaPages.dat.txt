@@ -1,0 +1,3 @@
+﻿The WikipediaPages.dat file contains a compressed set of random pages downloaded from Wikipedia.
+
+The text is licensed under CC-BY-SA - see http://creativecommons.org/licenses/by-sa/3.0 for more information.
