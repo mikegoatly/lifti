@@ -53,7 +53,7 @@ namespace Lifti
             return processedWords.ToList();
         }
 
-        private bool IsWordSplitCharacter(char current)
+        protected virtual bool IsWordSplitCharacter(char current)
         {
             return char.IsSeparator(current) ||
                 char.IsControl(current) ||
