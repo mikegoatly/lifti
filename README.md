@@ -1,4 +1,4 @@
-# lifti
+﻿# lifti
 A lightweight full text indexer for .NET
 
 This is very much a work in progress, and a re-imagining of the [original LIFTI project](https://github.com/mikegoatly/lifti-codeplex) from many years ago.
@@ -11,19 +11,23 @@ There is currently a dependency on preview BCL nuget packages (specifically Micr
 ## Significant differences between new and old implementations
 The old implementation followed a very simple tree structure where every node in the tree linked to its descendants via relevant chars, e.g.:
 
+```
 A
-|-P
-  |-E (matches APE)
-  |-P
-    |-L
-      |-E (matches APPLE)
+╚P
+ ╠E (matches APE)
+ ╚P
+  ╚L
+   ╚E (matches APPLE)
+```
 
 The new implementation expands upon this by allowing a node to also contain a series of "intra-node" characters - this reduces the number of
 nodes in the tree, reducing the overall memory footprint and allows for potential gains in search times. (less object traversal required):
 
+```
 AP
- |-E (matches APE)
- |-PLE (matches APPLE)
+ ╠E (matches APE)
+ ╚PLE (matches APPLE)
+```
 
 ## Performance testing vs old implementation
 |                                    Method |     Mean |    Error |   StdDev | Rank |      Gen 0 |      Gen 1 |     Gen 2 | Allocated |
