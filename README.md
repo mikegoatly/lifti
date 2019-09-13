@@ -38,3 +38,6 @@ AP
 | NewCodeIndexingIntraNodeTextAt2Characters | 456.7 ms | 3.035 ms | 2.839 ms |    2 | 25000.0000 |  7000.0000 | 1000.0000 | 144.86 MB |
 |                        legacycodeindexing | 481.6 ms | 5.867 ms | 5.488 ms |    4 | 39000.0000 | 10000.0000 | 1000.0000 | 228.35 MB |
 
+Notes: 
+- Each execution populates an index with 200 Wikipedia articles. In other words, in the best case above, it takes 446ms to completely index 200 Wikipedia pages (~7Mb of content) into memory.
+- The new implementation additionally normalizes characters to latin representations (i.e. allowing for case insensitive searching) and there is no equivalent of this in the previous implementation.
