@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lifti
+namespace Lifti.Preprocessing
 {
     public struct TokenHash
     {

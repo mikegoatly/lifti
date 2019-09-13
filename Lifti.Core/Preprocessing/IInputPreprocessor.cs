@@ -1,4 +1,4 @@
-﻿namespace Lifti
+﻿namespace Lifti.Preprocessing
 {
     public interface IInputPreprocessor
     {

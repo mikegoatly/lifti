@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Lifti
+namespace Lifti.Preprocessing
 {
     public class InputPreprocessorPipeline : IInputPreprocessorPipeline
     {
@@ -45,7 +45,7 @@ namespace Lifti
                     {
                         outputQueue.Enqueue(preprocessor.Preprocess(toProcess.Value));
                     }
-                    
+
                 }
 
                 outputQueue = Interlocked.Exchange(ref processQueue, outputQueue);

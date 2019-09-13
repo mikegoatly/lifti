@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace Lifti
+namespace Lifti.Preprocessing
 {
     public class TokenStore
     {

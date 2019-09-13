@@ -8,7 +8,8 @@ using System.Linq;
 
 namespace PerformanceProfiling
 {
-    [ClrJob(baseline: true), CoreJob]
+    //[ClrJob(baseline: true)]
+    [CoreJob]
     [RPlotExporter, RankColumn, MemoryDiagnoser]
     public class FullTextIndexTests
     {
@@ -28,21 +29,21 @@ namespace PerformanceProfiling
 
         }
 
-        [Benchmark()]
-        public void XmlWorkSplittingNew()
-        {
-            var splitter = new LiftiNew.Lifti.Preprocessing.XmlTokenizer(
-                new LiftiNew.Lifti.InputPreprocessorPipeline(Array.Empty<LiftiNew.Lifti.IInputPreprocessor>()));
+        //[Benchmark()]
+        //public void XmlWorkSplittingNew()
+        //{
+        //    var splitter = new LiftiNew.Lifti.Preprocessing.XmlTokenizer(
+        //        new LiftiNew.Lifti.InputPreprocessorPipeline(Array.Empty<LiftiNew.Lifti.IInputPreprocessor>()));
 
-            splitter.Process(this.wikipediaData[0].text).ToList();
-        }
+        //    splitter.Process(this.wikipediaData[0].text).ToList();
+        //}
 
-        [Benchmark()]
-        public void XmlWordSplittingLegacy()
-        {
-            var splitter = new XmlWordSplitter(new WordSplitter());
-            splitter.SplitWords(this.wikipediaData[0].text).ToList();
-        }
+        //[Benchmark()]
+        //public void XmlWordSplittingLegacy()
+        //{
+        //    var splitter = new XmlWordSplitter(new WordSplitter());
+        //    splitter.SplitWords(this.wikipediaData[0].text).ToList();
+        //}
 
         //[Benchmark()]
         //public void NewCodeIndexingAlwaysSupportIntraNodeText()
@@ -58,12 +59,12 @@ namespace PerformanceProfiling
         //    this.PopulateIndex(index);
         //}
 
-        //[Benchmark()]
-        //public void NewCodeIndexingIntraNodeTextAt4Characters()
-        //{
-        //    var index = CreateNewIndex(4);
-        //    this.PopulateIndex(index);
-        //}
+        [Benchmark()]
+        public void NewCodeIndexingIntraNodeTextAt4Characters()
+        {
+            var index = CreateNewIndex(4);
+            this.PopulateIndex(index);
+        }
 
         //[Benchmark]
         //public void NewCodeSearching()
@@ -72,7 +73,7 @@ namespace PerformanceProfiling
         //}
 
         //[Benchmark]
-        //public void LegacyCodeIndexing()
+        //public void legacycodeindexing()
         //{
         //    var index = CreateLegacyIndex();
         //    PopulateIndex(index);
@@ -119,8 +120,8 @@ namespace PerformanceProfiling
                     Advanced = { SupportIntraNodeTextAfterCharacterIndex = supportSplitAtIndex }
                 },
                 new LiftiNew.Lifti.Preprocessing.XmlTokenizer(
-                    new LiftiNew.Lifti.InputPreprocessorPipeline(
-                        new LiftiNew.Lifti.IInputPreprocessor[] {
+                    new Lifti.Preprocessing.InputPreprocessorPipeline(
+                        new Lifti.Preprocessing.IInputPreprocessor[] {
                             new LiftiNew.Lifti.Preprocessing.CaseInsensitiveNormalizer(),
                             new LiftiNew.Lifti.Preprocessing.LatinCharacterNormalizer()
                             })),

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Lifti.Preprocessing
+﻿namespace Lifti.Preprocessing
 {
     public class CaseInsensitiveNormalizer : IInputPreprocessor
     {

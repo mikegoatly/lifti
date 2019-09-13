@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Lifti.Preprocessing;
 using System.Linq;
 using Xunit;
 

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Lifti
+namespace Lifti.Preprocessing
 {
     public static class StringBuilderExtensions
     {

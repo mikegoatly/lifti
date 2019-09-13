@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Lifti
+namespace Lifti.Preprocessing
 {
     public interface ITokenizer : IConfiguredByOptions
     {
