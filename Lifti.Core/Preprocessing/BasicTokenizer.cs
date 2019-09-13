@@ -23,6 +23,7 @@ namespace Lifti
             var inputData = input.AsSpan();
             var start = 0;
             var wordBuilder = new StringBuilder();
+            var hash = new TokenHash();
             for (var i = 0; i < inputData.Length; i++)
             {
                 var current = input[i];
@@ -30,8 +31,9 @@ namespace Lifti
                 {
                     if (wordBuilder.Length > 0)
                     {
-                        CaptureWord(processedWords, inputData, start, i, wordBuilder);
+                        CaptureWord(processedWords, hash, start, i, wordBuilder);
                         wordBuilder.Length = 0;
+                        hash = new TokenHash();
                     }
 
                     start = i + 1;
@@ -41,13 +43,14 @@ namespace Lifti
                     foreach (var processed in this.inputPreprocessorPipeline.Process(current))
                     {
                         wordBuilder.Append(processed);
+                        hash = hash.Combine(processed);
                     }
                 }
             }
 
             if (wordBuilder.Length > 0)
             {
-                CaptureWord(processedWords, inputData, start, inputData.Length, wordBuilder);
+                CaptureWord(processedWords, hash, start, inputData.Length, wordBuilder);
             }
 
             return processedWords.ToList();
@@ -61,16 +64,9 @@ namespace Lifti
                 (this.additionalSplitChars?.Contains(current) == true);
         }
 
-        private static void CaptureWord(TokenStore processedWords, ReadOnlySpan<char> inputData, int start, int end, StringBuilder wordBuilder)
+        private static void CaptureWord(TokenStore processedWords, TokenHash hash, int start, int end, StringBuilder wordBuilder)
         {
             var length = end - start;
-
-            var hash = new TokenHash();
-            for (var i = 0; i < wordBuilder.Length; i++)
-            {
-                hash.Combine(wordBuilder[i]);
-            }
-
             processedWords.MergeOrAdd(hash, wordBuilder, new Range(start, length));
         }
 
