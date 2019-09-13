@@ -120,8 +120,8 @@ namespace PerformanceProfiling
                     Advanced = { SupportIntraNodeTextAfterCharacterIndex = supportSplitAtIndex }
                 },
                 new LiftiNew.Lifti.Preprocessing.XmlTokenizer(
-                    new Lifti.Preprocessing.InputPreprocessorPipeline(
-                        new Lifti.Preprocessing.IInputPreprocessor[] {
+                    new LiftiNew.Lifti.Preprocessing.InputPreprocessorPipeline(
+                        new LiftiNew.Lifti.Preprocessing.IInputPreprocessor[] {
                             new LiftiNew.Lifti.Preprocessing.CaseInsensitiveNormalizer(),
                             new LiftiNew.Lifti.Preprocessing.LatinCharacterNormalizer()
                             })),

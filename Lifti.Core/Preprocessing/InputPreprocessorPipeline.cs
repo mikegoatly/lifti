@@ -7,16 +7,14 @@ namespace Lifti.Preprocessing
     public class InputPreprocessorPipeline : IInputPreprocessorPipeline
     {
         private readonly IInputPreprocessor[] inputPreprocessors;
+        private Queue<PreprocessedInput> processQueue = new Queue<PreprocessedInput>();
+        private Queue<PreprocessedInput> outputQueue = new Queue<PreprocessedInput>();
 
         public InputPreprocessorPipeline(IInputPreprocessor[] inputPreprocessor)
         {
             this.inputPreprocessors = inputPreprocessor ?? Array.Empty<IInputPreprocessor>();
         }
 
-        /// <remarks>
-        /// Processed input is not expected to contain any word break characters, e.g.
-        /// whitespace or punctuation.
-        /// </remarks>
         public IEnumerable<char> Process(char input)
         {
             if (this.inputPreprocessors.Length == 0)
@@ -25,34 +23,33 @@ namespace Lifti.Preprocessing
                 yield break;
             }
 
-            var processQueue = new Queue<PreprocessedInput>(); // Pool?
-            processQueue.Enqueue(input);
-            var outputQueue = new Queue<PreprocessedInput>(); // Pool?
+            this.processQueue.Enqueue(input);
 
             foreach (var preprocessor in this.inputPreprocessors)
             {
-                while (processQueue.Count > 0)
+                while (this.processQueue.Count > 0)
                 {
-                    var toProcess = processQueue.Dequeue();
+                    var toProcess = this.processQueue.Dequeue();
                     if (toProcess.Replacement != null)
                     {
                         foreach (var toProcessChar in toProcess.Replacement)
                         {
-                            outputQueue.Enqueue(preprocessor.Preprocess(toProcessChar));
+                            this.outputQueue.Enqueue(preprocessor.Preprocess(toProcessChar));
                         }
                     }
                     else
                     {
-                        outputQueue.Enqueue(preprocessor.Preprocess(toProcess.Value));
+                        this.outputQueue.Enqueue(preprocessor.Preprocess(toProcess.Value));
                     }
 
                 }
 
-                outputQueue = Interlocked.Exchange(ref processQueue, outputQueue);
+                this.outputQueue = Interlocked.Exchange(ref this.processQueue, this.outputQueue);
             }
 
-            foreach (var toReturn in processQueue)
+            while (this.processQueue.Count > 0)
             {
+                var toReturn = this.processQueue.Dequeue();
                 // Duplicated as above - could be reduced to shared logic in PreprocessedInput?
                 if (toReturn.Replacement != null)
                 {
