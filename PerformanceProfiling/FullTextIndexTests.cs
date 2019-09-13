@@ -3,11 +3,8 @@
 using BenchmarkDotNet.Attributes;
 using Lifti;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Reflection;
+using System.Linq;
 
 namespace PerformanceProfiling
 {
@@ -16,27 +13,57 @@ namespace PerformanceProfiling
     public class FullTextIndexTests
     {
         private IList<(string name, string text)> wikipediaData;
-        private LiftiNew.Lifti.FullTextIndex<string> newIndex;
-        private UpdatableFullTextIndex<string> legacyIndex;
+        //private LiftiNew.Lifti.FullTextIndex<string> newIndex;
+        //private UpdatableFullTextIndex<string> legacyIndex;
 
         [GlobalSetup]
         public void Setup()
         {
             this.wikipediaData = WikipediaDataLoader.Load(typeof(Program));
-            this.newIndex = CreateNewIndex();
-            PopulateIndex(this.newIndex);
+            //this.newIndex = CreateNewIndex();
+            //PopulateIndex(this.newIndex);
 
-            this.legacyIndex = CreateLegacyIndex();
-            PopulateIndex(this.legacyIndex);
+            //this.legacyIndex = CreateLegacyIndex();
+            //PopulateIndex(this.legacyIndex);
 
         }
 
-        [Benchmark]
-        public void NewCodeIndexing()
+        [Benchmark()]
+        public void XmlWorkSplittingNew()
         {
-            var index = CreateNewIndex();
-            PopulateIndex(index);
+            var splitter = new LiftiNew.Lifti.Preprocessing.XmlTokenizer(
+                new LiftiNew.Lifti.InputPreprocessorPipeline(Array.Empty<LiftiNew.Lifti.IInputPreprocessor>()));
+
+            splitter.Process(this.wikipediaData[0].text).ToList();
         }
+
+        [Benchmark()]
+        public void XmlWordSplittingLegacy()
+        {
+            var splitter = new XmlWordSplitter(new WordSplitter());
+            splitter.SplitWords(this.wikipediaData[0].text).ToList();
+        }
+
+        //[Benchmark()]
+        //public void NewCodeIndexingAlwaysSupportIntraNodeText()
+        //{
+        //    var index = CreateNewIndex(-1);
+        //    this.PopulateIndex(index);
+        //}
+
+        //[Benchmark()]
+        //public void NewCodeIndexingAlwaysIndexCharByChar()
+        //{
+        //    var index = CreateNewIndex(1000);
+        //    this.PopulateIndex(index);
+        //}
+
+        //[Benchmark()]
+        //public void NewCodeIndexingIntraNodeTextAt4Characters()
+        //{
+        //    var index = CreateNewIndex(4);
+        //    this.PopulateIndex(index);
+        //}
 
         //[Benchmark]
         //public void NewCodeSearching()
@@ -44,12 +71,12 @@ namespace PerformanceProfiling
         //    this.newIndex.Search("confiscation");
         //}
 
-        [Benchmark]
-        public void LegacyCodeIndexing()
-        {
-            var index = CreateLegacyIndex();
-            PopulateIndex(index);
-        }
+        //[Benchmark]
+        //public void LegacyCodeIndexing()
+        //{
+        //    var index = CreateLegacyIndex();
+        //    PopulateIndex(index);
+        //}
 
         //[Benchmark]
         //public void LegacyCodeSearching()
@@ -67,9 +94,11 @@ namespace PerformanceProfiling
 
         private static UpdatableFullTextIndex<string> CreateLegacyIndex()
         {
-            var index = new UpdatableFullTextIndex<string>();
-            index.WordSplitter = new XmlWordSplitter(new WordSplitter());
-            index.SearchWordSplitter = new WordSplitter();
+            var index = new UpdatableFullTextIndex<string>
+            {
+                WordSplitter = new XmlWordSplitter(new WordSplitter()),
+                SearchWordSplitter = new WordSplitter()
+            };
             return index;
         }
 
@@ -81,12 +110,13 @@ namespace PerformanceProfiling
             }
         }
 
-        private static LiftiNew.Lifti.FullTextIndex<string> CreateNewIndex()
+        private static LiftiNew.Lifti.FullTextIndex<string> CreateNewIndex(int supportSplitAtIndex)
         {
             return new LiftiNew.Lifti.FullTextIndex<string>(
                 new LiftiNew.Lifti.FullTextIndexOptions<string>
                 {
-                    TokenizationOptions = { SplitOnPunctuation = true }
+                    TokenizationOptions = { SplitOnPunctuation = true },
+                    Advanced = { SupportIntraNodeTextAfterCharacterIndex = supportSplitAtIndex }
                 },
                 new LiftiNew.Lifti.Preprocessing.XmlTokenizer(
                     new LiftiNew.Lifti.InputPreprocessorPipeline(

@@ -7,16 +7,17 @@ namespace Lifti.Tests
 {
     public class FullTextIndexTests
     {
-        private FullTextIndex<string> index;
+        private readonly FullTextIndex<string> index;
 
         public FullTextIndexTests()
         {
             this.index = new FullTextIndex<string>(
                 new FullTextIndexOptions<string>
                 {
-                    TokenizationOptions = { SplitOnPunctuation = true }
+                    TokenizationOptions = { SplitOnPunctuation = true },
+                    Advanced = { SupportIntraNodeTextAfterCharacterIndex = 4 }
                 },
-                new BasicTokenizer(new InputPreprocessorPipeline(new[]
+                new XmlTokenizer(new InputPreprocessorPipeline(new[]
                 {
                     new CaseInsensitiveNormalizer()
                 })),

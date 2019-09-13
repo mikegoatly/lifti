@@ -25,12 +25,12 @@ namespace Lifti.Tests
         public IndexNodeTests()
         {
             this.indexNodeFactoryMock = new Mock<IIndexNodeFactory>();
-            this.sut = new IndexNode(this.indexNodeFactoryMock.Object);
+            this.sut = new IndexNode(this.indexNodeFactoryMock.Object, 0, IndexSupportLevelKind.IntraNodeText);
             this.indexNodeFactoryMock.Setup(
-                x => x.CreateNode())
-                    .Returns(() =>
+                x => x.CreateNode(It.IsAny<IndexNode>()))
+                    .Returns((IndexNode parent) =>
                     {
-                        var node = new IndexNode(this.indexNodeFactoryMock.Object);
+                        var node = new IndexNode(this.indexNodeFactoryMock.Object, parent.Depth + 1, IndexSupportLevelKind.IntraNodeText);
                         this.createdChildNodes.Add(node);
                         return node;
                     });
