@@ -8,6 +8,14 @@ More information will follow as the code is fleshed out.
 Note:
 There is currently a dependency on preview BCL nuget packages (specifically Microsoft.Bcl.HashCode).
 
+## Goals
+1) Provide a very simple way to build an in-memory full text index.
+2) netstandard2 compatibility
+3) Persistance via explicit serialization/deserialization points. Automatic persistance to a backing store upon changes to the index is out of scope.
+
+### Non-goals
+1) Distributed transactions are out of scope and don't make much sense anyway given automatic persistance is not in scope. (the old version did support this but I don't think anyone actually used it though - I know didn't :))
+
 ## Significant differences between new and old implementations
 The old implementation followed a very simple tree structure where every node in the tree linked to its descendants via relevant chars, e.g.:
 
