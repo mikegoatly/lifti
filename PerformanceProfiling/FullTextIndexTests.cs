@@ -45,24 +45,31 @@ namespace PerformanceProfiling
         //    splitter.SplitWords(this.wikipediaData[0].text).ToList();
         //}
 
-        //[Benchmark()]
-        //public void NewCodeIndexingAlwaysSupportIntraNodeText()
-        //{
-        //    var index = CreateNewIndex(-1);
-        //    this.PopulateIndex(index);
-        //}
+        [Benchmark()]
+        public void NewCodeIndexingAlwaysSupportIntraNodeText()
+        {
+            var index = CreateNewIndex(-1);
+            this.PopulateIndex(index);
+        }
 
-        //[Benchmark()]
-        //public void NewCodeIndexingAlwaysIndexCharByChar()
-        //{
-        //    var index = CreateNewIndex(1000);
-        //    this.PopulateIndex(index);
-        //}
+        [Benchmark()]
+        public void NewCodeIndexingAlwaysIndexCharByChar()
+        {
+            var index = CreateNewIndex(1000);
+            this.PopulateIndex(index);
+        }
 
         [Benchmark()]
         public void NewCodeIndexingIntraNodeTextAt4Characters()
         {
             var index = CreateNewIndex(4);
+            this.PopulateIndex(index);
+        }
+
+        [Benchmark()]
+        public void NewCodeIndexingIntraNodeTextAt2Characters()
+        {
+            var index = CreateNewIndex(2);
             this.PopulateIndex(index);
         }
 
@@ -72,12 +79,12 @@ namespace PerformanceProfiling
         //    this.newIndex.Search("confiscation");
         //}
 
-        //[Benchmark]
-        //public void legacycodeindexing()
-        //{
-        //    var index = CreateLegacyIndex();
-        //    PopulateIndex(index);
-        //}
+        [Benchmark]
+        public void legacycodeindexing()
+        {
+            var index = CreateLegacyIndex();
+            PopulateIndex(index);
+        }
 
         //[Benchmark]
         //public void LegacyCodeSearching()

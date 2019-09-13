@@ -12,6 +12,6 @@
 
     public class AdvancedOptions
     {
-        public int SupportIntraNodeTextAfterCharacterIndex { get; set; }
+        public int SupportIntraNodeTextAfterCharacterIndex { get; set; } = 4;
     }
 }
