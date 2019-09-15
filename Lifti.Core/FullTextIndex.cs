@@ -30,11 +30,11 @@ namespace Lifti
 
         public IndexNode Root { get; }
 
-        public void Index(TKey item, string text, TokenizationOptions tokenizationOptions = default)
+        public void Index(TKey item, string text, TokenizationOptions? tokenizationOptions = default)
         {
             var itemId = this.idPool.CreateIdFor(item);
 
-            var tokenizer = this.tokenizerFactory.Create(tokenizationOptions);
+            var tokenizer = this.tokenizerFactory.Create(tokenizationOptions ?? TokenizationOptions.Default);
             foreach (var word in tokenizer.Process(text))
             {
                 this.Root.Index(itemId, 0, word);
@@ -51,11 +51,11 @@ namespace Lifti
             return string.Empty;
         }
 
-        public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions tokenizationOptions = default)
+        public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = default)
         {
             var searchContext = new SearchContext(this);
 
-            var tokenizer = this.tokenizerFactory.Create(tokenizationOptions);
+            var tokenizer = this.tokenizerFactory.Create(tokenizationOptions ?? TokenizationOptions.Default);
             foreach (var searchWord in tokenizer.Process(searchText))
             {
                 searchContext.Match(searchWord.Value.AsSpan());

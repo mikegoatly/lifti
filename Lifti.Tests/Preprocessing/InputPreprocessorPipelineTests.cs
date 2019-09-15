@@ -26,7 +26,7 @@ namespace Lifti.Tests.Preprocessing
             var input = 'Ч';
             var expectedOutput = "Ch";
 
-            var pipeline = CreatePipeline(caseInsensitive: true);
+            var pipeline = CreatePipeline(accentInsensitive: true);
 
             var actual = pipeline.Process(input);
 
@@ -51,8 +51,8 @@ namespace Lifti.Tests.Preprocessing
             ((IConfiguredBy<TokenizationOptions>)pipeline).Configure(
                 new TokenizationOptions(
                     TokenizerKind.Default,
-                    caseInsensitive: true,
-                    accentInsensitive: true));
+                    caseInsensitive: caseInsensitive,
+                    accentInsensitive: accentInsensitive));
             return pipeline;
         }
     }

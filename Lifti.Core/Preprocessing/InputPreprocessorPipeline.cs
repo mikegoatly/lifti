@@ -60,14 +60,14 @@ namespace Lifti.Preprocessing
 
         protected override void OnConfiguring(TokenizationOptions options)
         {
-            if (options.CaseInsensitive)
-            {
-                this.inputPreprocessors.Add(new CaseInsensitiveNormalizer());
-            }
-
             if (options.AccentInsensitive)
             {
                 this.inputPreprocessors.Add(new LatinCharacterNormalizer());
+            }
+
+            if (options.CaseInsensitive)
+            {
+                this.inputPreprocessors.Add(new CaseInsensitiveNormalizer());
             }
         }
     }
