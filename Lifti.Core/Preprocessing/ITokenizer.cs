@@ -2,7 +2,7 @@
 
 namespace Lifti.Preprocessing
 {
-    public interface ITokenizer : IConfiguredByOptions
+    public interface ITokenizer : IConfiguredBy<TokenizationOptions>
     {
         IEnumerable<Token> Process(string input);
     }

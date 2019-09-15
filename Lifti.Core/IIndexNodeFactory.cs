@@ -1,6 +1,6 @@
 ﻿namespace Lifti
 {
-    public interface IIndexNodeFactory : IConfiguredByOptions
+    public interface IIndexNodeFactory : IConfiguredBy<FullTextIndexConfiguration>
     {
         IndexNode CreateNode();
         IndexNode CreateNode(IndexNode parent);

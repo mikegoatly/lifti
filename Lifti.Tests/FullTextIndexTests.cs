@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Lifti.Preprocessing;
 using PerformanceProfiling;
 using Xunit;
 
@@ -14,14 +13,8 @@ namespace Lifti.Tests
             this.index = new FullTextIndex<string>(
                 new FullTextIndexOptions<string>
                 {
-                    TokenizationOptions = { SplitOnPunctuation = true },
                     Advanced = { SupportIntraNodeTextAfterCharacterIndex = 4 }
-                },
-                new XmlTokenizer(new InputPreprocessorPipeline(new[]
-                {
-                    new CaseInsensitiveNormalizer()
-                })),
-                new IndexNodeFactory());
+                });
         }
 
         [Fact]

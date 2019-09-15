@@ -1,12 +1,11 @@
 ﻿namespace Lifti
 {
-    public class FullTextIndexOptions
+    public class FullTextIndexConfiguration
     {
-        public TokenizationOptions TokenizationOptions { get; } = new TokenizationOptions();
         public AdvancedOptions Advanced { get; } = new AdvancedOptions();
     }
 
-    public class FullTextIndexOptions<TKey> : FullTextIndexOptions
+    public class FullTextIndexOptions<TKey> : FullTextIndexConfiguration
     {
     }
 

@@ -114,7 +114,7 @@ namespace PerformanceProfiling
         {
             foreach (var entry in this.wikipediaData)
             {
-                index.Index(entry.name, entry.text);
+                index.Index(entry.name, entry.text, new LiftiNew.Lifti.TokenizationOptions(LiftiNew.Lifti.Preprocessing.TokenizerKind.XmlContent));
             }
         }
 
@@ -123,16 +123,8 @@ namespace PerformanceProfiling
             return new LiftiNew.Lifti.FullTextIndex<string>(
                 new LiftiNew.Lifti.FullTextIndexOptions<string>
                 {
-                    TokenizationOptions = { SplitOnPunctuation = true },
                     Advanced = { SupportIntraNodeTextAfterCharacterIndex = supportSplitAtIndex }
-                },
-                new LiftiNew.Lifti.Preprocessing.XmlTokenizer(
-                    new LiftiNew.Lifti.Preprocessing.InputPreprocessorPipeline(
-                        new LiftiNew.Lifti.Preprocessing.IInputPreprocessor[] {
-                            new LiftiNew.Lifti.Preprocessing.CaseInsensitiveNormalizer(),
-                            new LiftiNew.Lifti.Preprocessing.LatinCharacterNormalizer()
-                            })),
-                new LiftiNew.Lifti.IndexNodeFactory());
+                });
         }
     }
 }

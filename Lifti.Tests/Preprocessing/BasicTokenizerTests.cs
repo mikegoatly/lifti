@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Lifti.Preprocessing;
-using System;
 using System.Linq;
 using Xunit;
 
@@ -8,7 +7,7 @@ namespace Lifti.Tests.Preprocessing
 {
     public abstract class BasicTokenizerTests
     {
-        protected BasicTokenizer sut;
+        protected BasicTokenizer sut = new BasicTokenizer();
 
         [Fact]
         public void ShouldReturnNoTokensForEmptyString()
@@ -26,13 +25,19 @@ namespace Lifti.Tests.Preprocessing
             output.Should().BeEmpty();
         }
 
+        protected void WithConfiguration(bool splitOnPunctuation = true, char[] additionalSplitChars = null, bool caseInsensitive = false, bool accentInsensitive = false)
+        {
+            ((IConfiguredBy<TokenizationOptions>)this.sut).Configure(
+                new TokenizationOptions(
+                    TokenizerKind.Default,
+                    splitOnPunctuation: splitOnPunctuation,
+                    additionalSplitCharacters: additionalSplitChars,
+                    caseInsensitive: caseInsensitive,
+                    accentInsensitive: accentInsensitive));
+        }
+
         public class WithNoPreprocessors : BasicTokenizerTests
         {
-            public WithNoPreprocessors()
-            {
-                this.sut = new BasicTokenizer(new InputPreprocessorPipeline(Array.Empty<IInputPreprocessor>()));
-            }
-
             [Fact]
             public void ShouldReturnSingleTokenForStringContainingOnlyOneWord()
             {
@@ -58,7 +63,7 @@ namespace Lifti.Tests.Preprocessing
             [Fact]
             public void WhenSplittingAtPunctuation_ShouldTokenizeAtWordBreaksAndPunctuation()
             {
-                this.sut.ConfigureWith(new FullTextIndexOptions { TokenizationOptions = { SplitOnPunctuation = true } });
+                this.WithConfiguration();
 
                 var input = "Test string (with punctuation) with test spaces";
 
@@ -78,7 +83,7 @@ namespace Lifti.Tests.Preprocessing
             [Fact]
             public void WhenNotSplittingAtPunctuation_ShouldTokenizeAtWordBreaksOnly()
             {
-                this.sut.ConfigureWith(new FullTextIndexOptions { TokenizationOptions = { SplitOnPunctuation = false } });
+                this.WithConfiguration(splitOnPunctuation: false);
 
                 var input = "Test string (with punctuation) with test spaces";
 
@@ -99,14 +104,7 @@ namespace Lifti.Tests.Preprocessing
             [Fact]
             public void WhenSplittingOnAdditionalCharacters_ShouldTokenizeAtWordBreaksAndAdditionalCharacters()
             {
-                this.sut.ConfigureWith(new FullTextIndexOptions
-                {
-                    TokenizationOptions =
-                    {
-                        SplitOnPunctuation = false,
-                        AdditionalSplitCharacters = new[] { '@', '¬' }
-                    }
-                });
+                this.WithConfiguration(splitOnPunctuation: false, additionalSplitChars: new[] { '@', '¬' });
 
                 var input = "Test@string¬with custom\tsplits";
 
@@ -126,13 +124,7 @@ namespace Lifti.Tests.Preprocessing
             {
                 public WithAllInsensitivityProcessors()
                 {
-                    this.sut = new BasicTokenizer(
-                        new InputPreprocessorPipeline(
-                            new IInputPreprocessor[]
-                            {
-                                new LatinCharacterNormalizer(),
-                                new CaseInsensitiveNormalizer()
-                            }));
+                    this.WithConfiguration(caseInsensitive: true, accentInsensitive: true);
                 }
 
                 [Fact]
@@ -160,8 +152,6 @@ namespace Lifti.Tests.Preprocessing
                 [Fact]
                 public void WhenSplittingAtPunctuation_ShouldTokenizeAtWordBreaksAndPunctuation()
                 {
-                    this.sut.ConfigureWith(new FullTextIndexOptions { TokenizationOptions = { SplitOnPunctuation = true } });
-
                     var input = "Træ træ moo moǑ";
 
                     var output = this.sut.Process(input).ToList();

@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Lifti.Preprocessing;
-using System;
 using System.Linq;
 using Xunit;
 
@@ -14,12 +13,7 @@ namespace Lifti.Tests.Preprocessing
             var input = 'Ч';
             var expectedOutput = "CH";
 
-            var pipeline = new InputPreprocessorPipeline(
-                new IInputPreprocessor[]
-                {
-                    new LatinCharacterNormalizer(),
-                    new CaseInsensitiveNormalizer()
-                });
+            var pipeline = CreatePipeline(caseInsensitive: true, accentInsensitive: true);
 
             var actual = pipeline.Process(input);
 
@@ -32,11 +26,7 @@ namespace Lifti.Tests.Preprocessing
             var input = 'Ч';
             var expectedOutput = "Ch";
 
-            var pipeline = new InputPreprocessorPipeline(
-                new IInputPreprocessor[]
-                {
-                    new LatinCharacterNormalizer()
-                });
+            var pipeline = CreatePipeline(caseInsensitive: true);
 
             var actual = pipeline.Process(input);
 
@@ -48,11 +38,22 @@ namespace Lifti.Tests.Preprocessing
         {
             var input = 'Ч';
 
-            var pipeline = new InputPreprocessorPipeline(Array.Empty<IInputPreprocessor>());
+            var pipeline = CreatePipeline();
 
             var actual = pipeline.Process(input);
 
             actual.ToArray().Should().BeEquivalentTo(new[] { input });
+        }
+
+        private static IInputPreprocessorPipeline CreatePipeline(bool caseInsensitive = false, bool accentInsensitive = false)
+        {
+            var pipeline = new InputPreprocessorPipeline();
+            ((IConfiguredBy<TokenizationOptions>)pipeline).Configure(
+                new TokenizationOptions(
+                    TokenizerKind.Default,
+                    caseInsensitive: true,
+                    accentInsensitive: true));
+            return pipeline;
         }
     }
 }

@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 
 namespace Lifti.Preprocessing
 {
-    public class InputPreprocessorPipeline : IInputPreprocessorPipeline
+    public class InputPreprocessorPipeline : ConfiguredBy<TokenizationOptions>, IInputPreprocessorPipeline
     {
-        private readonly IInputPreprocessor[] inputPreprocessors;
+        private readonly List<IInputPreprocessor> inputPreprocessors = new List<IInputPreprocessor>();
         private Queue<PreprocessedInput> processQueue = new Queue<PreprocessedInput>();
         private Queue<PreprocessedInput> outputQueue = new Queue<PreprocessedInput>();
 
-        public InputPreprocessorPipeline(IInputPreprocessor[] inputPreprocessor)
-        {
-            this.inputPreprocessors = inputPreprocessor ?? Array.Empty<IInputPreprocessor>();
-        }
-
         public IEnumerable<char> Process(char input)
         {
-            if (this.inputPreprocessors.Length == 0)
+            if (this.inputPreprocessors.Count == 0)
             {
                 yield return input;
                 yield break;
@@ -50,7 +44,6 @@ namespace Lifti.Preprocessing
             while (this.processQueue.Count > 0)
             {
                 var toReturn = this.processQueue.Dequeue();
-                // Duplicated as above - could be reduced to shared logic in PreprocessedInput?
                 if (toReturn.Replacement != null)
                 {
                     foreach (var letter in toReturn.Replacement)
@@ -62,6 +55,19 @@ namespace Lifti.Preprocessing
                 {
                     yield return toReturn.Value;
                 }
+            }
+        }
+
+        protected override void OnConfiguring(TokenizationOptions options)
+        {
+            if (options.CaseInsensitive)
+            {
+                this.inputPreprocessors.Add(new CaseInsensitiveNormalizer());
+            }
+
+            if (options.AccentInsensitive)
+            {
+                this.inputPreprocessors.Add(new LatinCharacterNormalizer());
             }
         }
     }

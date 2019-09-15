@@ -4,11 +4,6 @@
     {
         private bool processingTag;
 
-        public XmlTokenizer(IInputPreprocessorPipeline inputPreprocessorPipeline)
-            : base(inputPreprocessorPipeline)
-        {
-        }
-
         protected override bool IsWordSplitCharacter(char current)
         {
             if (this.processingTag)

@@ -7,39 +7,35 @@ namespace Lifti
     public partial class FullTextIndex<TKey>
     {
         private readonly IIndexNodeFactory indexNodeFactory;
+        private readonly ITokenizerFactory tokenizerFactory;
         private readonly IIdPool<TKey> idPool = new IdPool<TKey>();
-        private readonly ITokenizer splitter;
 
         public FullTextIndex()
             : this(new FullTextIndexOptions<TKey>())
         {
         }
 
-        public FullTextIndex(FullTextIndexOptions<TKey> options)
-            : this(
-                  options,
-                  new BasicTokenizer(new InputPreprocessorPipeline(Array.Empty<IInputPreprocessor>())),
-                  new IndexNodeFactory())
-        {
-        }
-
         public FullTextIndex(
             FullTextIndexOptions<TKey> options,
-            ITokenizer wordSplitter,
-            IIndexNodeFactory indexNodeFactory)
+            IIndexNodeFactory indexNodeFactory = default,
+            ITokenizerFactory tokenizerFactory = default)
         {
-            this.ConfigureWith(options, wordSplitter, indexNodeFactory);
-            this.splitter = wordSplitter;
-            this.indexNodeFactory = indexNodeFactory;
+            this.indexNodeFactory = indexNodeFactory ?? new IndexNodeFactory();
+            this.tokenizerFactory = tokenizerFactory ?? new TokenizerFactory();
+
+            this.indexNodeFactory.Configure(options);
+
             this.Root = this.indexNodeFactory.CreateNode();
         }
 
         public IndexNode Root { get; }
 
-        public void Index(TKey item, string text)
+        public void Index(TKey item, string text, TokenizationOptions tokenizationOptions = default)
         {
             var itemId = this.idPool.CreateIdFor(item);
-            foreach (var word in this.splitter.Process(text))
+
+            var tokenizer = this.tokenizerFactory.Create(tokenizationOptions);
+            foreach (var word in tokenizer.Process(text))
             {
                 this.Root.Index(itemId, 0, word);
             }
@@ -55,24 +51,17 @@ namespace Lifti
             return string.Empty;
         }
 
-        public IEnumerable<SearchResult<TKey>> Search(string searchText)
+        public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions tokenizationOptions = default)
         {
             var searchContext = new SearchContext(this);
 
-            foreach (var searchWord in this.splitter.Process(searchText))
+            var tokenizer = this.tokenizerFactory.Create(tokenizationOptions);
+            foreach (var searchWord in tokenizer.Process(searchText))
             {
                 searchContext.Match(searchWord.Value.AsSpan());
             }
 
             return searchContext.Results();
-        }
-
-        private void ConfigureWith(FullTextIndexOptions<TKey> options, params IConfiguredByOptions[] configurable)
-        {
-            foreach (var item in configurable)
-            {
-                item.ConfigureWith(options);
-            }
         }
     }
 }

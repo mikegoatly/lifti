@@ -1,6 +1,6 @@
 ﻿namespace Lifti
 {
-    public class IndexNodeFactory : IIndexNodeFactory
+    public class IndexNodeFactory : ConfiguredBy<FullTextIndexConfiguration>, IIndexNodeFactory
     {
         private int supportIntraNodeTextAtDepth;
 
@@ -22,7 +22,7 @@
             return new IndexNode(this, nextDepth, this.GetIndexSupportLevelForDepth(nextDepth));
         }
 
-        public virtual void ConfigureWith(FullTextIndexOptions options)
+        protected override void OnConfiguring(FullTextIndexConfiguration options)
         {
             this.supportIntraNodeTextAtDepth = options.Advanced.SupportIntraNodeTextAfterCharacterIndex;
         }

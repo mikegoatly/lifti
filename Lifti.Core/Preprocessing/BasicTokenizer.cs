@@ -1,21 +1,15 @@
 ﻿using Lifti.Preprocessing;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Lifti
 {
-    public class BasicTokenizer : ITokenizer
+    public class BasicTokenizer : ConfiguredBy<TokenizationOptions>, ITokenizer
     {
-        private readonly IInputPreprocessorPipeline inputPreprocessorPipeline;
-        private TokenizationOptions tokenizationOptions = new TokenizationOptions();
+        private readonly IInputPreprocessorPipeline inputPreprocessorPipeline = new InputPreprocessorPipeline();
+        private TokenizationOptions tokenizationOptions;
         private HashSet<char> additionalSplitChars;
-
-        public BasicTokenizer(IInputPreprocessorPipeline inputPreprocessorPipeline)
-        {
-            this.inputPreprocessorPipeline = inputPreprocessorPipeline;
-        }
 
         public IEnumerable<Token> Process(string input)
         {
@@ -71,12 +65,15 @@ namespace Lifti
             processedWords.MergeOrAdd(hash, wordBuilder, new Range(start, length));
         }
 
-        public virtual void ConfigureWith(FullTextIndexOptions options)
+        protected override void OnConfiguring(TokenizationOptions options)
         {
-            this.tokenizationOptions = options.TokenizationOptions ?? throw new ArgumentNullException(nameof(options.TokenizationOptions));
+            this.tokenizationOptions = options;
+
             this.additionalSplitChars = this.tokenizationOptions.AdditionalSplitCharacters?.Length > 0
                 ? new HashSet<char>(this.tokenizationOptions.AdditionalSplitCharacters)
                 : null;
+
+            this.inputPreprocessorPipeline.Configure(options);
         }
     }
 }

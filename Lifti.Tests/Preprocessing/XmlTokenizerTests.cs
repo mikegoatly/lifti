@@ -1,20 +1,18 @@
 ﻿using FluentAssertions;
 using Lifti.Preprocessing;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace Lifti.Tests.Preprocessing
 {
     public class XmlTokenizerTests
     {
-        private XmlTokenizer sut;
+        private readonly XmlTokenizer sut;
 
         public XmlTokenizerTests()
         {
-            this.sut = new XmlTokenizer(new InputPreprocessorPipeline(Array.Empty<IInputPreprocessor>()));
+            this.sut = new XmlTokenizer();
+            ((ITokenizer)this.sut).Configure(new TokenizationOptions());
         }
 
         [Fact]
