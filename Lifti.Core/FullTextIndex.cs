@@ -4,11 +4,13 @@ using System.Collections.Generic;
 
 namespace Lifti
 {
+
     public partial class FullTextIndex<TKey>
     {
         private readonly IIndexNodeFactory indexNodeFactory;
         private readonly ITokenizerFactory tokenizerFactory;
         private readonly IIdPool<TKey> idPool = new IdPool<TKey>();
+        private readonly IndexedFieldLookup fieldLookup = new IndexedFieldLookup();
 
         public FullTextIndex()
             : this(new FullTextIndexOptions<TKey>())
@@ -30,25 +32,31 @@ namespace Lifti
 
         public IndexNode Root { get; }
 
-        public void Index(TKey item, string text, TokenizationOptions? tokenizationOptions = default)
+        public void Index(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = default)
         {
-            var itemId = this.idPool.CreateIdFor(item);
+            var itemId = this.idPool.CreateIdFor(itemKey);
 
             var tokenizer = this.tokenizerFactory.Create(tokenizationOptions ?? TokenizationOptions.Default);
             foreach (var word in tokenizer.Process(text))
             {
-                this.Root.Index(itemId, 0, word);
+                this.Root.Index(itemId, this.fieldLookup.DefaultField, word);
             }
         }
 
-        private string GetFieldName(byte fieldId)
+        public void Index<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> itemTokenizationOptions)
         {
-            if (fieldId != 0)
-            {
-                throw new NotImplementedException("Ultimately indexing an object by multiple fields will be possible - this will return the name of the field that the text was found in");
-            }
+            var itemKey = itemTokenizationOptions.KeyReader(item);
+            var itemId = this.idPool.CreateIdFor(itemKey);
 
-            return string.Empty;
+            foreach (var field in itemTokenizationOptions.FieldTokenization)
+            {
+                var fieldId = this.fieldLookup.GetOrCreateIdForField(field.Name);
+                var tokenizer = this.tokenizerFactory.Create(field.TokenizationOptions);
+                foreach (var word in tokenizer.Process(field.Reader(item)))
+                {
+                    this.Root.Index(itemId, fieldId, word);
+                }
+            }
         }
 
         public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = default)

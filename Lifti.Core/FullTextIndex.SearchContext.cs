@@ -90,7 +90,7 @@ namespace Lifti
                     var item = this.index.idPool.GetItemForId(itemResults.Key);
                     yield return new SearchResult<TKey>(
                         item,
-                        itemResults.Value.Select(m => new MatchedLocation(this.index.GetFieldName(m.FieldId), m.Locations)).ToList());
+                        itemResults.Value.Select(m => new MatchedLocation(this.index.fieldLookup.GetFieldForId(m.FieldId), m.Locations)).ToList());
                 }
             }
         }
