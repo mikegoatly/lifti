@@ -1,8 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
-using Lifti;
-using System;
+﻿using BenchmarkDotNet.Running;
 
 namespace PerformanceProfiling
 {
@@ -10,7 +6,7 @@ namespace PerformanceProfiling
     {
         public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<FullTextIndexTests>();
+            var summary = BenchmarkRunner.Run<IndexSearchingBenchmarks>();
         }
     }
 }

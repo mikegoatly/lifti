@@ -2,62 +2,81 @@
 
 using BenchmarkDotNet.Attributes;
 using Lifti;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace PerformanceProfiling
 {
-    //[ClrJob(baseline: true)]
-    [CoreJob]
-    [RPlotExporter, RankColumn, MemoryDiagnoser]
-    public class FullTextIndexTests
+    //[CoreJob]
+    [RankColumn, MemoryDiagnoser]
+    [ShortRunJob]
+    public class IndexSearchingBenchmarks : IndexBenchmarkBase
     {
-        private IList<(string name, string text)> wikipediaData;
-        //private LiftiNew.Lifti.FullTextIndex<string> newIndex;
-        //private UpdatableFullTextIndex<string> legacyIndex;
+        private LiftiNew.Lifti.FullTextIndex<string> index;
+        private UpdatableFullTextIndex<string> legacyIndex;
 
         [GlobalSetup]
-        public void Setup()
+        public void SetUp()
         {
-            this.wikipediaData = WikipediaDataLoader.Load(typeof(Program));
-            //this.newIndex = CreateNewIndex();
-            //PopulateIndex(this.newIndex);
-
-            //this.legacyIndex = CreateLegacyIndex();
-            //PopulateIndex(this.legacyIndex);
-
+            this.index = CreateNewIndex(4);
+            this.PopulateIndex(this.index);
+            this.legacyIndex = CreateLegacyIndex();
+            this.PopulateIndex(this.legacyIndex);
         }
 
-        //[Benchmark()]
-        //public void XmlWorkSplittingNew()
-        //{
-        //    var splitter = new LiftiNew.Lifti.Preprocessing.XmlTokenizer(
-        //        new LiftiNew.Lifti.InputPreprocessorPipeline(Array.Empty<LiftiNew.Lifti.IInputPreprocessor>()));
+        [Params("confiscation", "justification")]
+        public string SearchCriteria { get; set; }
 
-        //    splitter.Process(this.wikipediaData[0].text).ToList();
+        [Benchmark]
+        public object NewCodeSearching()
+        {
+            return this.index.Search(this.SearchCriteria);
+        }
+
+        [Benchmark]
+        public object LegacyCodeSearching()
+        {
+            return this.legacyIndex.Search(this.SearchCriteria);
+        }
+    }
+
+    [CoreJob]
+    [RankColumn, MemoryDiagnoser]
+    public class WordSplittingBenchmarks : IndexBenchmarkBase
+    {
+        [Benchmark()]
+        public void XmlWorkSplittingNew()
+        {
+            var splitter = new LiftiNew.Lifti.Preprocessing.XmlTokenizer();
+
+            splitter.Process(WikipediaData.SampleData[0].text).ToList();
+        }
+
+
+        [Benchmark()]
+        public void XmlWordSplittingLegacy()
+        {
+            var splitter = new XmlWordSplitter(new WordSplitter());
+            splitter.SplitWords(WikipediaData.SampleData[0].text).ToList();
+        }
+    }
+
+    [CoreJob]
+    [RankColumn, MemoryDiagnoser]
+    public class FullTextIndexTests : IndexBenchmarkBase
+    {
+        //[Benchmark()]
+        //public void NewCodeIndexingAlwaysSupportIntraNodeText()
+        //{
+        //    var index = CreateNewIndex(-1);
+        //    this.PopulateIndex(index);
         //}
 
         //[Benchmark()]
-        //public void XmlWordSplittingLegacy()
+        //public void NewCodeIndexingAlwaysIndexCharByChar()
         //{
-        //    var splitter = new XmlWordSplitter(new WordSplitter());
-        //    splitter.SplitWords(this.wikipediaData[0].text).ToList();
+        //    var index = CreateNewIndex(1000);
+        //    this.PopulateIndex(index);
         //}
-
-        [Benchmark()]
-        public void NewCodeIndexingAlwaysSupportIntraNodeText()
-        {
-            var index = CreateNewIndex(-1);
-            this.PopulateIndex(index);
-        }
-
-        [Benchmark()]
-        public void NewCodeIndexingAlwaysIndexCharByChar()
-        {
-            var index = CreateNewIndex(1000);
-            this.PopulateIndex(index);
-        }
 
         [Benchmark()]
         public void NewCodeIndexingIntraNodeTextAt4Characters()
@@ -66,65 +85,11 @@ namespace PerformanceProfiling
             this.PopulateIndex(index);
         }
 
-        [Benchmark()]
-        public void NewCodeIndexingIntraNodeTextAt2Characters()
-        {
-            var index = CreateNewIndex(2);
-            this.PopulateIndex(index);
-        }
-
-        //[Benchmark]
-        //public void NewCodeSearching()
+        //[Benchmark()]
+        //public void NewCodeIndexingIntraNodeTextAt2Characters()
         //{
-        //    this.newIndex.Search("confiscation");
+        //    var index = CreateNewIndex(2);
+        //    this.PopulateIndex(index);
         //}
-
-        [Benchmark]
-        public void legacycodeindexing()
-        {
-            var index = CreateLegacyIndex();
-            PopulateIndex(index);
-        }
-
-        //[Benchmark]
-        //public void LegacyCodeSearching()
-        //{
-        //    this.newIndex.Search("confiscation");
-        //}
-
-        private void PopulateIndex(UpdatableFullTextIndex<string> index)
-        {
-            foreach (var entry in this.wikipediaData)
-            {
-                index.Index(entry.name, entry.text);
-            }
-        }
-
-        private static UpdatableFullTextIndex<string> CreateLegacyIndex()
-        {
-            var index = new UpdatableFullTextIndex<string>
-            {
-                WordSplitter = new XmlWordSplitter(new WordSplitter()),
-                SearchWordSplitter = new WordSplitter()
-            };
-            return index;
-        }
-
-        private void PopulateIndex(LiftiNew.Lifti.FullTextIndex<string> index)
-        {
-            foreach (var entry in this.wikipediaData)
-            {
-                index.Index(entry.name, entry.text, new LiftiNew.Lifti.TokenizationOptions(LiftiNew.Lifti.Preprocessing.TokenizerKind.XmlContent));
-            }
-        }
-
-        private static LiftiNew.Lifti.FullTextIndex<string> CreateNewIndex(int supportSplitAtIndex)
-        {
-            return new LiftiNew.Lifti.FullTextIndex<string>(
-                new LiftiNew.Lifti.FullTextIndexOptions<string>
-                {
-                    Advanced = { SupportIntraNodeTextAfterCharacterIndex = supportSplitAtIndex }
-                });
-        }
     }
 }
