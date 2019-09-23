@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
-using Lifti.Preprocessing;
+using Lifti.Tokenization;
+using Lifti.Tokenization.Preprocessing;
 using System.Linq;
 using Xunit;
 
-namespace Lifti.Tests.Preprocessing
+namespace Lifti.Tests.Tokenization.Preprocessing
 {
     public class InputPreprocessorPipelineTests
     {

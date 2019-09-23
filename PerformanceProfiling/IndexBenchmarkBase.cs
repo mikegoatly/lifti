@@ -27,7 +27,7 @@ namespace PerformanceProfiling
         {
             foreach (var entry in WikipediaData.SampleData)
             {
-                index.Index(entry.name, entry.text, new LiftiNew.Lifti.TokenizationOptions(LiftiNew.Lifti.Preprocessing.TokenizerKind.XmlContent));
+                index.Index(entry.name, entry.text, new LiftiNew.Lifti.TokenizationOptions(LiftiNew.Lifti.Tokenization.TokenizerKind.XmlContent));
             }
         }
 

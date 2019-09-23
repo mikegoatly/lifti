@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lifti.Preprocessing
+namespace Lifti.Tokenization
 {
     public class TokenizerFactory : ITokenizerFactory
     {

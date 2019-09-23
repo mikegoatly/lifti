@@ -1,9 +1,9 @@
 using FluentAssertions;
-using Lifti.Preprocessing;
+using Lifti.Tokenization;
 using System.Text;
 using Xunit;
 
-namespace Lifti.Tests
+namespace Lifti.Tests.Tokenization
 {
     public class TokenStoreTests
     {

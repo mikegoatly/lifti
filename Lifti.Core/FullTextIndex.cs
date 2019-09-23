@@ -1,4 +1,4 @@
-﻿using Lifti.Preprocessing;
+﻿using Lifti.Tokenization;
 using System;
 using System.Collections.Generic;
 

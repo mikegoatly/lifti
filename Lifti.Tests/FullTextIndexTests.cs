@@ -11,9 +11,9 @@ namespace Lifti.Tests
 
         private readonly ItemTokenizationOptions<TestObject, string> tokenizationOptions = new ItemTokenizationOptions<TestObject, string>(
                 o => o.Id,
-                new FieldTokenization<TestObject>("Text1", o => o.Text1),
-                new FieldTokenization<TestObject>("Text2", o => o.Text2),
-                new FieldTokenization<TestObject>("Text3", o => o.Text3));
+                new FieldTokenizationOptions<TestObject>("Text1", o => o.Text1),
+                new FieldTokenizationOptions<TestObject>("Text2", o => o.Text2),
+                new FieldTokenizationOptions<TestObject>("Text3", o => o.Text3));
 
         public FullTextIndexTests()
         {

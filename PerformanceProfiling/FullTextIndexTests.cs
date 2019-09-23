@@ -46,7 +46,7 @@ namespace PerformanceProfiling
         [Benchmark()]
         public void XmlWorkSplittingNew()
         {
-            var splitter = new LiftiNew.Lifti.Preprocessing.XmlTokenizer();
+            var splitter = new LiftiNew.Lifti.Tokenization.XmlTokenizer();
 
             splitter.Process(WikipediaData.SampleData[0].text).ToList();
         }

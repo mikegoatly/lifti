@@ -2,9 +2,9 @@
 
 namespace Lifti
 {
-    public class FieldTokenization<TItem>
+    public class FieldTokenizationOptions<TItem>
     {
-        public FieldTokenization(string name, Func<TItem, string> reader, TokenizationOptions? tokenizationOptions = null)
+        public FieldTokenizationOptions(string name, Func<TItem, string> reader, TokenizationOptions? tokenizationOptions = null)
         {
             this.Name = name;
             this.Reader = reader;

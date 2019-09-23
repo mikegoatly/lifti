@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 
-namespace Lifti.Preprocessing
+namespace Lifti.Tokenization.Preprocessing
 {
     public class InputPreprocessorPipeline : ConfiguredBy<TokenizationOptions>, IInputPreprocessorPipeline
     {

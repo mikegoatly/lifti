@@ -6,13 +6,13 @@ namespace Lifti
     {
         public ItemTokenizationOptions(
             Func<TItem, TKey> idReader,
-            params FieldTokenization<TItem>[] fieldTokenization)
+            params FieldTokenizationOptions<TItem>[] fieldTokenization)
         {
             this.KeyReader = idReader;
             this.FieldTokenization = fieldTokenization;
         }
 
         public Func<TItem, TKey> KeyReader { get; }
-        public FieldTokenization<TItem>[] FieldTokenization { get; }
+        public FieldTokenizationOptions<TItem>[] FieldTokenization { get; }
     }
 }

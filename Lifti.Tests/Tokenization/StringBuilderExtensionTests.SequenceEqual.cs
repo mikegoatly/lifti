@@ -1,11 +1,10 @@
 ﻿using FluentAssertions;
-using Lifti.Preprocessing;
+using Lifti.Tokenization;
 using System;
-using System.Collections.Generic;
 using System.Text;
 using Xunit;
 
-namespace Lifti.Tests.Preprocessing
+namespace Lifti.Tests.Tokenization
 {
     public class StringBuilderExtensionTests_SequenceEqual
     {

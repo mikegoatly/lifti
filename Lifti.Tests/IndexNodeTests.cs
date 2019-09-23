@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
-using Lifti.Preprocessing;
+using Lifti.Tokenization;
 using Moq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;

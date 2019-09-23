@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Lifti.Preprocessing
+namespace Lifti.Tokenization
 {
     public class Token
     {

@@ -1,9 +1,9 @@
-﻿using Lifti.Preprocessing;
+﻿using Lifti.Tokenization.Preprocessing;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lifti
+namespace Lifti.Tokenization
 {
     public class BasicTokenizer : ConfiguredBy<TokenizationOptions>, ITokenizer
     {

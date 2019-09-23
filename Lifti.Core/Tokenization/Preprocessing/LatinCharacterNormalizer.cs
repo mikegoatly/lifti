@@ -1,4 +1,4 @@
-﻿namespace Lifti.Preprocessing
+﻿namespace Lifti.Tokenization.Preprocessing
 {
     public class LatinCharacterNormalizer : IInputPreprocessor
     {

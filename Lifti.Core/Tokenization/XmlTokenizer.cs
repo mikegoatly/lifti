@@ -1,4 +1,4 @@
-﻿namespace Lifti.Preprocessing
+﻿namespace Lifti.Tokenization
 {
     public class XmlTokenizer : BasicTokenizer
     {

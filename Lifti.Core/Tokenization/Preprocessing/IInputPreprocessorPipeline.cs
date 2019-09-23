@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Lifti.Preprocessing
+namespace Lifti.Tokenization.Preprocessing
 {
     public interface IInputPreprocessorPipeline : IConfiguredBy<TokenizationOptions>
     {

@@ -1,7 +1,6 @@
-﻿using Lifti.Preprocessing;
+﻿using Lifti.Tokenization;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Lifti
@@ -49,7 +48,7 @@ namespace Lifti
                 default:
                     throw new InvalidOperationException($"Unsupported index support level {this.indexSupportLevel}");
             }
-            
+
         }
 
         private void IndexWithIntraNodeTextSupport(int itemId, byte fieldId, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText)
