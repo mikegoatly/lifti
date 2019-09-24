@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Lifti
 {
-    internal class IndexedFieldLookup
+    public class IndexedFieldLookup : IIndexedFieldLookup
     {
         private readonly Dictionary<string, byte> fieldToIdLookup = new Dictionary<string, byte>();
         private readonly Dictionary<byte, string> idToFieldLookup = new Dictionary<byte, string>();

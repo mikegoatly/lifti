@@ -2,6 +2,7 @@
 
 using BenchmarkDotNet.Attributes;
 using Lifti;
+using System;
 using System.Linq;
 
 namespace PerformanceProfiling
@@ -48,7 +49,7 @@ namespace PerformanceProfiling
         {
             var splitter = new LiftiNew.Lifti.Tokenization.XmlTokenizer();
 
-            splitter.Process(WikipediaData.SampleData[0].text).ToList();
+            splitter.Process(WikipediaData.SampleData[0].text.AsSpan()).ToList();
         }
 
 

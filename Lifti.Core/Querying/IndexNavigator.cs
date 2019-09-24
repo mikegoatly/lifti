@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Lifti
+namespace Lifti.Querying
 {
-    public struct IndexNavigator
+    public struct IndexNavigator : IIndexNavigator
     {
         private IndexNode currentNode;
         private int intraNodeTextPosition;
@@ -18,14 +18,28 @@ namespace Lifti
         private bool HasIntraNodeTextLeftToProcess => this.currentNode.IntraNodeText != null &&
                     this.intraNodeTextPosition < this.currentNode.IntraNodeText.Length;
 
-        public IEnumerable<(int itemId, IReadOnlyList<IndexedWordLocation> indexedWordLocations)> GetExactMatches()
+        public IntermediateQueryResult GetExactMatches()
         {
             if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess)
             {
-                return Array.Empty<(int, IReadOnlyList<IndexedWordLocation>)>();
+                return new IntermediateQueryResult(Array.Empty<(int, IEnumerable<IndexedWordLocation>)>());
             }
 
-            return this.currentNode.Matches.Select(m => (m.Key, (IReadOnlyList<IndexedWordLocation>)m.Value));
+            return new IntermediateQueryResult(
+                this.currentNode.Matches.Select(m => (m.Key, (IEnumerable<IndexedWordLocation>)m.Value)));
+        }
+
+        public bool Process(ReadOnlySpan<char> text)
+        {
+            foreach (var next in text)
+            {
+                if (!this.Process(next))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public bool Process(char next)

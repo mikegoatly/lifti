@@ -11,15 +11,14 @@ namespace Lifti.Tokenization
         private TokenizationOptions tokenizationOptions;
         private HashSet<char> additionalSplitChars;
 
-        public IEnumerable<Token> Process(string input)
+        public IEnumerable<Token> Process(ReadOnlySpan<char> input)
         {
             var processedWords = new TokenStore(); // TODO Pool?
 
-            var inputData = input.AsSpan();
             var start = 0;
             var wordBuilder = new StringBuilder();
             var hash = new TokenHash();
-            for (var i = 0; i < inputData.Length; i++)
+            for (var i = 0; i < input.Length; i++)
             {
                 var current = input[i];
                 if (this.IsWordSplitCharacter(current))
@@ -45,7 +44,7 @@ namespace Lifti.Tokenization
 
             if (wordBuilder.Length > 0)
             {
-                CaptureWord(processedWords, hash, start, inputData.Length, wordBuilder);
+                CaptureWord(processedWords, hash, start, input.Length, wordBuilder);
             }
 
             return processedWords.ToList();

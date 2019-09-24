@@ -32,9 +32,9 @@ namespace Lifti.Tests
             this.index.Index("C", "Foo is testing this as well");
             this.index.Index("D", "One last test just for testing sake");
 
-            var results = this.index.Search("this");
+            var results = this.index.Search("this test");
 
-            results.Should().HaveCount(3);
+            results.Should().HaveCount(2);
         }
 
         [Fact]
