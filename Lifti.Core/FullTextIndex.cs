@@ -52,6 +52,11 @@ namespace Lifti
 
         public void Index<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> itemTokenizationOptions)
         {
+            if (itemTokenizationOptions is null)
+            {
+                throw new ArgumentNullException(nameof(itemTokenizationOptions));
+            }
+
             var itemKey = itemTokenizationOptions.KeyReader(item);
             var itemId = this.IdPool.CreateIdFor(itemKey);
 

@@ -29,7 +29,7 @@ namespace Lifti
             return $"[{this.Start},{this.Length}]";
         }
 
-        int IComparable<Range>.CompareTo(Range other)
+        public int CompareTo(Range other)
         {
             var result = this.Start.CompareTo(other.Start);
             if (result == 0)
@@ -44,6 +44,36 @@ namespace Lifti
         {
             return this.Start == range.Start &&
                    this.Length == range.Length;
+        }
+
+        public static bool operator ==(Range left, Range right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Range left, Range right)
+        {
+            return !(left == right);
+        }
+
+        public static bool operator <(Range left, Range right)
+        {
+            return left.CompareTo(right) < 0;
+        }
+
+        public static bool operator <=(Range left, Range right)
+        {
+            return left.CompareTo(right) <= 0;
+        }
+
+        public static bool operator >(Range left, Range right)
+        {
+            return left.CompareTo(right) > 0;
+        }
+
+        public static bool operator >=(Range left, Range right)
+        {
+            return left.CompareTo(right) >= 0;
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Lifti.Tokenization
 {
-    public class TokenStore
+    internal class TokenStore
     {
         private readonly Dictionary<int, List<Token>> materializedWords = new Dictionary<int, List<Token>>(); // Pooling? Configuration for expected unique words per document?
 

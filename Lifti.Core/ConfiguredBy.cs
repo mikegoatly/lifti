@@ -4,7 +4,7 @@
     {
         private bool configured;
 
-        void IConfiguredBy<T>.Configure(T options)
+        public void Configure(T options)
         {
             if (!this.configured)
             {

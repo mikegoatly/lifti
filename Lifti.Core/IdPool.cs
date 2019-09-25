@@ -13,7 +13,7 @@ namespace Lifti
         {
             if (this.itemIdIndex.ContainsKey(item))
             {
-                throw new LiftiException("Item already indexed");
+                throw new LiftiException(ExceptionMessages.ItemAlreadyIndexed);
             }
 
             var id = reusableIds.Count == 0 ? nextId++ : reusableIds.Dequeue();
@@ -26,7 +26,7 @@ namespace Lifti
         {
             if (!this.itemIdLookup.TryGetValue(id, out var item))
             {
-                throw new LiftiException("Item not found");
+                throw new LiftiException(ExceptionMessages.ItemNotFound);
             }
 
             return item;

@@ -120,6 +120,12 @@
   <data name="ExpectedToken" xml:space="preserve">
     <value>Token expected: {0}</value>
   </data>
+  <data name="ItemAlreadyIndexed" xml:space="preserve">
+    <value>Item already indexed</value>
+  </data>
+  <data name="ItemNotFound" xml:space="preserve">
+    <value>Item not found</value>
+  </data>
   <data name="UnexpectedEndOfQuery" xml:space="preserve">
     <value>The query ended unexpectedly - a token was expected.</value>
   </data>
@@ -131,5 +137,8 @@
   </data>
   <data name="UnexpectedTokenEncountered" xml:space="preserve">
     <value>Unexpected token encountered: {0}</value>
+  </data>
+  <data name="UnsupportedTokenizerKind" xml:space="preserve">
+    <value>Unsupported tokenizer kind {0}</value>
   </data>
 </root>

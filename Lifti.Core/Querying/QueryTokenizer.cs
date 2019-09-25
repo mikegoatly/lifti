@@ -7,7 +7,7 @@ namespace Lifti.Querying
     /// <summary>
     /// A tokenizer class capable of breaking a LIFTI query string down into its constituent tokens.
     /// </summary>
-    public class QueryTokenizer
+    public class QueryTokenizer : IQueryTokenizer
     {
         /// <summary>
         /// Parses the tokens from the given query text.

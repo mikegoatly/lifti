@@ -68,7 +68,7 @@ namespace Lifti.Tokenization
         {
             this.tokenizationOptions = options;
 
-            this.additionalSplitChars = this.tokenizationOptions.AdditionalSplitCharacters?.Length > 0
+            this.additionalSplitChars = this.tokenizationOptions.AdditionalSplitCharacters?.Count > 0
                 ? new HashSet<char>(this.tokenizationOptions.AdditionalSplitCharacters)
                 : null;
 

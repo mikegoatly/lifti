@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Lifti
 {
@@ -13,6 +14,6 @@ namespace Lifti
         }
 
         public Func<TItem, TKey> KeyReader { get; }
-        public FieldTokenizationOptions<TItem>[] FieldTokenization { get; }
+        public IReadOnlyList<FieldTokenizationOptions<TItem>> FieldTokenization { get; }
     }
 }

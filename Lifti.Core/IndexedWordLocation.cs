@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Lifti
 {
-    public struct IndexedWordLocation
+    public struct IndexedWordLocation : IEquatable<IndexedWordLocation>
     {
         public IndexedWordLocation(byte fieldId, IReadOnlyList<Range> locations)
         {
@@ -18,8 +18,7 @@ namespace Lifti
         public override bool Equals(object obj)
         {
             return obj is IndexedWordLocation location &&
-                   this.FieldId == location.FieldId &&
-                   this.Locations.SequenceEqual(location.Locations);
+                this.Equals(location);
         }
 
         public override int GetHashCode()
@@ -31,6 +30,22 @@ namespace Lifti
             }
 
             return hashCode;
+        }
+
+        public bool Equals(IndexedWordLocation other)
+        {
+            return this.FieldId == other.FieldId &&
+                   this.Locations.SequenceEqual(other.Locations);
+        }
+
+        public static bool operator ==(IndexedWordLocation left, IndexedWordLocation right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(IndexedWordLocation left, IndexedWordLocation right)
+        {
+            return !(left == right);
         }
     }
 }

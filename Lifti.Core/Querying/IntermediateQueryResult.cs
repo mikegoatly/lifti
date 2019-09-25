@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace Lifti.Querying
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Should not be compared")]
     public struct IntermediateQueryResult
     {
         public IntermediateQueryResult(IEnumerable<(int itemId, IEnumerable<IndexedWordLocation> indexedWordLocations)> matches)

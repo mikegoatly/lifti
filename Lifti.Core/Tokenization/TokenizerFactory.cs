@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Lifti.Tokenization
 {
@@ -6,12 +7,12 @@ namespace Lifti.Tokenization
     {
         public virtual ITokenizer Create(TokenizationOptions options)
         {
-            var tokenizer = this.CreateTokenizer(options.TokenizerKind);
+            var tokenizer = CreateTokenizer(options.TokenizerKind);
             tokenizer.Configure(options);
             return tokenizer;
         }
 
-        protected ITokenizer CreateTokenizer(TokenizerKind tokenizerKind)
+        private static ITokenizer CreateTokenizer(TokenizerKind tokenizerKind)
         {
             switch (tokenizerKind)
             {
@@ -20,7 +21,7 @@ namespace Lifti.Tokenization
                 case TokenizerKind.XmlContent:
                     return new XmlTokenizer();
                 default:
-                    throw new ArgumentException("Unsupported tokenizer kind " + tokenizerKind, nameof(tokenizerKind));
+                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.UnsupportedTokenizerKind, tokenizerKind), nameof(tokenizerKind));
             }
         }
     }

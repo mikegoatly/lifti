@@ -1,7 +1,9 @@
 ﻿using Lifti.Tokenization;
+using System.Collections.Generic;
 
 namespace Lifti
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Should not be compared")]
     public struct TokenizationOptions
     {
         public TokenizationOptions(
@@ -30,7 +32,7 @@ namespace Lifti
         /// <summary>
         /// Any additional characters that should cause tokens to be split. Defaults to an empty array.
         /// </summary>
-        public char[] AdditionalSplitCharacters { get; }
+        public IReadOnlyList<char> AdditionalSplitCharacters { get; }
 
         public bool CaseInsensitive { get; }
 

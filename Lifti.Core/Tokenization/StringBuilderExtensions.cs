@@ -6,6 +6,16 @@ namespace Lifti.Tokenization
     {
         public static bool SequenceEqual(this StringBuilder builder, string chars)
         {
+            if (builder is null)
+            {
+                throw new System.ArgumentNullException(nameof(builder));
+            }
+
+            if (chars is null)
+            {
+                throw new System.ArgumentNullException(nameof(chars));
+            }
+
             if (chars.Length != builder.Length)
             {
                 return false;

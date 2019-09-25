@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Lifti.Querying
 {
-    public struct IndexNavigator : IIndexNavigator
+    public class IndexNavigator : IIndexNavigator
     {
         private IndexNode currentNode;
         private int intraNodeTextPosition;
@@ -42,7 +42,7 @@ namespace Lifti.Querying
             return true;
         }
 
-        public bool Process(char next)
+        public bool Process(char value)
         {
             if (this.currentNode == null)
             {
@@ -51,7 +51,7 @@ namespace Lifti.Querying
 
             if (this.HasIntraNodeTextLeftToProcess)
             {
-                if (next == this.currentNode.IntraNodeText[this.intraNodeTextPosition])
+                if (value == this.currentNode.IntraNodeText[this.intraNodeTextPosition])
                 {
                     this.intraNodeTextPosition++;
                     return true;
@@ -61,7 +61,7 @@ namespace Lifti.Querying
                 return false;
             }
 
-            if (this.currentNode.ChildNodes != null && this.currentNode.ChildNodes.TryGetValue(next, out var nextNode))
+            if (this.currentNode.ChildNodes != null && this.currentNode.ChildNodes.TryGetValue(value, out var nextNode))
             {
                 this.currentNode = nextNode;
                 this.intraNodeTextPosition = 0;

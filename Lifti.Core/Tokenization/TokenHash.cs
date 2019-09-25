@@ -2,7 +2,7 @@
 
 namespace Lifti.Tokenization
 {
-    public struct TokenHash
+    internal struct TokenHash : IEquatable<TokenHash>
     {
         public TokenHash(ReadOnlySpan<char> word)
         {
@@ -35,12 +35,17 @@ namespace Lifti.Tokenization
         public override bool Equals(object obj)
         {
             return obj is TokenHash hash &&
-                   this.HashValue == hash.HashValue;
+                   this.Equals(hash);
         }
 
         public override int GetHashCode()
         {
             return this.HashValue;
+        }
+
+        public bool Equals(TokenHash other)
+        {
+            return this.HashValue == other.HashValue;
         }
     }
 }

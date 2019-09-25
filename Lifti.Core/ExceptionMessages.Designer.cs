@@ -70,6 +70,24 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Item already indexed.
+        /// </summary>
+        internal static string ItemAlreadyIndexed {
+            get {
+                return ResourceManager.GetString("ItemAlreadyIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Item not found.
+        /// </summary>
+        internal static string ItemNotFound {
+            get {
+                return ResourceManager.GetString("ItemNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The query ended unexpectedly - a token was expected..
         /// </summary>
         internal static string UnexpectedEndOfQuery {
@@ -102,6 +120,15 @@ namespace Lifti {
         internal static string UnexpectedTokenEncountered {
             get {
                 return ResourceManager.GetString("UnexpectedTokenEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported tokenizer kind {0}.
+        /// </summary>
+        internal static string UnsupportedTokenizerKind {
+            get {
+                return ResourceManager.GetString("UnsupportedTokenizerKind", resourceCulture);
             }
         }
     }

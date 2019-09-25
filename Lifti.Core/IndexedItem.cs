@@ -2,7 +2,7 @@
 
 namespace Lifti
 {
-    public struct IndexedItem
+    public struct IndexedItem : IEquatable<IndexedItem>
     {
         public IndexedItem(int itemId, byte fieldId)
         {
@@ -16,13 +16,28 @@ namespace Lifti
         public override bool Equals(object obj)
         {
             return obj is IndexedItem item &&
-                   this.ItemId == item.ItemId &&
-                   this.FieldId == item.FieldId;
+                   this.Equals(item);
         }
 
         public override int GetHashCode()
         {
             return HashCode.Combine(this.ItemId, this.FieldId);
+        }
+
+        public bool Equals(IndexedItem other)
+        {
+            return this.ItemId == other.ItemId &&
+                   this.FieldId == other.FieldId;
+        }
+
+        public static bool operator ==(IndexedItem left, IndexedItem right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(IndexedItem left, IndexedItem right)
+        {
+            return !(left == right);
         }
     }
 }

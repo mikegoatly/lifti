@@ -21,7 +21,7 @@ namespace Lifti.Tests.Querying
             return this.matches;
         }
 
-        public bool Process(char next)
+        public bool Process(char value)
         {
             return true;
         }

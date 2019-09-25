@@ -1,4 +1,6 @@
-﻿namespace Lifti
+﻿using System;
+
+namespace Lifti
 {
     public class IndexNodeFactory : ConfiguredBy<FullTextIndexConfiguration>, IIndexNodeFactory
     {
@@ -18,12 +20,22 @@
 
         public IndexNode CreateNode(IndexNode parent)
         {
+            if (parent is null)
+            {
+                throw new ArgumentNullException(nameof(parent));
+            }
+
             var nextDepth = parent.Depth + 1;
             return new IndexNode(this, nextDepth, this.GetIndexSupportLevelForDepth(nextDepth));
         }
 
         protected override void OnConfiguring(FullTextIndexConfiguration options)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             this.supportIntraNodeTextAtDepth = options.Advanced.SupportIntraNodeTextAfterCharacterIndex;
         }
     }

@@ -32,6 +32,11 @@ namespace Lifti
 
         public void Index(int itemId, byte fieldId, Token word)
         {
+            if (word is null)
+            {
+                throw new ArgumentNullException(nameof(word));
+            }
+
             this.Index(itemId, fieldId, word.Locations, word.Value.AsSpan());
         }
 

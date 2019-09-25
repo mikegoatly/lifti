@@ -179,6 +179,11 @@ namespace Lifti.Querying
 
         public IEnumerable<SearchResult<TKey>> Execute<TKey>(IFullTextIndex<TKey> index)
         {
+            if (index is null)
+            {
+                throw new ArgumentNullException(nameof(index));
+            }
+
             var matches = root.Evaluate(() => new IndexNavigator(index.Root)).Matches;
             var results = new Dictionary<int, List<IndexedWordLocation>>();
 
