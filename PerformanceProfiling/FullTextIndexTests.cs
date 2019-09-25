@@ -49,7 +49,7 @@ namespace PerformanceProfiling
         {
             var splitter = new LiftiNew.Lifti.Tokenization.XmlTokenizer();
 
-            splitter.Process(WikipediaData.SampleData[0].text.AsSpan()).ToList();
+            splitter.Process(WikipediaData.SampleData[0].text).ToList();
         }
 
 

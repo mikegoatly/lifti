@@ -5,6 +5,6 @@ namespace Lifti.Tokenization
 {
     public interface ITokenizer : IConfiguredBy<TokenizationOptions>
     {
-        IEnumerable<Token> Process(ReadOnlySpan<char> input);
+        IEnumerable<Token> Process(string input);
     }
 }

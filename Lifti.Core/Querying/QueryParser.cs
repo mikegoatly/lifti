@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Lifti.Tokenization;
 using System.Collections.Generic;
 using System.Linq;
-using Lifti.Tokenization;
 
 namespace Lifti.Querying
 {
@@ -12,8 +11,7 @@ namespace Lifti.Querying
             IQueryPart rootPart = null;
 
             var state = new QueryParserState(queryText);
-            QueryToken token;
-            while (state.TryGetNextToken(out token))
+            while (state.TryGetNextToken(out var token))
             {
                 rootPart = CreateQueryPart(state, token, wordTokenizer, rootPart);
             }
@@ -28,6 +26,7 @@ namespace Lifti.Querying
                 case QueryTokenType.Text:
                     return CreateWordParts(token, wordTokenizer).Aggregate(rootPart, ComposePart);
 
+                case QueryTokenType.OrOperator:
                 case QueryTokenType.AndOperator:
                     var rightPart = CreateQueryPart(state, state.GetNextToken(), wordTokenizer, null);
                     return CombineParts(rootPart, rightPart, token.TokenType);
@@ -39,7 +38,7 @@ namespace Lifti.Querying
 
         private static IEnumerable<IWordQueryPart> CreateWordParts(QueryToken token, ITokenizer wordTokenizer)
         {
-            return from w in wordTokenizer.Process(token.TokenText.AsSpan())
+            return from w in wordTokenizer.Process(token.TokenText)
                    let word = w.Value
                    select new ExactWordQueryPart(word);
         }
@@ -82,6 +81,9 @@ namespace Lifti.Querying
             {
                 case QueryTokenType.AndOperator:
                     return new AndQueryOperator(leftPart, rightPart);
+
+                case QueryTokenType.OrOperator:
+                    return new OrQueryOperator(leftPart, rightPart);
 
                 default:
                     throw new QueryParserException(ExceptionMessages.UnexpectedOperatorInternal, tokenType);
@@ -164,46 +166,6 @@ namespace Lifti.Querying
                 {
                     throw new QueryParserException(ExceptionMessages.ExpectedToken, terminatingToken);
                 }
-            }
-        }
-    }
-
-    public class Query : IQuery
-    {
-        private readonly IQueryPart root;
-
-        public Query(IQueryPart root)
-        {
-            this.root = root;
-        }
-
-        public IEnumerable<SearchResult<TKey>> Execute<TKey>(IFullTextIndex<TKey> index)
-        {
-            if (index is null)
-            {
-                throw new ArgumentNullException(nameof(index));
-            }
-
-            var matches = root.Evaluate(() => new IndexNavigator(index.Root)).Matches;
-            var results = new Dictionary<int, List<IndexedWordLocation>>();
-
-            foreach (var (itemId, indexedWordLocations) in matches)
-            {
-                if (!results.TryGetValue(itemId, out var itemResults))
-                {
-                    itemResults = new List<IndexedWordLocation>();
-                    results[itemId] = itemResults;
-                }
-
-                itemResults.AddRange(indexedWordLocations);
-            }
-
-            foreach (var itemResults in matches)
-            {
-                var item = index.IdPool.GetItemForId(itemResults.itemId);
-                yield return new SearchResult<TKey>(
-                    item,
-                    itemResults.indexedWordLocations.Select(m => new MatchedLocation(index.FieldLookup.GetFieldForId(m.FieldId), m.Locations)).ToList());
             }
         }
     }

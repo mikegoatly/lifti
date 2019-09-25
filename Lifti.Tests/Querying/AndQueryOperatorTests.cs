@@ -24,8 +24,8 @@ namespace Lifti.Tests.Querying
         public void ShouldMergeMatchingWordLocations()
         {
             var op = new AndQueryOperator(
-                new FakeQueryPart(new[] { (5, new[] { new IndexedWordLocation(1, new[] { new Range(1, 7) }) }) }),
-                new FakeQueryPart(new[] { (5, new[] { new IndexedWordLocation(2, new[] { new Range(4, 6) }) }) }));
+                new FakeQueryPart(new[] { (5, new[] { new IndexedWordLocation(1, new Range(1, 7)) }) }),
+                new FakeQueryPart(new[] { (5, new[] { new IndexedWordLocation(2, new Range(4, 6)) }) }));
 
             var result = op.Evaluate(() => new FakeIndexNavigator());
 

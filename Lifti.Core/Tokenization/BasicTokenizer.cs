@@ -11,7 +11,7 @@ namespace Lifti.Tokenization
         private TokenizationOptions tokenizationOptions;
         private HashSet<char> additionalSplitChars;
 
-        public IEnumerable<Token> Process(ReadOnlySpan<char> input)
+        public IEnumerable<Token> Process(string input)
         {
             var processedWords = new TokenStore(); // TODO Pool?
 

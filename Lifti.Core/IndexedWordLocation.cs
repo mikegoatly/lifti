@@ -6,6 +6,12 @@ namespace Lifti
 {
     public struct IndexedWordLocation : IEquatable<IndexedWordLocation>
     {
+        public IndexedWordLocation(byte fieldId, params Range[] locations)
+        {
+            this.FieldId = fieldId;
+            this.Locations = locations;
+        }
+
         public IndexedWordLocation(byte fieldId, IReadOnlyList<Range> locations)
         {
             this.FieldId = fieldId;

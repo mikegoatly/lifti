@@ -21,6 +21,14 @@ namespace Lifti.Querying
             return new IntermediateQueryResult(IntersectEnumerator(this, results));
         }
 
+        /// <summary>
+        /// Union this and the specified instance - this is the equivalent of an OR statement.
+        /// </summary>
+        public IntermediateQueryResult Union(IntermediateQueryResult results)
+        {
+            return new IntermediateQueryResult(UnionEnumerator(this, results));
+        }
+
         private static IEnumerable<(int itemId, IEnumerable<IndexedWordLocation> indexedWordLocations)> IntersectEnumerator(IntermediateQueryResult current, IntermediateQueryResult next)
         {
             var currentLookup = current.Matches.ToLookup(m => m.itemId);
@@ -37,6 +45,39 @@ namespace Lifti.Querying
                             .Concat(nextLookup[match.Key].SelectMany(m => m.indexedWordLocations))
                         );
                 }
+            }
+        }
+
+        private static IEnumerable<(int itemId, IEnumerable<IndexedWordLocation> indexedWordLocations)> UnionEnumerator(IntermediateQueryResult current, IntermediateQueryResult next)
+        {
+            var currentLookup = current.Matches.ToLookup(m => m.itemId);
+            var nextLookup = next.Matches.ToLookup(m => m.itemId).ToDictionary(i => i.Key, i => i);
+
+            foreach (var match in currentLookup)
+            {
+                if (nextLookup.TryGetValue(match.Key, out var nextLocations))
+                {
+                    // Exists in both
+                    yield return
+                        (
+                        match.Key,
+                        match.SelectMany(m => m.indexedWordLocations)
+                            .Concat(nextLocations.SelectMany(m => m.indexedWordLocations))
+                        );
+
+                    nextLookup.Remove(match.Key);
+                }
+                else
+                {
+                    // Exists only in current
+                    yield return (match.Key, match.SelectMany(m => m.indexedWordLocations));
+                }
+            }
+
+            // Any items still remaining in nextLookup exist only there
+            foreach (var match in nextLookup)
+            {
+                yield return (match.Key, match.Value.SelectMany(m => m.indexedWordLocations));
             }
         }
     }
