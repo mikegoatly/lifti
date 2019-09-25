@@ -18,7 +18,7 @@ namespace Lifti.Tests
         public FullTextIndexTests()
         {
             this.index = new FullTextIndex<string>(
-                new FullTextIndexOptions<string>
+                new FullTextIndexConfiguration<string>
                 {
                     Advanced = { SupportIntraNodeTextAfterCharacterIndex = 4 }
                 });

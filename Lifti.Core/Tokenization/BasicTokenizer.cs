@@ -13,6 +13,11 @@ namespace Lifti.Tokenization
 
         public IEnumerable<Token> Process(string input)
         {
+            return this.Process(input.AsSpan());
+        }
+
+        public IEnumerable<Token> Process(ReadOnlySpan<char> input)
+        {
             var processedWords = new TokenStore(); // TODO Pool?
 
             var start = 0;

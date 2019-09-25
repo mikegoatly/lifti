@@ -1,4 +1,5 @@
 ﻿using Lifti.Tokenization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,7 +25,7 @@ namespace Lifti.Querying
             switch (token.TokenType)
             {
                 case QueryTokenType.Text:
-                    return CreateWordParts(token, wordTokenizer).Aggregate(rootPart, ComposePart);
+                    return ComposePart(rootPart, CreateWordPart(token, wordTokenizer));
 
                 case QueryTokenType.OrOperator:
                 case QueryTokenType.AndOperator:
@@ -36,11 +37,19 @@ namespace Lifti.Querying
             }
         }
 
-        private static IEnumerable<IWordQueryPart> CreateWordParts(QueryToken token, ITokenizer wordTokenizer)
+        private static IWordQueryPart CreateWordPart(QueryToken queryToken, ITokenizer wordTokenizer)
         {
-            return from w in wordTokenizer.Process(token.TokenText)
-                   let word = w.Value
-                   select new ExactWordQueryPart(word);
+            var tokenText = queryToken.TokenText.AsSpan();
+
+            var hasWildcard = tokenText.Length > 0 && tokenText[tokenText.Length - 1] == '*';
+            if (hasWildcard)
+            {
+                tokenText = tokenText.Slice(0, tokenText.Length - 1);
+            }
+
+            var tokenizedWord = wordTokenizer.Process(tokenText).Single();
+            
+            return hasWildcard ? (IWordQueryPart)new StartsWithWordQueryPart(tokenizedWord.Value) : new ExactWordQueryPart(tokenizedWord.Value);
         }
 
         private static IQueryPart ComposePart(IQueryPart existingPart, IQueryPart newPart)

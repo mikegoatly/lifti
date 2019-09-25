@@ -22,11 +22,47 @@ namespace Lifti.Querying
         {
             if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess)
             {
-                return new IntermediateQueryResult(Array.Empty<(int, IEnumerable<IndexedWordLocation>)>());
+                return IntermediateQueryResult.Empty;
             }
 
-            return new IntermediateQueryResult(
-                this.currentNode.Matches.Select(m => (m.Key, (IEnumerable<IndexedWordLocation>)m.Value)));
+            return new IntermediateQueryResult(this.GetCurrentNodeMatches());
+        }
+
+        private IEnumerable<(int itemId, IEnumerable<IndexedWordLocation> indexedWordLocations)> GetCurrentNodeMatches()
+        {
+            return this.currentNode.Matches?.Select(m => (m.Key, (IEnumerable<IndexedWordLocation>)m.Value)) ?? 
+                Array.Empty<(int itemId, IEnumerable<IndexedWordLocation> indexedWordLocations)>();
+        }
+
+        public IntermediateQueryResult GetExactAndChildMatches()
+        {
+            if (this.currentNode == null)
+            {
+                return IntermediateQueryResult.Empty;
+            }
+
+            var matches = new List<(int itemId, IEnumerable<IndexedWordLocation> indexedWordLocations)>();
+            var childNodeStack = new Queue<IndexNode>();
+            childNodeStack.Enqueue(this.currentNode);
+
+            while (childNodeStack.Count > 0)
+            {
+                var node = childNodeStack.Dequeue();
+                if (node.Matches != null)
+                {
+                    matches.AddRange(node.Matches.Select(m => (m.Key, (IEnumerable<IndexedWordLocation>)m.Value)));
+                }
+
+                if (node.ChildNodes != null)
+                {
+                    foreach (var childNode in node.ChildNodes.Values)
+                    {
+                        childNodeStack.Enqueue(childNode);
+                    }
+                }
+            }
+            
+            return new IntermediateQueryResult(matches);
         }
 
         public bool Process(ReadOnlySpan<char> text)
@@ -68,6 +104,7 @@ namespace Lifti.Querying
                 return true;
             }
 
+            this.currentNode = null;
             return false;
         }
     }

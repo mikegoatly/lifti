@@ -12,12 +12,12 @@ namespace Lifti
         private readonly IQueryParser queryParser;
 
         public FullTextIndex()
-            : this(new FullTextIndexOptions<TKey>())
+            : this(new FullTextIndexConfiguration<TKey>())
         {
         }
 
         public FullTextIndex(
-            FullTextIndexOptions<TKey> options,
+            FullTextIndexConfiguration<TKey> options,
             IIndexNodeFactory indexNodeFactory = default,
             ITokenizerFactory tokenizerFactory = default,
             IQueryParser queryParser = default)

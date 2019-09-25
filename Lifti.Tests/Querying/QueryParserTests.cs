@@ -48,6 +48,17 @@ namespace Lifti.Tests.Querying
             result.Should().BeEquivalentTo(expectedQuery);
         }
 
+        [Theory]
+        [InlineData("word*")]
+        [InlineData(" word*")]
+        [InlineData(" word*  ")]
+        public void ParsingWordWithWildcard_ShouldReturnStartsWithWordQueryPart(string test)
+        {
+            var result = this.Parse(test);
+            var expectedQuery = new Query(new StartsWithWordQueryPart("word"));
+            result.Should().BeEquivalentTo(expectedQuery);
+        }
+
         [Fact]
         public void ParsingEmptyString_ShouldReturnNullQueryRoot()
         {
@@ -59,7 +70,7 @@ namespace Lifti.Tests.Querying
         private IQuery Parse(string text)
         {
             var parser = new QueryParser();
-            return parser.Parse(text, this.tokenizerMock.Object);
+            return parser.Parse(text, new FakeTokenizer());
         }
     }
 }

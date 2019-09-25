@@ -3,11 +3,11 @@
 namespace Lifti.Querying
 {
     /// <summary>
-    /// A query part that matches items that are indexed exactly against text.
+    /// A query part that matches items that are indexed starting with given text.
     /// </summary>
-    public class ExactWordQueryPart : WordQueryPart
+    public class StartsWithWordQueryPart : WordQueryPart
     {
-        public ExactWordQueryPart(string word)
+        public StartsWithWordQueryPart(string word)
             : base(word)
         {
         }
@@ -21,12 +21,12 @@ namespace Lifti.Querying
 
             var navigator = navigatorCreator();
             navigator.Process(this.Word.AsSpan());
-            return navigator.GetExactMatches();
+            return navigator.GetExactAndChildMatches();
         }
 
         public override string ToString()
         {
-            return "EXACT(" + this.Word + ")";
+            return "STARTSWITH(" + this.Word + ")";
         }
     }
 }

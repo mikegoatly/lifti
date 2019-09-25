@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lifti.Querying
@@ -6,6 +7,8 @@ namespace Lifti.Querying
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Should not be compared")]
     public struct IntermediateQueryResult
     {
+        public static IntermediateQueryResult Empty { get; } = new IntermediateQueryResult(Array.Empty<(int, IEnumerable<IndexedWordLocation>)>());
+
         public IntermediateQueryResult(IEnumerable<(int itemId, IEnumerable<IndexedWordLocation> indexedWordLocations)> matches)
         {
             this.Matches = matches;

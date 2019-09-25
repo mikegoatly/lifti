@@ -34,7 +34,7 @@ namespace PerformanceProfiling
         protected static LiftiNew.Lifti.FullTextIndex<string> CreateNewIndex(int supportSplitAtIndex)
         {
             return new LiftiNew.Lifti.FullTextIndex<string>(
-                new LiftiNew.Lifti.FullTextIndexOptions<string>
+                new LiftiNew.Lifti.FullTextIndexConfiguration<string>
                 {
                     Advanced = { SupportIntraNodeTextAfterCharacterIndex = supportSplitAtIndex }
                 });
