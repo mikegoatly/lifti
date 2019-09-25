@@ -21,7 +21,7 @@ namespace Lifti.Tokenization
                 case TokenizerKind.XmlContent:
                     return new XmlTokenizer();
                 default:
-                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.UnsupportedTokenizerKind, tokenizerKind), nameof(tokenizerKind));
+                    throw new LiftiException(ExceptionMessages.UnsupportedTokenizerKind, tokenizerKind);
             }
         }
     }

@@ -51,7 +51,7 @@ namespace Lifti
                     this.IndexWithIntraNodeTextSupport(itemId, fieldId, locations, remainingWordText);
                     break;
                 default:
-                    throw new InvalidOperationException($"Unsupported index support level {this.indexSupportLevel}");
+                    throw new LiftiException(ExceptionMessages.UnsupportedIndexSupportLevel, this.indexSupportLevel);
             }
 
         }

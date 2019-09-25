@@ -70,6 +70,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Field id {0} has no associated field name.
+        /// </summary>
+        internal static string FieldHasNoAssociatedFieldName {
+            get {
+                return ResourceManager.GetString("FieldHasNoAssociatedFieldName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Item already indexed.
         /// </summary>
         internal static string ItemAlreadyIndexed {
@@ -84,6 +93,15 @@ namespace Lifti {
         internal static string ItemNotFound {
             get {
                 return ResourceManager.GetString("ItemNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only 255 distinct fields can currently be indexed.
+        /// </summary>
+        internal static string MaximumDistinctFieldsIndexReached {
+            get {
+                return ResourceManager.GetString("MaximumDistinctFieldsIndexReached", resourceCulture);
             }
         }
         
@@ -120,6 +138,24 @@ namespace Lifti {
         internal static string UnexpectedTokenEncountered {
             get {
                 return ResourceManager.GetString("UnexpectedTokenEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown operator encountered: {0}.
+        /// </summary>
+        internal static string UnknownOperatorEncountered {
+            get {
+                return ResourceManager.GetString("UnknownOperatorEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported index support level {0}.
+        /// </summary>
+        internal static string UnsupportedIndexSupportLevel {
+            get {
+                return ResourceManager.GetString("UnsupportedIndexSupportLevel", resourceCulture);
             }
         }
         

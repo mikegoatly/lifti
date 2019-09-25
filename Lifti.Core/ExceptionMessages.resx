@@ -120,11 +120,17 @@
   <data name="ExpectedToken" xml:space="preserve">
     <value>Token expected: {0}</value>
   </data>
+  <data name="FieldHasNoAssociatedFieldName" xml:space="preserve">
+    <value>Field id {0} has no associated field name</value>
+  </data>
   <data name="ItemAlreadyIndexed" xml:space="preserve">
     <value>Item already indexed</value>
   </data>
   <data name="ItemNotFound" xml:space="preserve">
     <value>Item not found</value>
+  </data>
+  <data name="MaximumDistinctFieldsIndexReached" xml:space="preserve">
+    <value>Only 255 distinct fields can currently be indexed</value>
   </data>
   <data name="UnexpectedEndOfQuery" xml:space="preserve">
     <value>The query ended unexpectedly - a token was expected.</value>
@@ -137,6 +143,12 @@
   </data>
   <data name="UnexpectedTokenEncountered" xml:space="preserve">
     <value>Unexpected token encountered: {0}</value>
+  </data>
+  <data name="UnknownOperatorEncountered" xml:space="preserve">
+    <value>Unknown operator encountered: {0}</value>
+  </data>
+  <data name="UnsupportedIndexSupportLevel" xml:space="preserve">
+    <value>Unsupported index support level {0}</value>
   </data>
   <data name="UnsupportedTokenizerKind" xml:space="preserve">
     <value>Unsupported tokenizer kind {0}</value>

@@ -22,7 +22,7 @@ namespace Lifti
                 return fieldName;
             }
 
-            throw new LiftiException($"Field id {id} has no associated field name");
+            throw new LiftiException(ExceptionMessages.FieldHasNoAssociatedFieldName, id);
         }
 
         public byte GetOrCreateIdForField(string fieldName)
@@ -35,7 +35,7 @@ namespace Lifti
             var newId = Interlocked.Increment(ref nextId);
             if (newId > byte.MaxValue)
             {
-                throw new LiftiException($"Only {byte.MaxValue} distinct fields can currently be indexed");
+                throw new LiftiException(ExceptionMessages.MaximumDistinctFieldsIndexReached);
             }
 
             id = (byte)newId;

@@ -124,7 +124,7 @@ namespace Lifti.Querying
                     return QueryTokenType.NearOperator;
 
                 default:
-                    throw new QueryParserException("Unknown operator encountered: " + text);
+                    throw new QueryParserException(ExceptionMessages.UnknownOperatorEncountered, text);
             }
         }
 
