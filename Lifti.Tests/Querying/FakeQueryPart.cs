@@ -9,17 +9,16 @@ namespace Lifti.Tests.Querying
     {
         private IntermediateQueryResult results;
 
-        public FakeQueryPart(IEnumerable<(int itemId, IndexedWord[] indexedWordLocations)> matches)
+        public FakeQueryPart(params QueryWordMatch[] matches)
         {
-            this.results = new IntermediateQueryResult(matches
-                .Select(m => (m.itemId, (IEnumerable<IndexedWord>)m.indexedWordLocations)));
+            this.results = new IntermediateQueryResult(matches);
         }
 
         public FakeQueryPart(params int[] matchedItems)
         {
             this.results = new IntermediateQueryResult(
                 matchedItems.Select(
-                    m => (m, (IEnumerable<IndexedWord>)new[] { new IndexedWord((byte)m, new[] { new WordLocation(m, m, m) }) })));
+                    m => new QueryWordMatch(m, new[] { new IndexedWord((byte)m, new[] { new WordLocation(m, m, m) }) })));
         }
 
         public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)

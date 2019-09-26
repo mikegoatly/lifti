@@ -28,23 +28,23 @@ namespace Lifti.Querying
             var matches = this.Root.Evaluate(() => new IndexNavigator(index.Root)).Matches;
             var results = new Dictionary<int, List<IndexedWord>>();
 
-            foreach (var (itemId, indexedWordLocations) in matches)
+            foreach (var match in matches)
             {
-                if (!results.TryGetValue(itemId, out var itemResults))
+                if (!results.TryGetValue(match.ItemId, out var itemResults))
                 {
                     itemResults = new List<IndexedWord>();
-                    results[itemId] = itemResults;
+                    results[match.ItemId] = itemResults;
                 }
 
-                itemResults.AddRange(indexedWordLocations);
+                itemResults.AddRange(match.IndexedWordLocations);
             }
 
             foreach (var itemResults in matches)
             {
-                var item = index.IdPool.GetItemForId(itemResults.itemId);
+                var item = index.IdPool.GetItemForId(itemResults.ItemId);
                 yield return new SearchResult<TKey>(
                     item,
-                    itemResults.indexedWordLocations.Select(m => new MatchedLocation(index.FieldLookup.GetFieldForId(m.FieldId), m.Locations)).ToList());
+                    itemResults.IndexedWordLocations.Select(m => new MatchedLocation(index.FieldLookup.GetFieldForId(m.FieldId), m.Locations)).ToList());
             }
         }
     }

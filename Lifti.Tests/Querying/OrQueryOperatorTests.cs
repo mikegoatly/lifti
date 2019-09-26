@@ -16,7 +16,7 @@ namespace Lifti.Tests.Querying
 
             var result = op.Evaluate(() => new FakeIndexNavigator());
 
-            result.Matches.Select(m => m.itemId).Should().BeEquivalentTo(
+            result.Matches.Select(m => m.ItemId).Should().BeEquivalentTo(
                 new[] { 2, 5, 8, 9 });
         }
 
@@ -29,24 +29,20 @@ namespace Lifti.Tests.Querying
             var word4 = new IndexedWord(1, new WordLocation(3, 2, 9));
 
             var op = new OrQueryOperator(
-                new FakeQueryPart(new[]
-                {
-                    (4, new[] { word1 }),
-                    (5, new[] { word2 })
-                }),
-                new FakeQueryPart(new[]
-                {
-                    (5, new[] { word3 }),
-                    (7, new[] { word4 }),
-                }));
+                new FakeQueryPart(
+                    new QueryWordMatch(4, new[] { word1 }),
+                    new QueryWordMatch(5, new[] { word2 })),
+                new FakeQueryPart(
+                    new QueryWordMatch(5, new[] { word3 }),
+                    new QueryWordMatch(7, new[] { word4 })));
 
             var result = op.Evaluate(() => new FakeIndexNavigator());
 
             result.Matches.Should().BeEquivalentTo(
                 new[] {
-                    (4, new[] { word1 }),
-                    (5, new[] { word2, word3 }),
-                    (7, new[] { word4 }),
+                    new QueryWordMatch(4, new[] { word1 }),
+                    new QueryWordMatch(5, new[] { word2, word3 }),
+                    new QueryWordMatch(7, new[] { word4 }),
                 });
         }
     }

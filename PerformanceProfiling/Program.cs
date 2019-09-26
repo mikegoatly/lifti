@@ -6,7 +6,7 @@ namespace PerformanceProfiling
     {
         public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<FullTextIndexTests>();
+            var summary = BenchmarkRunner.Run<IndexSearchingBenchmarks>();
         }
     }
 }

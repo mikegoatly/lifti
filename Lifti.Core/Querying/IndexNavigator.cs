@@ -28,10 +28,10 @@ namespace Lifti.Querying
             return new IntermediateQueryResult(this.GetCurrentNodeMatches());
         }
 
-        private IEnumerable<(int itemId, IEnumerable<IndexedWord> indexedWordLocations)> GetCurrentNodeMatches()
+        private IEnumerable<QueryWordMatch> GetCurrentNodeMatches()
         {
-            return this.currentNode.Matches?.Select(m => (m.Key, (IEnumerable<IndexedWord>)m.Value)) ?? 
-                Array.Empty<(int itemId, IEnumerable<IndexedWord> indexedWordLocations)>();
+            return this.currentNode.Matches?.Select(m => new QueryWordMatch(m.Key, m.Value)) ?? 
+                Array.Empty<QueryWordMatch>();
         }
 
         public IntermediateQueryResult GetExactAndChildMatches()
@@ -41,7 +41,7 @@ namespace Lifti.Querying
                 return IntermediateQueryResult.Empty;
             }
 
-            var matches = new List<(int itemId, IEnumerable<IndexedWord> indexedWordLocations)>();
+            var matches = new List<QueryWordMatch>();
             var childNodeStack = new Queue<IndexNode>();
             childNodeStack.Enqueue(this.currentNode);
 
@@ -50,7 +50,7 @@ namespace Lifti.Querying
                 var node = childNodeStack.Dequeue();
                 if (node.Matches != null)
                 {
-                    matches.AddRange(node.Matches.Select(m => (m.Key, (IEnumerable<IndexedWord>)m.Value)));
+                    matches.AddRange(node.Matches.Select(m => new QueryWordMatch(m.Key, m.Value)));
                 }
 
                 if (node.ChildNodes != null)
