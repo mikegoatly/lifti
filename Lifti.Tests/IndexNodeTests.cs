@@ -12,10 +12,10 @@ namespace Lifti.Tests
         private readonly Mock<IIndexNodeFactory> indexNodeFactoryMock;
         private readonly IndexNode sut;
         private readonly List<IndexNode> createdChildNodes = new List<IndexNode>();
-        private readonly IndexedWordLocation locations1 = CreateLocations(0, (1, 2), (5, 8));
-        private readonly IndexedWordLocation locations2 = CreateLocations(0, (9, 2));
-        private readonly IndexedWordLocation locations3 = CreateLocations(0, (14, 5));
-        private readonly IndexedWordLocation locations4 = CreateLocations(0, (4, 5));
+        private readonly IndexedWord locations1 = CreateLocations(0, (0, 1, 2), (1, 5, 8));
+        private readonly IndexedWord locations2 = CreateLocations(0, (2, 9, 2));
+        private readonly IndexedWord locations3 = CreateLocations(0, (3, 14, 5));
+        private readonly IndexedWord locations4 = CreateLocations(0, (4, 4, 5));
         private const int item1 = 1;
         private const int item2 = 2;
         private const int item3 = 3;
@@ -133,15 +133,15 @@ namespace Lifti.Tests
             VerifySutState(this.createdChildNodes[2], null, new[] { (item2, this.locations2) });
         }
 
-        private static IndexedWordLocation CreateLocations(byte fieldId, params (int, int)[] locations)
+        private static IndexedWord CreateLocations(byte fieldId, params (int, int, int)[] locations)
         {
-            return new IndexedWordLocation(fieldId, locations.Select(r => new Range(r.Item1, r.Item2)).ToArray());
+            return new IndexedWord(fieldId, locations.Select(r => new WordLocation(r.Item1, r.Item2, r.Item3)).ToArray());
         }
 
         private static void VerifySutState(
             IndexNode node,
             string intraNodeText,
-            (int, IndexedWordLocation)[] expectedMatches = null,
+            (int, IndexedWord)[] expectedMatches = null,
             (char, IndexNode)[] expectedChildNodes = null)
         {
             node.IntraNodeText.Should().BeEquivalentTo(intraNodeText?.ToCharArray());

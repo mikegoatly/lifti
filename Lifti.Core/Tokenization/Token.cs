@@ -4,30 +4,30 @@ namespace Lifti.Tokenization
 {
     public class Token
     {
-        private readonly List<Range> locations;
+        private readonly List<WordLocation> locations;
 
-        public Token(string token, Range location)
+        public Token(string token, WordLocation location)
         {
-            this.locations = new List<Range> { location };
+            this.locations = new List<WordLocation> { location };
             this.Value = token;
         }
 
-        public Token(string token, params Range[] locations)
+        public Token(string token, params WordLocation[] locations)
         {
-            this.locations = new List<Range>(locations);
+            this.locations = new List<WordLocation>(locations);
             this.Value = token;
         }
 
-        public Token(string token, IReadOnlyList<Range> locations)
+        public Token(string token, IReadOnlyList<WordLocation> locations)
         {
-            this.locations = new List<Range>(locations);
+            this.locations = new List<WordLocation>(locations);
             this.Value = token;
         }
 
-        public IReadOnlyList<Range> Locations => this.locations;
+        public IReadOnlyList<WordLocation> Locations => this.locations;
         public string Value { get; }
 
-        public void AddLocation(Range location)
+        public void AddLocation(WordLocation location)
         {
             this.locations.Add(location);
         }

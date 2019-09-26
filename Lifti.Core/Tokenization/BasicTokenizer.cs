@@ -20,6 +20,7 @@ namespace Lifti.Tokenization
         {
             var processedWords = new TokenStore(); // TODO Pool?
 
+            var wordIndex = 0;
             var start = 0;
             var wordBuilder = new StringBuilder();
             var hash = new TokenHash();
@@ -30,7 +31,8 @@ namespace Lifti.Tokenization
                 {
                     if (wordBuilder.Length > 0)
                     {
-                        CaptureWord(processedWords, hash, start, i, wordBuilder);
+                        CaptureWord(processedWords, hash, wordIndex, start, i, wordBuilder);
+                        wordIndex++;
                         wordBuilder.Length = 0;
                         hash = new TokenHash();
                     }
@@ -49,7 +51,7 @@ namespace Lifti.Tokenization
 
             if (wordBuilder.Length > 0)
             {
-                CaptureWord(processedWords, hash, start, input.Length, wordBuilder);
+                CaptureWord(processedWords, hash, wordIndex, start, input.Length, wordBuilder);
             }
 
             return processedWords.ToList();
@@ -63,10 +65,10 @@ namespace Lifti.Tokenization
                 (this.additionalSplitChars?.Contains(current) == true);
         }
 
-        private static void CaptureWord(TokenStore processedWords, TokenHash hash, int start, int end, StringBuilder wordBuilder)
+        private static void CaptureWord(TokenStore processedWords, TokenHash hash, int wordIndex, int start, int end, StringBuilder wordBuilder)
         {
             var length = end - start;
-            processedWords.MergeOrAdd(hash, wordBuilder, new Range(start, length));
+            processedWords.MergeOrAdd(hash, wordBuilder, new WordLocation(wordIndex, start, length));
         }
 
         protected override void OnConfiguring(TokenizationOptions options)

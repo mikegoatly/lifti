@@ -15,7 +15,7 @@ namespace Lifti.Tests.Querying
         {
             this.ExpectedExactAndChildMatches = new IntermediateQueryResult(
                 matchedItems.Select(
-                    m => (m, (IEnumerable<IndexedWordLocation>)new[] { new IndexedWordLocation((byte)m, new[] { new Range(m, m) }) })));
+                    m => (m, (IEnumerable<IndexedWord>)new[] { new IndexedWord((byte)m, new[] { new WordLocation(m, m, m) }) })));
 
             this.ExpectedExactMatches = exactAndChildMatchOnly ? IntermediateQueryResult.Empty : this.ExpectedExactAndChildMatches;
         }

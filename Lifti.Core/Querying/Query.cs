@@ -26,13 +26,13 @@ namespace Lifti.Querying
             }
 
             var matches = this.Root.Evaluate(() => new IndexNavigator(index.Root)).Matches;
-            var results = new Dictionary<int, List<IndexedWordLocation>>();
+            var results = new Dictionary<int, List<IndexedWord>>();
 
             foreach (var (itemId, indexedWordLocations) in matches)
             {
                 if (!results.TryGetValue(itemId, out var itemResults))
                 {
-                    itemResults = new List<IndexedWordLocation>();
+                    itemResults = new List<IndexedWord>();
                     results[itemId] = itemResults;
                 }
 

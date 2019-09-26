@@ -13,7 +13,7 @@ namespace Lifti
 
     public class IndexNode
     {
-        private Dictionary<int, List<IndexedWordLocation>> matches;
+        private Dictionary<int, List<IndexedWord>> matches;
         private Dictionary<char, IndexNode> childNodes;
         private readonly IIndexNodeFactory indexNodeFactory;
         private readonly IndexSupportLevelKind indexSupportLevel;
@@ -28,7 +28,7 @@ namespace Lifti
         public int Depth { get; }
         internal char[] IntraNodeText { get; private set; }
         internal IReadOnlyDictionary<char, IndexNode> ChildNodes => this.childNodes;
-        internal IReadOnlyDictionary<int, List<IndexedWordLocation>> Matches => this.matches;
+        internal IReadOnlyDictionary<int, List<IndexedWord>> Matches => this.matches;
 
         public void Index(int itemId, byte fieldId, Token word)
         {
@@ -40,7 +40,7 @@ namespace Lifti
             this.Index(itemId, fieldId, word.Locations, word.Value.AsSpan());
         }
 
-        private void Index(int itemId, byte fieldId, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText)
+        private void Index(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlySpan<char> remainingWordText)
         {
             switch (this.indexSupportLevel)
             {
@@ -56,7 +56,7 @@ namespace Lifti
 
         }
 
-        private void IndexWithIntraNodeTextSupport(int itemId, byte fieldId, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText)
+        private void IndexWithIntraNodeTextSupport(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlySpan<char> remainingWordText)
         {
             if (this.IntraNodeText == null)
             {
@@ -97,7 +97,7 @@ namespace Lifti
             }
         }
 
-        private void IndexFromCharacter(int itemId, byte fieldId, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText, int testLength = 0)
+        private void IndexFromCharacter(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlySpan<char> remainingWordText, int testLength = 0)
         {
             if (remainingWordText.Length > testLength)
             {
@@ -110,7 +110,7 @@ namespace Lifti
             }
         }
 
-        private void ContinueIndexingAtChild(int itemId, byte fieldId, IReadOnlyList<Range> locations, ReadOnlySpan<char> remainingWordText, int remainingTextSplitPosition)
+        private void ContinueIndexingAtChild(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlySpan<char> remainingWordText, int remainingTextSplitPosition)
         {
             this.EnsureChildNodesLookupCreated();
 
@@ -154,20 +154,20 @@ namespace Lifti
             this.childNodes.Add(intraTextSpan[splitIndex], splitChildNode);
         }
 
-        private void AddMatchedItem(int itemId, byte fieldId, IReadOnlyList<Range> locations)
+        private void AddMatchedItem(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations)
         {
             if (this.matches == null)
             {
-                this.matches = new Dictionary<int, List<IndexedWordLocation>>();
+                this.matches = new Dictionary<int, List<IndexedWord>>();
             }
 
             if (!this.matches.TryGetValue(itemId, out var itemFieldLocations))
             {
-                itemFieldLocations = new List<IndexedWordLocation>(); // TODO Constrain list to size == number of fields for index?
+                itemFieldLocations = new List<IndexedWord>(); // TODO Constrain list to size == number of fields for index?
                 this.matches[itemId] = itemFieldLocations;
             }
 
-            itemFieldLocations.Add(new IndexedWordLocation(fieldId, locations));
+            itemFieldLocations.Add(new IndexedWord(fieldId, locations));
         }
 
         public override string ToString()

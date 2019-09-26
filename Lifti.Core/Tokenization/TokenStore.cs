@@ -8,7 +8,7 @@ namespace Lifti.Tokenization
     {
         private readonly Dictionary<int, List<Token>> materializedWords = new Dictionary<int, List<Token>>(); // Pooling? Configuration for expected unique words per document?
 
-        public void MergeOrAdd(TokenHash hash, StringBuilder word, Range location)
+        public void MergeOrAdd(TokenHash hash, StringBuilder word, WordLocation location)
         {
             if (this.materializedWords.TryGetValue(hash.HashValue, out var existingEntries))
             {

@@ -61,7 +61,7 @@ namespace PerformanceProfiling
         }
     }
 
-    [CoreJob]
+    [MediumRunJob]
     [RankColumn, MemoryDiagnoser]
     public class FullTextIndexTests : IndexBenchmarkBase
     {
@@ -92,5 +92,12 @@ namespace PerformanceProfiling
         //    var index = CreateNewIndex(2);
         //    this.PopulateIndex(index);
         //}
+
+        [Benchmark()]
+        public void LegacyCodeIndexing()
+        {
+            var index = CreateLegacyIndex();
+            this.PopulateIndex(index);
+        }
     }
 }

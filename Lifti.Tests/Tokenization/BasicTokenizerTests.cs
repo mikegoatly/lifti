@@ -45,7 +45,7 @@ namespace Lifti.Tests.Tokenization
 
                 output.Should().BeEquivalentTo(new[]
                 {
-                new Token("test", new Range(0, 4))
+                new Token("test", new WordLocation(0, 0, 4))
             });
             }
 
@@ -56,7 +56,7 @@ namespace Lifti.Tests.Tokenization
 
                 output.Should().BeEquivalentTo(new[]
                 {
-                new Token("test", new Range(1, 4))
+                new Token("test", new WordLocation(0, 1, 4))
             });
             }
 
@@ -71,12 +71,12 @@ namespace Lifti.Tests.Tokenization
 
                 output.Should().BeEquivalentTo(new[]
                 {
-                    new Token("Test", new Range(0, 4)),
-                    new Token("string", new Range(5, 6)),
-                    new Token("with", new Range(13, 4), new Range(31, 4)),
-                    new Token("punctuation", new Range(18, 11)),
-                    new Token("test", new Range(36, 4)),
-                    new Token("spaces", new Range(41, 6))
+                    new Token("Test", new WordLocation(0, 0, 4)),
+                    new Token("string", new WordLocation(1, 5, 6)),
+                    new Token("with", new WordLocation(2, 13, 4), new WordLocation(4, 31, 4)),
+                    new Token("punctuation", new WordLocation(3, 18, 11)),
+                    new Token("test", new WordLocation(5, 36, 4)),
+                    new Token("spaces", new WordLocation(6, 41, 6))
                 });
             }
 
@@ -91,13 +91,13 @@ namespace Lifti.Tests.Tokenization
 
                 output.Should().BeEquivalentTo(new[]
                 {
-                    new Token("Test", new Range(0, 4)),
-                    new Token("string", new Range(5, 6)),
-                    new Token("(with", new Range(12, 5)),
-                    new Token("punctuation)", new Range(18, 12)),
-                    new Token("with", new Range(31, 4)),
-                    new Token("test", new Range(36, 4)),
-                    new Token("spaces", new Range(41, 6))
+                    new Token("Test", new WordLocation(0, 0, 4)),
+                    new Token("string", new WordLocation(1, 5, 6)),
+                    new Token("(with", new WordLocation(2, 12, 5)),
+                    new Token("punctuation)", new WordLocation(3, 18, 12)),
+                    new Token("with", new WordLocation(4, 31, 4)),
+                    new Token("test", new WordLocation(5, 36, 4)),
+                    new Token("spaces", new WordLocation(6, 41, 6))
                 });
             }
 
@@ -112,11 +112,11 @@ namespace Lifti.Tests.Tokenization
 
                 output.Should().BeEquivalentTo(new[]
                 {
-                    new Token("Test", new Range(0, 4)),
-                    new Token("string", new Range(5, 6)),
-                    new Token("with", new Range(12, 4)),
-                    new Token("custom", new Range(17, 6)),
-                    new Token("splits", new Range(24, 6))
+                    new Token("Test", new WordLocation(0, 0, 4)),
+                    new Token("string", new WordLocation(1, 5, 6)),
+                    new Token("with", new WordLocation(2, 12, 4)),
+                    new Token("custom", new WordLocation(3, 17, 6)),
+                    new Token("splits", new WordLocation(4, 24, 6))
                 });
             }
 
@@ -134,7 +134,7 @@ namespace Lifti.Tests.Tokenization
 
                     output.Should().BeEquivalentTo(new[]
                     {
-                        new Token("TEST", new Range(0, 4))
+                        new Token("TEST", new WordLocation(0, 0, 4))
                     });
                 }
 
@@ -145,7 +145,7 @@ namespace Lifti.Tests.Tokenization
 
                     output.Should().BeEquivalentTo(new[]
                     {
-                        new Token("TEST", new Range(1, 4))
+                        new Token("TEST", new WordLocation(0, 1, 4))
                     });
                 }
 
@@ -158,8 +158,8 @@ namespace Lifti.Tests.Tokenization
 
                     output.OrderBy(o => o.Value[0]).Should().BeEquivalentTo(new[]
                     {
-                        new Token("MOO", new Range(8, 3), new Range(12, 3)),
-                        new Token("TRAE", new Range(0, 3), new Range(4, 3))
+                        new Token("MOO", new WordLocation(2, 8, 3), new WordLocation(3, 12, 3)),
+                        new Token("TRAE", new WordLocation(0, 0, 3), new WordLocation(1, 4, 3))
                     });
                 }
             }

@@ -21,23 +21,17 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
-        public void ShouldMergeMatchingWordLocations()
+        public void ShouldMergeIndexedWordsForMatchingFields()
         {
+            var word1 = new IndexedWord(1, new WordLocation(1, 1, 7));
+            var word2 = new IndexedWord(2, new WordLocation(2, 4, 6));
             var op = new AndQueryOperator(
-                new FakeQueryPart(new[] { (5, new[] { new IndexedWordLocation(1, new Range(1, 7)) }) }),
-                new FakeQueryPart(new[] { (5, new[] { new IndexedWordLocation(2, new Range(4, 6)) }) }));
+                new FakeQueryPart(new[] { (5, new[] { word1 }) }),
+                new FakeQueryPart(new[] { (5, new[] { word2 }) }));
 
             var result = op.Evaluate(() => new FakeIndexNavigator());
 
-            result.Matches.Should().BeEquivalentTo(
-                new[] {
-                    (5,
-                    new[] 
-                    {
-                        new IndexedWordLocation(1, new[] { new Range(1, 7) }),
-                        new IndexedWordLocation(2, new[] { new Range(4, 6) })
-                    })
-                });
+            result.Matches.Should().BeEquivalentTo(new[] { (5, new[] { word1, word2 }) });
         }
     }
 }
