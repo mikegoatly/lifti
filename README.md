@@ -5,9 +5,6 @@ This is very much a work in progress, and a re-imagining of the [original LIFTI 
 
 More information will follow as the code is fleshed out.
 
-Note:
-There is currently a dependency on preview BCL nuget packages (specifically Microsoft.Bcl.HashCode).
-
 ## Goals
 1) Provide a very simple way to build an in-memory full text index.
 2) netstandard2 compatibility
