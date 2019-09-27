@@ -1,9 +1,11 @@
-﻿# lifti
+# lifti
 A lightweight full text indexer for .NET
 
 This is very much a work in progress, and a re-imagining of the [original LIFTI project](https://github.com/mikegoatly/lifti-codeplex) from many years ago.
 
 More information will follow as the code is fleshed out.
+
+Design documents/thoughts are starting to appear in the [wiki](https://github.com/mikegoatly/lifti/wiki).
 
 ## Goals
 1) Provide a very simple way to build an in-memory full text index.
