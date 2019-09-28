@@ -26,17 +26,17 @@ namespace Lifti.Querying
             }
 
             var matches = this.Root.Evaluate(() => new IndexNavigator(index.Root)).Matches;
-            var results = new Dictionary<int, List<IndexedWord>>();
+            var results = new Dictionary<int, List<FieldMatch>>();
 
             foreach (var match in matches)
             {
                 if (!results.TryGetValue(match.ItemId, out var itemResults))
                 {
-                    itemResults = new List<IndexedWord>();
+                    itemResults = new List<FieldMatch>();
                     results[match.ItemId] = itemResults;
                 }
 
-                itemResults.AddRange(match.IndexedWordLocations);
+                itemResults.AddRange(match.FieldMatches);
             }
 
             foreach (var itemResults in matches)
@@ -44,7 +44,10 @@ namespace Lifti.Querying
                 var item = index.IdPool.GetItemForId(itemResults.ItemId);
                 yield return new SearchResult<TKey>(
                     item,
-                    itemResults.IndexedWordLocations.Select(m => new MatchedLocation(index.FieldLookup.GetFieldForId(m.FieldId), m.Locations)).ToList());
+                    itemResults.FieldMatches.Select(m => new MatchedLocation(
+                        index.FieldLookup.GetFieldForId(m.FieldId), 
+                        m.GetWordLocations()))
+                    .ToList());
             }
         }
     }

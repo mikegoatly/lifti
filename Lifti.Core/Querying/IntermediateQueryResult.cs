@@ -43,8 +43,8 @@ namespace Lifti.Querying
                 {
                     yield return new QueryWordMatch(
                         match.Key,
-                        match.SelectMany(m => m.IndexedWordLocations)
-                            .Concat(nextLookup[match.Key].SelectMany(m => m.IndexedWordLocations)));
+                        match.SelectMany(m => m.FieldMatches)
+                            .Concat(nextLookup[match.Key].SelectMany(m => m.FieldMatches)));
                 }
             }
         }
@@ -61,22 +61,22 @@ namespace Lifti.Querying
                     // Exists in both
                     yield return new QueryWordMatch(
                         match.Key,
-                        match.SelectMany(m => m.IndexedWordLocations)
-                            .Concat(nextLocations.SelectMany(m => m.IndexedWordLocations)));
+                        match.SelectMany(m => m.FieldMatches)
+                            .Concat(nextLocations.SelectMany(m => m.FieldMatches)));
 
                     nextLookup.Remove(match.Key);
                 }
                 else
                 {
                     // Exists only in current
-                    yield return new QueryWordMatch(match.Key, match.SelectMany(m => m.IndexedWordLocations));
+                    yield return new QueryWordMatch(match.Key, match.SelectMany(m => m.FieldMatches));
                 }
             }
 
             // Any items still remaining in nextLookup exist only there
             foreach (var match in nextLookup)
             {
-                yield return new QueryWordMatch(match.Key, match.Value.SelectMany(m => m.IndexedWordLocations));
+                yield return new QueryWordMatch(match.Key, match.Value.SelectMany(m => m.FieldMatches));
             }
         }
     }

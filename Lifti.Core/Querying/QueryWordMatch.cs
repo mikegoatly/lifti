@@ -6,14 +6,14 @@ namespace Lifti.Querying
 {
     public struct QueryWordMatch : IEquatable<QueryWordMatch>
     {
-        public QueryWordMatch(int itemId, IEnumerable<IndexedWord> indexedWordLocations)
+        public QueryWordMatch(int itemId, IEnumerable<FieldMatch> fieldMatches)
         {
             this.ItemId = itemId;
-            this.IndexedWordLocations = indexedWordLocations.ToList();
+            this.FieldMatches = fieldMatches.ToList();
         }
 
         public int ItemId { get; }
-        public IReadOnlyList<IndexedWord> IndexedWordLocations { get; }
+        public IReadOnlyList<FieldMatch> FieldMatches { get; }
 
         public override bool Equals(object obj)
         {
@@ -23,7 +23,7 @@ namespace Lifti.Querying
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.ItemId, this.IndexedWordLocations);
+            return HashCode.Combine(this.ItemId, this.FieldMatches);
         }
 
         public static bool operator ==(QueryWordMatch left, QueryWordMatch right)
@@ -39,7 +39,7 @@ namespace Lifti.Querying
         public bool Equals(QueryWordMatch other)
         {
             return this.ItemId == other.ItemId &&
-                   this.IndexedWordLocations.SequenceEqual(other.IndexedWordLocations);
+                   this.FieldMatches.SequenceEqual(other.FieldMatches);
         }
     }
 }

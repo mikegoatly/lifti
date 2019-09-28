@@ -18,7 +18,7 @@ namespace Lifti.Tests.Querying
         {
             this.results = new IntermediateQueryResult(
                 matchedItems.Select(
-                    m => new QueryWordMatch(m, new[] { new IndexedWord((byte)m, new[] { new WordLocation(m, m, m) }) })));
+                    m => new QueryWordMatch(m, new[] { new FieldMatch((byte)m, new[] { new WordLocation(m, m, m) }) })));
         }
 
         public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)

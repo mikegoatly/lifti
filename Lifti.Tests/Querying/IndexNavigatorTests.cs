@@ -50,7 +50,7 @@ namespace Lifti.Tests.Querying
             results.Matches.Should().BeEquivalentTo(
                 new[]
                 {
-                    new QueryWordMatch(0,  new[] { new IndexedWord(0, new WordLocation(5, 42, 12)) })
+                    new QueryWordMatch(0,  new[] { new FieldMatch(0, new[] { new WordLocation(5, 42, 12) })  })
                 });
         }
 

@@ -23,10 +23,10 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void ShouldMergeMatchingWordLocations()
         {
-            var word1 = new IndexedWord(1, new WordLocation(0, 4, 3));
-            var word2 = new IndexedWord(1, new WordLocation(1, 1, 7));
-            var word3 = new IndexedWord(2, new WordLocation(2, 4, 6));
-            var word4 = new IndexedWord(1, new WordLocation(3, 2, 9));
+            var word1 = new FieldMatch(1, new[] { new WordLocation(0, 4, 3) });
+            var word2 = new FieldMatch(1, new[] { new WordLocation(1, 1, 7) });
+            var word3 = new FieldMatch(2, new[] { new WordLocation(2, 4, 6) });
+            var word4 = new FieldMatch(1, new[] { new WordLocation(3, 2, 9) });
 
             var op = new OrQueryOperator(
                 new FakeQueryPart(

@@ -30,7 +30,7 @@ namespace Lifti.Querying
 
         private IEnumerable<QueryWordMatch> GetCurrentNodeMatches()
         {
-            return this.currentNode.Matches?.Select(m => new QueryWordMatch(m.Key, m.Value)) ?? 
+            return this.currentNode.Matches?.Select(CreateQueryWordMatch) ??
                 Array.Empty<QueryWordMatch>();
         }
 
@@ -50,7 +50,7 @@ namespace Lifti.Querying
                 var node = childNodeStack.Dequeue();
                 if (node.Matches != null)
                 {
-                    matches.AddRange(node.Matches.Select(m => new QueryWordMatch(m.Key, m.Value)));
+                    matches.AddRange(node.Matches.Select(CreateQueryWordMatch));
                 }
 
                 if (node.ChildNodes != null)
@@ -106,6 +106,11 @@ namespace Lifti.Querying
 
             this.currentNode = null;
             return false;
+        }
+
+        private static QueryWordMatch CreateQueryWordMatch(KeyValuePair<int, List<IndexedWord>> match)
+        {
+            return new QueryWordMatch(match.Key, match.Value.Select(v => new FieldMatch(v)));
         }
     }
 }
