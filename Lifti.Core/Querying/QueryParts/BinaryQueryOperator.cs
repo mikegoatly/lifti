@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lifti.Querying
+namespace Lifti.Querying.QueryParts
 {
     /// <summary>
     /// An abstract class representing a binary query operator, e.g. an AND or an OR operator.

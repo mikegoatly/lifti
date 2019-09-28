@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
+using Lifti.Querying.QueryParts;
 using System.Linq;
 using Xunit;
 
-namespace Lifti.Tests.Querying
+namespace Lifti.Tests.Querying.QueryParts
 {
     public class AndQueryOperatorTests
     {

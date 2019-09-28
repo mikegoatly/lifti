@@ -1,4 +1,5 @@
-﻿using Lifti.Tokenization;
+﻿using Lifti.Querying.QueryParts;
+using Lifti.Tokenization;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace Lifti.Querying
+namespace Lifti.Querying.QueryParts
 {
-    public class AndQueryOperator : BinaryQueryOperator
+    public class OrQueryOperator : BinaryQueryOperator
     {
-        public AndQueryOperator(IQueryPart left, IQueryPart right)
+        public OrQueryOperator(IQueryPart left, IQueryPart right)
             : base(left, right)
         {
         }
@@ -13,13 +13,12 @@ namespace Lifti.Querying
 
         public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)
         {
-            return this.Left.Evaluate(navigatorCreator).Intersect(this.Right.Evaluate(navigatorCreator));
+            return this.Left.Evaluate(navigatorCreator).Union(this.Right.Evaluate(navigatorCreator));
         }
 
         public override string ToString()
         {
-            return "(" + this.Left + " AND " + this.Right + ")";
+            return "(" + this.Left + " OR " + this.Right + ")";
         }
     }
-
 }

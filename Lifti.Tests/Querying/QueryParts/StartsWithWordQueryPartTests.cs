@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
-using Lifti.Querying;
+using Lifti.Querying.QueryParts;
 using Xunit;
 
-namespace Lifti.Tests.Querying
+namespace Lifti.Tests.Querying.QueryParts
 {
     public class StartsWithWordQueryPartTests
     {

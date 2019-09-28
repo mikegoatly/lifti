@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lifti.Querying
+namespace Lifti.Querying.QueryParts
 {
     /// <summary>
     /// A query part that matches on a single word in some way.

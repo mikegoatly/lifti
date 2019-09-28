@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Lifti.Querying.QueryParts;
+using System.Collections.Generic;
 
 namespace Lifti.Querying
 {

@@ -1,4 +1,5 @@
 ﻿using Lifti.Querying;
+using Lifti.Querying.QueryParts;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
+using Lifti.Querying.QueryParts;
 using Lifti.Tokenization;
 using Moq;
 using Xunit;

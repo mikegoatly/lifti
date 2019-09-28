@@ -1,13 +1,13 @@
 ﻿using System;
 
-namespace Lifti.Querying
+namespace Lifti.Querying.QueryParts
 {
     /// <summary>
-    /// A query part that matches items that are indexed starting with given text.
+    /// A query part that matches items that are indexed exactly against text.
     /// </summary>
-    public class StartsWithWordQueryPart : WordQueryPart
+    public class ExactWordQueryPart : WordQueryPart
     {
-        public StartsWithWordQueryPart(string word)
+        public ExactWordQueryPart(string word)
             : base(word)
         {
         }
@@ -21,12 +21,12 @@ namespace Lifti.Querying
 
             var navigator = navigatorCreator();
             navigator.Process(this.Word.AsSpan());
-            return navigator.GetExactAndChildMatches();
+            return navigator.GetExactMatches();
         }
 
         public override string ToString()
         {
-            return "STARTSWITH(" + this.Word + ")";
+            return "EXACT(" + this.Word + ")";
         }
     }
 }

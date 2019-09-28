@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lifti.Querying
+namespace Lifti.Querying.QueryParts
 {
     public interface IQueryPart
     {

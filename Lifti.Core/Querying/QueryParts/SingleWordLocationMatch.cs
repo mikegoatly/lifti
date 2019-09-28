@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Lifti.Querying
+namespace Lifti.Querying.QueryParts
 {
     public struct SingleWordLocationMatch : IWordLocationMatch, IEquatable<SingleWordLocationMatch>
     {
