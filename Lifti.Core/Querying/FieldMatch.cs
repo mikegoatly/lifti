@@ -1,5 +1,4 @@
-﻿using Lifti.Querying.QueryParts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,6 +15,12 @@ namespace Lifti.Querying
         {
             this.FieldId = fieldId;
             this.Locations = locations.Select(l => (IWordLocationMatch)new SingleWordLocationMatch(l)).ToList();
+        }
+
+        public FieldMatch(byte fieldId, IReadOnlyList<IWordLocationMatch> locations)
+        {
+            this.FieldId = fieldId;
+            this.Locations = locations;
         }
 
         public FieldMatch(byte fieldId, params IWordLocationMatch[] locations)

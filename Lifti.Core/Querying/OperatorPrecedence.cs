@@ -6,9 +6,9 @@
     public enum OperatorPrecedence
     {
         /// <summary>
-        /// The location-specific statements (near, before, after).
+        /// The location-specific statements (near, preceding).
         /// </summary>
-        Locational,
+        Positional,
 
         /// <summary>
         /// And statements.

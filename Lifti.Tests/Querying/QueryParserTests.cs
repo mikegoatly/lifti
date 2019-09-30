@@ -34,10 +34,10 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
-        public void ParsingTwoWordsWithOrOperator_ShouldComposeWithOrOperator()
+        public void ParsingTwoWordsWithPrecedingOperator_ShouldComposeWithPrecedingOperator()
         {
-            var result = this.Parse("wordone | wordtwo");
-            var expectedQuery = new Query(new OrQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo")));
+            var result = this.Parse("wordone > wordtwo");
+            var expectedQuery = new Query(new PrecedingQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo")));
             result.Should().BeEquivalentTo(expectedQuery);
         }
 
@@ -46,6 +46,44 @@ namespace Lifti.Tests.Querying
         {
             var result = this.Parse("wordone");
             var expectedQuery = new Query(new ExactWordQueryPart("wordone"));
+            result.Should().BeEquivalentTo(expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingTwoWordsWithNearOperator_ShouldComposeWithNearOperatorWithToleranceOf5ByDefault()
+        {
+            var result = this.Parse("wordone ~ wordtwo");
+            var expectedQuery = new Query(new NearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), 5));
+            result.Should().BeEquivalentTo(expectedQuery);
+        }
+
+        [Theory]
+        [InlineData("wordone ~4 wordtwo", 4)]
+        [InlineData("wordone ~12 wordtwo", 12)]
+        [InlineData("wordone ~1234567890 wordtwo", 1234567890)]
+        public void ParsingTwoWordsWithNearOperator_ShouldComposeWithNearOperatorWithSpecifiedTolerance(string query, int expectedTolerance)
+        {
+            var result = this.Parse(query);
+            var expectedQuery = new Query(new NearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), expectedTolerance));
+            result.Should().BeEquivalentTo(expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingTwoWordsWithPrecedingNearOperator_ShouldComposeWithPrecedingNearOperatorWithToleranceOf5ByDefault()
+        {
+            var result = this.Parse("wordone ~> wordtwo");
+            var expectedQuery = new Query(new PrecedingNearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), 5));
+            result.Should().BeEquivalentTo(expectedQuery);
+        }
+
+        [Theory]
+        [InlineData("wordone ~4> wordtwo", 4)]
+        [InlineData("wordone ~12> wordtwo", 12)]
+        [InlineData("wordone ~1234567890> wordtwo", 1234567890)]
+        public void ParsingTwoWordsWithPrecedingNearOperator_ShouldComposeWithPrecedingNearOperatorWithSpecifiedTolerance(string query, int expectedTolerance)
+        {
+            var result = this.Parse(query);
+            var expectedQuery = new Query(new PrecedingNearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), expectedTolerance));
             result.Should().BeEquivalentTo(expectedQuery);
         }
 

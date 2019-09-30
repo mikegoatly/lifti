@@ -9,7 +9,13 @@ namespace Lifti.Querying
         public QueryWordMatch(int itemId, IEnumerable<FieldMatch> fieldMatches)
         {
             this.ItemId = itemId;
-            this.FieldMatches = fieldMatches.ToList();
+            this.FieldMatches = fieldMatches as IReadOnlyList<FieldMatch> ?? fieldMatches.ToList();
+        }
+
+        public QueryWordMatch(int itemId, params FieldMatch[] fieldMatches)
+        {
+            this.ItemId = itemId;
+            this.FieldMatches = fieldMatches;
         }
 
         public int ItemId { get; }

@@ -30,8 +30,11 @@ namespace Lifti.Querying
 
                 case QueryTokenType.OrOperator:
                 case QueryTokenType.AndOperator:
+                case QueryTokenType.NearOperator:
+                case QueryTokenType.PrecedingNearOperator:
+                case QueryTokenType.PrecedingOperator:
                     var rightPart = CreateQueryPart(state, state.GetNextToken(), wordTokenizer, null);
-                    return CombineParts(rootPart, rightPart, token.TokenType);
+                    return CombineParts(rootPart, rightPart, token.TokenType, token.Tolerance);
 
                 default:
                     throw new QueryParserException(ExceptionMessages.UnexpectedTokenEncountered, token.TokenType);
@@ -60,10 +63,10 @@ namespace Lifti.Querying
                 return newPart;
             }
 
-            return CombineParts(existingPart, newPart, QueryTokenType.AndOperator);
+            return CombineParts(existingPart, newPart, QueryTokenType.AndOperator, 0);
         }
 
-        private static IBinaryQueryOperator CombineParts(IQueryPart existingPart, IQueryPart newPart, QueryTokenType operatorType)
+        private static IBinaryQueryOperator CombineParts(IQueryPart existingPart, IQueryPart newPart, QueryTokenType operatorType, int tolerance)
         {
             if (existingPart == null)
             {
@@ -75,17 +78,17 @@ namespace Lifti.Querying
             {
                 if (existingBinaryOperator.Precedence >= TokenPrecedence(operatorType))
                 {
-                    existingBinaryOperator.Right = CreateOperator(operatorType, existingBinaryOperator.Right, newPart);
+                    existingBinaryOperator.Right = CreateOperator(operatorType, existingBinaryOperator.Right, newPart, tolerance);
                     return existingBinaryOperator;
                 }
 
-                return CreateOperator(operatorType, existingBinaryOperator, newPart);
+                return CreateOperator(operatorType, existingBinaryOperator, newPart, tolerance);
             }
 
-            return CreateOperator(operatorType, existingPart, newPart);
+            return CreateOperator(operatorType, existingPart, newPart, tolerance);
         }
 
-        private static IBinaryQueryOperator CreateOperator(QueryTokenType tokenType, IQueryPart leftPart, IQueryPart rightPart)
+        private static IBinaryQueryOperator CreateOperator(QueryTokenType tokenType, IQueryPart leftPart, IQueryPart rightPart, int tolerance)
         {
             switch (tokenType)
             {
@@ -94,6 +97,15 @@ namespace Lifti.Querying
 
                 case QueryTokenType.OrOperator:
                     return new OrQueryOperator(leftPart, rightPart);
+
+                case QueryTokenType.NearOperator:
+                    return new NearQueryOperator(leftPart, rightPart, tolerance);
+
+                case QueryTokenType.PrecedingNearOperator:
+                    return new PrecedingNearQueryOperator(leftPart, rightPart, tolerance);
+
+                case QueryTokenType.PrecedingOperator:
+                    return new PrecedingQueryOperator(leftPart, rightPart);
 
                 default:
                     throw new QueryParserException(ExceptionMessages.UnexpectedOperatorInternal, tokenType);
@@ -113,7 +125,7 @@ namespace Lifti.Querying
                 case QueryTokenType.PrecedingNearOperator:
                 case QueryTokenType.NearOperator:
                 case QueryTokenType.PrecedingOperator:
-                    return OperatorPrecedence.Locational;
+                    return OperatorPrecedence.Positional;
 
                 default:
                     throw new QueryParserException(ExceptionMessages.UnexpectedOperatorInternal, tokenType);

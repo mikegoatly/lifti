@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Lifti.Querying.QueryParts
+namespace Lifti.Querying
 {
     public struct SingleWordLocationMatch : IWordLocationMatch, IEquatable<SingleWordLocationMatch>
     {
         private readonly WordLocation original;
+
+        public int MaxWordIndex => this.original.WordIndex;
+
+        public int MinWordIndex => this.original.WordIndex;
 
         public SingleWordLocationMatch(WordLocation original)
         {
