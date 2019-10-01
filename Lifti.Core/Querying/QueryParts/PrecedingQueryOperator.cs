@@ -15,5 +15,10 @@ namespace Lifti.Querying.QueryParts
         {
             return this.Left.Evaluate(navigatorCreator).PositionalIntersect(this.Right.Evaluate(navigatorCreator), int.MaxValue, 0);
         }
+
+        public override string ToString()
+        {
+            return $"{this.Left} > {this.Right}";
+        }
     }
 }

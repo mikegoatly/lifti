@@ -18,7 +18,7 @@ namespace Lifti.Querying.QueryParts
 
         public override string ToString()
         {
-            return "(" + this.Left + " AND " + this.Right + ")";
+            return this.Left + " & " + this.Right;
         }
     }
 

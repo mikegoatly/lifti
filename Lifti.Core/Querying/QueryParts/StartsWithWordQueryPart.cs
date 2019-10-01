@@ -26,7 +26,7 @@ namespace Lifti.Querying.QueryParts
 
         public override string ToString()
         {
-            return "STARTSWITH(" + this.Word + ")";
+            return $"{this.Word}*";
         }
     }
 }

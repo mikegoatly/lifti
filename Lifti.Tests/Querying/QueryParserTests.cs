@@ -21,40 +21,69 @@ namespace Lifti.Tests.Querying
         public void ParsingTwoWordsWithNoOperator_ShouldComposeWithAndOperator()
         {
             var result = this.Parse("wordone wordtwo");
-            var expectedQuery = new Query(new AndQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo")));
-            result.Should().BeEquivalentTo(expectedQuery);
+            var expectedQuery = new AndQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"));
+            VerifyResult(result, expectedQuery);
         }
 
         [Fact]
         public void ParsingTwoWordsWithAndOperator_ShouldComposeWithAndOperator()
         {
             var result = this.Parse("wordone & wordtwo");
-            var expectedQuery = new Query(new AndQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo")));
-            result.Should().BeEquivalentTo(expectedQuery);
+            var expectedQuery = new AndQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"));
+            VerifyResult(result, expectedQuery);
         }
 
         [Fact]
         public void ParsingTwoWordsWithPrecedingOperator_ShouldComposeWithPrecedingOperator()
         {
             var result = this.Parse("wordone > wordtwo");
-            var expectedQuery = new Query(new PrecedingQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo")));
-            result.Should().BeEquivalentTo(expectedQuery);
+            var expectedQuery = new PrecedingQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"));
+            VerifyResult(result, expectedQuery);
         }
 
         [Fact]
         public void ParsingSingleExactWord_ShouldReturnExactWordQueryPart()
         {
             var result = this.Parse("wordone");
-            var expectedQuery = new Query(new ExactWordQueryPart("wordone"));
-            result.Should().BeEquivalentTo(expectedQuery);
+            var expectedQuery = new ExactWordQueryPart("wordone");
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingBracketedSingleExpression_ShouldReturnBracketedQueryPartContainer()
+        {
+            var result = this.Parse("(wordone*)");
+            var expectedQuery = new BracketedQueryPart(new StartsWithWordQueryPart("wordone"));
+
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingBracketedAndExpressions_ShouldReturnBracketedQueryPartContainer()
+        {
+            var result = this.Parse("(wordone wordtwo)");
+            var expectedQuery = new BracketedQueryPart(
+                    new AndQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo")));
+
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingBracketedOrExpressions_ShouldReturnBracketedQueryPartContainer()
+        {
+            var result = this.Parse("(wordone | wordtwo)");
+            var expectedQuery = new BracketedQueryPart(
+                    new OrQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo")));
+
+            VerifyResult(result, expectedQuery);
         }
 
         [Fact]
         public void ParsingTwoWordsWithNearOperator_ShouldComposeWithNearOperatorWithToleranceOf5ByDefault()
         {
             var result = this.Parse("wordone ~ wordtwo");
-            var expectedQuery = new Query(new NearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), 5));
-            result.Should().BeEquivalentTo(expectedQuery);
+            var expectedQuery = new NearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), 5);
+            VerifyResult(result, expectedQuery);
         }
 
         [Theory]
@@ -64,16 +93,16 @@ namespace Lifti.Tests.Querying
         public void ParsingTwoWordsWithNearOperator_ShouldComposeWithNearOperatorWithSpecifiedTolerance(string query, int expectedTolerance)
         {
             var result = this.Parse(query);
-            var expectedQuery = new Query(new NearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), expectedTolerance));
-            result.Should().BeEquivalentTo(expectedQuery);
+            var expectedQuery = new NearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), expectedTolerance);
+            VerifyResult(result, expectedQuery);
         }
 
         [Fact]
         public void ParsingTwoWordsWithPrecedingNearOperator_ShouldComposeWithPrecedingNearOperatorWithToleranceOf5ByDefault()
         {
             var result = this.Parse("wordone ~> wordtwo");
-            var expectedQuery = new Query(new PrecedingNearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), 5));
-            result.Should().BeEquivalentTo(expectedQuery);
+            var expectedQuery = new PrecedingNearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), 5);
+            VerifyResult(result, expectedQuery);
         }
 
         [Theory]
@@ -83,8 +112,8 @@ namespace Lifti.Tests.Querying
         public void ParsingTwoWordsWithPrecedingNearOperator_ShouldComposeWithPrecedingNearOperatorWithSpecifiedTolerance(string query, int expectedTolerance)
         {
             var result = this.Parse(query);
-            var expectedQuery = new Query(new PrecedingNearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), expectedTolerance));
-            result.Should().BeEquivalentTo(expectedQuery);
+            var expectedQuery = new PrecedingNearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), expectedTolerance);
+            VerifyResult(result, expectedQuery);
         }
 
         [Theory]
@@ -94,16 +123,20 @@ namespace Lifti.Tests.Querying
         public void ParsingWordWithWildcard_ShouldReturnStartsWithWordQueryPart(string test)
         {
             var result = this.Parse(test);
-            var expectedQuery = new Query(new StartsWithWordQueryPart("word"));
-            result.Should().BeEquivalentTo(expectedQuery);
+            var expectedQuery = new StartsWithWordQueryPart("word");
+            VerifyResult(result, expectedQuery);
         }
 
         [Fact]
         public void ParsingEmptyString_ShouldReturnNullQueryRoot()
         {
             var result = this.Parse("");
-            var expectedQuery = new Query(null);
-            result.Should().BeEquivalentTo(expectedQuery);
+            result.Root.Should().BeNull();
+        }
+
+        private static void VerifyResult(IQuery result, IQueryPart expectedQuery)
+        {
+            result.Root.ToString().Should().Be(expectedQuery.ToString());
         }
 
         private IQuery Parse(string text)

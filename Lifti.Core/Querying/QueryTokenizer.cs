@@ -22,15 +22,28 @@ namespace Lifti.Querying
             var state = State.None;
             var tokenStart = (int?)null;
             var tolerance = 0;
+
+            QueryToken? createWordForYielding(int endIndex)
+            {
+                if (tokenStart != null)
+                {
+                    var token = QueryToken.ForWord(queryText.Substring(tokenStart.Value, endIndex - tokenStart.Value));
+                    tokenStart = null;
+                    return token;
+                }
+
+                return null;
+            }
+
             for (var i = 0; i < queryText.Length; i++)
             {
                 var current = queryText[i];
                 if (char.IsWhiteSpace(current))
                 {
-                    if (tokenStart != null)
+                    var token = createWordForYielding(i);
+                    if (token != null)
                     {
-                        yield return QueryToken.ForWord(queryText.Substring(tokenStart.Value, i - tokenStart.Value));
-                        tokenStart = null;
+                        yield return token.Value;
                     }
                 }
                 else
@@ -50,6 +63,12 @@ namespace Lifti.Querying
                                     yield return QueryToken.ForOperator(QueryTokenType.PrecedingOperator);
                                     break;
                                 case ')':
+                                    var token = createWordForYielding(i);
+                                    if (token != null)
+                                    {
+                                        yield return token.Value;
+                                    }
+
                                     yield return QueryToken.ForOperator(QueryTokenType.CloseBracket);
                                     break;
                                 case '(':
@@ -74,13 +93,13 @@ namespace Lifti.Querying
                             {
                                 case '"':
                                     state = State.None;
-                                    yield return QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator);
-                                    if (tokenStart != null)
+                                    var token = createWordForYielding(i);
+                                    if (token != null)
                                     {
-                                        yield return QueryToken.ForWord(queryText.Substring(tokenStart.Value, i - tokenStart.Value));
-                                        tokenStart = null;
+                                        yield return token.Value;
                                     }
 
+                                    yield return QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator);
                                     break;
                                 default:
                                     tokenStart = tokenStart ?? i;
@@ -113,6 +132,7 @@ namespace Lifti.Querying
                                     yield return QueryToken.ForOperatorWithTolerance(QueryTokenType.NearOperator, tolerance);
                                     state = State.None;
                                     // Skip back a character to re-process it now state is None
+                                    i -= 1;
                                     break;
                             }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Lifti.Querying.QueryParts
 {
@@ -17,6 +18,12 @@ namespace Lifti.Querying.QueryParts
         public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)
         {
             return this.Left.Evaluate(navigatorCreator).PositionalIntersectAndCombine(this.Right.Evaluate(navigatorCreator), this.Tolerance, 0);
+        }
+
+        public override string ToString()
+        {
+            var toleranceText = this.Tolerance == 5 ? string.Empty : this.Tolerance.ToString(CultureInfo.InvariantCulture);
+            return $"{this.Left} ~{toleranceText}> {this.Right}";
         }
     }
 }

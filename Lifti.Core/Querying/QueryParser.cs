@@ -36,6 +36,14 @@ namespace Lifti.Querying
                     var rightPart = CreateQueryPart(state, state.GetNextToken(), wordTokenizer, null);
                     return CombineParts(rootPart, rightPart, token.TokenType, token.Tolerance);
 
+                case QueryTokenType.OpenBracket:
+                    var bracketedPart = state.GetTokensUntil(QueryTokenType.CloseBracket)
+                        .Aggregate((IQueryPart)null, (current, next) => CreateQueryPart(state, next, wordTokenizer, current));
+
+                    return bracketedPart == null
+                               ? rootPart
+                               : ComposePart(rootPart, new BracketedQueryPart(bracketedPart));
+
                 default:
                     throw new QueryParserException(ExceptionMessages.UnexpectedTokenEncountered, token.TokenType);
             }
