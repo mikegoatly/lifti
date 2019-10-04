@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Lifti.Tests.Querying
 {
-    public class IndexNavigatorTests
+    public class IndexNavigatorTests : QueryTestBase
     {
         private readonly FullTextIndex<string> index;
         private readonly IndexNavigator sut;
@@ -50,7 +50,7 @@ namespace Lifti.Tests.Querying
             results.Matches.Should().BeEquivalentTo(
                 new[]
                 {
-                    new QueryWordMatch(0,  new[] { new FieldMatch(0, new[] { new WordLocation(5, 42, 12) })  })
+                    QueryWordMatch(0, new FieldMatch(0, new SingleWordLocationMatch(new WordLocation(5, 42, 12))))
                 });
         }
 

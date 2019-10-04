@@ -12,12 +12,6 @@ namespace Lifti.Querying
             this.FieldMatches = fieldMatches as IReadOnlyList<FieldMatch> ?? fieldMatches.ToList();
         }
 
-        public QueryWordMatch(int itemId, params FieldMatch[] fieldMatches)
-        {
-            this.ItemId = itemId;
-            this.FieldMatches = fieldMatches;
-        }
-
         public int ItemId { get; }
         public IReadOnlyList<FieldMatch> FieldMatches { get; }
 

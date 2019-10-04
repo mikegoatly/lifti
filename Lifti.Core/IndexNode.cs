@@ -1,6 +1,8 @@
 ﻿using Lifti.Tokenization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 namespace Lifti
@@ -36,6 +38,8 @@ namespace Lifti
             {
                 throw new ArgumentNullException(nameof(word));
             }
+
+            Debug.Assert(word.Locations.Select((l, i) => i > 0 && l.WordIndex > word.Locations[i - 1].WordIndex).All(v => v));
 
             this.Index(itemId, fieldId, word.Locations, word.Value.AsSpan());
         }

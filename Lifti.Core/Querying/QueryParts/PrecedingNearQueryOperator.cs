@@ -17,7 +17,7 @@ namespace Lifti.Querying.QueryParts
 
         public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)
         {
-            return this.Left.Evaluate(navigatorCreator).PositionalIntersectAndCombine(this.Right.Evaluate(navigatorCreator), this.Tolerance, 0);
+            return this.Left.Evaluate(navigatorCreator).CompositePositionalIntersect(this.Right.Evaluate(navigatorCreator), 0, this.Tolerance);
         }
 
         public override string ToString()

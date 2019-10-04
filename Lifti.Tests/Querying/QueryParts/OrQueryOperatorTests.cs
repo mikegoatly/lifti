@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Lifti.Tests.Querying.QueryParts
 {
-    public class OrQueryOperatorTests
+    public class OrQueryOperatorTests : QueryTestBase
     {
         [Fact]
         public void ShouldReturnItemsAppearingOnBothSides()
@@ -22,28 +22,23 @@ namespace Lifti.Tests.Querying.QueryParts
         }
 
         [Fact]
-        public void ShouldMergeMatchingWordLocations()
+        public void ShouldMergeAllFieldMatchesInCorrectWordOrder()
         {
-            var word1 = new FieldMatch(1, new[] { new WordLocation(0, 4, 3) });
-            var word2 = new FieldMatch(1, new[] { new WordLocation(1, 1, 7) });
-            var word3 = new FieldMatch(2, new[] { new WordLocation(2, 4, 6) });
-            var word4 = new FieldMatch(1, new[] { new WordLocation(3, 2, 9) });
-
             var op = new OrQueryOperator(
                 new FakeQueryPart(
-                    new QueryWordMatch(4, new[] { word1 }),
-                    new QueryWordMatch(5, new[] { word2 })),
+                    QueryWordMatch(4, FieldMatch(1, 5, 6) ),
+                    QueryWordMatch(5, FieldMatch(1, 9, 11))),
                 new FakeQueryPart(
-                    new QueryWordMatch(5, new[] { word3 }),
-                    new QueryWordMatch(7, new[] { word4 })));
+                    QueryWordMatch(5, FieldMatch(1, 1, 103), FieldMatch(2, 2, 18)),
+                    QueryWordMatch(7, FieldMatch(1, 18) )));
 
             var result = op.Evaluate(() => new FakeIndexNavigator());
 
             result.Matches.Should().BeEquivalentTo(
                 new[] {
-                    new QueryWordMatch(4, new[] { word1 }),
-                    new QueryWordMatch(5, new[] { word2, word3 }),
-                    new QueryWordMatch(7, new[] { word4 }),
+                    QueryWordMatch(4, FieldMatch(1, 5, 6)),
+                    QueryWordMatch(5, FieldMatch(1, 1, 9, 11, 103), FieldMatch(2, 2, 18)),
+                    QueryWordMatch(7, FieldMatch(1, 18))
                 });
         }
     }

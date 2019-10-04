@@ -1,24 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Lifti.Querying
 {
     public struct CompositeWordMatchLocation : IWordLocationMatch, IEquatable<CompositeWordMatchLocation>
     {
-        private readonly IWordLocationMatch currentWord;
-        private readonly IWordLocationMatch nextWord;
+        private readonly IWordLocationMatch leftWord;
+        private readonly IWordLocationMatch rightWord;
+        private readonly Lazy<int> minWordIndex;
+        private readonly Lazy<int> maxWordIndex;
 
-        public CompositeWordMatchLocation(IWordLocationMatch currentWord, IWordLocationMatch nextWord)
+        public CompositeWordMatchLocation(IWordLocationMatch leftWord, IWordLocationMatch rightWord)
         {
-            this.currentWord = currentWord;
-            this.nextWord = nextWord;
+            this.leftWord = leftWord;
+            this.rightWord = rightWord;
+            this.minWordIndex = new Lazy<int>(() => Math.Max(leftWord.MinWordIndex, rightWord.MinWordIndex));
+            this.maxWordIndex = new Lazy<int>(() => Math.Max(leftWord.MaxWordIndex, rightWord.MaxWordIndex));
         }
 
-        public int MaxWordIndex => Math.Max(this.currentWord.MaxWordIndex, this.nextWord.MaxWordIndex);
+        public int MaxWordIndex => this.maxWordIndex.Value;
 
-        public int MinWordIndex => Math.Min(this.currentWord.MaxWordIndex, this.nextWord.MaxWordIndex);
+        public int MinWordIndex => this.minWordIndex.Value;
 
         public override bool Equals(object obj)
         {
@@ -28,18 +31,18 @@ namespace Lifti.Querying
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.currentWord, this.nextWord);
+            return HashCode.Combine(this.leftWord, this.rightWord);
         }
 
         public IEnumerable<WordLocation> GetLocations()
         {
-            return this.currentWord.GetLocations().Concat(this.nextWord.GetLocations());
+            return this.leftWord.GetLocations().Concat(this.rightWord.GetLocations());
         }
 
         public bool Equals(CompositeWordMatchLocation other)
         {
-            return this.currentWord.Equals(other.currentWord) &&
-                   this.nextWord.Equals(other.nextWord);
+            return this.leftWord.Equals(other.leftWord) &&
+                   this.rightWord.Equals(other.rightWord);
         }
 
         public static bool operator ==(CompositeWordMatchLocation left, CompositeWordMatchLocation right)

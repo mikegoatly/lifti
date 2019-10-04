@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Lifti.Tests.Querying
 {
-    public class FakeIndexNavigator : IIndexNavigator
+    public class FakeIndexNavigator : QueryTestBase, IIndexNavigator
     {
         public FakeIndexNavigator()
         {
@@ -15,9 +15,9 @@ namespace Lifti.Tests.Querying
         {
             this.ExpectedExactAndChildMatches = new IntermediateQueryResult(
                 matchedItems.Select(
-                    m => new QueryWordMatch(m, new[] { new FieldMatch((byte)m, new[] { new WordLocation(m, m, m) }) })));
+                    m => new QueryWordMatch(m, new[] { FieldMatch((byte)m, m) })));
 
-            this.ExpectedExactMatches = exactAndChildMatchOnly ? IntermediateQueryResult.Empty : this.ExpectedExactAndChildMatches;
+            this.ExpectedExactMatches = exactAndChildMatchOnly ? Lifti.Querying.IntermediateQueryResult.Empty : this.ExpectedExactAndChildMatches;
         }
 
         public IntermediateQueryResult ExpectedExactMatches { get; set; }

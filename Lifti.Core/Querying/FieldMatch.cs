@@ -11,12 +11,6 @@ namespace Lifti.Querying
         {
         }
 
-        public FieldMatch(byte fieldId, IReadOnlyList<WordLocation> locations)
-        {
-            this.FieldId = fieldId;
-            this.Locations = locations.Select(l => (IWordLocationMatch)new SingleWordLocationMatch(l)).ToList();
-        }
-
         public FieldMatch(byte fieldId, IReadOnlyList<IWordLocationMatch> locations)
         {
             this.FieldId = fieldId;
@@ -27,6 +21,12 @@ namespace Lifti.Querying
         {
             this.FieldId = fieldId;
             this.Locations = locations;
+        }
+
+        private FieldMatch(byte fieldId, IReadOnlyList<WordLocation> locations)
+        {
+            this.FieldId = fieldId;
+            this.Locations = locations.Select(l => (IWordLocationMatch)new SingleWordLocationMatch(l)).ToList();
         }
 
         public byte FieldId { get; }

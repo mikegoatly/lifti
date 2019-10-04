@@ -1,14 +1,13 @@
 ﻿using Lifti.Querying;
 using Lifti.Querying.QueryParts;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Lifti.Tests.Querying
 {
-    public class FakeQueryPart : IQueryPart
+    public class FakeQueryPart : QueryTestBase, IQueryPart, IWordQueryPart
     {
-        private IntermediateQueryResult results;
+        private readonly IntermediateQueryResult results;
 
         public FakeQueryPart(params QueryWordMatch[] matches)
         {
@@ -19,8 +18,10 @@ namespace Lifti.Tests.Querying
         {
             this.results = new IntermediateQueryResult(
                 matchedItems.Select(
-                    m => new QueryWordMatch(m, new[] { new FieldMatch((byte)m, new[] { new WordLocation(m, m, m) }) })));
+                    m => new QueryWordMatch(m, new[] { FieldMatch((byte)m, m) })));
         }
+
+        public string Word => throw new NotImplementedException();
 
         public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)
         {
