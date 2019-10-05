@@ -1,3 +1,5 @@
+[![Build Status](https://goatly.visualstudio.com/LIFTI/_apis/build/status/mikegoatly.lifti?branchName=master)](https://goatly.visualstudio.com/LIFTI/_build/latest?definitionId=14&branchName=master)
+
 # LIFTI
 A lightweight full text indexer for .NET
 
