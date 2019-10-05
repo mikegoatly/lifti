@@ -53,17 +53,6 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
-        public void CompositeStringWithEscapedQuoteYieldsThreeResults()
-        {
-            this.sut.ParseQueryTokens(@"""Jack be \""quick\""""").Should().BeEquivalentTo(
-                QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator),
-                QueryToken.ForWord("Jack"),
-                QueryToken.ForWord("be"),
-                QueryToken.ForWord("\"quick\""),
-                QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator));
-        }
-
-        [Fact]
         public void TwoCompositeStringsYieldsSixResults()
         {
             this.sut.ParseQueryTokens(@"""First string"" ""Second string""").Should().BeEquivalentTo(
