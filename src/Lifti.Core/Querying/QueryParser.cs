@@ -178,7 +178,7 @@ namespace Lifti.Querying
                     return true;
                 }
 
-                token = default;
+                token = default(QueryToken);
                 return false;
             }
 

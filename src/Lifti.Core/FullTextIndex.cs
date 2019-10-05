@@ -18,9 +18,9 @@ namespace Lifti
 
         public FullTextIndex(
             FullTextIndexConfiguration<TKey> options,
-            IIndexNodeFactory indexNodeFactory = default,
-            ITokenizerFactory tokenizerFactory = default,
-            IQueryParser queryParser = default)
+            IIndexNodeFactory indexNodeFactory = null,
+            ITokenizerFactory tokenizerFactory = null,
+            IQueryParser queryParser = null)
         {
             this.indexNodeFactory = indexNodeFactory ?? new IndexNodeFactory();
             this.tokenizerFactory = tokenizerFactory ?? new TokenizerFactory();
@@ -39,7 +39,7 @@ namespace Lifti
 
         public IIndexedFieldLookup FieldLookup { get; }
 
-        public void Index(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = default)
+        public void Index(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = null)
         {
             var itemId = this.IdPool.CreateIdFor(itemKey);
 
@@ -71,7 +71,7 @@ namespace Lifti
             }
         }
 
-        public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = default)
+        public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = null)
         {
             var query = this.queryParser.Parse(this.FieldLookup, searchText, this.GetTokenizer(tokenizationOptions));
             return query.Execute(this);
