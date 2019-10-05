@@ -1,5 +1,6 @@
 ﻿extern alias LiftiNew;
 using Lifti;
+using Lifti.Querying;
 
 namespace PerformanceProfiling
 {
@@ -18,7 +19,8 @@ namespace PerformanceProfiling
             var index = new UpdatableFullTextIndex<string>
             {
                 WordSplitter = new XmlWordSplitter(new WordSplitter()),
-                SearchWordSplitter = new WordSplitter()
+                SearchWordSplitter = new WordSplitter(),
+                QueryParser = new LiftiQueryParser()
             };
             return index;
         }

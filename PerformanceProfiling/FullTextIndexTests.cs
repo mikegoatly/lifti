@@ -24,7 +24,7 @@ namespace PerformanceProfiling
             this.PopulateIndex(this.legacyIndex);
         }
 
-        [Params("confiscation", "justification")]
+        [Params("confiscation & and & they")]
         public string SearchCriteria { get; set; }
 
         [Benchmark]
