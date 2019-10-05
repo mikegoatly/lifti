@@ -1,6 +1,7 @@
 [![Build Status](https://goatly.visualstudio.com/LIFTI/_apis/build/status/mikegoatly.lifti?branchName=master)](https://goatly.visualstudio.com/LIFTI/_build/latest?definitionId=14&branchName=master)
 
 # LIFTI
+
 A lightweight full text indexer for .NET
 
 This is very much a work in progress, and a re-imagining of the [original LIFTI project](https://github.com/mikegoatly/lifti-codeplex) from many years ago.
@@ -8,6 +9,34 @@ This is very much a work in progress, and a re-imagining of the [original LIFTI 
 More information will follow as the code is fleshed out.
 
 Design documents/thoughts are starting to appear in the [wiki](https://github.com/mikegoatly/lifti/wiki).
+
+## Simplest possible quick start
+
+``` c#
+// Create a full text index with default settings
+var index = new FullTextIndex<string>();
+            
+// Index
+index.Index("A", "This is some text associated with A: fizz");
+index.Index("B", "Some buzz text for B");
+index.Index("C", "Text associated with C is both fizz and buzz");
+
+// Search for text containing both Fizz *and* Buzz
+var results = index.Search("Fizz Buzz").ToList();
+
+// Output: Items with both Fizz and Buzz: 1
+Console.WriteLine($"Items with both Fizz and Buzz: {results.Count}");
+
+// Search for text containing both Fizz *or* Buzz
+results = index.Search("Fizz | Buzz").ToList();
+
+// Outputs: Items with Fizz or Buzz: 3
+Console.WriteLine($"Items with Fizz or Buzz: {results.Count}");
+```
+
+## CI nuget feed
+
+If you want to try out the early versions of this, you can download the Lifti.Core package from the CI package feed: https://goatly.pkgs.visualstudio.com/LIFTI/_packaging/lifti-ci/nuget/v3/index.json
 
 ## Goals
 1) Provide a very simple way to build an in-memory full text index.
