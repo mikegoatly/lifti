@@ -8,37 +8,58 @@ namespace Lifti.Querying
 {
     public class QueryParser : IQueryParser
     {
-        public IQuery Parse(string queryText, ITokenizer wordTokenizer)
+        public IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, ITokenizer wordTokenizer)
         {
+            if (fieldLookup is null)
+            {
+                throw new ArgumentNullException(nameof(fieldLookup));
+            }
+
             IQueryPart rootPart = null;
 
             var state = new QueryParserState(queryText);
             while (state.TryGetNextToken(out var token))
             {
-                rootPart = CreateQueryPart(state, token, wordTokenizer, rootPart);
+                rootPart = CreateQueryPart(fieldLookup, state, token, wordTokenizer, rootPart);
             }
 
             return new Query(rootPart);
         }
 
-        private static IQueryPart CreateQueryPart(QueryParserState state, QueryToken token, ITokenizer wordTokenizer, IQueryPart rootPart)
+        private static IQueryPart CreateQueryPart(
+            IIndexedFieldLookup fieldLookup, 
+            QueryParserState state, 
+            QueryToken token, 
+            ITokenizer wordTokenizer, 
+            IQueryPart rootPart)
         {
             switch (token.TokenType)
             {
                 case QueryTokenType.Text:
                     return ComposePart(rootPart, CreateWordPart(token, wordTokenizer));
 
+                case QueryTokenType.FieldFilter:
+                    var filteredPart = CreateQueryPart(fieldLookup, state, state.GetNextToken(), wordTokenizer, null);
+                    if (fieldLookup.TryGetIdForField(token.TokenText, out var fieldId))
+                    {
+                        return ComposePart(
+                            rootPart,
+                            new FieldFilterQueryOperator(token.TokenText, fieldId, filteredPart));
+                    }
+
+                    throw new QueryParserException(ExceptionMessages.UnknownFieldReference, token.TokenText);
+
                 case QueryTokenType.OrOperator:
                 case QueryTokenType.AndOperator:
                 case QueryTokenType.NearOperator:
                 case QueryTokenType.PrecedingNearOperator:
                 case QueryTokenType.PrecedingOperator:
-                    var rightPart = CreateQueryPart(state, state.GetNextToken(), wordTokenizer, null);
+                    var rightPart = CreateQueryPart(fieldLookup, state, state.GetNextToken(), wordTokenizer, null);
                     return CombineParts(rootPart, rightPart, token.TokenType, token.Tolerance);
 
                 case QueryTokenType.OpenBracket:
                     var bracketedPart = state.GetTokensUntil(QueryTokenType.CloseBracket)
-                        .Aggregate((IQueryPart)null, (current, next) => CreateQueryPart(state, next, wordTokenizer, current));
+                        .Aggregate((IQueryPart)null, (current, next) => CreateQueryPart(fieldLookup, state, next, wordTokenizer, current));
 
                     return bracketedPart == null
                                ? rootPart

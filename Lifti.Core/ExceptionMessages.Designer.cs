@@ -142,6 +142,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown field &apos;{0}&apos; referenced in query.
+        /// </summary>
+        internal static string UnknownFieldReference {
+            get {
+                return ResourceManager.GetString("UnknownFieldReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown operator encountered: {0}.
         /// </summary>
         internal static string UnknownOperatorEncountered {

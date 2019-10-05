@@ -25,6 +25,11 @@ namespace Lifti
             throw new LiftiException(ExceptionMessages.FieldHasNoAssociatedFieldName, id);
         }
 
+        public bool TryGetIdForField(string fieldName, out byte id)
+        {
+            return this.fieldToIdLookup.TryGetValue(fieldName, out id);
+        }
+
         public byte GetOrCreateIdForField(string fieldName)
         {
             if (this.fieldToIdLookup.TryGetValue(fieldName, out var id))

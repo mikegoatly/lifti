@@ -144,6 +144,9 @@
   <data name="UnexpectedTokenEncountered" xml:space="preserve">
     <value>Unexpected token encountered: {0}</value>
   </data>
+  <data name="UnknownFieldReference" xml:space="preserve">
+    <value>Unknown field '{0}' referenced in query</value>
+  </data>
   <data name="UnknownOperatorEncountered" xml:space="preserve">
     <value>Unknown operator encountered: {0}</value>
   </data>

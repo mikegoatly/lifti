@@ -9,10 +9,19 @@ namespace Lifti.Tests.Querying
 {
     public class QueryParserTests
     {
+        private const byte TestFieldId = 9;
+        private const byte OtherFieldId = 11;
+        private readonly Mock<IIndexedFieldLookup> fieldLookupMock;
         private readonly Mock<ITokenizer> tokenizerMock;
 
         public QueryParserTests()
         {
+            this.fieldLookupMock = new Mock<IIndexedFieldLookup>();
+            var testFieldId = TestFieldId;
+            var otherFieldId = OtherFieldId;
+            this.fieldLookupMock.Setup(l => l.TryGetIdForField("testfield", out testFieldId)).Returns(true);
+            this.fieldLookupMock.Setup(l => l.TryGetIdForField("otherfield", out otherFieldId)).Returns(true);
+
             this.tokenizerMock = new Mock<ITokenizer>();
             this.tokenizerMock.Setup(m => m.Process(It.IsAny<string>())).Returns((string data) => new[] { new Token(data, new WordLocation(0, 0, data.Length)) });
         }
@@ -134,6 +143,41 @@ namespace Lifti.Tests.Querying
             result.Root.Should().BeNull();
         }
 
+        [Fact]
+        public void ParsingFieldFilterWithSingleWord_ShouldReturnFieldFilterOperatorWithWordAsChild()
+        {
+            var result = this.Parse("testfield=test");
+            var expectedQuery = new FieldFilterQueryOperator("testfield", TestFieldId, new ExactWordQueryPart("test"));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingFieldFilterWithBracketedStatement_ShouldReturnFieldFilterOperatorWithStatementAsChild()
+        {
+            var result = this.Parse("testfield=(test | foo) & otherfield=(foo & bar)");
+            var expectedQuery = 
+                new AndQueryOperator(
+                    new FieldFilterQueryOperator(
+                        "testfield", 
+                        TestFieldId,
+                        new BracketedQueryPart(
+                            new OrQueryOperator(new ExactWordQueryPart("test"), new ExactWordQueryPart("foo")))),
+                    new FieldFilterQueryOperator(
+                        "otherfield",
+                        OtherFieldId,
+                        new BracketedQueryPart(
+                            new AndQueryOperator(new ExactWordQueryPart("foo"), new ExactWordQueryPart("bar")))));
+
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingFieldFilterWithUnknownFieldName_ShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => this.Parse("foofield=test"))
+                .Message.Should().Be("Unknown field 'foofield' referenced in query");
+        }
+
         private static void VerifyResult(IQuery result, IQueryPart expectedQuery)
         {
             result.Root.ToString().Should().Be(expectedQuery.ToString());
@@ -142,7 +186,7 @@ namespace Lifti.Tests.Querying
         private IQuery Parse(string text)
         {
             var parser = new QueryParser();
-            return parser.Parse(text, new FakeTokenizer());
+            return parser.Parse(this.fieldLookupMock.Object, text, new FakeTokenizer());
         }
     }
 }

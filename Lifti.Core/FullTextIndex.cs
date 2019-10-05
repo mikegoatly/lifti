@@ -73,7 +73,7 @@ namespace Lifti
 
         public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = default)
         {
-            var query = this.queryParser.Parse(searchText, this.GetTokenizer(tokenizationOptions));
+            var query = this.queryParser.Parse(this.FieldLookup, searchText, this.GetTokenizer(tokenizationOptions));
             return query.Execute(this);
         }
 

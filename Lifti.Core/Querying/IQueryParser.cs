@@ -4,6 +4,6 @@ namespace Lifti.Querying
 {
     public interface IQueryParser
     {
-        IQuery Parse(string queryText, ITokenizer wordTokenizer);
+        IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, ITokenizer wordTokenizer);
     }
 }
