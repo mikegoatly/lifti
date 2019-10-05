@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lifti.Core", "Lifti.Core\Lifti.Core.csproj", "{6F736F83-883D-4790-B6BD-7C6ADD82664E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lifti.Core", "src\Lifti.Core\Lifti.Core.csproj", "{6F736F83-883D-4790-B6BD-7C6ADD82664E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lifti.Tests", "Lifti.Tests\Lifti.Tests.csproj", "{A941286C-A3B6-49EE-912A-65260BF8CD28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lifti.Tests", "test\Lifti.Tests\Lifti.Tests.csproj", "{A941286C-A3B6-49EE-912A-65260BF8CD28}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{696D1CD2-CF04-4546-A20E-710AB127F021}"
 	ProjectSection(SolutionItems) = preProject
@@ -14,9 +14,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerformanceProfiling", "PerformanceProfiling\PerformanceProfiling.csproj", "{B424FD1A-0516-461D-9EAE-46F06507F1C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerformanceProfiling", "test\PerformanceProfiling\PerformanceProfiling.csproj", "{B424FD1A-0516-461D-9EAE-46F06507F1C6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestConsole", "TestConsole\TestConsole.csproj", "{598A0226-61CD-46C2-9BDB-E0E93290FF08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestConsole", "samples\TestConsole\TestConsole.csproj", "{598A0226-61CD-46C2-9BDB-E0E93290FF08}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4ED3E4BC-A000-4B80-94CD-637BB76D3288}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{3F8110F6-5E82-41F9-BF5E-B9700F1F53FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +47,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A941286C-A3B6-49EE-912A-65260BF8CD28} = {4ED3E4BC-A000-4B80-94CD-637BB76D3288}
+		{B424FD1A-0516-461D-9EAE-46F06507F1C6} = {4ED3E4BC-A000-4B80-94CD-637BB76D3288}
+		{598A0226-61CD-46C2-9BDB-E0E93290FF08} = {3F8110F6-5E82-41F9-BF5E-B9700F1F53FB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CAF5B965-BA7E-4252-B325-27002CE752CC}

@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lifti.Core\Lifti.Core.csproj" />
+    <ProjectReference Include="..\..\src\Lifti.Core\Lifti.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
