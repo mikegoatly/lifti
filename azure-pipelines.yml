@@ -13,7 +13,6 @@ steps:
   inputs:
     command: 'pack'
     packagesToPack: 'src/Lifti.Core/Lifti.Core.csproj'
-    includesymbols: true
     versioningScheme: 'byPrereleaseNumber'
     majorVersion: '0'
     minorVersion: '1'
