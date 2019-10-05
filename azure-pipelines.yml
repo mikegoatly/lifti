@@ -12,7 +12,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'pack'
-    packagesToPack: 'src/Lifti.CoreLifti.Core.csproj'
+    packagesToPack: 'src/Lifti.Core/Lifti.Core.csproj'
     includesymbols: true
     versioningScheme: 'byPrereleaseNumber'
     majorVersion: '0'
