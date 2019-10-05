@@ -18,6 +18,7 @@ namespace Lifti.Querying
         public QueryTokenType TokenType { get; }
 
         public static QueryToken ForWord(string text) => new QueryToken(text, QueryTokenType.Text, 0);
+        public static QueryToken ForFieldFilter(string text) => new QueryToken(text, QueryTokenType.FieldFilter, 0);
         public static QueryToken ForOperator(QueryTokenType operatorType) => new QueryToken(null, operatorType, 0);
         public static QueryToken ForOperatorWithTolerance(QueryTokenType operatorType, int tolerance) => 
             new QueryToken(null, operatorType, tolerance == 0 ? 5 : tolerance);

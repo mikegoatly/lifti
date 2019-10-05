@@ -62,6 +62,15 @@ namespace Lifti.Querying
                                 case '>':
                                     yield return QueryToken.ForOperator(QueryTokenType.PrecedingOperator);
                                     break;
+                                case '=':
+                                    if (tokenStart == null)
+                                    {
+                                        throw new QueryParserException(ExceptionMessages.UnexpectedOperator, "=");
+                                    }
+
+                                    yield return QueryToken.ForFieldFilter(queryText.Substring(tokenStart.Value, i - tokenStart.Value));
+                                    tokenStart = null;
+                                    break;
                                 case ')':
                                     var token = createWordForYielding(i);
                                     if (token != null)

@@ -53,7 +53,12 @@
         /// <summary>
         /// The token is a preceding operator - the left word must precede the right word.
         /// </summary>
-        PrecedingOperator
+        PrecedingOperator,
+
+        /// <summary>
+        /// The token is a field filter - the captured word is the field that results should be restricted to.
+        /// </summary>
+        FieldFilter
     }
 
 }
