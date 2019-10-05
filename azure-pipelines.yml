@@ -8,14 +8,16 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
-    projects: 'test/Lifti.Tests.csproj'
-    testRunTitle: 'Run LIFTI unit tests'
+    projects: 'test/Lifti.Tests/Lifti.Tests.csproj'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'pack'
-    packagesToPack: 'src/Lifti.Core.csproj'
+    packagesToPack: 'src/Lifti.CoreLifti.Core.csproj'
     includesymbols: true
-    versioningScheme: 'byBuildNumber'
+    versioningScheme: 'byPrereleaseNumber'
+    majorVersion: '0'
+    minorVersion: '1'
+    patchVersion: '0'
     verbosityPack: 'Normal'
 - task: DotNetCoreCLI@2
   inputs:
