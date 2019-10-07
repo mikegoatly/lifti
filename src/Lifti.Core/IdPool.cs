@@ -9,6 +9,8 @@ namespace Lifti
         private readonly Dictionary<int, T> itemIdLookup = new Dictionary<int, T>();
         private int nextId;
 
+        public int AllocatedIdCount => this.itemIdIndex.Count;
+
         public int CreateIdFor(T item)
         {
             if (this.itemIdIndex.ContainsKey(item))

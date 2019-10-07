@@ -39,6 +39,8 @@ namespace Lifti
 
         public IIndexedFieldLookup FieldLookup { get; }
 
+        public int Count => this.IdPool.AllocatedIdCount;
+
         public void Index(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = null)
         {
             var itemId = this.IdPool.CreateIdFor(itemKey);

@@ -7,6 +7,7 @@ namespace Lifti
         IndexNode Root { get; }
         IIdPool<TKey> IdPool { get; }
         IIndexedFieldLookup FieldLookup { get; }
+        int Count { get; }
 
         void Index(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = null);
         void Index<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> itemTokenizationOptions);
