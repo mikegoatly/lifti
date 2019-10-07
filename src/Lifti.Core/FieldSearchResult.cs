@@ -2,9 +2,9 @@
 
 namespace Lifti
 {
-    public class MatchedLocation
+    public class FieldSearchResult
     {
-        public MatchedLocation(string foundIn, IReadOnlyList<WordLocation> locations)
+        public FieldSearchResult(string foundIn, IReadOnlyList<WordLocation> locations)
         {
             this.FoundIn = foundIn;
             this.Locations = locations;

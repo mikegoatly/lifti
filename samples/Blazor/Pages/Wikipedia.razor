@@ -1,0 +1,143 @@
+﻿@page "/wikipedia-search"
+@using Lifti
+@inject HttpClient Http
+
+<p>This example fetches random Wikipedia page content and indexes the text in it. You can try out various LIFTI searches to find content in them.</p>
+
+<div class="position-relative">
+    <div class="alert alert-@(this.errored ? "danger" : "secondary") d-flex">
+        <span class="align-self-center">@Message</span>
+        <span class="align-self-center text-right flex-fill mr-2">@index.Count pages indexed.</span>
+        <button disabled=@indexing class="btn btn-secondary" @onclick="IndexRandomPagesAsync">Index more...</button>
+    </div>
+
+    <div class="d-flex flex-row">
+        <input type="text" @bind="SearchText" />
+        <button disabled=@indexing class="btn btn-primary ml-2" @onclick="Search">Search</button>
+    </div>
+
+    @if (results != null)
+    {
+        <div class="container-fluid">
+            <div class="row">
+                <ul class="col-4 search-results">
+                    @foreach (var result in results)
+                    {
+                        <li class="p-1" @onclick="() => this.ShowItem(result)">@result.Item</li>
+                    }
+                </ul>
+                @if (this.selectedContent != null)
+                {
+                    <div class="col-8">
+                        @((MarkupString)this.selectedContent)
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    PageSummary[] defaultPages = new[]
+    {
+        new PageSummary { Slug = "The_Three-Body_Problem_(novel)" },
+        new PageSummary { Slug = "Aliens_(film)" },
+        new PageSummary { Slug = "Porcupine_Tree" },
+        new PageSummary { Slug = "Buffy_the_Vampire_Slayer" },
+        new PageSummary { Slug = "Monstress_(comics)" },
+        new PageSummary { Slug = "Donnie_Darko" },
+        new PageSummary { Slug = "Zune" },
+        new PageSummary { Slug = "The_Boys_(2019_TV_series)" },
+        new PageSummary { Slug = "Game_of_Thrones" },
+        new PageSummary { Slug = "Fantastic_Mr_Fox" }
+    };
+
+    IEnumerable<SearchResult<string>> results = null;
+    FullTextIndex<string> index = new FullTextIndex<string>();
+
+    private bool errored;
+    private bool indexing;
+    private string selectedContent;
+
+    private string Message { get; set; }
+    private string SearchText { get; set; }
+    private Dictionary<string, string> loadedPages = new Dictionary<string, string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchPagesAsync(defaultPages);
+    }
+
+    void ShowItem(SearchResult<string> searchResult)
+    {
+        var builder = new System.Text.StringBuilder(this.loadedPages[searchResult.Item]);
+
+        foreach (var location in searchResult.FieldMatches.SelectMany(m => m.Locations).OrderByDescending(l => l.Start))
+        {
+            builder.Insert(location.Start + location.Length, "</span>");
+            builder.Insert(location.Start, "<span class='bg-warning'>");
+        }
+
+        this.selectedContent = builder.ToString();
+    }
+
+    async Task IndexRandomPagesAsync()
+    {
+        this.errored = false;
+
+        this.Message = "Getting 10 random Wikipedia pages...";
+
+        try
+        {
+            var randomList = await Http.GetJsonAsync<RandomResult>("https://en.wikipedia.org/w/api.php?action=query&list=random&rnlimit=10&rnnamespace=0&format=json&&origin=*");
+
+            await this.FetchPagesAsync(randomList.Query.random);
+        }
+        catch (Exception ex)
+        {
+            this.Message = ex.Message;
+            this.errored = true;
+        }
+    }
+
+    async Task FetchPagesAsync(IEnumerable<PageSummary> pages)
+    {
+        this.indexing = true;
+        this.errored = false;
+
+        try
+        {
+            var i = 1;
+            foreach (var result in pages)
+            {
+                var counter = $"[{i++}/10]";
+                this.Message = $"{counter} Fetching page {result.Title ?? result.Slug}";
+                base.StateHasChanged();
+
+                var filter = result.Slug != null ? "page=" + result.Slug : "pageid=" + result.Id;
+                var results = await Http.GetJsonAsync<WikipediaResult>($"https://en.wikipedia.org/w/api.php?action=parse&section=0&prop=text&{filter}&format=json&&origin=*");
+
+                this.Message = $"{counter} Indexing...";
+                base.StateHasChanged();
+                loadedPages[results.Page.Title] = results.Page.Text.Content;
+                this.index.Index(results.Page.Title, results.Page.Text.Content, new TokenizationOptions(Lifti.Tokenization.TokenizerKind.XmlContent));
+            }
+
+            this.Message = "Ready";
+        }
+        catch (Exception ex)
+        {
+            this.Message = ex.Message;
+            this.errored = true;
+        }
+        finally
+        {
+            this.indexing = false;
+        }
+    }
+
+    void Search()
+    {
+        results = this.index.Search(this.SearchText).ToList();
+    }
+}

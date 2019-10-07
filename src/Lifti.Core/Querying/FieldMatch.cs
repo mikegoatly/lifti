@@ -62,7 +62,10 @@ namespace Lifti.Querying
 
         public IReadOnlyList<WordLocation> GetWordLocations()
         {
-            return this.Locations.SelectMany(l => l.GetLocations()).ToList();
+            return this.Locations.SelectMany(l => l.GetLocations())
+                .Distinct()
+                .OrderBy(l => l.WordIndex)
+                .ToList();
         }
     }
 }

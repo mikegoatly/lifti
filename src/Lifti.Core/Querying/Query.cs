@@ -45,8 +45,8 @@ namespace Lifti.Querying
                 var item = index.IdPool.GetItemForId(itemResults.ItemId);
                 yield return new SearchResult<TKey>(
                     item,
-                    itemResults.FieldMatches.Select(m => new MatchedLocation(
-                        index.FieldLookup.GetFieldForId(m.FieldId), 
+                    itemResults.FieldMatches.Select(m => new FieldSearchResult(
+                        index.FieldLookup.GetFieldForId(m.FieldId),
                         m.GetWordLocations()))
                     .ToList());
             }

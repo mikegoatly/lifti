@@ -1,0 +1,10 @@
+{
+  "solution": {
+    "path": "Lifti.sln",
+    "projects": [
+      "src\\Lifti.Core\\Lifti.Core.csproj",
+      "test\\Lifti.Tests\\Lifti.Tests.csproj",
+      "test\\PerformanceProfiling\\PerformanceProfiling.csproj"
+    ]
+  }
+}
