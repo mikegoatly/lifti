@@ -15,6 +15,7 @@
         <input type="text" @bind="SearchText" />
         <button disabled=@indexing class="btn btn-primary ml-2" @onclick="Search">Search</button>
         <button disabled=@indexing class="btn btn-secondary ml-2" @onclick="ShowAll">Show all</button>
+        <button disabled=@indexing class="btn btn-secondary ml-2" @onclick="Clear">Clear results</button>
         <a href="https://github.com/mikegoatly/lifti/wiki/The-LIFTI-query-language" class="align-self-center ml-2" target="_blank">Query language examples</a>
     </div>
 
@@ -44,8 +45,17 @@
                     </ul>
                     @if (this.selectedContent != null)
                     {
-                        <div class="col-9 pl-4 pt-2">
-                            @((MarkupString)this.selectedContent)
+                        <div class="col-9 pl-4 pt-2 d-flex flex-row">
+                            <div>
+                                @((MarkupString)this.selectedContent)
+                            </div>
+                            <div style="max-width:140px;width:140px;min-width:140px">
+                                <strong>Word matches:</strong>
+                                @foreach (var location in this.wordLocations)
+                                {
+                                    <div>@location</div>
+                                }
+                            </div>
                         </div>
                     }
                 </div>
@@ -61,6 +71,8 @@
                 <dd>All these words in this order</dd>
                 <dt>critical ~> acclaim</dt>
                 <dd>The word "critical" when it appears before and near to the wrod "acclaim"</dd>
+                <dt>st* & sp*</dt>
+                <dd>The document must contain words starting with "st" and "sp"</dd>
             </dl>
         </div>
     }
@@ -87,6 +99,7 @@
     private bool errored;
     private bool indexing;
     private string selectedContent;
+    private IReadOnlyList<WordLocation> wordLocations;
 
     private string SyntaxError { get; set; }
     private string Message { get; set; }
@@ -101,13 +114,14 @@
     void ShowItem(SearchResult<string> searchResult)
     {
         var builder = new System.Text.StringBuilder(this.loadedPages[searchResult.Item]);
-
-        foreach (var location in searchResult.FieldMatches.SelectMany(m => m.Locations).OrderByDescending(l => l.Start))
+        var locations = searchResult.FieldMatches.SelectMany(m => m.Locations).ToList();
+        foreach (var location in locations.OrderByDescending(l => l.Start))
         {
             builder.Insert(location.Start + location.Length, "</span>");
             builder.Insert(location.Start, "<span class='bg-warning'>");
         }
 
+        this.wordLocations = locations;
         this.selectedContent = builder.ToString();
     }
 
@@ -164,6 +178,11 @@
         {
             this.indexing = false;
         }
+    }
+
+    void Clear()
+    {
+        this.results = null;
     }
 
     void Search()
