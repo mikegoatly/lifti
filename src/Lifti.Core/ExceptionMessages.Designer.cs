@@ -61,6 +61,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expected a text token - got {0}.
+        /// </summary>
+        internal static string ExpectedTextToken {
+            get {
+                return ResourceManager.GetString("ExpectedTextToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Token expected: {0}.
         /// </summary>
         internal static string ExpectedToken {

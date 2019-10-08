@@ -65,6 +65,13 @@ namespace Lifti.Querying
                                ? rootPart
                                : ComposePart(rootPart, new BracketedQueryPart(bracketedPart));
 
+                case QueryTokenType.BeginAdjacentTextOperator:
+                    var words = state.GetTokensUntil(QueryTokenType.EndAdjacentTextOperator)
+                        .Select(t => CreateWordPart(t, wordTokenizer))
+                        .ToList();
+
+                    return words.Count == 0 ? rootPart : ComposePart(rootPart, new AdjacentWordsQueryOperator(words));
+
                 default:
                     throw new QueryParserException(ExceptionMessages.UnexpectedTokenEncountered, token.TokenType);
             }
@@ -72,6 +79,11 @@ namespace Lifti.Querying
 
         private static IWordQueryPart CreateWordPart(QueryToken queryToken, ITokenizer wordTokenizer)
         {
+            if (queryToken.TokenType != QueryTokenType.Text)
+            {
+                throw new QueryParserException(ExceptionMessages.ExpectedTextToken, queryToken.TokenType);
+            }
+
             var tokenText = queryToken.TokenText.AsSpan();
 
             var hasWildcard = tokenText.Length > 0 && tokenText[tokenText.Length - 1] == '*';

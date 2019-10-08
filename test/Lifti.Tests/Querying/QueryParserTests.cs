@@ -114,6 +114,45 @@ namespace Lifti.Tests.Querying
             VerifyResult(result, expectedQuery);
         }
 
+        [Fact]
+        public void ParsingFieldFilters_ShouldCreateFieldFilterOperator()
+        {
+            var result = this.Parse("field1:he");
+            var expectedQuery = new PrecedingNearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), 5);
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingWordsInQuotes_ShouldResultInAdjacentWordsQueryOperator()
+        {
+            var result = this.Parse("\"search words startswith* too\"");
+            var expectedQuery = new AdjacentWordsQueryOperator(
+                new IWordQueryPart[]
+                {
+                    new ExactWordQueryPart("search"),
+                    new ExactWordQueryPart("words"),
+                    new StartsWithWordQueryPart("startswith"),
+                    new ExactWordQueryPart("too")
+                });
+
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingOperatorsInQuotes_ShouldTreatAsText()
+        {
+            var result = this.Parse("\"test & hello\"");
+            var expectedQuery = new AdjacentWordsQueryOperator(
+                new IWordQueryPart[]
+                {
+                    new ExactWordQueryPart("test"),
+                    new ExactWordQueryPart("&"),
+                    new ExactWordQueryPart("hello")
+                });
+
+            VerifyResult(result, expectedQuery);
+        }
+
         [Theory]
         [InlineData("wordone ~4> wordtwo", 4)]
         [InlineData("wordone ~12> wordtwo", 12)]
@@ -155,10 +194,10 @@ namespace Lifti.Tests.Querying
         public void ParsingFieldFilterWithBracketedStatement_ShouldReturnFieldFilterOperatorWithStatementAsChild()
         {
             var result = this.Parse("testfield=(test | foo) & otherfield=(foo & bar)");
-            var expectedQuery = 
+            var expectedQuery =
                 new AndQueryOperator(
                     new FieldFilterQueryOperator(
-                        "testfield", 
+                        "testfield",
                         TestFieldId,
                         new BracketedQueryPart(
                             new OrQueryOperator(new ExactWordQueryPart("test"), new ExactWordQueryPart("foo")))),
