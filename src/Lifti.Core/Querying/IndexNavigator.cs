@@ -41,7 +41,7 @@ namespace Lifti.Querying
                 return IntermediateQueryResult.Empty;
             }
 
-            var matches = new List<QueryWordMatch>();
+            var matches = new Dictionary<int, List<FieldMatch>>();
             var childNodeStack = new Queue<IndexNode>();
             childNodeStack.Enqueue(this.currentNode);
 
@@ -50,7 +50,19 @@ namespace Lifti.Querying
                 var node = childNodeStack.Dequeue();
                 if (node.Matches != null)
                 {
-                    matches.AddRange(node.Matches.Select(CreateQueryWordMatch));
+                    foreach (var match in node.Matches)
+                    {
+                        var fieldMatches = match.Value.Select(v => new FieldMatch(v));
+                        if (!matches.TryGetValue(match.Key, out var mergedItemResults))
+                        {
+                            mergedItemResults = new List<FieldMatch>(fieldMatches);
+                            matches[match.Key] = mergedItemResults;
+                        }
+                        else
+                        {
+                            mergedItemResults.AddRange(fieldMatches);
+                        }
+                    }
                 }
 
                 if (node.ChildNodes != null)
@@ -61,8 +73,8 @@ namespace Lifti.Querying
                     }
                 }
             }
-            
-            return new IntermediateQueryResult(matches);
+
+            return new IntermediateQueryResult(matches.Select(m => new QueryWordMatch(m.Key, MergeItemMatches(m.Value))));
         }
 
         public bool Process(ReadOnlySpan<char> text)
@@ -106,6 +118,14 @@ namespace Lifti.Querying
 
             this.currentNode = null;
             return false;
+        }
+
+        private IEnumerable<FieldMatch> MergeItemMatches(List<FieldMatch> fieldMatches)
+        {
+            return fieldMatches.ToLookup(m => m.FieldId)
+                .Select(m => new FieldMatch(
+                    m.Key,
+                    m.SelectMany(w => w.Locations).OrderBy(w => w.MinWordIndex).ToList()));
         }
 
         private static QueryWordMatch CreateQueryWordMatch(KeyValuePair<int, List<IndexedWord>> match)

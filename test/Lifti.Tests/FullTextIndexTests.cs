@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using PerformanceProfiling;
+using System;
 using System.Linq;
 using Xunit;
 
@@ -27,10 +28,7 @@ namespace Lifti.Tests
         [Fact]
         public void IndexedItemsShouldBeRetrievable()
         {
-            this.index.Index("A", "This is a test");
-            this.index.Index("B", "This is another test");
-            this.index.Index("C", "Foo is testing this as well");
-            this.index.Index("D", "One last test just for testing sake");
+            this.WithIndexedStrings();
 
             var results = this.index.Search("this test");
 
@@ -40,8 +38,7 @@ namespace Lifti.Tests
         [Fact]
         public void WordsRetrievedBySearchingForTextIndexedBySimpleStringsShouldBeAssociatedToDefaultField()
         {
-            this.index.Index("A", "This is a test");
-            this.index.Index("B", "This is another test");
+            this.WithIndexedStrings();
 
             var results = this.index.Search("this");
 
@@ -49,10 +46,19 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public void SearchingByMultipleWildcards_ShouldReturnResult()
+        {
+            this.WithIndexedStrings();
+
+            var results = this.index.Search("fo* te*");
+
+            results.Should().HaveCount(2);
+        }
+
+        [Fact]
         public void IndexedObjectsShouldBeRetrievableByTextFromAnyIndexedField()
         {
-            this.index.Index(new TestObject("A", "Text One", "Text Two", "Text Three"), this.tokenizationOptions);
-            this.index.Index(new TestObject("B", "Not One", "Not Two", "Not Three"), this.tokenizationOptions);
+            WithIndexedObjects();
 
             this.index.Search("text").Should().HaveCount(1);
             this.index.Search("one").Should().HaveCount(2);
@@ -63,8 +69,7 @@ namespace Lifti.Tests
         [Fact]
         public void WordsRetrievedBySearchingForTextIndexedByObjectsShouldBeAssociatedToCorrectFields()
         {
-            this.index.Index(new TestObject("A", "Text One", "Text Two", "Text Three"), this.tokenizationOptions);
-            this.index.Index(new TestObject("B", "Not One", "Not Two", "Not Three"), this.tokenizationOptions);
+            WithIndexedObjects();
 
             var results = this.index.Search("one");
             results.All(i => i.FieldMatches.All(l => l.FoundIn == "Text1")).Should().BeTrue();
@@ -81,6 +86,20 @@ namespace Lifti.Tests
             {
                 this.index.Index(entry.name, entry.text);
             }
+        }
+
+        private void WithIndexedObjects()
+        {
+            this.index.Index(new TestObject("A", "Text One", "Text Two", "Text Three"), this.tokenizationOptions);
+            this.index.Index(new TestObject("B", "Not One", "Not Two", "Not Three"), this.tokenizationOptions);
+        }
+
+        private void WithIndexedStrings()
+        {
+            this.index.Index("A", "This is a test");
+            this.index.Index("B", "This is another test");
+            this.index.Index("C", "Foo is testing this as well");
+            this.index.Index("D", "One last test just for testing sake");
         }
 
         public class TestObject

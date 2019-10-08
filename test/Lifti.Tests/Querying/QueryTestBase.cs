@@ -42,6 +42,11 @@ namespace Lifti.Tests.Querying
             return new SingleWordLocationMatch(new WordLocation(index, index, index));
         }
 
+        protected static IWordLocationMatch WordMatch(int index, int start, int length)
+        {
+            return new SingleWordLocationMatch(new WordLocation(index, start, length));
+        }
+
         protected static IntermediateQueryResult IntermediateQueryResult(params QueryWordMatch[] matches)
         {
             return new IntermediateQueryResult(matches);
