@@ -115,14 +115,6 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
-        public void ParsingFieldFilters_ShouldCreateFieldFilterOperator()
-        {
-            var result = this.Parse("field1:he");
-            var expectedQuery = new PrecedingNearQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"), 5);
-            VerifyResult(result, expectedQuery);
-        }
-
-        [Fact]
         public void ParsingWordsInQuotes_ShouldResultInAdjacentWordsQueryOperator()
         {
             var result = this.Parse("\"search words startswith* too\"");
