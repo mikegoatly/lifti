@@ -9,11 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Tokenization\Stemming\StemmerTestCases.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\PerformanceProfiling\WikipediaDataLoader.cs" Link="WikipediaDataLoader.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="..\PerformanceProfiling\WikipediaPages.dat" Link="WikipediaPages.dat" />
+    <EmbeddedResource Include="Tokenization\Stemming\StemmerTestCases.txt" />
   </ItemGroup>
 
   <ItemGroup>
