@@ -2,7 +2,7 @@
 
 namespace Lifti.Tokenization
 {
-    public static class StringBuilderExtensions
+    internal static class StringBuilderExtensions
     {
         public static bool SequenceEqual(this StringBuilder builder, string chars)
         {
