@@ -41,6 +41,11 @@ namespace Lifti
 
         public int Count => this.IdPool.AllocatedIdCount;
 
+        public IndexNavigator CreateNavigator()
+        {
+            return new IndexNavigator(this.Root);
+        }
+
         public void Index(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = null)
         {
             var itemId = this.IdPool.CreateIdFor(itemKey);

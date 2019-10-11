@@ -120,6 +120,18 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public void IndexingAtNodeCausingSplitAtMiddleOfIntraNodeText_ShouldPlaceMatchAtSplit()
+        {
+            this.sut.Index(item1, fieldId1, new Token("NOITAZI", this.locations1.Locations));
+            this.sut.Index(item2, fieldId1, new Token("NOITA", this.locations2.Locations));
+
+            this.createdChildNodes.Should().HaveCount(1);
+
+            VerifySutState(this.sut, "NOITA", new[] { (item2, this.locations2) }, expectedChildNodes: new[] { ('Z', this.createdChildNodes[0]) });
+            VerifySutState(this.createdChildNodes[0], "I", new[] { (item1, this.locations1) });
+        }
+
+        [Fact]
         public void IndexingAtNodeCausingSplitAtStartOfIntraNodeText_ShouldReturnInEntryAddedAtSplitNode()
         {
             this.sut.Index(item1, fieldId1, new Token("www", this.locations1.Locations));

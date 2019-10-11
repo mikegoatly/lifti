@@ -11,13 +11,15 @@ namespace Lifti
             bool splitOnPunctuation = true,
             char[] additionalSplitCharacters = null,
             bool caseInsensitive = true,
-            bool accentInsensitive = true)
+            bool accentInsensitive = true,
+            bool stem = false)
         {
             this.TokenizerKind = tokenizerKind;
             this.SplitOnPunctuation = splitOnPunctuation;
             this.AdditionalSplitCharacters = additionalSplitCharacters;
             this.CaseInsensitive = caseInsensitive;
             this.AccentInsensitive = accentInsensitive;
+            this.Stem = stem;
         }
 
         public static TokenizationOptions Default { get; } = new TokenizationOptions(TokenizerKind.Default);
@@ -37,5 +39,6 @@ namespace Lifti
         public bool CaseInsensitive { get; }
 
         public bool AccentInsensitive { get; }
+        public bool Stem { get; }
     }
 }

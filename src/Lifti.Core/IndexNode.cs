@@ -96,7 +96,12 @@ namespace Lifti
                     }
                 }
 
-                // No split occurred
+                if (this.IntraNodeText.Length > testLength)
+                {
+                    // This word is indexed in the middle of intra-node text. Split it and index here
+                    this.SplitIntraNodeText(testLength);
+                }
+
                 this.IndexFromCharacter(itemId, fieldId, locations, remainingWordText, testLength);
             }
         }

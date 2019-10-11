@@ -17,6 +17,18 @@ namespace Lifti.Tokenization.Stemming
         /// </summary>
         private readonly Dictionary<char, string[]> doubles = CreateSearchLookup(new[] { "BB", "DD", "FF", "GG", "MM", "NN", "PP", "RR", "TT" });
 
+        private static ItemTokenizationOptions<WordReplacement, WordReplacement> wordReplacementTokenization = new ItemTokenizationOptions<WordReplacement, WordReplacement>(
+            i => i,
+            new FieldTokenizationOptions<WordReplacement>(
+                "find",
+                x => new string(x.MatchWord.Reverse().ToArray()),
+                new TokenizationOptions(
+                    TokenizerKind.Default,
+                    splitOnPunctuation: false,
+                    caseInsensitive: false,
+                    accentInsensitive: false,
+                    stem: false)));
+
         /// <summary>
         /// The set of exceptions that are obeyed prior to any steps being executed.
         /// </summary>
@@ -75,7 +87,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The replacements that can be made in step 1B.
         /// </summary>
-        private readonly Dictionary<char, WordReplacement[]> step1bReplacements = CreateReplacementLookup(new[]
+        private readonly FullTextIndex<WordReplacement> step1bReplacements = CreateReplacementLookup(new[]
         {
             new WordReplacement("EEDLY", 3),
             new WordReplacement("INGLY", 5),
@@ -88,7 +100,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The replacements that can be made in step 2.
         /// </summary>
-        private readonly Dictionary<char, WordReplacement[]> step2Replacements = CreateReplacementLookup(new[]
+        private readonly FullTextIndex<WordReplacement> step2Replacements = CreateReplacementLookup(new[]
         {
             new WordReplacement("IZATION", "IZE"),
             new WordReplacement("IVENESS", 4),
@@ -119,7 +131,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The replacements that can be made in step 3.
         /// </summary>
-        private readonly Dictionary<char, WordReplacement[]> step3Replacements = CreateReplacementLookup(new[]
+        private readonly FullTextIndex<WordReplacement> step3Replacements = CreateReplacementLookup(new[]
         {
             new WordReplacement("ATIONAL", "ATE"),
             new WordReplacement("TIONAL", 2),
@@ -135,7 +147,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The replacements that can be made in step 4.
         /// </summary>
-        private readonly Dictionary<char, WordReplacement[]> step4Replacements = CreateReplacementLookup(new[]
+        private readonly FullTextIndex<WordReplacement> step4Replacements = CreateReplacementLookup(new[]
         {
             new WordReplacement("EMENT", 5),
             new WordReplacement("MENT", 4),
@@ -204,12 +216,15 @@ namespace Lifti.Tokenization.Stemming
         /// </summary>
         /// <param name="replacements">The replacements to create the lookup for.</param>
         /// <returns>The lookup of replacements, keyed on the last character in the search text.</returns>
-        private static Dictionary<char, WordReplacement[]> CreateReplacementLookup(IEnumerable<WordReplacement> replacements)
+        private static FullTextIndex<WordReplacement> CreateReplacementLookup(IEnumerable<WordReplacement> replacements)
         {
-            return (from r in replacements
-                    group r by r.MatchWord[r.MatchWord.Length - 1]
-                        into g
-                    select g).ToDictionary(r => r.Key, r => r.ToArray());
+            var index = new FullTextIndex<WordReplacement>(new FullTextIndexConfiguration<WordReplacement>() { Advanced = { SupportIntraNodeTextAfterCharacterIndex = 0 } });
+            foreach (var replacement in replacements)
+            {
+                index.Index(replacement, wordReplacementTokenization);
+            }
+
+            return index;
         }
 
         /// <summary>

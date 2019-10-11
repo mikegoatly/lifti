@@ -18,7 +18,7 @@ namespace PerformanceProfiling
         {
             var index = new UpdatableFullTextIndex<string>
             {
-                WordSplitter = new XmlWordSplitter(new WordSplitter()),
+                WordSplitter = new XmlWordSplitter(new StemmingWordSplitter()),
                 SearchWordSplitter = new WordSplitter(),
                 QueryParser = new LiftiQueryParser()
             };

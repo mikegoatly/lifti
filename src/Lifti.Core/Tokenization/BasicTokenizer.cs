@@ -11,6 +11,7 @@ namespace Lifti.Tokenization
         private readonly IInputPreprocessorPipeline inputPreprocessorPipeline = new InputPreprocessorPipeline();
         private TokenizationOptions tokenizationOptions;
         private HashSet<char> additionalSplitChars;
+        private PorterStemmer stemmer;
 
         public IEnumerable<Token> Process(string input)
         {
@@ -63,17 +64,27 @@ namespace Lifti.Tokenization
                 (this.additionalSplitChars?.Contains(current) == true);
         }
 
-        private readonly PorterStemmer stemmer = new PorterStemmer();
+        
         private void CaptureWord(TokenStore processedWords, int wordIndex, int start, int end, StringBuilder wordBuilder)
         {
             var length = end - start;
-            this.stemmer.Stem(wordBuilder);
+
+            if (this.stemmer != null)
+            {
+                this.stemmer.Stem(wordBuilder);
+            }
+
             processedWords.MergeOrAdd(new TokenHash(wordBuilder), wordBuilder, new WordLocation(wordIndex, start, length));
         }
 
         protected override void OnConfiguring(TokenizationOptions options)
         {
             this.tokenizationOptions = options;
+
+            if (this.tokenizationOptions.Stem)
+            {
+                this.stemmer = new PorterStemmer();
+            }
 
             this.additionalSplitChars = this.tokenizationOptions.AdditionalSplitCharacters?.Count > 0
                 ? new HashSet<char>(this.tokenizationOptions.AdditionalSplitCharacters)

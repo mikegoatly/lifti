@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization.Stemming;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Xunit;
@@ -38,7 +37,7 @@ namespace Lifti.Tests.Tokenization.Stemming
                         builder.Length = 0;
                         builder.Append(testCase[0]);
                         stemmer.Stem(builder);
-                        builder.ToString().Should().Be(testCase[1],because: "Stemming {0}", testCase[0]);
+                        builder.ToString().Should().Be(testCase[1], because: "Stemming {0}", testCase[0]);
                     }
                 }
             }

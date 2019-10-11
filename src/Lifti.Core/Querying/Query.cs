@@ -26,7 +26,7 @@ namespace Lifti.Querying
                 yield break;
             }
 
-            var matches = this.Root.Evaluate(() => new IndexNavigator(index.Root)).Matches;
+            var matches = this.Root.Evaluate(index.CreateNavigator).Matches;
             var results = new Dictionary<int, List<FieldMatch>>();
 
             foreach (var match in matches)

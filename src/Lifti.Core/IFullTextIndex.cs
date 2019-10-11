@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Lifti.Querying;
+using System.Collections.Generic;
 
 namespace Lifti
 {
@@ -12,5 +13,6 @@ namespace Lifti
         void Index(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = null);
         void Index<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> itemTokenizationOptions);
         IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = null);
+        IndexNavigator CreateNavigator();
     }
 }

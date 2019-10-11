@@ -1,5 +1,6 @@
 ﻿namespace Lifti.Tokenization.Stemming
 {
+    using Lifti.Querying;
     using System;
     using System.Collections.Generic;
     using System.Text;
@@ -150,18 +151,32 @@
         /// <returns>
         /// The text to replace at the end of the string builder. The match word of the word replacement will be null if no matches were found.
         /// </returns>
-        public static WordReplacement EndsWith(this StringBuilder builder, Dictionary<char, WordReplacement[]> replacementSetLookup)
+        public static WordReplacement EndsWith(this StringBuilder builder, FullTextIndex<WordReplacement> replacementSetLookup)
         {
             var length = builder.Length;
-            if (length > 0 &&
-                replacementSetLookup.TryGetValue(builder[length - 1], out var potentialReplacements))
+            if (length > 3)
             {
-                var endTestOffset = length - 1;
-                foreach (var potentialMatch in potentialReplacements)
+                var navigator = replacementSetLookup.CreateNavigator();
+                if (navigator.Process(builder[builder.Length - 1]))
                 {
-                    if (builder.EndsWith(potentialMatch.MatchWord, endTestOffset))
+                    var bestMatch = IntermediateQueryResult.Empty;
+                    for (var i = builder.Length - 2; i >= 0; i--)
                     {
-                        return potentialMatch;
+                        if (!navigator.Process(builder[i]))
+                        {
+                            break;
+                        }
+
+                        var match = navigator.GetExactMatches();
+                        if (match.Matches.Count > 0)
+                        {
+                            bestMatch = match;
+                        }
+                    }
+
+                    if (bestMatch.Matches.Count > 0)
+                    {
+                        return replacementSetLookup.IdPool.GetItemForId(bestMatch.Matches[0].ItemId);
                     }
                 }
             }
