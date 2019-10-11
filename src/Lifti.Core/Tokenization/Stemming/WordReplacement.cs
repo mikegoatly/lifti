@@ -13,6 +13,14 @@
         {
             this.MatchWord = matchWord;
             this.MatchResult = matchWord;
+            this.TrimCharacterCount = 0;
+        }
+
+        public WordReplacement(string matchWord, int trimCharacterCount)
+        {
+            this.MatchWord = matchWord;
+            this.MatchResult = null;
+            this.TrimCharacterCount = trimCharacterCount;
         }
 
         /// <summary>
@@ -24,6 +32,7 @@
         {
             this.MatchWord = matchWord;
             this.MatchResult = matchResult;
+            this.TrimCharacterCount = 0;
         }
 
         /// <summary>
@@ -37,5 +46,6 @@
         /// </summary>
         /// <value>The exception result.</value>
         public string MatchResult { get; }
+        public int TrimCharacterCount { get; }
     }
 }

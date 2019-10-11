@@ -111,10 +111,9 @@ namespace Lifti.Tokenization.Stemming
         /// <param name="replacement">The replacement to make.</param>
         public void ReplaceEnd(WordReplacement replacement)
         {
-            var replacementLength = replacement.MatchWord.Length;
-            if (replacementLength == 0)
+            if (replacement.MatchResult == null)
             {
-                this.Length -= replacementLength;
+                this.Length -= replacement.TrimCharacterCount;
             }
             else
             {

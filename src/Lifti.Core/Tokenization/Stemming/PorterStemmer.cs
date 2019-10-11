@@ -76,12 +76,12 @@ namespace Lifti.Tokenization.Stemming
         /// </summary>
         private readonly Dictionary<char, WordReplacement[]> step1bReplacements = CreateReplacementLookup(new[]
         {
-            new WordReplacement("EEDLY", "EE"),
-            new WordReplacement("INGLY", string.Empty),
-            new WordReplacement("EDLY", string.Empty),
-            new WordReplacement("EED", "EE"),
-            new WordReplacement("ING", string.Empty),
-            new WordReplacement("ED", string.Empty)
+            new WordReplacement("EEDLY", 3),
+            new WordReplacement("INGLY", 5),
+            new WordReplacement("EDLY", 4),
+            new WordReplacement("EED", 1),
+            new WordReplacement("ING", 3),
+            new WordReplacement("ED", 2)
         });
 
         /// <summary>
@@ -90,29 +90,29 @@ namespace Lifti.Tokenization.Stemming
         private readonly Dictionary<char, WordReplacement[]> step2Replacements = CreateReplacementLookup(new[]
         {
             new WordReplacement("IZATION", "IZE"),
-            new WordReplacement("IVENESS", "IVE"),
-            new WordReplacement("FULNESS", "FUL"),
+            new WordReplacement("IVENESS", 4),
+            new WordReplacement("FULNESS", 4),
             new WordReplacement("ATIONAL", "ATE"),
-            new WordReplacement("OUSNESS", "OUS"),
+            new WordReplacement("OUSNESS", 4),
             new WordReplacement("BILITI", "BLE"),
-            new WordReplacement("TIONAL", "TION"),
-            new WordReplacement("LESSLI", "LESS"),
-            new WordReplacement("FULLI", "FUL"),
-            new WordReplacement("ENTLI", "ENT"),
+            new WordReplacement("TIONAL", 2),
+            new WordReplacement("LESSLI", 2),
+            new WordReplacement("FULLI", 2),
+            new WordReplacement("ENTLI", 2),
             new WordReplacement("ATION", "ATE"),
-            new WordReplacement("ALITI", "AL"),
+            new WordReplacement("ALITI", 3),
             new WordReplacement("IVITI", "IVE"),
-            new WordReplacement("OUSLI", "OUS"),
-            new WordReplacement("ALISM", "AL"),
+            new WordReplacement("OUSLI", 2),
+            new WordReplacement("ALISM", 3),
             new WordReplacement("ABLI", "ABLE"),
             new WordReplacement("ANCI", "ANCE"),
-            new WordReplacement("ALLI", "AL"),
-            new WordReplacement("IZER", "IZE"),
+            new WordReplacement("ALLI", 2),
+            new WordReplacement("IZER", 1),
             new WordReplacement("ENCI", "ENCE"),
             new WordReplacement("ATOR", "ATE"),
             new WordReplacement("BLI", "BLE"),
-            new WordReplacement("OGI", "OG"),
-            new WordReplacement("LI", string.Empty)
+            new WordReplacement("OGI", 1),
+            new WordReplacement("LI", 2)
         });
 
         /// <summary>
@@ -121,14 +121,14 @@ namespace Lifti.Tokenization.Stemming
         private readonly Dictionary<char, WordReplacement[]> step3Replacements = CreateReplacementLookup(new[]
         {
             new WordReplacement("ATIONAL", "ATE"),
-            new WordReplacement("TIONAL", "TION"),
-            new WordReplacement("ALIZE", "AL"),
-            new WordReplacement("ICATE", "IC"),
-            new WordReplacement("ICITI", "IC"),
-            new WordReplacement("ATIVE", string.Empty),
-            new WordReplacement("ICAL", "IC"),
-            new WordReplacement("NESS", string.Empty),
-            new WordReplacement("FUL", string.Empty)
+            new WordReplacement("TIONAL", 2),
+            new WordReplacement("ALIZE", 3),
+            new WordReplacement("ICATE", 3),
+            new WordReplacement("ICITI", 3),
+            new WordReplacement("ATIVE", 5),
+            new WordReplacement("ICAL", 2),
+            new WordReplacement("NESS", 4),
+            new WordReplacement("FUL", 3)
         });
 
         /// <summary>
@@ -136,24 +136,24 @@ namespace Lifti.Tokenization.Stemming
         /// </summary>
         private readonly Dictionary<char, WordReplacement[]> step4Replacements = CreateReplacementLookup(new[]
         {
-            new WordReplacement("EMENT", string.Empty),
-            new WordReplacement("MENT", string.Empty),
-            new WordReplacement("ABLE", string.Empty),
-            new WordReplacement("IBLE", string.Empty),
-            new WordReplacement("ANCE", string.Empty),
-            new WordReplacement("ENCE", string.Empty),
-            new WordReplacement("ATE", string.Empty),
-            new WordReplacement("ITI", string.Empty),
-            new WordReplacement("ION", string.Empty),
-            new WordReplacement("IZE", string.Empty),
-            new WordReplacement("IVE", string.Empty),
-            new WordReplacement("OUS", string.Empty),
-            new WordReplacement("ANT", string.Empty),
-            new WordReplacement("ISM", string.Empty),
-            new WordReplacement("ENT", string.Empty),
-            new WordReplacement("AL", string.Empty),
-            new WordReplacement("ER", string.Empty),
-            new WordReplacement("IC", string.Empty)
+            new WordReplacement("EMENT", 5),
+            new WordReplacement("MENT", 4),
+            new WordReplacement("ABLE", 4),
+            new WordReplacement("IBLE", 4),
+            new WordReplacement("ANCE", 4),
+            new WordReplacement("ENCE", 4),
+            new WordReplacement("ATE", 3),
+            new WordReplacement("ITI", 3),
+            new WordReplacement("ION", 3),
+            new WordReplacement("IZE", 3),
+            new WordReplacement("IVE", 3),
+            new WordReplacement("OUS", 3),
+            new WordReplacement("ANT", 3),
+            new WordReplacement("ISM", 3),
+            new WordReplacement("ENT", 3),
+            new WordReplacement("AL", 2),
+            new WordReplacement("ER", 2),
+            new WordReplacement("IC", 2)
         });
 
         /// <inheritdoc />
@@ -172,7 +172,7 @@ namespace Lifti.Tokenization.Stemming
             var word = new ProcessingWord(original);
             if (TryMatchExceptionWord(ref word, this.exceptions, out var exception))
             {
-                return exception.AsSpan();
+                return exception;
             }
 
             word.ChangeY();
@@ -183,7 +183,7 @@ namespace Lifti.Tokenization.Stemming
 
             if (TryMatchExceptionWord(ref word, this.exceptions2, out exception))
             {
-                return exception.AsSpan();
+                return exception;
             }
 
             this.Step1b(ref word, stemRegion);
@@ -297,13 +297,22 @@ namespace Lifti.Tokenization.Stemming
             }
         }
 
-        private static bool TryMatchExceptionWord(ref ProcessingWord word, IEnumerable<WordReplacement> possibleExceptions, out string match)
+        private static bool TryMatchExceptionWord(ref ProcessingWord word, IEnumerable<WordReplacement> possibleExceptions, out ReadOnlySpan<char> match)
         {
             foreach (var possibleException in possibleExceptions)
             {
                 if (word.Equals(possibleException.MatchWord))
                 {
-                    match = possibleException.MatchResult;
+                    if (possibleException.MatchResult == null)
+                    {
+                        word.Length -= possibleException.TrimCharacterCount;
+                        match = word.AsSpan();
+                    }
+                    else
+                    {
+                        match = possibleException.MatchResult.AsSpan();
+                    }
+
                     return true;
                 }
             }
