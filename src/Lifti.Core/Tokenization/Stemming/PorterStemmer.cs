@@ -52,7 +52,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The set of exceptions that are obeyed between steps 1A and 1B.
         /// </summary>
-        private readonly WordReplacement[] exceptions2 = 
+        private readonly WordReplacement[] exceptions2 =
             {
                 new WordReplacement("INNING"),
                 new WordReplacement("OUTING"),
@@ -63,16 +63,6 @@ namespace Lifti.Tokenization.Stemming
                 new WordReplacement("EXCEED"),
                 new WordReplacement("SUCCEED")
             };
-
-        /// <summary>
-        /// The list of characters that must precede ION at the end of a word for it to be removable in step 4.
-        /// </summary>
-        private readonly HashSet<char> removableIonEndings = new HashSet<char>(new[] { 'S', 'T' });
-
-        /// <summary>
-        /// The list of characters that must precede LI at the end of a word for it to be removable in step 2.
-        /// </summary>
-        private readonly HashSet<char> removableLiEndings = new HashSet<char>(new[] { 'C', 'D', 'E', 'G', 'H', 'K', 'M', 'N', 'R', 'T' });
 
         /// <summary>
         /// The list of endings need to have an "e" appended to the word during step 1b.
@@ -433,7 +423,7 @@ namespace Lifti.Tokenization.Stemming
                         break;
 
                     case "LI":
-                        if (length > 1 && this.removableLiEndings.Contains(word[length - 3]))
+                        if (length > 1 && IsRemovableLiEnding(word[length - 3]))
                         {
                             word.Length -= 2;
                         }
@@ -444,6 +434,26 @@ namespace Lifti.Tokenization.Stemming
                         word.ReplaceEnd(replacement);
                         break;
                 }
+            }
+        }
+
+        private static bool IsRemovableLiEnding(char letter)
+        {
+            switch (letter)
+            {
+                case 'C':
+                case 'D':
+                case 'E':
+                case 'G':
+                case 'H':
+                case 'K':
+                case 'M':
+                case 'N':
+                case 'R':
+                case 'T':
+                    return true;
+                default:
+                    return false;
             }
         }
 
@@ -473,7 +483,7 @@ namespace Lifti.Tokenization.Stemming
             {
                 if (replacement.MatchWord == "ION")
                 {
-                    if (word.Length > 3 && this.removableIonEndings.Contains(word[word.Length - 4]))
+                    if (word.Length > 3 && IsRemovableIonEnding(word[word.Length - 4]))
                     {
                         word.Length -= replacement.MatchWord.Length;
                     }
@@ -482,6 +492,18 @@ namespace Lifti.Tokenization.Stemming
                 {
                     word.Length -= replacement.MatchWord.Length;
                 }
+            }
+        }
+
+        private static bool IsRemovableIonEnding(char letter)
+        {
+            switch (letter)
+            {
+                case 'S':
+                case 'T':
+                    return true;
+                default:
+                    return false;
             }
         }
     }
