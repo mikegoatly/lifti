@@ -12,7 +12,7 @@
         public WordReplacement(string matchWord)
         {
             this.MatchWord = matchWord;
-            this.MatchResult = matchWord;
+            this.MatchResult = null;
             this.TrimCharacterCount = 0;
         }
 

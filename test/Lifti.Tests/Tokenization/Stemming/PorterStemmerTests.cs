@@ -19,6 +19,7 @@ namespace Lifti.Tests.Tokenization.Stemming
         {
             var stemmer = new PorterStemmer();
 
+            var builder = new StringBuilder();
             using (var stream = typeof(PorterStemmerTests).Assembly.GetManifestResourceStream(typeof(PorterStemmerTests), "StemmerTestCases.txt"))
             {
                 using (var reader = new StreamReader(stream))
@@ -34,8 +35,10 @@ namespace Lifti.Tests.Tokenization.Stemming
                             throw new Exception("Expected an array of two - word, stemmed word");
                         }
 
-                        new string(stemmer.Stem(testCase[0].AsSpan()))
-                            .Should().Be(testCase[1],because: "Stemming {0}", testCase[0]);
+                        builder.Length = 0;
+                        builder.Append(testCase[0]);
+                        stemmer.Stem(builder);
+                        builder.ToString().Should().Be(testCase[1],because: "Stemming {0}", testCase[0]);
                     }
                 }
             }

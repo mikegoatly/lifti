@@ -1,10 +1,22 @@
 ﻿using System;
+using System.Text;
 
 namespace Lifti.Tokenization
 {
     internal struct TokenHash : IEquatable<TokenHash>
     {
         public TokenHash(ReadOnlySpan<char> word)
+        {
+            var hash = 0;
+            for (var i = 0; i < word.Length; i++)
+            {
+                hash = CalculateNext(hash, word[i]);
+            }
+
+            this.HashValue = hash;
+        }
+
+        public TokenHash(StringBuilder word)
         {
             var hash = 0;
             for (var i = 0; i < word.Length; i++)

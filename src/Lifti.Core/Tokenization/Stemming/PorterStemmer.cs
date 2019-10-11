@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Lifti.Tokenization.Stemming
 {
@@ -157,43 +158,45 @@ namespace Lifti.Tokenization.Stemming
         });
 
         /// <inheritdoc />
-        public ReadOnlySpan<char> Stem(ReadOnlySpan<char> original)
+        public void Stem(StringBuilder builder)
         {
-            if (original == null || original.Length < 3)
+            if (builder.Length < 3)
             {
-                return original;
+                return;
             }
 
-            if (original[0] == '\'')
+            if (builder[0] == '\'')
             {
-                original = original.Slice(1);
+                builder.Remove(0, 1);
             }
 
-            var word = new ProcessingWord(original);
-            if (TryMatchExceptionWord(ref word, this.exceptions, out var exception))
+            if (TryMatchExceptionWord(builder, this.exceptions))
             {
-                return exception;
+                return;
             }
 
-            word.ChangeY();
-            var stemRegion = word.ComputeStemRegion();
+            var changedY = builder.ChangeY();
+            var stemRegion = builder.ComputeStemRegion();
 
-            this.Step0(ref word);
-            Step1a(ref word);
+            this.Step0(builder);
+            Step1a(builder);
 
-            if (TryMatchExceptionWord(ref word, this.exceptions2, out exception))
+            if (TryMatchExceptionWord(builder, this.exceptions2))
             {
-                return exception;
+                return;
             }
 
-            this.Step1b(ref word, stemRegion);
-            Step1c(ref word);
-            this.Step2(ref word, stemRegion);
-            this.Step3(ref word, stemRegion);
-            this.Step4(ref word, stemRegion);
-            Step5(ref word, stemRegion);
+            this.Step1b(builder, stemRegion);
+            Step1c(builder);
+            this.Step2(builder, stemRegion);
+            this.Step3(builder, stemRegion);
+            this.Step4(builder, stemRegion);
+            Step5(builder, stemRegion);
 
-            return word.AsSpan();
+            if (changedY)
+            {
+                builder.RevertY();
+            }
         }
 
         /// <summary>
@@ -222,7 +225,7 @@ namespace Lifti.Tokenization.Stemming
                     select g).ToDictionary(r => r.Key, r => r.ToArray());
         }
 
-        private static void Step1a(ref ProcessingWord word)
+        private static void Step1a(StringBuilder word)
         {
             if (word.EndsWith("SSES"))
             {
@@ -263,7 +266,7 @@ namespace Lifti.Tokenization.Stemming
             }
         }
 
-        private static void Step1c(ref ProcessingWord word)
+        private static void Step1c(StringBuilder word)
         {
             var length = word.Length;
             if (length <= 2)
@@ -278,7 +281,7 @@ namespace Lifti.Tokenization.Stemming
             }
         }
 
-        private static void Step5(ref ProcessingWord word, StemRegion stemRegion)
+        private static void Step5(StringBuilder word, StemRegion stemRegion)
         {
             var length = word.Length;
             if (length == 0)
@@ -291,37 +294,36 @@ namespace Lifti.Tokenization.Stemming
             {
                 word.Length -= 1;
             }
-            else if (word.EndsWith("LL") && length - 1 >= stemRegion.R2)
+            else if (length - 1 >= stemRegion.R2 && word.EndsWith("LL"))
             {
                 word.Length -= 1;
             }
         }
 
-        private static bool TryMatchExceptionWord(ref ProcessingWord word, IEnumerable<WordReplacement> possibleExceptions, out ReadOnlySpan<char> match)
+        private static bool TryMatchExceptionWord(StringBuilder word, IEnumerable<WordReplacement> possibleExceptions)
         {
             foreach (var possibleException in possibleExceptions)
             {
-                if (word.Equals(possibleException.MatchWord))
+                if (word.SequenceEqual(possibleException.MatchWord))
                 {
                     if (possibleException.MatchResult == null)
                     {
                         word.Length -= possibleException.TrimCharacterCount;
-                        match = word.AsSpan();
                     }
                     else
                     {
-                        match = possibleException.MatchResult.AsSpan();
+                        word.Length = 0;
+                        word.Append(possibleException.MatchResult);
                     }
 
                     return true;
                 }
             }
 
-            match = null;
             return false;
         }
 
-        private void Step0(ref ProcessingWord word)
+        private void Step0(StringBuilder word)
         {
             var endsWith = word.EndsWith(this.apostropheEnds);
             if (endsWith != null)
@@ -330,7 +332,7 @@ namespace Lifti.Tokenization.Stemming
             }
         }
 
-        private void Step1b(ref ProcessingWord word, StemRegion stemRegion)
+        private void Step1b(StringBuilder word, StemRegion stemRegion)
         {
             var replacement = word.EndsWith(this.step1bReplacements);
             var matchedWord = replacement.MatchWord;
@@ -379,7 +381,7 @@ namespace Lifti.Tokenization.Stemming
             }
         }
 
-        private void Step2(ref ProcessingWord word, StemRegion stemRegion)
+        private void Step2(StringBuilder word, StemRegion stemRegion)
         {
             var replacement = word.EndsWith(this.step2Replacements);
             var length = word.Length;
@@ -410,7 +412,7 @@ namespace Lifti.Tokenization.Stemming
             }
         }
 
-        private void Step3(ref ProcessingWord word, StemRegion stemRegion)
+        private void Step3(StringBuilder word, StemRegion stemRegion)
         {
             var replacement = word.EndsWith(this.step3Replacements);
             if (replacement.MatchWord != null && word.Length - replacement.MatchWord.Length >= stemRegion.R1)
@@ -429,7 +431,7 @@ namespace Lifti.Tokenization.Stemming
             }
         }
 
-        private void Step4(ref ProcessingWord word, StemRegion stemRegion)
+        private void Step4(StringBuilder word, StemRegion stemRegion)
         {
             var replacement = word.EndsWith(this.step4Replacements);
             if (replacement.MatchWord != null && word.Length - replacement.MatchWord.Length >= stemRegion.R2)
