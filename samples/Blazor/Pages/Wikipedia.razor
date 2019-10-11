@@ -73,6 +73,8 @@
                 <dd>The word "critical" when it appears before and near to the wrod "acclaim"</dd>
                 <dt>st* & sp*</dt>
                 <dd>The document must contain words starting with "st" and "sp"</dd>
+                <dt>fight | thrones</dt>
+                <dd>Documents containing words deriving from "fight" or "thrones" (Word stemming is enabled)</dd>
             </dl>
         </div>
     }
@@ -144,6 +146,9 @@
         }
     }
 
+    TokenizationOptions indexTokenizationOptions = new TokenizationOptions(Lifti.Tokenization.TokenizerKind.XmlContent, stem: true);
+    TokenizationOptions searchTokenizationOptions = new TokenizationOptions(Lifti.Tokenization.TokenizerKind.Default, stem: true);
+
     async Task FetchPagesAsync(IEnumerable<PageSummary> pages)
     {
         this.indexing = true;
@@ -164,7 +169,7 @@
                 this.Message = $"{counter} Indexing...";
                 base.StateHasChanged();
                 loadedPages[results.Page.Title] = results.Page.Text.Content;
-                this.index.Index(results.Page.Title, results.Page.Text.Content, new TokenizationOptions(Lifti.Tokenization.TokenizerKind.XmlContent));
+                this.index.Index(results.Page.Title, results.Page.Text.Content, indexTokenizationOptions);
             }
 
             this.Message = "Ready";
@@ -190,7 +195,7 @@
         try
         {
             this.SyntaxError = null;
-            results = this.index.Search(this.SearchText).ToList();
+            results = this.index.Search(this.SearchText, searchTokenizationOptions).ToList();
         }
         catch (Exception ex)
         {
