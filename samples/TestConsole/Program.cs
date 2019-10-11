@@ -1,6 +1,9 @@
 ﻿using Lifti;
+using Lifti.Tokenization.Stemming;
 using System;
+using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace TestConsole
 {
@@ -8,25 +11,30 @@ namespace TestConsole
     {
         private static void Main(string[] args)
         {
-            // Create a full text index with default settings
-            var index = new FullTextIndex<string>();
+            var stemmer = new PorterStemmer();
 
-            // Index
-            index.Index("A", "This is some text associated with A: fizz");
-            index.Index("B", "Some buzz text for B");
-            index.Index("C", "Text associated with C is both fizz and buzz");
+            var builder = new StringBuilder();
+            using (var stream = typeof(Program).Assembly.GetManifestResourceStream(typeof(Program), "StemmerTestCases.txt"))
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    string line;
+                    string[] testCase;
+                    var space = new[] { ' ' };
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        testCase = line.Split(space, StringSplitOptions.RemoveEmptyEntries);
+                        if (testCase.Length != 2)
+                        {
+                            throw new Exception("Expected an array of two - word, stemmed word");
+                        }
 
-            // Search for text containing both Fizz *and* Buzz
-            var results = index.Search("Fizz Buzz").ToList();
-
-            // Output: Items with both Fizz and Buzz: 1
-            Console.WriteLine($"Items with both Fizz and Buzz: {results.Count}");
-
-            // Search for text containing both Fizz *or* Buzz
-            results = index.Search("Fizz | Buzz").ToList();
-
-            // Outputs: Items with Fizz or Buzz: 3
-            Console.WriteLine($"Items with Fizz or Buzz: {results.Count}");
+                        builder.Length = 0;
+                        builder.Append(testCase[0]);
+                        stemmer.Stem(builder);
+                    }
+                }
+            }
         }
     }
 }
