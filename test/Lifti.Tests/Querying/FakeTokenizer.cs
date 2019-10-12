@@ -12,12 +12,12 @@ namespace Lifti.Tests.Querying
 
         public IEnumerable<Token> Process(string input)
         {
-            yield return new Token(input, new WordLocation(0, 0, input.Length));
+            yield return new Token(input, new WordLocation(0, 0, (ushort)input.Length));
         }
 
         public IEnumerable<Token> Process(ReadOnlySpan<char> input)
         {
-            return new[] { new Token(input.ToString(), new WordLocation(0, 0, input.Length)) };
+            return new[] { new Token(input.ToString(), new WordLocation(0, 0, (ushort)input.Length)) };
         }
     }
 }

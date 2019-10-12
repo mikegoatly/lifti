@@ -4,7 +4,7 @@ namespace Lifti
 {
     public struct WordLocation : IComparable<WordLocation>, IEquatable<WordLocation>
     {
-        public WordLocation(int wordIndex, int start, int length)
+        public WordLocation(int wordIndex, int start, ushort length)
         {
             this.WordIndex = wordIndex;
             this.Start = start;
@@ -13,7 +13,7 @@ namespace Lifti
 
         public int WordIndex { get; }
         public int Start { get; }
-        public int Length { get; }
+        public ushort Length { get; }
 
         public override bool Equals(object obj)
         {

@@ -39,12 +39,12 @@ namespace Lifti.Tests.Querying
 
         protected static IWordLocationMatch WordMatch(int index)
         {
-            return new SingleWordLocationMatch(new WordLocation(index, index, index));
+            return new SingleWordLocationMatch(new WordLocation(index, index, (ushort)index));
         }
 
         protected static IWordLocationMatch WordMatch(int index, int start, int length)
         {
-            return new SingleWordLocationMatch(new WordLocation(index, start, length));
+            return new SingleWordLocationMatch(new WordLocation(index, start, (ushort)length));
         }
 
         protected static IntermediateQueryResult IntermediateQueryResult(params QueryWordMatch[] matches)

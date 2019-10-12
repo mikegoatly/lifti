@@ -145,7 +145,7 @@ namespace Lifti.Tests
             VerifySutState(this.createdChildNodes[2], null, new[] { (item2, this.locations2) });
         }
 
-        private static IndexedWord CreateLocations(byte fieldId, params (int, int, int)[] locations)
+        private static IndexedWord CreateLocations(byte fieldId, params (int, int, ushort)[] locations)
         {
             return new IndexedWord(fieldId, locations.Select(r => new WordLocation(r.Item1, r.Item2, r.Item3)).ToArray());
         }

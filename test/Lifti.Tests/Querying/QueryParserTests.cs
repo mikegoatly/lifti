@@ -23,7 +23,7 @@ namespace Lifti.Tests.Querying
             this.fieldLookupMock.Setup(l => l.TryGetIdForField("otherfield", out otherFieldId)).Returns(true);
 
             this.tokenizerMock = new Mock<ITokenizer>();
-            this.tokenizerMock.Setup(m => m.Process(It.IsAny<string>())).Returns((string data) => new[] { new Token(data, new WordLocation(0, 0, data.Length)) });
+            this.tokenizerMock.Setup(m => m.Process(It.IsAny<string>())).Returns((string data) => new[] { new Token(data, new WordLocation(0, 0, (ushort)data.Length)) });
         }
 
         [Fact]

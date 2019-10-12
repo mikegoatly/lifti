@@ -69,12 +69,17 @@ namespace Lifti.Tokenization
         {
             var length = end - start;
 
+            if (length > ushort.MaxValue)
+            {
+                throw new LiftiException($"Only words up to {ushort.MaxValue} characters long can be indexed");
+            }
+
             if (this.stemmer != null)
             {
                 this.stemmer.Stem(wordBuilder);
             }
 
-            processedWords.MergeOrAdd(new TokenHash(wordBuilder), wordBuilder, new WordLocation(wordIndex, start, length));
+            processedWords.MergeOrAdd(new TokenHash(wordBuilder), wordBuilder, new WordLocation(wordIndex, start, (ushort)length));
         }
 
         protected override void OnConfiguring(TokenizationOptions options)
