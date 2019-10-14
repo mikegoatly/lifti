@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Lifti
 {
@@ -10,6 +11,11 @@ namespace Lifti
         private int nextId;
 
         public int AllocatedIdCount => this.itemIdIndex.Count;
+
+        public IEnumerable<(T item, int itemId)> GetIndexedItems()
+        {
+            return this.itemIdIndex.Select(p => (p.Key, p.Value));
+        }
 
         public int CreateIdFor(T item)
         {
