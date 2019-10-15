@@ -126,6 +126,12 @@
   <data name="FieldHasNoAssociatedFieldName" xml:space="preserve">
     <value>Field id {0} has no associated field name</value>
   </data>
+  <data name="IdAlreadyUsed" xml:space="preserve">
+    <value>Id {0} is already registered in the index.</value>
+  </data>
+  <data name="IndexMustBeEmptyForDeserialization" xml:space="preserve">
+    <value>An index must be empty when attempting to deserialize its contents.</value>
+  </data>
   <data name="ItemAlreadyIndexed" xml:space="preserve">
     <value>Item already indexed</value>
   </data>
@@ -134,6 +140,18 @@
   </data>
   <data name="MaximumDistinctFieldsIndexReached" xml:space="preserve">
     <value>Only 255 distinct fields can currently be indexed</value>
+  </data>
+  <data name="MissingIndexTerminator" xml:space="preserve">
+    <value>The index terminator was not found at the end of the file.</value>
+  </data>
+  <data name="MissingLiftiHeaderIndicatorBytes" xml:space="preserve">
+    <value>The expected header bytes could not be found in the stream - this is probably not a serialized index.</value>
+  </data>
+  <data name="NoDeserializerAvailableForIndexVersion" xml:space="preserve">
+    <value>No deserializer available for binary serialized version {0}.</value>
+  </data>
+  <data name="UnableToReadHeaderInformation" xml:space="preserve">
+    <value>Unable to read header data from serialized index content.</value>
   </data>
   <data name="UnexpectedEndOfQuery" xml:space="preserve">
     <value>The query ended unexpectedly - a token was expected.</value>

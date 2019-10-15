@@ -88,6 +88,24 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Id {0} is already registered in the index..
+        /// </summary>
+        internal static string IdAlreadyUsed {
+            get {
+                return ResourceManager.GetString("IdAlreadyUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An index must be empty when attempting to deserialize its contents..
+        /// </summary>
+        internal static string IndexMustBeEmptyForDeserialization {
+            get {
+                return ResourceManager.GetString("IndexMustBeEmptyForDeserialization", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Item already indexed.
         /// </summary>
         internal static string ItemAlreadyIndexed {
@@ -111,6 +129,42 @@ namespace Lifti {
         internal static string MaximumDistinctFieldsIndexReached {
             get {
                 return ResourceManager.GetString("MaximumDistinctFieldsIndexReached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The index terminator was not found at the end of the file..
+        /// </summary>
+        internal static string MissingIndexTerminator {
+            get {
+                return ResourceManager.GetString("MissingIndexTerminator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The expected header bytes could not be found in the stream - this is probably not a serialized index..
+        /// </summary>
+        internal static string MissingLiftiHeaderIndicatorBytes {
+            get {
+                return ResourceManager.GetString("MissingLiftiHeaderIndicatorBytes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No deserializer available for binary serialized version {0}..
+        /// </summary>
+        internal static string NoDeserializerAvailableForIndexVersion {
+            get {
+                return ResourceManager.GetString("NoDeserializerAvailableForIndexVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to read header data from serialized index content..
+        /// </summary>
+        internal static string UnableToReadHeaderInformation {
+            get {
+                return ResourceManager.GetString("UnableToReadHeaderInformation", resourceCulture);
             }
         }
         

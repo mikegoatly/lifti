@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lifti
@@ -47,6 +48,23 @@ namespace Lifti
             this.itemIdLookup.Remove(id);
             this.reusableIds.Enqueue(id);
             return id;
+        }
+
+        public void Add(int id, T item)
+        {
+            if (this.itemIdIndex.ContainsKey(item))
+            {
+                throw new LiftiException(ExceptionMessages.ItemAlreadyIndexed);
+            }
+
+            if (this.itemIdLookup.ContainsKey(id))
+            {
+                throw new LiftiException(ExceptionMessages.IdAlreadyUsed, id);
+            }
+
+            itemIdIndex[item] = id;
+            itemIdLookup[id] = item;
+            this.nextId = Math.Max(this.nextId, id + 1);
         }
     }
 }
