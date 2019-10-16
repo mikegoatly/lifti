@@ -12,6 +12,8 @@ namespace Lifti
 
         void Index(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = null);
         void Index<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> itemTokenizationOptions);
+
+        bool Remove(TKey itemKey);
         IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = null);
         IndexNavigator CreateNavigator();
     }

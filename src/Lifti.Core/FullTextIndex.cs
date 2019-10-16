@@ -78,6 +78,19 @@ namespace Lifti
             }
         }
 
+        public bool Remove(TKey itemKey)
+        {
+            if (!this.IdPool.Contains(itemKey))
+            {
+                return false;
+            }
+
+            var id = this.IdPool.ReleaseItem(itemKey);
+            this.Root.Remove(id);
+
+            return true;
+        }
+
         public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = null)
         {
             var query = this.queryParser.Parse(this.FieldLookup, searchText, this.GetTokenizer(tokenizationOptions));

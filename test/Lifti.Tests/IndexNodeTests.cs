@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
 using Moq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -143,6 +144,20 @@ namespace Lifti.Tests
             VerifySutState(this.createdChildNodes[0], "w", new[] { (item1, this.locations1) });
             VerifySutState(this.createdChildNodes[1], null, new[] { (item3, this.locations3) }, new[] { ('c', this.createdChildNodes[2]) });
             VerifySutState(this.createdChildNodes[2], null, new[] { (item2, this.locations2) });
+        }
+
+        [Fact]
+        public void RemovingItemId_ShouldCauseItemToBeRemovedFromIndexAndChildNodes()
+        {
+            this.sut.Index(item1, fieldId1, new Token("www", this.locations1.Locations));
+            this.sut.Index(item1, fieldId1, new Token("wwwww", this.locations2.Locations));
+
+            this.createdChildNodes.Should().HaveCount(1);
+
+            this.sut.Remove(item1);
+
+            VerifySutState(this.sut, "www", expectedChildNodes: new[] { ('w', this.createdChildNodes[0]) }, expectedMatches: Array.Empty<(int, IndexedWord)>());
+            VerifySutState(this.createdChildNodes[0], "w", expectedMatches: Array.Empty<(int, IndexedWord)>());
         }
 
         private static IndexedWord CreateLocations(byte fieldId, params (int, int, ushort)[] locations)

@@ -80,12 +80,39 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public void RemovingItemFromIndex_ShouldMakeItUnsearchable()
+        {
+            this.WithIndexedStrings();
+
+            this.index.Search("foo").Should().HaveCount(1);
+
+            this.index.Remove("C").Should().BeTrue();
+
+            this.index.Search("foo").Should().HaveCount(0);
+        }
+
+        [Fact]
+        public void RemovingItemFromIndexThatIsntIndexed_ShouldReturnFalse()
+        {
+            this.WithIndexedStrings();
+
+            this.index.Remove("Z").Should().BeFalse();
+            this.index.Remove("C").Should().BeTrue();
+            this.index.Remove("C").Should().BeFalse();
+        }
+
+        [Fact]
         public void WhenLoadingLotsOfDataShouldNotError()
         {
-            foreach (var entry in WikipediaDataLoader.Load(this.GetType()))
+            var wikipediaTests = WikipediaDataLoader.Load(this.GetType());
+            foreach (var (name, text) in wikipediaTests)
             {
-                this.index.Index(entry.name, entry.text);
+                this.index.Index(name, text);
             }
+
+            this.index.Remove(wikipediaTests[10].name);
+            this.index.Remove(wikipediaTests[9].name);
+            this.index.Remove(wikipediaTests[8].name);
         }
 
         private void WithIndexedObjects()

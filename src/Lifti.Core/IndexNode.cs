@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Lifti
 {
@@ -86,6 +87,18 @@ namespace Lifti
                     throw new LiftiException(ExceptionMessages.UnsupportedIndexSupportLevel, this.indexSupportLevel);
             }
 
+        }
+
+        internal void Remove(int itemId)
+        {
+            this.matches?.Remove(itemId);
+            if (this.childNodes != null)
+            {
+                foreach (var childNode in this.childNodes.Values)
+                {
+                    childNode.Remove(itemId);
+                }
+            }
         }
 
         private void IndexWithIntraNodeTextSupport(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlySpan<char> remainingWordText)

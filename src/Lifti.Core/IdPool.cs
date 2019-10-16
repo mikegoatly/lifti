@@ -66,5 +66,10 @@ namespace Lifti
             itemIdLookup[id] = item;
             this.nextId = Math.Max(this.nextId, id + 1);
         }
+
+        public bool Contains(T item)
+        {
+            return this.itemIdIndex.ContainsKey(item);
+        }
     }
 }

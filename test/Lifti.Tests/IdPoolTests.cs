@@ -59,5 +59,17 @@ namespace Lifti.Tests
             this.sut.CreateIdFor("4").Should().Be(id2);
             this.sut.CreateIdFor("5").Should().Be(id2 + 1);
         }
+
+        [Fact]
+        public void Contains_WhenItemExists_ShouldReturnTrue()
+        {
+            this.sut.Contains("1").Should().BeTrue();
+        }
+
+        [Fact]
+        public void Contains_WhenItemDoesntExist_ShouldReturnFalse()
+        {
+            this.sut.Contains("9").Should().BeFalse();
+        }
     }
 }
