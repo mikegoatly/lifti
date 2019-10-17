@@ -124,6 +124,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Malformed index data encountered - expected a full location entry.
+        /// </summary>
+        internal static string MalformedDataExpectedFullLocationEntry {
+            get {
+                return ResourceManager.GetString("MalformedDataExpectedFullLocationEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Only 255 distinct fields can currently be indexed.
         /// </summary>
         internal static string MaximumDistinctFieldsIndexReached {

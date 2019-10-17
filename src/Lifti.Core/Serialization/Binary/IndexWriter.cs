@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,10 +19,10 @@ namespace Lifti.Serialization.Binary
             this.underlyingStream = stream;
             this.disposeStream = disposeStream;
             this.keySerializer = keySerializer;
-            this.buffer = new MemoryStream();
+            this.buffer = new MemoryStream(32768);
             this.writer = new BinaryWriter(this.buffer, Encoding.UTF8);
         }
-        
+
         public async Task WriteAsync(IFullTextIndex<TKey> index)
         {
             await this.WriteHeaderAsync(index).ConfigureAwait(false);
@@ -58,10 +59,13 @@ namespace Lifti.Serialization.Binary
 
             if (matchCount > 0)
             {
-                WriteMatchLocations(node);
+                this.WriteMatchLocations(node);
             }
 
-            await this.FlushAsync().ConfigureAwait(false);
+            if (childNodeCount > 0)
+            {
+                await this.FlushAsync().ConfigureAwait(false);
+            }
         }
 
         private void WriteMatchLocations(IndexNode node)
@@ -75,15 +79,110 @@ namespace Lifti.Serialization.Binary
                 {
                     this.writer.Write(fieldMatch.FieldId);
                     this.writer.Write(fieldMatch.Locations.Count);
-
-                    foreach (var location in fieldMatch.Locations)
-                    {
-                        this.writer.Write(location.WordIndex);
-                        this.writer.Write(location.Start);
-                        this.writer.Write(location.Length);
-                    }
+                    this.WriteWordLocations(fieldMatch);
                 }
             }
+        }
+
+        private void WriteWordLocations(IndexedWord fieldMatch)
+        {
+            WordLocation? lastLocation = null;
+            foreach (var location in fieldMatch.Locations)
+            {
+                if (lastLocation != null)
+                {
+                    var locationData = DeriveEntryStructureInformation(lastLocation.Value, location);
+
+                    if (locationData.structure == LocationEntryStructure.Full)
+                    {
+                        this.WriteLocationInFull(location);
+                    }
+                    else
+                    {
+                        this.WriteAbbreviatedLocationDetails(location.Length, locationData);
+                    }
+                }
+                else
+                {
+                    this.WriteLocationInFull(location);
+                }
+
+                lastLocation = location;
+            }
+        }
+
+        private static (LocationEntryStructure structure, int wordIndexValue, int startValue) DeriveEntryStructureInformation(WordLocation lastLocation, WordLocation location)
+        {
+            var relativeWordIndex = location.WordIndex - lastLocation.WordIndex;
+            var relativeStart = location.Start - lastLocation.Start;
+
+            if (relativeWordIndex < 0 || relativeStart < 0)
+            {
+                Debug.Fail("Warning: This shouldn't happen");
+                return (LocationEntryStructure.Full, location.WordIndex, location.Start);
+            }
+
+            var entryStructure = LocationEntryStructure.Full;
+            if (relativeWordIndex <= byte.MaxValue)
+            {
+                entryStructure |= LocationEntryStructure.WordIndexByte;
+            }
+            else if (relativeWordIndex <= ushort.MaxValue)
+            {
+                entryStructure |= LocationEntryStructure.WordIndexUInt16;
+            }
+
+            if (relativeStart <= byte.MaxValue)
+            {
+                entryStructure |= LocationEntryStructure.WordStartByte;
+            }
+            else if (relativeStart <= ushort.MaxValue)
+            {
+                entryStructure |= LocationEntryStructure.WordStartUInt16;
+            }
+
+            if (lastLocation.Length == location.Length)
+            {
+                entryStructure |= LocationEntryStructure.LengthSameAsLast;
+            }
+
+            return (entryStructure, relativeWordIndex, relativeStart);
+        }
+
+        private void WriteAbbreviatedLocationDetails(ushort wordLength, (LocationEntryStructure structure, int wordIndex, int start) locationData)
+        {
+            this.writer.Write((byte)locationData.structure);
+            this.WriteAbbreviatedData(locationData.wordIndex, locationData.structure, LocationEntryStructure.WordIndexByte, LocationEntryStructure.WordIndexUInt16);
+            this.WriteAbbreviatedData(locationData.start, locationData.structure, LocationEntryStructure.WordStartByte, LocationEntryStructure.WordStartUInt16);
+
+            if ((locationData.structure & LocationEntryStructure.LengthSameAsLast) != LocationEntryStructure.LengthSameAsLast)
+            {
+                this.writer.Write(wordLength);
+            }
+        }
+
+        private void WriteAbbreviatedData(int data, LocationEntryStructure structure, LocationEntryStructure byteSize, LocationEntryStructure uint16Size)
+        {
+            if ((structure & byteSize) == byteSize)
+            {
+                this.writer.Write((byte)data);
+            }
+            else if ((structure & uint16Size) == uint16Size)
+            {
+                this.writer.Write((ushort)data);
+            }
+            else
+            {
+                this.writer.Write(data);
+            }
+        }
+
+        private void WriteLocationInFull(WordLocation location)
+        {
+            this.writer.Write((byte)LocationEntryStructure.Full);
+            this.writer.Write(location.WordIndex);
+            this.writer.Write(location.Start);
+            this.writer.Write(location.Length);
         }
 
         private async Task WriteTerminatorAsync()

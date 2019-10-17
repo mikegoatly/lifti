@@ -138,6 +138,9 @@
   <data name="ItemNotFound" xml:space="preserve">
     <value>Item not found</value>
   </data>
+  <data name="MalformedDataExpectedFullLocationEntry" xml:space="preserve">
+    <value>Malformed index data encountered - expected a full location entry</value>
+  </data>
   <data name="MaximumDistinctFieldsIndexReached" xml:space="preserve">
     <value>Only 255 distinct fields can currently be indexed</value>
   </data>

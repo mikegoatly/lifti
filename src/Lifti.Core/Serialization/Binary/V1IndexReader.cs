@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -7,11 +6,11 @@ namespace Lifti.Serialization.Binary
 {
     internal class V1IndexReader<TKey> : IIndexReader<TKey>
     {
-        private Stream underlyingStream;
-        private bool disposeStream;
-        private IKeySerializer<TKey> keySerializer;
-        private MemoryStream buffer;
-        private BinaryReader reader;
+        private readonly Stream underlyingStream;
+        private readonly bool disposeStream;
+        private readonly IKeySerializer<TKey> keySerializer;
+        private readonly MemoryStream buffer;
+        private readonly BinaryReader reader;
 
         public V1IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer)
         {
@@ -19,7 +18,7 @@ namespace Lifti.Serialization.Binary
             this.disposeStream = disposeStream;
             this.keySerializer = keySerializer;
 
-            this.buffer = new MemoryStream((int)underlyingStream.Length);
+            this.buffer = new MemoryStream((int)this.underlyingStream.Length);
             this.reader = new BinaryReader(this.buffer);
         }
 
@@ -68,6 +67,7 @@ namespace Lifti.Serialization.Binary
                 this.DeserializeNode(node.CreateChildNode(matchChar));
             }
 
+            var locationMatches = new List<WordLocation>(50);
             for (var itemMatch = 0; itemMatch < matchCount; itemMatch++)
             {
                 var itemId = this.reader.ReadInt32();
@@ -77,15 +77,76 @@ namespace Lifti.Serialization.Binary
                 {
                     var fieldId = this.reader.ReadByte();
                     var locationCount = this.reader.ReadInt32();
-                    var locationMatches = new List<WordLocation>(locationCount);
-                    for (int locationMatch = 0; locationMatch < locationCount; locationMatch++)
+
+                    locationMatches.Clear();
+
+                    // Resize the collection immediately if required to prevent multiple resizes during deserialization
+                    if (locationMatches.Capacity < locationCount)
                     {
-                        locationMatches.Add(new WordLocation(reader.ReadInt32(), reader.ReadInt32(), reader.ReadUInt16()));
+                        locationMatches.Capacity = locationCount;
                     }
 
-                    node.AddMatchedItem(itemId, fieldId, locationMatches);
+                    this.ReadLocations(locationCount, locationMatches);
+
+                    node.AddMatchedItem(itemId, fieldId, locationMatches.ToArray());
                 }
             }
+        }
+
+        private void ReadLocations(int locationCount, List<WordLocation> locationMatches)
+        {
+            WordLocation? lastLocation = null;
+            for (var locationMatch = 0; locationMatch < locationCount; locationMatch++)
+            {
+                var structureType = (LocationEntryStructure)this.reader.ReadByte();
+                WordLocation location;
+                if (structureType == LocationEntryStructure.Full)
+                {
+                    location = new WordLocation(this.reader.ReadInt32(), this.reader.ReadInt32(), this.reader.ReadUInt16());
+                }
+                else
+                {
+                    if (lastLocation == null)
+                    {
+                        throw new DeserializationException(ExceptionMessages.MalformedDataExpectedFullLocationEntry);
+                    }
+
+                    location = this.DeserializeLocationData(lastLocation.Value, structureType);
+                }
+
+                locationMatches.Add(location);
+                lastLocation = location;
+            }
+        }
+
+        private WordLocation DeserializeLocationData(WordLocation previous, LocationEntryStructure structureType)
+        {
+            return new WordLocation(
+                previous.WordIndex + this.DeserializeAbbreviatedData(
+                    structureType,
+                    LocationEntryStructure.WordIndexByte,
+                    LocationEntryStructure.WordIndexUInt16),
+                previous.Start + this.DeserializeAbbreviatedData(
+                    structureType,
+                    LocationEntryStructure.WordStartByte,
+                    LocationEntryStructure.WordStartUInt16),
+                ((structureType & LocationEntryStructure.LengthSameAsLast) == LocationEntryStructure.LengthSameAsLast) ?
+                    previous.Length :
+                    this.reader.ReadUInt16());
+        }
+
+        private int DeserializeAbbreviatedData(LocationEntryStructure structureType, LocationEntryStructure byteSize, LocationEntryStructure uint16Size)
+        {
+            if ((structureType & byteSize) == byteSize)
+            {
+                return this.reader.ReadByte();
+            }
+            else if ((structureType & uint16Size) == uint16Size)
+            {
+                return this.reader.ReadUInt16();
+            }
+
+            return this.reader.ReadInt32();
         }
 
         private async Task FillBufferAsync()
