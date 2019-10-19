@@ -8,5 +8,7 @@ namespace Lifti.Tokenization
         IEnumerable<Token> Process(string input);
 
         IEnumerable<Token> Process(ReadOnlySpan<char> input);
+
+        IEnumerable<Token> Process(IEnumerable<string> input);
     }
 }

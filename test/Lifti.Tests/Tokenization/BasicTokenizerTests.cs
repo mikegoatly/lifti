@@ -141,6 +141,34 @@ namespace Lifti.Tests.Tokenization
                 }
 
                 [Fact]
+                public void ProcessingEnumerableSetOfOneWordStrings_ShouldReturnSingleTokenForEachWithContinuingIndexAndOffset()
+                {
+                    var output = this.sut.Process(new[] { "test", "test2", "test3" }).ToList();
+
+                    output.Should().BeEquivalentTo(new[]
+                    {
+                        new Token("TEST", new WordLocation(0, 0, 4)),
+                        new Token("TEST2", new WordLocation(1, 4, 5)),
+                        new Token("TEST3", new WordLocation(2, 9, 5))
+                    });
+                }
+
+                [Fact]
+                public void ProcessingEnumerableContainingMultipleWordStrings_ShouldReturnTokensWithContinuingIndexAndOffset()
+                {
+                    var output = this.sut.Process(new[] { "test", "test2 and test3", "test4" }).ToList();
+
+                    output.Should().BeEquivalentTo(new[]
+                    {
+                        new Token("TEST", new WordLocation(0, 0, 4)),
+                        new Token("TEST2", new WordLocation(1, 4, 5)),
+                        new Token("AND", new WordLocation(2, 10, 3)),
+                        new Token("TEST3", new WordLocation(3, 14, 5)),
+                        new Token("TEST4", new WordLocation(4, 19, 5))
+                    });
+                }
+
+                [Fact]
                 public void ShouldReturnSingleTokenForStringContainingOnlyOneWordEnclosedWithWordBreaks()
                 {
                     var output = this.sut.Process(" test\r\n").ToList();

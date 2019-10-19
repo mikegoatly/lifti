@@ -20,11 +20,46 @@ namespace Lifti.Tokenization
 
         public IEnumerable<Token> Process(ReadOnlySpan<char> input)
         {
-            var processedWords = new TokenStore(); // TODO Pool?
-
+            var processedWords = new TokenStore();
             var wordIndex = 0;
             var start = 0;
             var wordBuilder = new StringBuilder();
+
+            Process(processedWords, ref wordIndex, ref start, 0, wordBuilder, input);
+
+            return processedWords.ToList();
+        }
+
+        public IEnumerable<Token> Process(IEnumerable<string> inputs)
+        {
+            if (inputs is null)
+            {
+                throw new ArgumentNullException(nameof(inputs));
+            }
+
+            var processedWords = new TokenStore();
+            var wordIndex = 0;
+            var start = 0;
+            var wordBuilder = new StringBuilder();
+            var endOffset = 0;
+
+            foreach (var input in inputs)
+            {
+                Process(processedWords, ref wordIndex, ref start, endOffset, wordBuilder, input.AsSpan());
+                endOffset += input.Length;
+            }
+
+            return processedWords.ToList();
+        }
+
+        private void Process(
+            TokenStore processedWords,
+            ref int wordIndex,
+            ref int start,
+            int endOffset,
+            StringBuilder wordBuilder,
+            ReadOnlySpan<char> input)
+        {
             for (var i = 0; i < input.Length; i++)
             {
                 var current = input[i];
@@ -32,12 +67,12 @@ namespace Lifti.Tokenization
                 {
                     if (wordBuilder.Length > 0)
                     {
-                        this.CaptureWord(processedWords, wordIndex, start, i, wordBuilder);
+                        this.CaptureWord(processedWords, wordIndex, start, i + endOffset, wordBuilder);
                         wordIndex++;
                         wordBuilder.Length = 0;
                     }
 
-                    start = i + 1;
+                    start = i + endOffset + 1;
                 }
                 else
                 {
@@ -50,10 +85,13 @@ namespace Lifti.Tokenization
 
             if (wordBuilder.Length > 0)
             {
-                this.CaptureWord(processedWords, wordIndex, start, input.Length, wordBuilder);
+                this.CaptureWord(processedWords, wordIndex, start, input.Length + endOffset, wordBuilder);
+                wordIndex++;
+                wordBuilder.Length = 0;
             }
 
-            return processedWords.ToList();
+            endOffset += input.Length;
+            start = endOffset;
         }
 
         protected virtual bool IsWordSplitCharacter(char current)
