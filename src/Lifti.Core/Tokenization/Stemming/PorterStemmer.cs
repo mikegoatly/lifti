@@ -5,29 +5,17 @@ using System.Text;
 
 namespace Lifti.Tokenization.Stemming
 {
-    public class PorterStemmer
+    internal class PorterStemmer
     {
         /// <summary>
         /// The list of apostrophe based endings that can be pruned in step 0.
         /// </summary>
         private readonly Dictionary<char, string[]> apostropheEnds = CreateSearchLookup(new[] { "'S'", "'S", "'" });
 
-        private static readonly ItemTokenizationOptions<WordReplacement, WordReplacement> wordReplacementReversedTokenization = new ItemTokenizationOptions<WordReplacement, WordReplacement>(
-            i => i,
-            new FieldTokenizationOptions<WordReplacement>(
-                "find",
-                x => new string(x.MatchWord.Reverse().ToArray()),
-                new TokenizationOptions(
-                    TokenizerKind.Default,
-                    splitOnPunctuation: false,
-                    caseInsensitive: false,
-                    accentInsensitive: false,
-                    stem: false)));
-
         /// <summary>
         /// The set of exceptions that are obeyed prior to any steps being executed.
         /// </summary>
-        private readonly WordReplacement[] exceptions =
+        private static readonly WordReplacement[] exceptions =
             {
                 new WordReplacement("SKIS", "SKI"),
                 new WordReplacement("SKIES", "SKY"),
@@ -52,7 +40,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The set of exceptions that are obeyed between steps 1A and 1B.
         /// </summary>
-        private readonly WordReplacement[] exceptions2 =
+        private static readonly WordReplacement[] exceptions2 =
             {
                 new WordReplacement("INNING"),
                 new WordReplacement("OUTING"),
@@ -67,12 +55,12 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The list of endings need to have an "e" appended to the word during step 1b.
         /// </summary>
-        private readonly Dictionary<char, string[]> step1bAppendEEndings = CreateSearchLookup(new[] { "AT", "BL", "IZ" });
+        private static readonly Dictionary<char, string[]> step1bAppendEEndings = CreateSearchLookup(new[] { "AT", "BL", "IZ" });
 
         /// <summary>
         /// The replacements that can be made in step 1B.
         /// </summary>
-        private readonly FullTextIndex<WordReplacement> step1bReplacements = CreateReplacementLookup(
+        private static readonly FullTextIndex<WordReplacement> step1bReplacements = CreateReplacementLookup(
             new[]
             {
                 new WordReplacement("EEDLY", 3),
@@ -86,7 +74,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The replacements that can be made in step 2.
         /// </summary>
-        private readonly FullTextIndex<WordReplacement> step2Replacements = CreateReplacementLookup(
+        private static readonly FullTextIndex<WordReplacement> step2Replacements = CreateReplacementLookup(
             new[]
             {
                 new WordReplacement("IZATION", "IZE"),
@@ -118,7 +106,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The replacements that can be made in step 3.
         /// </summary>
-        private readonly FullTextIndex<WordReplacement> step3Replacements = CreateReplacementLookup(
+        private static readonly FullTextIndex<WordReplacement> step3Replacements = CreateReplacementLookup(
             new[]
             {
                 new WordReplacement("ATIONAL", "ATE"),
@@ -135,7 +123,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The replacements that can be made in step 4.
         /// </summary>
-        private readonly FullTextIndex<WordReplacement> step4Replacements = CreateReplacementLookup(
+        private static readonly FullTextIndex<WordReplacement> step4Replacements = CreateReplacementLookup(
             new[]
             {
                 new WordReplacement("EMENT", 5),
@@ -171,7 +159,7 @@ namespace Lifti.Tokenization.Stemming
                 builder.Remove(0, 1);
             }
 
-            if (MatchExceptionWord(builder, this.exceptions))
+            if (MatchExceptionWord(builder, exceptions))
             {
                 return;
             }
@@ -182,7 +170,7 @@ namespace Lifti.Tokenization.Stemming
             this.Step0(builder);
             Step1a(builder);
 
-            if (MatchExceptionWord(builder, this.exceptions2))
+            if (MatchExceptionWord(builder, exceptions2))
             {
                 return;
             }
@@ -209,9 +197,20 @@ namespace Lifti.Tokenization.Stemming
             IEnumerable<WordReplacement> replacements)
         {
             var index = new FullTextIndex<WordReplacement>(new FullTextIndexConfiguration<WordReplacement>() { Advanced = { SupportIntraNodeTextAfterCharacterIndex = 4 } });
+            index.WithItemTokenization<WordReplacement>(i => i)
+                .WithField(
+                    "find",
+                    x => new string(x.MatchWord.Reverse().ToArray()),
+                    new TokenizationOptions(TokenizerKind.Default)
+                    {
+                        SplitOnPunctuation = false,
+                        CaseInsensitive = false,
+                        AccentInsensitive = false
+                    });
+
             foreach (var replacement in replacements)
             {
-                index.Index(replacement, wordReplacementReversedTokenization);
+                index.Index(replacement);
             }
 
             return index;
@@ -330,7 +329,7 @@ namespace Lifti.Tokenization.Stemming
 
         private void Step0(StringBuilder word)
         {
-            var endsWith = word.EndsWith(this.apostropheEnds);
+            var endsWith = word.EndsWith(apostropheEnds);
             if (endsWith != null)
             {
                 word.Length -= endsWith.Length;
@@ -339,7 +338,7 @@ namespace Lifti.Tokenization.Stemming
 
         private void Step1b(StringBuilder word, StemRegion stemRegion)
         {
-            var replacement = word.EndsWith(this.step1bReplacements);
+            var replacement = word.EndsWith(step1bReplacements);
             var matchedWord = replacement.MatchWord;
             if (matchedWord != null)
             {
@@ -367,7 +366,7 @@ namespace Lifti.Tokenization.Stemming
 
                         if (found)
                         {
-                            if (word.EndsWith(this.step1bAppendEEndings) != null)
+                            if (word.EndsWith(step1bAppendEEndings) != null)
                             {
                                 word.Append('E');
                             }
@@ -408,7 +407,7 @@ namespace Lifti.Tokenization.Stemming
 
         private void Step2(StringBuilder word, StemRegion stemRegion)
         {
-            var replacement = word.EndsWith(this.step2Replacements);
+            var replacement = word.EndsWith(step2Replacements);
             var length = word.Length;
             if (replacement.MatchWord != null && length - replacement.MatchWord.Length >= stemRegion.R1)
             {
@@ -459,7 +458,7 @@ namespace Lifti.Tokenization.Stemming
 
         private void Step3(StringBuilder word, StemRegion stemRegion)
         {
-            var replacement = word.EndsWith(this.step3Replacements);
+            var replacement = word.EndsWith(step3Replacements);
             if (replacement.MatchWord != null && word.Length - replacement.MatchWord.Length >= stemRegion.R1)
             {
                 if (replacement.MatchWord == "ATIVE")
@@ -478,7 +477,7 @@ namespace Lifti.Tokenization.Stemming
 
         private void Step4(StringBuilder word, StemRegion stemRegion)
         {
-            var replacement = word.EndsWith(this.step4Replacements);
+            var replacement = word.EndsWith(step4Replacements);
             if (replacement.MatchWord != null && word.Length - replacement.MatchWord.Length >= stemRegion.R2)
             {
                 if (replacement.MatchWord == "ION")

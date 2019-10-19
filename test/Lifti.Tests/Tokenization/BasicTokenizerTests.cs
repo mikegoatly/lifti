@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
+using System;
 using System.Linq;
 using Xunit;
 
@@ -28,12 +29,13 @@ namespace Lifti.Tests.Tokenization
         protected void WithConfiguration(bool splitOnPunctuation = true, char[] additionalSplitChars = null, bool caseInsensitive = false, bool accentInsensitive = false)
         {
             ((IConfiguredBy<TokenizationOptions>)this.sut).Configure(
-                new TokenizationOptions(
-                    TokenizerKind.Default,
-                    splitOnPunctuation: splitOnPunctuation,
-                    additionalSplitCharacters: additionalSplitChars,
-                    caseInsensitive: caseInsensitive,
-                    accentInsensitive: accentInsensitive));
+                new TokenizationOptions(TokenizerKind.Default)
+                {
+                    SplitOnPunctuation = splitOnPunctuation,
+                    AdditionalSplitCharacters = additionalSplitChars ?? Array.Empty<char>(),
+                    CaseInsensitive = caseInsensitive,
+                    AccentInsensitive = accentInsensitive
+                });
         }
 
         public class WithNoPreprocessors : BasicTokenizerTests
@@ -45,8 +47,8 @@ namespace Lifti.Tests.Tokenization
 
                 output.Should().BeEquivalentTo(new[]
                 {
-                new Token("test", new WordLocation(0, 0, 4))
-            });
+                    new Token("test", new WordLocation(0, 0, 4))
+                });
             }
 
             [Fact]
@@ -56,8 +58,8 @@ namespace Lifti.Tests.Tokenization
 
                 output.Should().BeEquivalentTo(new[]
                 {
-                new Token("test", new WordLocation(0, 1, 4))
-            });
+                    new Token("test", new WordLocation(0, 1, 4))
+                });
             }
 
             [Fact]

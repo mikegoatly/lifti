@@ -169,6 +169,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No tokenization options have been provided for type {0}.
+        /// </summary>
+        internal static string NoTokenizationOptionsProvidedForType {
+            get {
+                return ResourceManager.GetString("NoTokenizationOptionsProvidedForType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to read header data from serialized index content..
         /// </summary>
         internal static string UnableToReadHeaderInformation {

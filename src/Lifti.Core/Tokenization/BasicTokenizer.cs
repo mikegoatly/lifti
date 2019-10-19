@@ -9,7 +9,7 @@ namespace Lifti.Tokenization
     public class BasicTokenizer : ConfiguredBy<TokenizationOptions>, ITokenizer
     {
         private readonly IInputPreprocessorPipeline inputPreprocessorPipeline = new InputPreprocessorPipeline();
-        private TokenizationOptions tokenizationOptions;
+        private TokenizationOptions tokenizationOptions = TokenizationOptions.Default;
         private HashSet<char> additionalSplitChars;
         private PorterStemmer stemmer;
 
@@ -60,7 +60,7 @@ namespace Lifti.Tokenization
         {
             return char.IsSeparator(current) ||
                 char.IsControl(current) ||
-                (this.tokenizationOptions.SplitOnPunctuation && char.IsPunctuation(current)) ||
+                (this.tokenizationOptions.SplitOnPunctuation == true && char.IsPunctuation(current)) ||
                 (this.additionalSplitChars?.Contains(current) == true);
         }
 
@@ -84,14 +84,14 @@ namespace Lifti.Tokenization
 
         protected override void OnConfiguring(TokenizationOptions options)
         {
-            this.tokenizationOptions = options;
+            this.tokenizationOptions = options ?? throw new ArgumentNullException(nameof(options));
 
             if (this.tokenizationOptions.Stem)
             {
                 this.stemmer = new PorterStemmer();
             }
 
-            this.additionalSplitChars = this.tokenizationOptions.AdditionalSplitCharacters?.Count > 0
+            this.additionalSplitChars = this.tokenizationOptions.AdditionalSplitCharacters.Count > 0
                 ? new HashSet<char>(this.tokenizationOptions.AdditionalSplitCharacters)
                 : null;
 

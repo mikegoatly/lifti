@@ -153,6 +153,9 @@
   <data name="NoDeserializerAvailableForIndexVersion" xml:space="preserve">
     <value>No deserializer available for binary serialized version {0}.</value>
   </data>
+  <data name="NoTokenizationOptionsProvidedForType" xml:space="preserve">
+    <value>No tokenization options have been provided for type {0}</value>
+  </data>
   <data name="UnableToReadHeaderInformation" xml:space="preserve">
     <value>Unable to read header data from serialized index content.</value>
   </data>

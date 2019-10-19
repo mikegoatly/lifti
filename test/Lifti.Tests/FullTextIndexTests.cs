@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using PerformanceProfiling;
-using System;
 using System.Linq;
 using Xunit;
 
@@ -10,12 +9,6 @@ namespace Lifti.Tests
     {
         private readonly FullTextIndex<string> index;
 
-        private readonly ItemTokenizationOptions<TestObject, string> tokenizationOptions = new ItemTokenizationOptions<TestObject, string>(
-                o => o.Id,
-                new FieldTokenizationOptions<TestObject>("Text1", o => o.Text1),
-                new FieldTokenizationOptions<TestObject>("Text2", o => o.Text2),
-                new FieldTokenizationOptions<TestObject>("Text3", o => o.Text3));
-
         public FullTextIndexTests()
         {
             this.index = new FullTextIndex<string>(
@@ -23,6 +16,11 @@ namespace Lifti.Tests
                 {
                     Advanced = { SupportIntraNodeTextAfterCharacterIndex = 4 }
                 });
+
+            this.index.WithItemTokenization<TestObject>(o => o.Id)
+                .WithField("Text1", o => o.Text1)
+                .WithField("Text2", o => o.Text2)
+                .WithField("Text3", o => o.Text3);
         }
 
         [Fact]
@@ -58,7 +56,7 @@ namespace Lifti.Tests
         [Fact]
         public void IndexedObjectsShouldBeRetrievableByTextFromAnyIndexedField()
         {
-            WithIndexedObjects();
+            this.WithIndexedObjects();
 
             this.index.Search("text").Should().HaveCount(1);
             this.index.Search("one").Should().HaveCount(2);
@@ -69,7 +67,7 @@ namespace Lifti.Tests
         [Fact]
         public void WordsRetrievedBySearchingForTextIndexedByObjectsShouldBeAssociatedToCorrectFields()
         {
-            WithIndexedObjects();
+            this.WithIndexedObjects();
 
             var results = this.index.Search("one");
             results.All(i => i.FieldMatches.All(l => l.FoundIn == "Text1")).Should().BeTrue();
@@ -117,8 +115,8 @@ namespace Lifti.Tests
 
         private void WithIndexedObjects()
         {
-            this.index.Index(new TestObject("A", "Text One", "Text Two", "Text Three"), this.tokenizationOptions);
-            this.index.Index(new TestObject("B", "Not One", "Not Two", "Not Three"), this.tokenizationOptions);
+            this.index.Index(new TestObject("A", "Text One", "Text Two", "Text Three"));
+            this.index.Index(new TestObject("B", "Not One", "Not Two", "Not Three"));
         }
 
         private void WithIndexedStrings()

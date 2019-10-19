@@ -10,6 +10,7 @@ namespace Lifti
         private readonly IIndexNodeFactory indexNodeFactory;
         private readonly ITokenizerFactory tokenizerFactory;
         private readonly IQueryParser queryParser;
+        private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions = new ConfiguredItemTokenizationOptions<TKey>();
 
         public FullTextIndex()
             : this(new FullTextIndexConfiguration<TKey>())
@@ -46,28 +47,32 @@ namespace Lifti
             return new IndexNavigator(this.Root);
         }
 
-        public void Index(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = null)
+        public ItemTokenizationOptions<TItem, TKey> WithItemTokenization<TItem>(Func<TItem, TKey> idReader)
+        {
+            var options = new ItemTokenizationOptions<TItem, TKey>(idReader);
+            this.itemTokenizationOptions.Add(options);
+            return options;
+        }
+
+        public void Index(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null)
         {
             var itemId = this.IdPool.CreateIdFor(itemKey);
 
-            var tokenizer = GetTokenizer(tokenizationOptions);
+            var tokenizer = this.GetTokenizer(tokenizationOptions);
             foreach (var word in tokenizer.Process(text))
             {
                 this.Root.Index(itemId, this.FieldLookup.DefaultField, word);
             }
         }
 
-        public void Index<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> itemTokenizationOptions)
+        public void Index<TItem>(TItem item)
         {
-            if (itemTokenizationOptions is null)
-            {
-                throw new ArgumentNullException(nameof(itemTokenizationOptions));
-            }
+            var options = itemTokenizationOptions.Get<TItem>();
 
-            var itemKey = itemTokenizationOptions.KeyReader(item);
+            var itemKey = options.KeyReader(item);
             var itemId = this.IdPool.CreateIdFor(itemKey);
 
-            foreach (var field in itemTokenizationOptions.FieldTokenization)
+            foreach (var field in options.FieldTokenization)
             {
                 var fieldId = this.FieldLookup.GetOrCreateIdForField(field.Name);
                 var tokenizer = this.tokenizerFactory.Create(field.TokenizationOptions);
@@ -91,13 +96,13 @@ namespace Lifti
             return true;
         }
 
-        public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = null)
+        public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions tokenizationOptions = null)
         {
             var query = this.queryParser.Parse(this.FieldLookup, searchText, this.GetTokenizer(tokenizationOptions));
             return query.Execute(this);
         }
 
-        private ITokenizer GetTokenizer(TokenizationOptions? tokenizationOptions)
+        private ITokenizer GetTokenizer(TokenizationOptions tokenizationOptions)
         {
             return this.tokenizerFactory.Create(tokenizationOptions ?? TokenizationOptions.Default);
         }

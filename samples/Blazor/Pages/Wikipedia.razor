@@ -146,8 +146,8 @@
         }
     }
 
-    TokenizationOptions indexTokenizationOptions = new TokenizationOptions(Lifti.Tokenization.TokenizerKind.XmlContent, stem: true);
-    TokenizationOptions searchTokenizationOptions = new TokenizationOptions(Lifti.Tokenization.TokenizerKind.Default, stem: true);
+    TokenizationOptions indexTokenizationOptions = new TokenizationOptions(Lifti.Tokenization.TokenizerKind.XmlContent) { Stem = true };
+    TokenizationOptions searchTokenizationOptions = new TokenizationOptions(Lifti.Tokenization.TokenizerKind.Default) { Stem = true };
 
     async Task FetchPagesAsync(IEnumerable<PageSummary> pages)
     {

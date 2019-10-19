@@ -1,44 +1,60 @@
 ﻿using Lifti.Tokenization;
+using System;
 using System.Collections.Generic;
 
 namespace Lifti
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Should not be compared")]
-    public struct TokenizationOptions
+    public class TokenizationOptions
     {
-        public TokenizationOptions(
-            TokenizerKind tokenizerKind,
-            bool splitOnPunctuation = true,
-            char[] additionalSplitCharacters = null,
-            bool caseInsensitive = true,
-            bool accentInsensitive = true,
-            bool stem = false)
+        private bool caseInsensitive = true;
+        private bool accentInsensitive = true;
+
+        public TokenizationOptions(TokenizerKind tokenizerKind)
         {
             this.TokenizerKind = tokenizerKind;
-            this.SplitOnPunctuation = splitOnPunctuation;
-            this.AdditionalSplitCharacters = additionalSplitCharacters;
-            this.CaseInsensitive = caseInsensitive;
-            this.AccentInsensitive = accentInsensitive;
-            this.Stem = stem;
         }
 
         public static TokenizationOptions Default { get; } = new TokenizationOptions(TokenizerKind.Default);
 
+        /// <summary>
+        /// Gets the kind of tokenizer that should be used to read from any provided text.
+        /// </summary>
         public TokenizerKind TokenizerKind { get; }
 
         /// <summary>
-        /// Whether tokens should be split on punctuation in addition to standard separator characters. Defaults to true.
+        /// Gets or sets a value indicating whether tokens should be split on punctuation in addition to standard 
+        /// separator characters. Defaults to <c>true</c>.
         /// </summary>
-        public bool SplitOnPunctuation { get; }
+        public bool SplitOnPunctuation { get; set; }
 
         /// <summary>
-        /// Any additional characters that should cause tokens to be split. Defaults to an empty array.
+        /// Gets or sets any additional characters that should cause tokens to be split. Defaults to an empty array.
         /// </summary>
-        public IReadOnlyList<char> AdditionalSplitCharacters { get; }
+        public IReadOnlyList<char> AdditionalSplitCharacters { get; set; } = Array.Empty<char>();
 
-        public bool CaseInsensitive { get; }
+        /// <summary>
+        /// Gets or sets a value indicating whether case insensitivity should be enforced when tokenizing. Defaults to <c>true</c>.
+        /// </summary>
+        public bool CaseInsensitive
+        {
+            get => this.caseInsensitive || this.Stem;
+            set => this.caseInsensitive = value;
+        }
 
-        public bool AccentInsensitive { get; }
-        public bool Stem { get; }
+        /// <summary>
+        /// Gets or sets a value indicating whether accents should be stripped from characters when tokenizing. Defaults to <c>true</c>.
+        /// </summary>
+        public bool AccentInsensitive
+        {
+            get => this.accentInsensitive || this.Stem;
+            set => this.accentInsensitive = value;
+        }
+
+
+        /// <summary>
+        /// Gets or sets a value indicating whether word stemming should be applied when tokenizing. Setting this value to true 
+        /// forces both <see cref="CaseInsensitive"/> and <see cref="AccentInsensitive"/> to be <c>true</c>.
+        /// </summary>
+        public bool Stem { get; set; }
     }
 }

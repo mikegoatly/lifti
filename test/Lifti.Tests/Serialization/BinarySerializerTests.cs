@@ -20,7 +20,7 @@ namespace Lifti.Tests.Serialization
         {
             this.index = new FullTextIndex<string>();
             var wikipediaTests = WikipediaDataLoader.Load(typeof(FullTextIndexTests));
-            var options = new TokenizationOptions(Lifti.Tokenization.TokenizerKind.XmlContent, stem: true);
+            var options = new TokenizationOptions(Lifti.Tokenization.TokenizerKind.XmlContent) { Stem = true };
             foreach (var (name, text) in wikipediaTests)
             {
                 this.index.Index(name, text, options);
@@ -35,7 +35,7 @@ namespace Lifti.Tests.Serialization
             var serializer = new BinarySerializer<string>();
 
             var fileName = Guid.NewGuid().ToString() + ".dat";
-            
+
             using (var stream = File.Open(fileName, FileMode.CreateNew))
             {
                 var stopwatch = Stopwatch.StartNew();
