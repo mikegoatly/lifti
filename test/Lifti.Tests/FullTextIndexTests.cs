@@ -21,6 +21,9 @@ namespace Lifti.Tests
                 .WithField("Text1", o => o.Text1)
                 .WithField("Text2", o => o.Text2)
                 .WithField("Text3", o => o.Text3);
+
+            this.index.WithItemTokenization<TestObject2>(o => o.Id)
+                .WithField("MultiText", o => o.Text);
         }
 
         [Fact]
@@ -56,7 +59,7 @@ namespace Lifti.Tests
         [Fact]
         public void IndexedObjectsShouldBeRetrievableByTextFromAnyIndexedField()
         {
-            this.WithIndexedObjects();
+            this.WithIndexedSingleStringPropertyObjects();
 
             this.index.Search("text").Should().HaveCount(1);
             this.index.Search("one").Should().HaveCount(2);
@@ -67,7 +70,7 @@ namespace Lifti.Tests
         [Fact]
         public void WordsRetrievedBySearchingForTextIndexedByObjectsShouldBeAssociatedToCorrectFields()
         {
-            this.WithIndexedObjects();
+            this.WithIndexedSingleStringPropertyObjects();
 
             var results = this.index.Search("one");
             results.All(i => i.FieldMatches.All(l => l.FoundIn == "Text1")).Should().BeTrue();
@@ -75,6 +78,30 @@ namespace Lifti.Tests
             results.All(i => i.FieldMatches.All(l => l.FoundIn == "Text2")).Should().BeTrue();
             results = this.index.Search("three");
             results.All(i => i.FieldMatches.All(l => l.FoundIn == "Text3")).Should().BeTrue();
+        }
+
+        [Fact]
+        public void IndexedMultiStringPropertyObjectsShouldBeRetrievableByTextFromAnyIndexedField()
+        {
+            this.WithIndexedMultiStringPropertyObjects();
+
+            this.index.Search("text").Should().HaveCount(1);
+            this.index.Search("one").Should().HaveCount(2);
+            this.index.Search("two").Should().HaveCount(2);
+            this.index.Search("three").Should().HaveCount(2);
+        }
+
+        [Fact]
+        public void WordsRetrievedBySearchingForTextIndexedByMultiStringPropertyObjectsShouldBeAssociatedToCorrectFields()
+        {
+            this.WithIndexedMultiStringPropertyObjects();
+
+            var results = this.index.Search("one");
+            results.All(i => i.FieldMatches.All(l => l.FoundIn == "MultiText")).Should().BeTrue();
+            results = this.index.Search("two");
+            results.All(i => i.FieldMatches.All(l => l.FoundIn == "MultiText")).Should().BeTrue();
+            results = this.index.Search("three");
+            results.All(i => i.FieldMatches.All(l => l.FoundIn == "MultiText")).Should().BeTrue();
         }
 
         [Fact]
@@ -113,10 +140,16 @@ namespace Lifti.Tests
             this.index.Remove(wikipediaTests[8].name);
         }
 
-        private void WithIndexedObjects()
+        private void WithIndexedSingleStringPropertyObjects()
         {
             this.index.Index(new TestObject("A", "Text One", "Text Two", "Text Three"));
             this.index.Index(new TestObject("B", "Not One", "Not Two", "Not Three"));
+        }
+
+        private void WithIndexedMultiStringPropertyObjects()
+        {
+            this.index.Index(new TestObject2("A", "Text One", "Text Two", "Text Three"));
+            this.index.Index(new TestObject2("B", "Not One", "Not Two", "Not Three"));
         }
 
         private void WithIndexedStrings()
@@ -141,6 +174,18 @@ namespace Lifti.Tests
             public string Text1 { get; }
             public string Text2 { get; }
             public string Text3 { get; }
+        }
+
+        public class TestObject2
+        {
+            public TestObject2(string id, params string[] text)
+            {
+                this.Id = id;
+                this.Text = text;
+            }
+
+            public string Id { get; }
+            public string[] Text { get; }
         }
     }
 }

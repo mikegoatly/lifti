@@ -41,5 +41,23 @@ namespace Lifti
             this.fieldTokenization.Add(new FieldTokenizationOptions<TItem>(name, reader, tokenizationOptions));
             return this;
         }
+
+        /// <summary>
+        /// Adds a field to be indexed for the item.
+        /// </summary>
+        /// <param name="name">
+        /// The name of the field. This can be referred to when querying to restrict searches to text read for this field only.
+        /// </param>
+        /// <param name="reader">
+        /// The delegate capable of reading the entire text for the field.
+        /// </param>
+        /// <param name="tokenizationOptions">
+        /// The tokenization options to be used when reading tokens for this field
+        /// </param>
+        public ItemTokenizationOptions<TItem, TKey> WithField(string name, Func<TItem, IEnumerable<string>> reader, TokenizationOptions tokenizationOptions = null)
+        {
+            this.fieldTokenization.Add(new FieldTokenizationOptions<TItem>(name, reader, tokenizationOptions));
+            return this;
+        }
     }
 }

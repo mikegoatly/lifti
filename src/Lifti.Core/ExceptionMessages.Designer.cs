@@ -169,6 +169,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No reader delegates configured.
+        /// </summary>
+        internal static string NoReaderDelegatesConfigured {
+            get {
+                return ResourceManager.GetString("NoReaderDelegatesConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No tokenization options have been provided for type {0}.
         /// </summary>
         internal static string NoTokenizationOptionsProvidedForType {

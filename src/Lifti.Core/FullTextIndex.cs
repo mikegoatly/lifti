@@ -76,7 +76,9 @@ namespace Lifti
             {
                 var fieldId = this.FieldLookup.GetOrCreateIdForField(field.Name);
                 var tokenizer = this.tokenizerFactory.Create(field.TokenizationOptions);
-                foreach (var word in tokenizer.Process(field.Reader(item)))
+                var tokens = field.Tokenize(tokenizer, item);
+
+                foreach (var word in tokens)
                 {
                     this.Root.Index(itemId, fieldId, word);
                 }

@@ -153,6 +153,9 @@
   <data name="NoDeserializerAvailableForIndexVersion" xml:space="preserve">
     <value>No deserializer available for binary serialized version {0}.</value>
   </data>
+  <data name="NoReaderDelegatesConfigured" xml:space="preserve">
+    <value>No reader delegates configured</value>
+  </data>
   <data name="NoTokenizationOptionsProvidedForType" xml:space="preserve">
     <value>No tokenization options have been provided for type {0}</value>
   </data>
