@@ -51,7 +51,7 @@ stages:
         verbosityPack: 'Normal'
         arguments: '--configuration $(buildConfiguration)'
 
-    - publish: '$(Build.ArtifactStagingDirectory)'
+    - publish: '$(Build.ArtifactStagingDirectory)/packages'
       artifact: 'packages'
 
 
