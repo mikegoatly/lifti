@@ -51,7 +51,6 @@ stages:
         packagesToPack: 'src/Lifti.Core/Lifti.Core.csproj'
         versioningScheme: 'off'
         buildProperties: '-p:PackageVersion=$(majorVersion).$(minorVersion).$(patchVersion)'
-        verbosityPack: 'Normal'
     - task: DotNetCoreCLI@2
       inputs:
         command: 'push'
