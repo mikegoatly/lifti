@@ -51,11 +51,11 @@ stages:
         verbosityPack: 'Normal'
         arguments: '--configuration $(buildConfiguration)'
 
-    - publish: '$(Build.ArtifactStagingDirectory)/packages'
+    - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: 'packages'
 
 
-- stage: PublishNuget
+- stage: PublishCINugetPackage
   displayName: Publish to CI feed
   dependsOn: Build
   condition: succeeded()
@@ -77,3 +77,24 @@ stages:
         packagesToPush: '$(Pipeline.Workspace)/ci/*.nupkg'
         nuGetFeedType: 'internal'
         publishVstsFeed: '21c23043-21b0-4e5a-8557-00b88fc52fd4/9f4e269d-a35a-4657-b2a3-b56b01c01f8c'
+
+- stage: 'PublishReleaseNuGetPackage'
+  displayName: 'Publish Release NuGet Package'
+  dependsOn: 'PublishCINugetPackage'
+  condition: succeeded()
+  jobs:
+  - deployment:
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'Nuget'
+    strategy:
+     runOnce:
+       deploy:
+         steps:
+         - task: NuGetCommand@2
+           displayName: 'Push NuGet Package'
+           inputs:
+             command: 'push'
+             packagesToPush: '$(Pipeline.Workspace)/release/*.nupkg'
+             nuGetFeedType: 'external'
+             publishFeedCredentials: 'NuGet'
