@@ -51,3 +51,4 @@ stages:
         packagesToPack: 'src/Lifti.Core/Lifti.Core.csproj'
         versioningScheme: 'off'
         buildProperties: 'PackageVersion=$(majorVersion).$(minorVersion).$(patchVersion)'
+        verbosityPack: 'Normal'
