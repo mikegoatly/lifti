@@ -1,26 +1,60 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'ubuntu-latest'
+variables:
+  majorVersion: 0
+  minorVersion: 1
+  patchVersion: 0
 
-steps:
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'test'
-    projects: 'test/Lifti.Tests/Lifti.Tests.csproj'
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'pack'
-    packagesToPack: 'src/Lifti.Core/Lifti.Core.csproj'
-    versioningScheme: 'byPrereleaseNumber'
-    majorVersion: '0'
-    minorVersion: '1'
-    patchVersion: '0'
-    verbosityPack: 'Normal'
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-    nuGetFeedType: 'internal'
-    publishVstsFeed: '21c23043-21b0-4e5a-8557-00b88fc52fd4/9f4e269d-a35a-4657-b2a3-b56b01c01f8c'
+stages:
+- stage: Build
+  displayName: Build nuget package
+  jobs:
+  - job: Build
+
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    steps:
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'test'
+        projects: 'test/Lifti.Tests/Lifti.Tests.csproj'
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'pack'
+        packagesToPack: 'src/Lifti.Core/Lifti.Core.csproj'
+        versioningScheme: 'byPrereleaseNumber'
+        majorVersion: $(majorVersion)
+        minorVersion: $(minorVersion)
+        patchVersion: $(patchVersion)
+        verbosityPack: 'Normal'
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'push'
+        packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+        nuGetFeedType: 'internal'
+        publishVstsFeed: '21c23043-21b0-4e5a-8557-00b88fc52fd4/9f4e269d-a35a-4657-b2a3-b56b01c01f8c'
+
+- stage: PublishNuget
+  displayName: Publish to CI feed
+  dependsOn: Build
+
+  jobs:
+  - job: PublishCI
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'pack'
+        packagesToPack: 'src/Lifti.Core/Lifti.Core.csproj'
+        versioningScheme: 'off'
+        buildProperties: '-p:PackageVersion=$(majorVersion).$(minorVersion).$(patchVersion)'
+        verbosityPack: 'Normal'
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'push'
+        packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+        nuGetFeedType: 'internal'
+        publishVstsFeed: '21c23043-21b0-4e5a-8557-00b88fc52fd4/9f4e269d-a35a-4657-b2a3-b56b01c01f8c'
