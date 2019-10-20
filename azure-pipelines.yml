@@ -51,9 +51,3 @@ stages:
         packagesToPack: 'src/Lifti.Core/Lifti.Core.csproj'
         versioningScheme: 'off'
         buildProperties: '-p:PackageVersion=$(majorVersion).$(minorVersion).$(patchVersion)'
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'push'
-        packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-        nuGetFeedType: 'internal'
-        publishVstsFeed: '21c23043-21b0-4e5a-8557-00b88fc52fd4/9f4e269d-a35a-4657-b2a3-b56b01c01f8c'
