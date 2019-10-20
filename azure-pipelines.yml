@@ -58,12 +58,19 @@ stages:
 - stage: PublishNuget
   displayName: Publish to CI feed
   dependsOn: Build
+  condition: succeeded()
 
   jobs:
   - job: PublishCI
     pool:
       vmImage: 'ubuntu-latest'
+      
     steps:
+    - checkout: none
+
+    - download: current
+      artifact: 'packages'
+      
     - task: DotNetCoreCLI@2
       inputs:
         command: 'push'
