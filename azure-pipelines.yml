@@ -5,36 +5,55 @@ variables:
   majorVersion: 0
   minorVersion: 1
   patchVersion: 0
+  project: src/Lifti.Core/Lifti.Core.csproj
+  testProject: test/Lifti.Tests/Lifti.Tests.csproj
 
 stages:
 - stage: Build
   displayName: Build nuget package
+  variables:
+    buildConfiguration: 'Release'
   jobs:
   - job: Build
 
     pool:
       vmImage: 'ubuntu-latest'
 
-    steps:
+    steps:   
+    - task: DotNetCoreCLI@2
+      displayName: "NuGet Restore"
+      inputs:
+        command: restore
+        projects: '**/*.csproj'
     - task: DotNetCoreCLI@2
       inputs:
         command: 'test'
-        projects: 'test/Lifti.Tests/Lifti.Tests.csproj'
+        projects: $(testProject)
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'pack'
+        packagesToPack: '$(project)'
+        packDirectory: '$(Build.ArtifactStagingDirectory)/ci'
+        versioningScheme: 'byPrereleaseNumber'
+        majorVersion: '$(majorVersion)'
+        minorVersion: '$(minorVersion)'
+        patchVersion: '$(patchVersion)'
+        verbosityPack: 'Normal'
+        arguments: '--configuration $(buildConfiguration)'
+
     - task: DotNetCoreCLI@2
       inputs:
         command: 'pack'
         packagesToPack: 'src/Lifti.Core/Lifti.Core.csproj'
-        versioningScheme: 'byPrereleaseNumber'
-        majorVersion: $(majorVersion)
-        minorVersion: $(minorVersion)
-        patchVersion: $(patchVersion)
+        packDirectory: '$(Build.ArtifactStagingDirectory)/release'
+        versioningScheme: 'off'
+        buildProperties: 'PackageVersion=$(majorVersion).$(minorVersion).$(patchVersion)'
         verbosityPack: 'Normal'
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'push'
-        packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-        nuGetFeedType: 'internal'
-        publishVstsFeed: '21c23043-21b0-4e5a-8557-00b88fc52fd4/9f4e269d-a35a-4657-b2a3-b56b01c01f8c'
+        arguments: '--configuration $(buildConfiguration)'
+
+    - publish: '$(Build.ArtifactStagingDirectory)/packages'
+      artifact: 'packages'
+
 
 - stage: PublishNuget
   displayName: Publish to CI feed
@@ -47,8 +66,7 @@ stages:
     steps:
     - task: DotNetCoreCLI@2
       inputs:
-        command: 'pack'
-        packagesToPack: 'src/Lifti.Core/Lifti.Core.csproj'
-        versioningScheme: 'off'
-        buildProperties: 'PackageVersion=$(majorVersion).$(minorVersion).$(patchVersion)'
-        verbosityPack: 'Normal'
+        command: 'push'
+        packagesToPush: '$(Pipeline.Workspace)/ci/*.nupkg'
+        nuGetFeedType: 'internal'
+        publishVstsFeed: '21c23043-21b0-4e5a-8557-00b88fc52fd4/9f4e269d-a35a-4657-b2a3-b56b01c01f8c'
