@@ -12,6 +12,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Full Text Search Index Indexing</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
+    <PackageId>Lifti</PackageId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

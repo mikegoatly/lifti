@@ -2,9 +2,9 @@ trigger:
 - master
 
 variables:
-  majorVersion: 0
+  majorVersion: 2
   minorVersion: 1
-  patchVersion: 0
+  patchVersion: 0-beta
   project: src/Lifti.Core/Lifti.Core.csproj
   testProject: test/Lifti.Tests/Lifti.Tests.csproj
 
