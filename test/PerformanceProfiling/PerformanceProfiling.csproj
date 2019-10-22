@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
-    <PackageReference Include="LIFTI" Version="1.1.6-beta" />
+    <PackageReference Include="Lifti.Core" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
