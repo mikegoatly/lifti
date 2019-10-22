@@ -42,7 +42,7 @@ namespace Lifti
 
         public int Count => this.IdPool.AllocatedIdCount;
 
-        public IndexNavigator CreateNavigator()
+        public IIndexNavigator CreateNavigator()
         {
             return new IndexNavigator(this.Root);
         }
