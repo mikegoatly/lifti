@@ -5,14 +5,17 @@
     <TargetFramework>netstandard2</TargetFramework>
     <RootNamespace>Lifti</RootNamespace>
     <Authors>Mike Goatly</Authors>
-    <Product>Lifti</Product>
+    <Product>LIFTI</Product>
     <Description>A simple to use in-memory full text indexing library.</Description>
     <PackageProjectUrl>https://github.com/mikegoatly/lifti</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mikegoatly/lifti</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>Full Text Search Index Indexing</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
-    <PackageId>Lifti</PackageId>
+    <PackageId>Lifti.Core</PackageId>
+    <Copyright>Mike Goatly</Copyright>
+    <PackageLicenseFile></PackageLicenseFile>
+    <PackageReleaseNotes>First version of the new rewrite</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
