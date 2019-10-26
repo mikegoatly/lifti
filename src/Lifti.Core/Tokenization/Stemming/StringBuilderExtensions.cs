@@ -151,7 +151,7 @@
         /// <returns>
         /// The text to replace at the end of the string builder. The match word of the word replacement will be null if no matches were found.
         /// </returns>
-        public static WordReplacement EndsWith(this StringBuilder builder, FullTextIndex<WordReplacement> replacementSetLookup)
+        public static WordReplacement EndsWith(this StringBuilder builder, IFullTextIndex<WordReplacement> replacementSetLookup)
         {
             var length = builder.Length;
             if (length > 3)

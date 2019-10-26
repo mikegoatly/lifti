@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Lifti
 {
     public class IndexedFieldLookup : IIndexedFieldLookup
     {
-        private readonly Dictionary<string, byte> fieldToIdLookup = new Dictionary<string, byte>();
+        private readonly Dictionary<string, byte> fieldToIdLookup = new Dictionary<string, byte>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<byte, string> idToFieldLookup = new Dictionary<byte, string>();
         private int nextId = 0;
 

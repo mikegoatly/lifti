@@ -16,6 +16,7 @@
     <Copyright>Mike Goatly</Copyright>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageReleaseNotes>First version of the new rewrite</PackageReleaseNotes>
+    <AssemblyName>Lifti.Core</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

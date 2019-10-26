@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-
-namespace Lifti.Tokenization
+﻿namespace Lifti.Tokenization
 {
     public class TokenizerFactory : ITokenizerFactory
     {

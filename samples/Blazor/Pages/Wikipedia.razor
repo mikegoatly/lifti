@@ -40,7 +40,7 @@
                     <ul class="col-3 search-results pr-2 pt-2 border-primary border-right">
                         @foreach (var result in results)
                         {
-                            <li class="p-1" @onclick="() => this.ShowItem(result)">@result.Item</li>
+                            <li class="p-1" @onclick="() => this.ShowItem(result)">@result.Key</li>
                         }
                     </ul>
                     @if (this.selectedContent != null)
@@ -96,7 +96,7 @@
     };
 
     IList<SearchResult<string>> results = null;
-    FullTextIndex<string> index = new FullTextIndex<string>();
+    IFullTextIndex<string> index = new FullTextIndexBuilder<string>().Build();
 
     private bool errored;
     private bool indexing;
@@ -115,7 +115,7 @@
 
     void ShowItem(SearchResult<string> searchResult)
     {
-        var builder = new System.Text.StringBuilder(this.loadedPages[searchResult.Item]);
+        var builder = new System.Text.StringBuilder(this.loadedPages[searchResult.Key]);
         var locations = searchResult.FieldMatches.SelectMany(m => m.Locations).ToList();
         foreach (var location in locations.OrderByDescending(l => l.Start))
         {
@@ -169,7 +169,7 @@
                 this.Message = $"{counter} Indexing...";
                 base.StateHasChanged();
                 loadedPages[results.Page.Title] = results.Page.Text.Content;
-                this.index.Index(results.Page.Title, results.Page.Text.Content, indexTokenizationOptions);
+                this.index.Add(results.Page.Title, results.Page.Text.Content, indexTokenizationOptions);
             }
 
             this.Message = "Ready";

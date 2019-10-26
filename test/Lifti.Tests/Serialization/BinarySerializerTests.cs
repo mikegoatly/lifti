@@ -13,17 +13,17 @@ namespace Lifti.Tests.Serialization
 {
     public class BinarySerializerTests
     {
-        private readonly FullTextIndex<string> index;
+        private readonly IFullTextIndex<string> index;
         private readonly ITestOutputHelper output;
 
         public BinarySerializerTests(ITestOutputHelper output)
         {
-            this.index = new FullTextIndex<string>();
+            this.index = new FullTextIndexBuilder<string>().Build();
             var wikipediaTests = WikipediaDataLoader.Load(typeof(FullTextIndexTests));
             var options = new TokenizationOptions(Lifti.Tokenization.TokenizerKind.XmlContent) { Stem = true };
             foreach (var (name, text) in wikipediaTests)
             {
-                this.index.Index(name, text, options);
+                this.index.Add(name, text, options);
             }
 
             this.output = output;
@@ -45,7 +45,7 @@ namespace Lifti.Tests.Serialization
 
                 stream.Length.Should().BeGreaterThan(4);
 
-                var newIndex = new FullTextIndex<string>();
+                var newIndex = new FullTextIndexBuilder<string>().Build();
 
                 stream.Position = 0;
 

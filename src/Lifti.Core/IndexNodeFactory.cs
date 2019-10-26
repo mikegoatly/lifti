@@ -2,7 +2,7 @@
 
 namespace Lifti
 {
-    public class IndexNodeFactory : ConfiguredBy<FullTextIndexConfiguration>, IIndexNodeFactory
+    public class IndexNodeFactory : ConfiguredBy<AdvancedOptions>, IIndexNodeFactory
     {
         private int supportIntraNodeTextAtDepth;
 
@@ -29,14 +29,14 @@ namespace Lifti
             return new IndexNode(this, nextDepth, this.GetIndexSupportLevelForDepth(nextDepth));
         }
 
-        protected override void OnConfiguring(FullTextIndexConfiguration options)
+        protected override void OnConfiguring(AdvancedOptions options)
         {
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
             }
 
-            this.supportIntraNodeTextAtDepth = options.Advanced.SupportIntraNodeTextAfterCharacterIndex;
+            this.supportIntraNodeTextAtDepth = options.SupportIntraNodeTextAfterIndexDepth;
         }
     }
 }
