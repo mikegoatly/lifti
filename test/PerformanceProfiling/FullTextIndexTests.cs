@@ -12,7 +12,7 @@ namespace PerformanceProfiling
     [ShortRunJob]
     public class IndexSearchingBenchmarks : IndexBenchmarkBase
     {
-        private LiftiNew.Lifti.FullTextIndex<string> index;
+        private LiftiNew.Lifti.IFullTextIndex<string> index;
         private UpdatableFullTextIndex<string> legacyIndex;
 
         [GlobalSetup]

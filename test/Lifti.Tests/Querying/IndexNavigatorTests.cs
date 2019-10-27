@@ -6,17 +6,19 @@ namespace Lifti.Tests.Querying
 {
     public class IndexNavigatorTests : QueryTestBase
     {
-        private readonly FullTextIndex<string> index;
+        private readonly IFullTextIndex<string> index;
         private readonly IndexNavigator sut;
 
         public IndexNavigatorTests()
         {
-            this.index = new FullTextIndex<string>();
-            this.index.WithItemTokenization<(string, string, string)>(i => i.Item1)
-                .WithField("Field1", i => i.Item2)
-                .WithField("Field2", i => i.Item3);
+            this.index = new FullTextIndexBuilder<string>()
+                .WithItemTokenization<(string, string, string)>(
+                    o => o.WithKey(i => i.Item1)
+                        .WithField("Field1", i => i.Item2)
+                        .WithField("Field2", i => i.Item3))
+                .Build();
 
-            this.index.Index("A", "Triumphant elephant strode elegantly with indifference to shouting subjects, giving withering looks to individuals");
+            this.index.Add("A", "Triumphant elephant strode elegantly with indifference to shouting subjects, giving withering looks to individuals");
             this.sut = new IndexNavigator(this.index.Root);
         }
 
@@ -75,8 +77,8 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void GettingExactAndChildMatches_ShouldMergeResultsAcrossFields()
         {
-            this.index.Index(("B", "Zoopla Zoo Zammo", "Zany Zippy Llamas"));
-            this.index.Index(("C", "Zak", "Ziggy Stardust"));
+            this.index.Add(("B", "Zoopla Zoo Zammo", "Zany Zippy Llamas"));
+            this.index.Add(("C", "Zak", "Ziggy Stardust"));
 
             this.sut.Process("Z").Should().BeTrue();
             var results = this.sut.GetExactAndChildMatches();

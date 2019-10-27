@@ -61,6 +61,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to At least one field must be configured for an item.
+        /// </summary>
+        internal static string AtLeastOneFieldMustBeIndexed {
+            get {
+                return ResourceManager.GetString("AtLeastOneFieldMustBeIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected a text token - got {0}.
         /// </summary>
         internal static string ExpectedTextToken {
@@ -84,6 +93,15 @@ namespace Lifti {
         internal static string FieldHasNoAssociatedFieldName {
             get {
                 return ResourceManager.GetString("FieldHasNoAssociatedFieldName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name must not be empty.
+        /// </summary>
+        internal static string FieldNameMustNotBeEmpty {
+            get {
+                return ResourceManager.GetString("FieldNameMustNotBeEmpty", resourceCulture);
             }
         }
         
@@ -120,6 +138,15 @@ namespace Lifti {
         internal static string ItemNotFound {
             get {
                 return ResourceManager.GetString("ItemNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A key reader must be specified with a call to WithKey.
+        /// </summary>
+        internal static string KeyReaderMustBeProvided {
+            get {
+                return ResourceManager.GetString("KeyReaderMustBeProvided", resourceCulture);
             }
         }
         
@@ -264,6 +291,15 @@ namespace Lifti {
         internal static string UnsupportedTokenizerKind {
             get {
                 return ResourceManager.GetString("UnsupportedTokenizerKind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value must not be less than zero.
+        /// </summary>
+        internal static string ValueMustNotBeLessThanZero {
+            get {
+                return ResourceManager.GetString("ValueMustNotBeLessThanZero", resourceCulture);
             }
         }
     }

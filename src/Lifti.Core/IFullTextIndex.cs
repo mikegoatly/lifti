@@ -1,9 +1,8 @@
 ﻿using Lifti.Querying;
-using System;
 using System.Collections.Generic;
 
 namespace Lifti
-{    
+{
     public interface IFullTextIndex<TKey>
     {
         IIdPool<TKey> IdPool { get; }
@@ -16,8 +15,40 @@ namespace Lifti
 
         IndexNode Root { get; }
 
-        void Index(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null);
-        void Index<TItem>(TItem item);
+        /// <summary>
+        /// Indexes some text against a given key.
+        /// </summary>
+        /// <param name="itemKey">The key of the item being indexed.</param>
+        /// <param name="text">The text to index against the item.</param>
+        /// <param name="tokenizationOptions">
+        /// An instance of <see cref="TokenizationOptions"/>
+        /// that describes how the text should be treated as it is tokenized.
+        /// When null, <see cref="TokenizationOptions.Default"/> will be used.
+        /// </param>
+        void Add(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null);
+
+        /// <summary>
+        /// Indexes a single item of type <typeparamref name="TItem"/>. This type must have been
+        /// configured when the index was built.
+        /// </summary>
+        /// <typeparam name="TItem">
+        /// The type of the item being indexed.
+        /// </typeparam>
+        /// <param name="item">
+        /// The item to index.
+        /// </param>
+        void Add<TItem>(TItem item);
+
+        /// <summary>
+        /// Indexes the 
+        /// </summary>
+        /// <typeparam name="TItem">
+        /// The type of the item being indexed.
+        /// </typeparam>
+        /// <param name="items">
+        /// The items to index.
+        /// </param>
+        void AddRange<TItem>(IEnumerable<TItem> items);
 
         /// <summary>
         /// Removes the item with the given key from this index. If the key is not indexed then
@@ -50,16 +81,5 @@ namespace Lifti
         /// on a character by character basis.
         /// </summary>
         IIndexNavigator CreateNavigator();
-
-        /// <summary>
-        /// Creates an <see cref="ItemTokenizationOptions{TItem, TKey}"/> configuration entry for an item of type <typeparamref name="TItem"/>
-        /// in the index. Subsequent calls to the <see cref="ItemTokenizationOptions{TItem, TKey}.WithField"/> can be used to configure
-        /// the fields that should be indexed on the type.
-        /// </summary>
-        /// <param name="idReader">
-        /// A delegate capable of reading the key of type <typeparamref name="TKey"/> to store in the index. The retrieved value must uniquely
-        /// identify the object.
-        /// </param>
-        ItemTokenizationOptions<TItem, TKey> WithItemTokenization<TItem>(Func<TItem, TKey> idReader);
     }
 }

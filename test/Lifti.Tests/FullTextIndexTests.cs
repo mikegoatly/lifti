@@ -7,23 +7,20 @@ namespace Lifti.Tests
 {
     public class FullTextIndexTests
     {
-        private readonly FullTextIndex<string> index;
+        private readonly IFullTextIndex<string> index;
 
         public FullTextIndexTests()
         {
-            this.index = new FullTextIndex<string>(
-                new FullTextIndexConfiguration<string>
-                {
-                    Advanced = { SupportIntraNodeTextAfterCharacterIndex = 4 }
-                });
-
-            this.index.WithItemTokenization<TestObject>(o => o.Id)
-                .WithField("Text1", o => o.Text1)
-                .WithField("Text2", o => o.Text2)
-                .WithField("Text3", o => o.Text3);
-
-            this.index.WithItemTokenization<TestObject2>(o => o.Id)
-                .WithField("MultiText", o => o.Text);
+            this.index = new FullTextIndexBuilder<string>()
+                .WithItemTokenization<TestObject>(
+                    o => o.WithKey(i => i.Id)
+                        .WithField("Text1", i => i.Text1)
+                        .WithField("Text2", i => i.Text2)
+                        .WithField("Text3", i => i.Text3))
+                .WithItemTokenization<TestObject2>(
+                    o => o.WithKey(i => i.Id)
+                        .WithField("MultiText", i => i.Text))
+                .Build();
         }
 
         [Fact]
@@ -132,7 +129,7 @@ namespace Lifti.Tests
             var wikipediaTests = WikipediaDataLoader.Load(this.GetType());
             foreach (var (name, text) in wikipediaTests)
             {
-                this.index.Index(name, text);
+                this.index.Add(name, text);
             }
 
             this.index.Remove(wikipediaTests[10].name);
@@ -142,22 +139,22 @@ namespace Lifti.Tests
 
         private void WithIndexedSingleStringPropertyObjects()
         {
-            this.index.Index(new TestObject("A", "Text One", "Text Two", "Text Three"));
-            this.index.Index(new TestObject("B", "Not One", "Not Two", "Not Three"));
+            this.index.Add(new TestObject("A", "Text One", "Text Two", "Text Three"));
+            this.index.Add(new TestObject("B", "Not One", "Not Two", "Not Three"));
         }
 
         private void WithIndexedMultiStringPropertyObjects()
         {
-            this.index.Index(new TestObject2("A", "Text One", "Text Two", "Text Three"));
-            this.index.Index(new TestObject2("B", "Not One", "Not Two", "Not Three"));
+            this.index.Add(new TestObject2("A", "Text One", "Text Two", "Text Three"));
+            this.index.Add(new TestObject2("B", "Not One", "Not Two", "Not Three"));
         }
 
         private void WithIndexedStrings()
         {
-            this.index.Index("A", "This is a test");
-            this.index.Index("B", "This is another test");
-            this.index.Index("C", "Foo is testing this as well");
-            this.index.Index("D", "One last test just for testing sake");
+            this.index.Add("A", "This is a test");
+            this.index.Add("B", "This is another test");
+            this.index.Add("C", "Foo is testing this as well");
+            this.index.Add("D", "One last test just for testing sake");
         }
 
         public class TestObject

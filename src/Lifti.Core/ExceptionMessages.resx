@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AtLeastOneFieldMustBeIndexed" xml:space="preserve">
+    <value>At least one field must be configured for an item</value>
+  </data>
   <data name="ExpectedTextToken" xml:space="preserve">
     <value>Expected a text token - got {0}</value>
   </data>
@@ -125,6 +128,9 @@
   </data>
   <data name="FieldHasNoAssociatedFieldName" xml:space="preserve">
     <value>Field id {0} has no associated field name</value>
+  </data>
+  <data name="FieldNameMustNotBeEmpty" xml:space="preserve">
+    <value>Name must not be empty</value>
   </data>
   <data name="IdAlreadyUsed" xml:space="preserve">
     <value>Id {0} is already registered in the index.</value>
@@ -137,6 +143,9 @@
   </data>
   <data name="ItemNotFound" xml:space="preserve">
     <value>Item not found</value>
+  </data>
+  <data name="KeyReaderMustBeProvided" xml:space="preserve">
+    <value>A key reader must be specified with a call to WithKey</value>
   </data>
   <data name="MalformedDataExpectedFullLocationEntry" xml:space="preserve">
     <value>Malformed index data encountered - expected a full location entry</value>
@@ -185,5 +194,8 @@
   </data>
   <data name="UnsupportedTokenizerKind" xml:space="preserve">
     <value>Unsupported tokenizer kind {0}</value>
+  </data>
+  <data name="ValueMustNotBeLessThanZero" xml:space="preserve">
+    <value>Value must not be less than zero</value>
   </data>
 </root>

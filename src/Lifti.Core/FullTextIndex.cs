@@ -1,33 +1,28 @@
 ﻿using Lifti.Querying;
 using Lifti.Tokenization;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Lifti
 {
-    public partial class FullTextIndex<TKey> : IFullTextIndex<TKey>
+    public class FullTextIndex<TKey> : IFullTextIndex<TKey>
     {
         private readonly IIndexNodeFactory indexNodeFactory;
         private readonly ITokenizerFactory tokenizerFactory;
         private readonly IQueryParser queryParser;
-        private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions = new ConfiguredItemTokenizationOptions<TKey>();
+        private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions;
 
-        public FullTextIndex()
-            : this(new FullTextIndexConfiguration<TKey>())
+        internal FullTextIndex(
+            ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions,
+            IIndexNodeFactory indexNodeFactory,
+            ITokenizerFactory tokenizerFactory,
+            IQueryParser queryParser)
         {
-        }
-
-        public FullTextIndex(
-            FullTextIndexConfiguration<TKey> options,
-            IIndexNodeFactory indexNodeFactory = null,
-            ITokenizerFactory tokenizerFactory = null,
-            IQueryParser queryParser = null)
-        {
-            this.indexNodeFactory = indexNodeFactory ?? new IndexNodeFactory();
-            this.tokenizerFactory = tokenizerFactory ?? new TokenizerFactory();
-            this.queryParser = queryParser ?? new QueryParser();
-
-            this.indexNodeFactory.Configure(options);
+            this.itemTokenizationOptions = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
+            this.indexNodeFactory = indexNodeFactory ?? throw new ArgumentNullException(nameof(indexNodeFactory));
+            this.tokenizerFactory = tokenizerFactory ?? throw new ArgumentNullException(nameof(tokenizerFactory));
+            this.queryParser = queryParser ?? throw new ArgumentNullException(nameof(queryParser));
 
             this.IdPool = new IdPool<TKey>();
             this.FieldLookup = new IndexedFieldLookup();
@@ -47,14 +42,7 @@ namespace Lifti
             return new IndexNavigator(this.Root);
         }
 
-        public ItemTokenizationOptions<TItem, TKey> WithItemTokenization<TItem>(Func<TItem, TKey> idReader)
-        {
-            var options = new ItemTokenizationOptions<TItem, TKey>(idReader);
-            this.itemTokenizationOptions.Add(options);
-            return options;
-        }
-
-        public void Index(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null)
+        public void Add(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null)
         {
             var itemId = this.IdPool.CreateIdFor(itemKey);
 
@@ -65,9 +53,22 @@ namespace Lifti
             }
         }
 
-        public void Index<TItem>(TItem item)
+        public void AddRange<TItem>(IEnumerable<TItem> items)
         {
-            var options = itemTokenizationOptions.Get<TItem>();
+            if (items is null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+
+            foreach (var item in items)
+            {
+                this.Add(item);
+            }
+        }
+
+        public void Add<TItem>(TItem item)
+        {
+            var options = this.itemTokenizationOptions.Get<TItem>();
 
             var itemKey = options.KeyReader(item);
             var itemId = this.IdPool.CreateIdFor(itemKey);

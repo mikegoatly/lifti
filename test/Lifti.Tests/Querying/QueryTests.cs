@@ -8,12 +8,12 @@ namespace Lifti.Tests.Querying
 {
     public class QueryTests
     {
-        private readonly FullTextIndex<string> index;
+        private readonly IFullTextIndex<string> index;
 
         public QueryTests()
         {
-            this.index = new FullTextIndex<string>();
-            this.index.Index("A", "Some test text");
+            this.index = new FullTextIndexBuilder<string>().Build();
+            this.index.Add("A", "Some test text");
         }
 
         [Fact]
