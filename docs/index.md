@@ -4,12 +4,12 @@ LIFTI is a simple to use netstandard2 compatible in-memory full text indexing AP
 
 ``` c#
 // Create a full text index with default settings
-var index = new FullTextIndex<string>();
+var index = new FullTextIndexBuilder<string>().Build();
             
 // Index
-index.Index("A", "This is some text associated with A: fizz");
-index.Index("B", "Some buzz text for B");
-index.Index("C", "Text associated with C is both fizz and buzz");
+index.Add("A", "This is some text associated with A: fizz");
+index.Add("B", "Some buzz text for B");
+index.Add("C", "Text associated with C is both fizz and buzz");
 
 // Search for text containing both Fizz *and* Buzz
 var results = index.Search("Fizz Buzz").ToList();
