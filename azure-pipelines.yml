@@ -63,7 +63,7 @@ stages:
         zipAfterPublish: false
         modifyOutputPath: false
 
-    - publish: '$(Build.ArtifactStagingDirectory)/blazorsample'
+    - publish: '$(Build.ArtifactStagingDirectory)/blazorsample/BlazorApp/dist'
       artifact: 'blazorsample'
 
     - publish: '$(Build.ArtifactStagingDirectory)/packages'
