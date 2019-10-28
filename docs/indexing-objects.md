@@ -19,9 +19,9 @@ var bookIndex = new FullTextIndexBuilder<int>() // Books are indexed by their Bo
     .WithItemTokenization<Book>(
         options => options
             .WithKey(b => b.BookId)
-            .WithField("Title", b => b.Title, new TokenizationOptions(TokenizerKind.Default) { Stem = true })
+            .WithField("Title", b => b.Title, tokenOptions => tokenOptions.WithStemming())
             .WithField("Authors", b => b.Authors)
-            .WithField("Synopsis", b => b.Synopsis))
+            .WithField("Synopsis", b => b.Synopsis, tokenOptions => tokenOptions.WithStemming()))
     .Build();
 ```
 

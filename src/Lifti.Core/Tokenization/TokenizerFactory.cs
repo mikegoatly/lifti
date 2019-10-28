@@ -13,7 +13,7 @@
         {
             switch (tokenizerKind)
             {
-                case TokenizerKind.Default:
+                case TokenizerKind.PlainText:
                     return new BasicTokenizer();
                 case TokenizerKind.XmlContent:
                     return new XmlTokenizer();

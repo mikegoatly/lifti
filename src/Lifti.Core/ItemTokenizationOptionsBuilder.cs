@@ -35,10 +35,15 @@ namespace Lifti
         /// <param name="reader">
         /// The delegate capable of reading the entire text for the field.
         /// </param>
-        /// <param name="tokenizationOptions">
-        /// The tokenization options to be used when reading tokens for this field
+        /// <param name="optionsBuilder">
+        /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
+        /// null then <see cref="TokenizationOptions.Default"/> will be used when processing text - this provides a tokenizer that
+        /// is accent and case insensitive that splits on punctuation and whitespace, but does <b>not</b> perform word stemming.
         /// </param>
-        public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(string name, Func<TItem, string> reader, TokenizationOptions tokenizationOptions = null)
+        public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(
+            string name, 
+            Func<TItem, string> reader, 
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder = null)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -50,6 +55,7 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(reader));
             }
 
+            var tokenizationOptions = optionsBuilder.BuildOptionsOrDefault();
             this.fieldTokenization.Add(new FieldTokenizationOptions<TItem>(name, reader, tokenizationOptions));
             return this;
         }
@@ -63,10 +69,15 @@ namespace Lifti
         /// <param name="reader">
         /// The delegate capable of reading the entire text for the field.
         /// </param>
-        /// <param name="tokenizationOptions">
-        /// The tokenization options to be used when reading tokens for this field
+        /// <param name="optionsBuilder">
+        /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
+        /// null then <see cref="TokenizationOptions.Default"/> will be used when processing text - this provides a tokenizer that
+        /// is accent and case insensitive that splits on punctuation and whitespace, but does <b>not</b> perform word stemming.
         /// </param>
-        public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(string name, Func<TItem, IEnumerable<string>> reader, TokenizationOptions tokenizationOptions = null)
+        public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(
+            string name,
+            Func<TItem, IEnumerable<string>> reader,
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder = null)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -78,6 +89,7 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(reader));
             }
 
+            var tokenizationOptions = optionsBuilder.BuildOptionsOrDefault();
             this.fieldTokenization.Add(new FieldTokenizationOptions<TItem>(name, reader, tokenizationOptions));
             return this;
         }

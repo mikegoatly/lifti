@@ -202,12 +202,9 @@ namespace Lifti.Tokenization.Stemming
                         .WithField(
                             "find",
                             x => new string(x.MatchWord.Reverse().ToArray()),
-                            new TokenizationOptions(TokenizerKind.Default)
-                            {
-                                SplitOnPunctuation = false,
-                                CaseInsensitive = false,
-                                AccentInsensitive = false
-                            }))
+                            to => to.SplitOnPunctuation(false)
+                                .CaseInsensitive(false)
+                                .AccentInsensitive(false)))
                 .Build();
 
             foreach (var replacement in replacements)

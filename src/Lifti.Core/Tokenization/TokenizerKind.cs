@@ -2,7 +2,7 @@
 {
     public enum TokenizerKind
     {
-        Default = 0,
+        PlainText = 0,
         XmlContent = 1
     }
 }

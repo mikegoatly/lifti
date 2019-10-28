@@ -124,7 +124,7 @@ namespace Lifti.Tokenization
         {
             this.tokenizationOptions = options ?? throw new ArgumentNullException(nameof(options));
 
-            if (this.tokenizationOptions.Stem)
+            if (this.tokenizationOptions.Stemming)
             {
                 this.stemmer = new PorterStemmer();
             }

@@ -62,24 +62,3 @@ AP
  ╠E (matches APE)
  ╚PLE (matches APPLE)
 ```
-
-## Performance testing vs old implementation
-
-|                                    Method |     Mean |    Error |   StdDev | Rank |      Gen 0 |      Gen 1 |     Gen 2 | Allocated |
-|------------------------------------------ |---------:|---------:|---------:|-----:|-----------:|-----------:|----------:|----------:|
-| NewCodeIndexingAlwaysSupportIntraNodeText | 464.9 ms | 1.310 ms | 1.226 ms |    3 | 25000.0000 |  7000.0000 | 1000.0000 | 144.85 MB |
-|      NewCodeIndexingAlwaysIndexCharByChar | 475.6 ms | 2.606 ms | 2.310 ms |    4 | 27000.0000 |  8000.0000 | 1000.0000 |  155.7 MB |
-| NewCodeIndexingIntraNodeTextAt4Characters | 446.4 ms | 3.884 ms | 3.633 ms |    1 | 26000.0000 |  7000.0000 | 2000.0000 | 145.32 MB |
-| NewCodeIndexingIntraNodeTextAt2Characters | 456.7 ms | 3.035 ms | 2.839 ms |    2 | 25000.0000 |  7000.0000 | 1000.0000 | 144.86 MB |
-|                        legacycodeindexing | 481.6 ms | 5.867 ms | 5.488 ms |    4 | 39000.0000 | 10000.0000 | 1000.0000 | 228.35 MB |
-
-And with word stemming (a Porter stemming implementation) enabled, the difference is even more noticable:
-
-|                                    Method |     Mean |    Error |   StdDev | Rank |      Gen 0 |      Gen 1 |     Gen 2 | Allocated |
-|------------------------------------------ |---------:|---------:|---------:|-----:|-----------:|-----------:|----------:|----------:|
-| NewCodeIndexingIntraNodeTextAt4Characters | **523.9 ms** | 6.450 ms | 9.655 ms |    1 | 27000.0000 |  7000.0000 | 2000.0000 | 148.46 MB |
-|                        LegacyCodeIndexing | 730.6 ms | 3.852 ms | 5.646 ms |    2 | 58000.0000 | 14000.0000 | 2000.0000 | 336.37 MB |
-
-Notes: 
-- Each execution populates an index with 200 Wikipedia articles. In other words, in the best case above, it takes 446ms to completely index 200 Wikipedia pages (~7Mb of content) into memory.
-- The new implementation additionally normalizes characters to latin representations (i.e. allowing for case insensitive searching) and there is no equivalent of this in the previous implementation.

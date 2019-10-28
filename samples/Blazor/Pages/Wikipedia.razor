@@ -16,10 +16,17 @@
         <button disabled=@indexing class="btn btn-primary ml-2" @onclick="Search">Search</button>
         <button disabled=@indexing class="btn btn-secondary ml-2" @onclick="ShowAll">Show all</button>
         <button disabled=@indexing class="btn btn-secondary ml-2" @onclick="Clear">Clear results</button>
+        <button disabled=@indexing class="btn btn-secondary ml-2" @onclick="ShowIndex">Show me the index</button>
         <a href="https://github.com/mikegoatly/lifti/wiki/The-LIFTI-query-language" class="align-self-center ml-2" target="_blank">Query language examples</a>
     </div>
 
-    @if (this.SyntaxError != null)
+    @if (this.IndexText != null)
+    {
+        <pre>
+            @this.IndexText
+        </pre>
+    }
+     else if (this.SyntaxError != null)
     {
         <div class="alert alert-danger d-flex">
             <span class="align-self-center">@this.SyntaxError</span>
@@ -81,8 +88,8 @@
 </div>
 
 @code {
-    PageSummary[] defaultPages = new[]
-    {
+        PageSummary[] defaultPages = new[]
+        {
         new PageSummary { Slug = "The_Three-Body_Problem_(novel)" },
         new PageSummary { Slug = "Aliens_(film)" },
         new PageSummary { Slug = "Porcupine_Tree" },
@@ -95,14 +102,19 @@
         new PageSummary { Slug = "Fantastic_Mr_Fox" }
     };
 
-    IList<SearchResult<string>> results = null;
-    IFullTextIndex<string> index = new FullTextIndexBuilder<string>().Build();
+        IList<SearchResult<string>> results = null;
+        IFullTextIndex<string> index = new FullTextIndexBuilder<string>()
+            .WithItemTokenization<WikipediaPage>(
+                page => page.WithKey(i => i.Title)
+                    .WithField("Content", i => i.Text.Content, o => o.XmlContent().WithStemming().SplitOnPunctuation()))
+            .Build();
 
     private bool errored;
     private bool indexing;
     private string selectedContent;
     private IReadOnlyList<WordLocation> wordLocations;
 
+    private string IndexText { get; set; }
     private string SyntaxError { get; set; }
     private string Message { get; set; }
     private string SearchText { get; set; }
@@ -146,8 +158,7 @@
         }
     }
 
-    TokenizationOptions indexTokenizationOptions = new TokenizationOptions(Lifti.Tokenization.TokenizerKind.XmlContent) { Stem = true };
-    TokenizationOptions searchTokenizationOptions = new TokenizationOptions(Lifti.Tokenization.TokenizerKind.Default) { Stem = true };
+    TokenizationOptions searchTokenizationOptions = new TokenizationOptionsBuilder().WithStemming().Build();
 
     async Task FetchPagesAsync(IEnumerable<PageSummary> pages)
     {
@@ -169,7 +180,7 @@
                 this.Message = $"{counter} Indexing...";
                 base.StateHasChanged();
                 loadedPages[results.Page.Title] = results.Page.Text.Content;
-                this.index.Add(results.Page.Title, results.Page.Text.Content, indexTokenizationOptions);
+                this.index.Add(results.Page);
             }
 
             this.Message = "Ready";
@@ -185,8 +196,14 @@
         }
     }
 
+    void ShowIndex()
+    {
+        this.IndexText = this.index.Root.ToString();
+    }
+
     void Clear()
     {
+        this.IndexText = null;
         this.results = null;
     }
 
@@ -194,6 +211,7 @@
     {
         try
         {
+            this.IndexText = null;
             this.SyntaxError = null;
             results = this.index.Search(this.SearchText, searchTokenizationOptions).ToList();
         }
@@ -205,6 +223,7 @@
 
     void ShowAll()
     {
+        this.IndexText = null;  
         results = this.loadedPages.Keys.Select(k => new SearchResult<string>(k, Array.Empty<FieldSearchResult>())).ToList();
     }
 }

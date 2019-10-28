@@ -14,9 +14,9 @@ namespace Lifti.Tests
             this.index = new FullTextIndexBuilder<string>()
                 .WithItemTokenization<TestObject>(
                     o => o.WithKey(i => i.Id)
-                        .WithField("Text1", i => i.Text1)
+                        .WithField("Text1", i => i.Text1, opts => opts.CaseInsensitive(false))
                         .WithField("Text2", i => i.Text2)
-                        .WithField("Text3", i => i.Text3))
+                        .WithField("Text3", i => i.Text3, opts => opts.WithStemming()))
                 .WithItemTokenization<TestObject2>(
                     o => o.WithKey(i => i.Id)
                         .WithField("MultiText", i => i.Text))
@@ -54,12 +54,27 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public void IndexingItemsShouldObeyTokenizationOptionsForFields()
+        {
+            this.WithIndexedSingleStringPropertyObjects();
+
+            var options = new TokenizationOptionsBuilder().CaseInsensitive(false).Build();
+            this.index.Search("one", options).Should().HaveCount(0);
+            this.index.Search("One", options).Should().HaveCount(2);
+
+            options = new TokenizationOptionsBuilder().WithStemming().Build();
+            this.index.Search("summer", options).Should().HaveCount(1);
+            this.index.Search("summers", options).Should().HaveCount(1);
+            this.index.Search("drum", options).Should().HaveCount(1);
+            this.index.Search("drumming", options).Should().HaveCount(1);
+            this.index.Search("drums", options).Should().HaveCount(1);
+        }
+
+        [Fact]
         public void IndexedObjectsShouldBeRetrievableByTextFromAnyIndexedField()
         {
             this.WithIndexedSingleStringPropertyObjects();
 
-            this.index.Search("text").Should().HaveCount(1);
-            this.index.Search("one").Should().HaveCount(2);
             this.index.Search("two").Should().HaveCount(2);
             this.index.Search("three").Should().HaveCount(2);
         }
@@ -139,8 +154,8 @@ namespace Lifti.Tests
 
         private void WithIndexedSingleStringPropertyObjects()
         {
-            this.index.Add(new TestObject("A", "Text One", "Text Two", "Text Three"));
-            this.index.Add(new TestObject("B", "Not One", "Not Two", "Not Three"));
+            this.index.Add(new TestObject("A", "Text One", "Text Two", "Text Three Drumming"));
+            this.index.Add(new TestObject("B", "Not One", "Not Two", "Not Three Summers"));
         }
 
         private void WithIndexedMultiStringPropertyObjects()

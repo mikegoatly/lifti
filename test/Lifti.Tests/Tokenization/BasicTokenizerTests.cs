@@ -29,7 +29,7 @@ namespace Lifti.Tests.Tokenization
         protected void WithConfiguration(bool splitOnPunctuation = true, char[] additionalSplitChars = null, bool caseInsensitive = false, bool accentInsensitive = false)
         {
             ((IConfiguredBy<TokenizationOptions>)this.sut).Configure(
-                new TokenizationOptions(TokenizerKind.Default)
+                new TokenizationOptions(TokenizerKind.PlainText)
                 {
                     SplitOnPunctuation = splitOnPunctuation,
                     AdditionalSplitCharacters = additionalSplitChars ?? Array.Empty<char>(),
