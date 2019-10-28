@@ -137,4 +137,4 @@ stages:
         Destination: 'AzureBlob'
         storage: 'liftidemo'
         ContainerName: '$web'
-        AdditionalArgumentsForBlobCopy: /Y /S
+        AdditionalArgumentsForBlobCopy: /Y /S /SetContentType
