@@ -132,7 +132,7 @@ stages:
 
     - task: AzureFileCopy@3
       inputs:
-        SourcePath: '(Pipeline.Workspace)/blazorsample'
+        SourcePath: '$(Pipeline.Workspace)/blazorsample'
         azureSubscription: 'GitHub Demos'
         Destination: 'AzureBlob'
         storage: 'liftidemo'
