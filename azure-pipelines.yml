@@ -119,7 +119,7 @@ stages:
   jobs:
   - job: PublishCI
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'windows-latest'
       
     steps:
     - checkout: none
