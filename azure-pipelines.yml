@@ -4,7 +4,7 @@ trigger:
 variables:
   majorVersion: 2
   minorVersion: 0
-  patchVersion: 0-beta1
+  patchVersion: 0-beta2
   project: src/Lifti.Core/Lifti.Core.csproj
   testProject: test/Lifti.Tests/Lifti.Tests.csproj
 
@@ -51,8 +51,20 @@ stages:
         verbosityPack: 'Normal'
         arguments: '--configuration $(buildConfiguration)'
 
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: 'samples/Blazor/Blazor.csproj'
+        arguments: '-o $(Build.ArtifactStagingDirectory)/blazorsample -c $(buildConfiguration)'
+        zipAfterPublish: false
+        modifyOutputPath: false
+
     - publish: '$(Build.ArtifactStagingDirectory)/packages'
       artifact: 'packages'
+
+    - publish: '$(Build.ArtifactStagingDirectory)/blazorsample'
+      artifact: 'blazorsample'
 
 
 - stage: PublishCINugetPackage
@@ -98,3 +110,27 @@ stages:
              packagesToPush: '$(Pipeline.Workspace)/packages/release/*.nupkg'
              nuGetFeedType: 'external'
              publishFeedCredentials: 'NuGet'
+
+- stage: PublishBlazorApp
+  displayName: Publish Blazor sample app to blob storage
+  dependsOn: Build
+  condition: succeeded()
+
+  jobs:
+  - job: PublishCI
+    pool:
+      vmImage: 'ubuntu-latest'
+      
+    steps:
+    - checkout: none
+
+    - download: current
+      artifact: 'blazorsample'
+
+    - task: AzureFileCopy@3
+      inputs:
+        SourcePath: '(Pipeline.Workspace)/blazorsample'
+        azureSubscription: 'GitHub Demos'
+        Destination: 'AzureBlob'
+        storage: 'liftidemo'
+        ContainerName: '$web'
