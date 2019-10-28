@@ -7,14 +7,14 @@ variables:
   patchVersion: 0-beta2
   project: src/Lifti.Core/Lifti.Core.csproj
   testProject: test/Lifti.Tests/Lifti.Tests.csproj
+  buildConfiguration: 'Release'
 
 stages:
-- stage: BuildNuget
+- stage: Build
   displayName: Build nuget packages
-  variables:
-    buildConfiguration: 'Release'
+
   jobs:
-  - job: BuildNuget
+  - job: Build
 
     pool:
       vmImage: 'ubuntu-latest'
@@ -34,7 +34,7 @@ stages:
       displayName: Pack CI nuget version
       inputs:
         command: 'pack'
-        packagesToPack: '$(project)'
+        packagesToPack: $(project)
         packDirectory: '$(Build.ArtifactStagingDirectory)/packages/ci'
         versioningScheme: 'byPrereleaseNumber'
         majorVersion: '$(majorVersion)'
@@ -47,24 +47,13 @@ stages:
       displayName: Pack release nuget version
       inputs:
         command: 'pack'
-        packagesToPack: 'src/Lifti.Core/Lifti.Core.csproj'
+        packagesToPack: $(project)
         packDirectory: '$(Build.ArtifactStagingDirectory)/packages/release'
         versioningScheme: 'off'
         buildProperties: 'PackageVersion=$(majorVersion).$(minorVersion).$(patchVersion)'
         verbosityPack: 'Normal'
         arguments: '--configuration $(buildConfiguration)'
 
-    - publish: '$(Build.ArtifactStagingDirectory)/packages'
-      artifact: 'packages'
-
-- stage: BuildBlazorSample
-  displayName: Build blazor sample
-  jobs:
-  - job: BuildBlazorSample
-    pool:
-      vmImage: 'ubuntu-latest'
-    
-    steps:
     - task: DotNetCoreCLI@2
       inputs:
         command: 'publish'
@@ -77,9 +66,12 @@ stages:
     - publish: '$(Build.ArtifactStagingDirectory)/blazorsample'
       artifact: 'blazorsample'
 
+    - publish: '$(Build.ArtifactStagingDirectory)/packages'
+      artifact: 'packages'
+
 - stage: PublishCINugetPackage
   displayName: Publish to CI feed
-  dependsOn: BuildNuget
+  dependsOn: Build
   condition: succeeded()
 
   jobs:
@@ -124,8 +116,7 @@ stages:
 - stage: PublishBlazorApp
   displayName: Publish Blazor sample app to blob storage
   dependsOn: 
-  - BuildNuget
-  - BuildBlazorSample
+  - Build
   condition: succeeded()
 
   jobs:
