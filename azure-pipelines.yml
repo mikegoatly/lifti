@@ -9,12 +9,12 @@ variables:
   testProject: test/Lifti.Tests/Lifti.Tests.csproj
 
 stages:
-- stage: Build
-  displayName: Build nuget package
+- stage: BuildNuget
+  displayName: Build nuget packages
   variables:
     buildConfiguration: 'Release'
   jobs:
-  - job: Build
+  - job: BuildNuget
 
     pool:
       vmImage: 'ubuntu-latest'
@@ -26,10 +26,12 @@ stages:
         command: restore
         projects: '**/*.csproj'
     - task: DotNetCoreCLI@2
+      displayName: Run unit tests
       inputs:
         command: 'test'
         projects: $(testProject)
     - task: DotNetCoreCLI@2
+      displayName: Pack CI nuget version
       inputs:
         command: 'pack'
         packagesToPack: '$(project)'
@@ -42,6 +44,7 @@ stages:
         arguments: '--configuration $(buildConfiguration)'
 
     - task: DotNetCoreCLI@2
+      displayName: Pack release nuget version
       inputs:
         command: 'pack'
         packagesToPack: 'src/Lifti.Core/Lifti.Core.csproj'
@@ -51,6 +54,17 @@ stages:
         verbosityPack: 'Normal'
         arguments: '--configuration $(buildConfiguration)'
 
+    - publish: '$(Build.ArtifactStagingDirectory)/packages'
+      artifact: 'packages'
+
+- stage: BuildBlazorSample
+  displayName: Build blazor sample
+  jobs:
+  - job: BuildBlazorSample
+    pool:
+      vmImage: 'ubuntu-latest'
+    
+    steps:
     - task: DotNetCoreCLI@2
       inputs:
         command: 'publish'
@@ -60,16 +74,12 @@ stages:
         zipAfterPublish: false
         modifyOutputPath: false
 
-    - publish: '$(Build.ArtifactStagingDirectory)/packages'
-      artifact: 'packages'
-
     - publish: '$(Build.ArtifactStagingDirectory)/blazorsample'
       artifact: 'blazorsample'
 
-
 - stage: PublishCINugetPackage
   displayName: Publish to CI feed
-  dependsOn: Build
+  dependsOn: BuildNuget
   condition: succeeded()
 
   jobs:
@@ -113,7 +123,9 @@ stages:
 
 - stage: PublishBlazorApp
   displayName: Publish Blazor sample app to blob storage
-  dependsOn: Build
+  dependsOn: 
+  - BuildNuget
+  - BuildBlazorSample
   condition: succeeded()
 
   jobs:
@@ -134,3 +146,4 @@ stages:
         Destination: 'AzureBlob'
         storage: 'liftidemo'
         ContainerName: '$web'
+        AdditionalArgumentsForBlobCopy: /Y
