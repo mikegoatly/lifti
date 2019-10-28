@@ -120,6 +120,9 @@
   <data name="AtLeastOneFieldMustBeIndexed" xml:space="preserve">
     <value>At least one field must be configured for an item</value>
   </data>
+  <data name="ExpectedAtLeastOneWordPartParsed" xml:space="preserve">
+    <value>Expected at least one word part to be parsed</value>
+  </data>
   <data name="ExpectedTextToken" xml:space="preserve">
     <value>Expected a text token - got {0}</value>
   </data>

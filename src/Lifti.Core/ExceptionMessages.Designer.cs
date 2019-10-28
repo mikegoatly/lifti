@@ -70,6 +70,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expected at least one word part to be parsed.
+        /// </summary>
+        internal static string ExpectedAtLeastOneWordPartParsed {
+            get {
+                return ResourceManager.GetString("ExpectedAtLeastOneWordPartParsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected a text token - got {0}.
         /// </summary>
         internal static string ExpectedTextToken {

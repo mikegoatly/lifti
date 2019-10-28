@@ -34,6 +34,16 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public void IndexShouldBeSearchableWithHypenatedText()
+        {
+            this.WithIndexedStrings();
+
+            var results = this.index.Search("third-eye");
+
+            results.Should().HaveCount(1);
+        }
+
+        [Fact]
         public void WordsRetrievedBySearchingForTextIndexedBySimpleStringsShouldBeAssociatedToDefaultField()
         {
             this.WithIndexedStrings();
@@ -169,7 +179,7 @@ namespace Lifti.Tests
             this.index.Add("A", "This is a test");
             this.index.Add("B", "This is another test");
             this.index.Add("C", "Foo is testing this as well");
-            this.index.Add("D", "One last test just for testing sake");
+            this.index.Add("D", "One last test just for testing sake with hypenated text: third-eye");
         }
 
         public class TestObject

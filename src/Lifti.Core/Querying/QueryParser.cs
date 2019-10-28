@@ -67,7 +67,7 @@ namespace Lifti.Querying
 
                 case QueryTokenType.BeginAdjacentTextOperator:
                     var words = state.GetTokensUntil(QueryTokenType.EndAdjacentTextOperator)
-                        .Select(t => CreateWordPart(t, wordTokenizer))
+                        .SelectMany(t => CreateWordParts(t, wordTokenizer))
                         .ToList();
 
                     return words.Count == 0 ? rootPart : ComposePart(rootPart, new AdjacentWordsQueryOperator(words));
@@ -77,7 +77,25 @@ namespace Lifti.Querying
             }
         }
 
-        private static IWordQueryPart CreateWordPart(QueryToken queryToken, ITokenizer wordTokenizer)
+        private static IQueryPart CreateWordPart(QueryToken queryToken, ITokenizer wordTokenizer)
+        {
+            var wordParts = CreateWordParts(queryToken, wordTokenizer).ToList();
+
+            if (wordParts.Count == 0)
+            {
+                throw new QueryParserException(ExceptionMessages.ExpectedAtLeastOneWordPartParsed);
+            }
+
+            IQueryPart part = wordParts[0];
+            for (var i = 1; i < wordParts.Count; i++)
+            {
+                part = ComposePart(part, wordParts[i]);
+            }
+
+            return part;
+        }
+
+        private static IEnumerable<IWordQueryPart> CreateWordParts(QueryToken queryToken, ITokenizer wordTokenizer)
         {
             if (queryToken.TokenType != QueryTokenType.Text)
             {
@@ -92,9 +110,11 @@ namespace Lifti.Querying
                 tokenText = tokenText.Slice(0, tokenText.Length - 1);
             }
 
-            var tokenizedWord = wordTokenizer.Process(tokenText).Single();
             
-            return hasWildcard ? (IWordQueryPart)new StartsWithWordQueryPart(tokenizedWord.Value) : new ExactWordQueryPart(tokenizedWord.Value);
+            return wordTokenizer.Process(tokenText)
+                .Select(tokenizedWord => hasWildcard ? 
+                    (IWordQueryPart)new StartsWithWordQueryPart(tokenizedWord.Value) : 
+                    new ExactWordQueryPart(tokenizedWord.Value));
         }
 
         private static IQueryPart ComposePart(IQueryPart existingPart, IQueryPart newPart)
