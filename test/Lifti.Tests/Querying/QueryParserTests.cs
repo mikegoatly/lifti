@@ -12,18 +12,16 @@ namespace Lifti.Tests.Querying
         private const byte TestFieldId = 9;
         private const byte OtherFieldId = 11;
         private readonly Mock<IIndexedFieldLookup> fieldLookupMock;
-        private readonly Mock<ITokenizer> tokenizerMock;
 
         public QueryParserTests()
         {
             this.fieldLookupMock = new Mock<IIndexedFieldLookup>();
             var testFieldId = TestFieldId;
             var otherFieldId = OtherFieldId;
-            this.fieldLookupMock.Setup(l => l.GetFieldInfo("testfield")).Returns(new IndexedFieldDetails(testFieldId, tokenizerMock.Object));
-            this.fieldLookupMock.Setup(l => l.GetFieldInfo("otherfield")).Returns(new IndexedFieldDetails(otherFieldId, tokenizerMock.Object));
 
-            this.tokenizerMock = new Mock<ITokenizer>();
-            this.tokenizerMock.Setup(m => m.Process(It.IsAny<string>())).Returns((string data) => new[] { new Token(data, new WordLocation(0, 0, (ushort)data.Length)) });
+            var tokenizer = new FakeTokenizer();
+            this.fieldLookupMock.Setup(l => l.GetFieldInfo("testfield")).Returns(new IndexedFieldDetails(testFieldId, tokenizer));
+            this.fieldLookupMock.Setup(l => l.GetFieldInfo("otherfield")).Returns(new IndexedFieldDetails(otherFieldId, tokenizer));
         }
 
         [Fact]
@@ -200,13 +198,6 @@ namespace Lifti.Tests.Querying
                             new AndQueryOperator(new ExactWordQueryPart("foo"), new ExactWordQueryPart("bar")))));
 
             VerifyResult(result, expectedQuery);
-        }
-
-        [Fact]
-        public void ParsingFieldFilterWithUnknownFieldName_ShouldThrowException()
-        {
-            Assert.Throws<QueryParserException>(() => this.Parse("foofield=test"))
-                .Message.Should().Be("Unknown field 'foofield' referenced in query");
         }
 
         private static void VerifyResult(IQuery result, IQueryPart expectedQuery)
