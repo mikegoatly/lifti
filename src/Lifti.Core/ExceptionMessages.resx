@@ -132,6 +132,9 @@
   <data name="FieldHasNoAssociatedFieldName" xml:space="preserve">
     <value>Field id {0} has no associated field name</value>
   </data>
+  <data name="FieldNameAlreadyUsed" xml:space="preserve">
+    <value>Duplicate field name used: {0}. Field names must be unique across all item types registered with an index.</value>
+  </data>
   <data name="FieldNameMustNotBeEmpty" xml:space="preserve">
     <value>Name must not be empty</value>
   </data>
@@ -148,7 +151,7 @@
     <value>Item not found</value>
   </data>
   <data name="KeyReaderMustBeProvided" xml:space="preserve">
-    <value>A key reader must be specified with a call to WithKey</value>
+    <value>A key reader must be specified with a call to WithKey wen configuring item tokenization options</value>
   </data>
   <data name="MalformedDataExpectedFullLocationEntry" xml:space="preserve">
     <value>Malformed index data encountered - expected a full location entry</value>
@@ -186,8 +189,8 @@
   <data name="UnexpectedTokenEncountered" xml:space="preserve">
     <value>Unexpected token encountered: {0}</value>
   </data>
-  <data name="UnknownFieldReference" xml:space="preserve">
-    <value>Unknown field '{0}' referenced in query</value>
+  <data name="UnknownField" xml:space="preserve">
+    <value>Unknown field '{0}'</value>
   </data>
   <data name="UnknownOperatorEncountered" xml:space="preserve">
     <value>Unknown operator encountered: {0}</value>

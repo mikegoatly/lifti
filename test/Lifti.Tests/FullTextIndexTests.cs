@@ -64,20 +64,18 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void IndexingItemsShouldObeyTokenizationOptionsForFields()
+        public void SearchingWithinFieldsShouldObeyTokenizationOptionsForFields()
         {
             this.WithIndexedSingleStringPropertyObjects();
 
-            var options = new TokenizationOptionsBuilder().CaseInsensitive(false).Build();
-            this.index.Search("one", options).Should().HaveCount(0);
-            this.index.Search("One", options).Should().HaveCount(2);
+            this.index.Search("Text1=one").Should().HaveCount(0);
+            this.index.Search("Text1=One").Should().HaveCount(2);
 
-            options = new TokenizationOptionsBuilder().WithStemming().Build();
-            this.index.Search("summer", options).Should().HaveCount(1);
-            this.index.Search("summers", options).Should().HaveCount(1);
-            this.index.Search("drum", options).Should().HaveCount(1);
-            this.index.Search("drumming", options).Should().HaveCount(1);
-            this.index.Search("drums", options).Should().HaveCount(1);
+            this.index.Search("Text3=summer").Should().HaveCount(1);
+            this.index.Search("Text3=summers").Should().HaveCount(1);
+            this.index.Search("Text3=drum").Should().HaveCount(1);
+            this.index.Search("Text3=drumming").Should().HaveCount(1);
+            this.index.Search("Text3=drums").Should().HaveCount(1);
         }
 
         [Fact]

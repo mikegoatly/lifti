@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lifti
 {
-    public class FieldTokenizationOptions<TItem>
+    public class FieldTokenizationOptions<TItem> : IFieldTokenizationOptions
     {
         internal FieldTokenizationOptions(string name, Func<TItem, string> reader, TokenizationOptions tokenizationOptions = null)
         {

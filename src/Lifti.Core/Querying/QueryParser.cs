@@ -39,15 +39,13 @@ namespace Lifti.Querying
                     return ComposePart(rootPart, CreateWordPart(token, wordTokenizer));
 
                 case QueryTokenType.FieldFilter:
-                    var filteredPart = CreateQueryPart(fieldLookup, state, state.GetNextToken(), wordTokenizer, null);
-                    if (fieldLookup.TryGetIdForField(token.TokenText, out var fieldId))
-                    {
-                        return ComposePart(
-                            rootPart,
-                            new FieldFilterQueryOperator(token.TokenText, fieldId, filteredPart));
-                    }
+                    var (fieldId, tokenizer) = fieldLookup.GetFieldInfo(token.TokenText);
+                    var filteredPart = CreateQueryPart(fieldLookup, state, state.GetNextToken(), tokenizer, null);
+                    return ComposePart(
+                        rootPart,
+                        new FieldFilterQueryOperator(token.TokenText, fieldId, filteredPart));
 
-                    throw new QueryParserException(ExceptionMessages.UnknownFieldReference, token.TokenText);
+                    
 
                 case QueryTokenType.OrOperator:
                 case QueryTokenType.AndOperator:

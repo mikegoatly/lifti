@@ -108,7 +108,7 @@
         IFullTextIndex<string> index = new FullTextIndexBuilder<string>()
             .WithItemTokenization<WikipediaPage>(
                 page => page.WithKey(i => i.Title)
-                    .WithField("Content", i => i.Text.Content, o => o.XmlContent().WithStemming().SplitOnPunctuation()))
+                    .WithField("Content", i => i.Text.Content, o => o.XmlContent().WithStemming()))
             .Build();
 
     private bool errored;

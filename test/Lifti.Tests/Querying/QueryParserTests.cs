@@ -19,8 +19,8 @@ namespace Lifti.Tests.Querying
             this.fieldLookupMock = new Mock<IIndexedFieldLookup>();
             var testFieldId = TestFieldId;
             var otherFieldId = OtherFieldId;
-            this.fieldLookupMock.Setup(l => l.TryGetIdForField("testfield", out testFieldId)).Returns(true);
-            this.fieldLookupMock.Setup(l => l.TryGetIdForField("otherfield", out otherFieldId)).Returns(true);
+            this.fieldLookupMock.Setup(l => l.GetFieldInfo("testfield")).Returns(new IndexedFieldDetails(testFieldId, tokenizerMock.Object));
+            this.fieldLookupMock.Setup(l => l.GetFieldInfo("otherfield")).Returns(new IndexedFieldDetails(otherFieldId, tokenizerMock.Object));
 
             this.tokenizerMock = new Mock<ITokenizer>();
             this.tokenizerMock.Setup(m => m.Process(It.IsAny<string>())).Returns((string data) => new[] { new Token(data, new WordLocation(0, 0, (ushort)data.Length)) });

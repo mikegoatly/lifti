@@ -106,6 +106,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Duplicate field name used: {0}. Field names must be unique across all item types registered with an index..
+        /// </summary>
+        internal static string FieldNameAlreadyUsed {
+            get {
+                return ResourceManager.GetString("FieldNameAlreadyUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name must not be empty.
         /// </summary>
         internal static string FieldNameMustNotBeEmpty {
@@ -151,7 +160,7 @@ namespace Lifti {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A key reader must be specified with a call to WithKey.
+        ///   Looks up a localized string similar to A key reader must be specified with a call to WithKey wen configuring item tokenization options.
         /// </summary>
         internal static string KeyReaderMustBeProvided {
             get {
@@ -268,11 +277,11 @@ namespace Lifti {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unknown field &apos;{0}&apos; referenced in query.
+        ///   Looks up a localized string similar to Unknown field &apos;{0}&apos;.
         /// </summary>
-        internal static string UnknownFieldReference {
+        internal static string UnknownField {
             get {
-                return ResourceManager.GetString("UnknownFieldReference", resourceCulture);
+                return ResourceManager.GetString("UnknownField", resourceCulture);
             }
         }
         

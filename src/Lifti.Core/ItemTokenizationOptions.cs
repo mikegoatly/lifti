@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Lifti
 {
-    public class ItemTokenizationOptions<TItem, TKey>
+    public class ItemTokenizationOptions<TItem, TKey> : IItemTokenizationOptions
     {
         internal ItemTokenizationOptions(
             Func<TItem, TKey> keyReader,
@@ -22,6 +22,11 @@ namespace Lifti
         /// Gets the set of configurations that determine how fields should be read from an object of 
         /// type <see cref="TItem"/>.
         /// </summary>
-        public IReadOnlyList<FieldTokenizationOptions<TItem>> FieldTokenization { get;}
+        public IReadOnlyList<FieldTokenizationOptions<TItem>> FieldTokenization { get; }
+
+        IEnumerable<IFieldTokenizationOptions> IItemTokenizationOptions.GetConfiguredFields()
+        {
+            return this.FieldTokenization;
+        }
     }
 }

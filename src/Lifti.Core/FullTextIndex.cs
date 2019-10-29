@@ -25,7 +25,7 @@ namespace Lifti
             this.queryParser = queryParser ?? throw new ArgumentNullException(nameof(queryParser));
 
             this.IdPool = new IdPool<TKey>();
-            this.FieldLookup = new IndexedFieldLookup();
+            this.FieldLookup = new IndexedFieldLookup(this.itemTokenizationOptions.GetAllConfiguredFields(), tokenizerFactory);
             this.Root = this.indexNodeFactory.CreateNode();
         }
 
@@ -75,8 +75,7 @@ namespace Lifti
 
             foreach (var field in options.FieldTokenization)
             {
-                var fieldId = this.FieldLookup.GetOrCreateIdForField(field.Name);
-                var tokenizer = this.tokenizerFactory.Create(field.TokenizationOptions);
+                var (fieldId, tokenizer) = this.FieldLookup.GetFieldInfo(field.Name);
                 var tokens = field.Tokenize(tokenizer, item);
 
                 foreach (var word in tokens)

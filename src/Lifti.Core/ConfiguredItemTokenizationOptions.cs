@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lifti
 {
     internal class ConfiguredItemTokenizationOptions<TKey>
     {
-        private readonly Dictionary<Type, object> options = new Dictionary<Type, object>();
+        private readonly Dictionary<Type, IItemTokenizationOptions> options = new Dictionary<Type, IItemTokenizationOptions>();
 
         public void Add<TItem>(ItemTokenizationOptions<TItem, TKey> options)
         {
@@ -20,6 +21,11 @@ namespace Lifti
             }
 
             throw new LiftiException(ExceptionMessages.NoTokenizationOptionsProvidedForType, typeof(TItem));
+        }
+
+        internal IEnumerable<IFieldTokenizationOptions> GetAllConfiguredFields()
+        {
+            return this.options.Values.SelectMany(o => o.GetConfiguredFields());
         }
     }
 }

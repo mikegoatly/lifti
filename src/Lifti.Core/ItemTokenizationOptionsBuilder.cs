@@ -32,7 +32,7 @@ namespace Lifti
         /// <param name="name">
         /// The name of the field. This can be referred to when querying to restrict searches to text read for this field only.
         /// </param>
-        /// <param name="reader">
+        /// <param name="fieldTextReader">
         /// The delegate capable of reading the entire text for the field.
         /// </param>
         /// <param name="optionsBuilder">
@@ -42,7 +42,7 @@ namespace Lifti
         /// </param>
         public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(
             string name, 
-            Func<TItem, string> reader, 
+            Func<TItem, string> fieldTextReader, 
             Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder = null)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -50,13 +50,13 @@ namespace Lifti
                 throw new ArgumentException(ExceptionMessages.FieldNameMustNotBeEmpty, nameof(name));
             }
 
-            if (reader is null)
+            if (fieldTextReader is null)
             {
-                throw new ArgumentNullException(nameof(reader));
+                throw new ArgumentNullException(nameof(fieldTextReader));
             }
 
             var tokenizationOptions = optionsBuilder.BuildOptionsOrDefault();
-            this.fieldTokenization.Add(new FieldTokenizationOptions<TItem>(name, reader, tokenizationOptions));
+            this.fieldTokenization.Add(new FieldTokenizationOptions<TItem>(name, fieldTextReader, tokenizationOptions));
             return this;
         }
 
