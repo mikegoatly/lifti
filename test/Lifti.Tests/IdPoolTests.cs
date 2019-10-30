@@ -12,21 +12,74 @@ namespace Lifti.Tests
         public IdPoolTests()
         {
             this.sut = new IdPool<string>();
-            this.id1 = this.sut.CreateIdFor("1");
-            this.id2 = this.sut.CreateIdFor("2");
+            this.id1 = this.sut.Add("1");
+            this.id2 = this.sut.Add("2");
         }
 
         [Fact]
-        public void CreateIdFor_ShouldIncrementWhenNoItemsReturned()
+        public void Add_ItemOnly_ShouldIncrementWhenNoItemsReturned()
         {
             this.id1.Should().BeLessThan(this.id2);
         }
 
         [Fact]
-        public void CreateIdFor_ShouldThrowExceptionIfItemAlreadyIndexed()
+        public void Add_ItemOnly_ShouldThrowExceptionIfItemAlreadyIndexed()
         {
-            Assert.Throws<LiftiException>(() => this.sut.CreateIdFor("1"))
+            Assert.Throws<LiftiException>(() => this.sut.Add("1"))
                 .Message.Should().Be("Item already indexed");
+        }
+
+        [Fact]
+        public void Add_ItemWithId_ShouldThrowExceptionIfItemAlreadyIndexed()
+        {
+            Assert.Throws<LiftiException>(() => this.sut.Add(9, "1"))
+                .Message.Should().Be("Item already indexed");
+        }
+
+        [Fact]
+        public void Add_ItemWithId_ShouldThrowExceptionIfIdAlreadyUsedAlreadyIndexed()
+        {
+            Assert.Throws<LiftiException>(() => this.sut.Add(1, "9"))
+                .Message.Should().Be("Id 1 is already registered in the index.");
+        }
+
+        [Fact]
+        public void Add_ItemWithId_ShouldAddItemToIndex()
+        {
+            this.sut.Add(9, "9");
+            this.sut.GetItemForId(9).Should().Be("9");
+        }
+
+        [Fact]
+        public void Add_ItemWithId_ShouldResetTheNextIdBasedOnTheHighestIndexedId()
+        {
+            this.sut.Add(10, "10");
+            this.sut.Add(9, "9");
+
+            this.sut.Add("7");
+
+            this.sut.GetIndexedItems().Should().BeEquivalentTo(
+                ("1", 0),
+                ("2", 1),
+                ("9", 9),
+                ("10", 10),
+                ("7", 11)
+            );
+        }
+
+        [Fact]
+        public void Count_ShouldReturnCorrectValue()
+        {
+            this.sut.Count.Should().Be(2);
+        }
+
+        [Fact]
+        public void GetIndexedItems_ShouldReturnItemsInTheIndexWithAssociatedIds()
+        {
+            this.sut.GetIndexedItems().Should().BeEquivalentTo(
+                ("1", 0),
+                ("2", 1)
+            );
         }
 
         [Fact]
@@ -55,9 +108,9 @@ namespace Lifti.Tests
         {
             this.sut.ReleaseItem("1").Should().Be(id1);
             this.sut.ReleaseItem("2").Should().Be(id2);
-            this.sut.CreateIdFor("3").Should().Be(id1);
-            this.sut.CreateIdFor("4").Should().Be(id2);
-            this.sut.CreateIdFor("5").Should().Be(id2 + 1);
+            this.sut.Add("3").Should().Be(id1);
+            this.sut.Add("4").Should().Be(id2);
+            this.sut.Add("5").Should().Be(id2 + 1);
         }
 
         [Fact]

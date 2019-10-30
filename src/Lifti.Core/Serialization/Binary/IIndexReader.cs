@@ -5,6 +5,6 @@ namespace Lifti.Serialization.Binary
 {
     public interface IIndexReader<TKey> : IDisposable
     {
-        Task ReadIntoAsync(IFullTextIndex<TKey> index);
+        Task ReadIntoAsync(FullTextIndex<TKey> index);
     }
 }

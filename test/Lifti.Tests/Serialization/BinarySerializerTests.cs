@@ -13,7 +13,7 @@ namespace Lifti.Tests.Serialization
 {
     public class BinarySerializerTests
     {
-        private readonly IFullTextIndex<string> index;
+        private readonly FullTextIndex<string> index;
         private readonly ITestOutputHelper output;
 
         public BinarySerializerTests(ITestOutputHelper output)
@@ -54,7 +54,7 @@ namespace Lifti.Tests.Serialization
 
                 this.output.WriteLine($"Deserialized in {stopwatch.ElapsedMilliseconds}ms");
 
-                newIndex.IdPool.GetIndexedItems().Should().BeEquivalentTo(this.index.IdPool.GetIndexedItems());
+                newIndex.IdLookup.GetIndexedItems().Should().BeEquivalentTo(this.index.IdLookup.GetIndexedItems());
                 newIndex.Count.Should().Be(this.index.Count);
                 newIndex.Root.ToString().Should().Be(this.index.Root.ToString());
 

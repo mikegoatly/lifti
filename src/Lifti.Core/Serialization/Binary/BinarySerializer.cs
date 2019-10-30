@@ -18,7 +18,7 @@ namespace Lifti.Serialization.Binary
             this.keySerializer = keySerializer;
         }
 
-        public async Task SerializeAsync(IFullTextIndex<TKey> index, Stream stream, bool disposeStream = true)
+        public async Task SerializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true)
         {
             if (index is null)
             {
@@ -31,7 +31,7 @@ namespace Lifti.Serialization.Binary
             }
         }
 
-        public async Task DeserializeAsync(IFullTextIndex<TKey> index, Stream stream, bool disposeStream = true)
+        public async Task DeserializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true)
         {
             if (index is null)
             {

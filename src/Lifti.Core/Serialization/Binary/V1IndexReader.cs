@@ -33,7 +33,7 @@ namespace Lifti.Serialization.Binary
             }
         }
 
-        public async Task ReadIntoAsync(IFullTextIndex<TKey> index)
+        public async Task ReadIntoAsync(FullTextIndex<TKey> index)
         {
             await this.FillBufferAsync().ConfigureAwait(false);
 

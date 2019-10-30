@@ -1,16 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace Lifti
+﻿namespace Lifti
 {
-    public interface IIdPool<T>
+    internal interface IIdPool<T> : IIdLookup<T>
     {
-        int AllocatedIdCount { get; }
-
-        IEnumerable<(T item, int itemId)> GetIndexedItems();
-
-        int CreateIdFor(T item);
-        T GetItemForId(int id);
-
         /// <summary>
         /// Returns the id associated to the given item back to the pool.
         /// </summary>
@@ -18,7 +9,25 @@ namespace Lifti
         /// The id that was associated to the item.
         /// </returns>
         int ReleaseItem(T item);
+
+        /// <summary>
+        /// Adds the given item with the pre-determined id. This is used when
+        /// de-serializing an index and the ids are already known.
+        /// </summary>
+        /// <exception cref="LiftiException">
+        /// Thrown when the id is already used or the item is already indexed.
+        /// </exception>
         void Add(int id, T item);
-        bool Contains(T item);
+
+        /// <summary>
+        /// Adds the given item, generating a new id for it as it is stored.
+        /// </summary>
+        /// <returns>
+        /// The id for the item.
+        /// </returns>
+        /// <exception cref="LiftiException">
+        /// Thrown when the item is already indexed.
+        /// </exception>
+        int Add(T item);
     }
 }

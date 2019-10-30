@@ -6,7 +6,7 @@ namespace Lifti.Tests.Querying
 {
     public class IndexNavigatorTests : QueryTestBase
     {
-        private readonly IFullTextIndex<string> index;
+        private readonly FullTextIndex<string> index;
         private readonly IndexNavigator sut;
 
         public IndexNavigatorTests()

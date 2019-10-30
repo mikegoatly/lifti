@@ -42,7 +42,7 @@ namespace Lifti.Querying
 
             foreach (var itemResults in matches)
             {
-                var item = index.IdPool.GetItemForId(itemResults.ItemId);
+                var item = index.IdLookup.GetItemForId(itemResults.ItemId);
                 yield return new SearchResult<TKey>(
                     item,
                     itemResults.FieldMatches.Select(m => new FieldSearchResult(

@@ -93,7 +93,7 @@ namespace Lifti
             return this;
         }
 
-        public IFullTextIndex<TKey> Build()
+        public FullTextIndex<TKey> Build()
         {
             this.indexNodeFactory = this.indexNodeFactory ?? new IndexNodeFactory();
 

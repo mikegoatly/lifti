@@ -6,6 +6,6 @@ namespace Lifti.Serialization.Binary
 {
     internal interface IIndexWriter<TKey> : IDisposable
     {
-        Task WriteAsync(IFullTextIndex<TKey> index);
+        Task WriteAsync(FullTextIndex<TKey> index);
     }
 }

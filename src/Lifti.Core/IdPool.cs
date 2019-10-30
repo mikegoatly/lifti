@@ -11,14 +11,14 @@ namespace Lifti
         private readonly Dictionary<int, T> itemIdLookup = new Dictionary<int, T>();
         private int nextId;
 
-        public int AllocatedIdCount => this.itemIdIndex.Count;
+        public int Count => this.itemIdIndex.Count;
 
         public IEnumerable<(T item, int itemId)> GetIndexedItems()
         {
             return this.itemIdIndex.Select(p => (p.Key, p.Value));
         }
 
-        public int CreateIdFor(T item)
+        public int Add(T item)
         {
             if (this.itemIdIndex.ContainsKey(item))
             {

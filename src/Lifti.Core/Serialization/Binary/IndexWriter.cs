@@ -23,7 +23,7 @@ namespace Lifti.Serialization.Binary
             this.writer = new BinaryWriter(this.buffer, Encoding.UTF8);
         }
 
-        public async Task WriteAsync(IFullTextIndex<TKey> index)
+        public async Task WriteAsync(FullTextIndex<TKey> index)
         {
             await this.WriteHeaderAsync(index).ConfigureAwait(false);
 
@@ -193,7 +193,7 @@ namespace Lifti.Serialization.Binary
 
         private async Task WriteItemsAsync(IFullTextIndex<TKey> index)
         {
-            foreach (var (item, itemId) in index.IdPool.GetIndexedItems())
+            foreach (var (item, itemId) in index.IdLookup.GetIndexedItems())
             {
                 this.writer.Write(itemId);
                 this.keySerializer.Write(this.writer, item);

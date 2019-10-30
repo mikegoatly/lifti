@@ -6,15 +6,22 @@ namespace Lifti
 {
     public interface IFullTextIndex<TKey>
     {
-        IIdPool<TKey> IdPool { get; }
+        /// <summary>
+        /// Internally an index keeps track of an item as a integer ID reference. This lookup
+        /// can be used get ids for items and visa-versa.
+        /// </summary>
+        IIdLookup<TKey> IdLookup { get; }
+
+        /// <summary>
+        /// Fields are tracked internally as a id of type <see cref="Byte"/>. This lookup can
+        /// be used to get the field associated to an id, and visa versa.
+        /// </summary>
         IIndexedFieldLookup FieldLookup { get; }
 
         /// <summary>
         /// Gets the number of items contained in the index.
         /// </summary>
         int Count { get; }
-
-        IndexNode Root { get; }
 
         /// <summary>
         /// Indexes some text against a given key.
