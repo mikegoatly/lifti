@@ -7,6 +7,13 @@ namespace Lifti.Querying
 {
     public class Query : IQuery
     {
+        /// <summary>
+        /// Constructs a new <see cref="Query"/> object capable of searching against an index.
+        /// </summary>
+        /// <param name="root">
+        /// The root part of the query. Passing this parameter as null is allowed, and causes the query
+        /// to always return an empty set of results.
+        /// </param>
         public Query(IQueryPart root)
         {
             this.Root = root;

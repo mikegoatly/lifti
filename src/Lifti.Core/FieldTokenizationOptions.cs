@@ -10,14 +10,14 @@ namespace Lifti
         {
             this.Name = name;
             this.Reader = reader;
-            this.TokenizationOptions = tokenizationOptions ?? TokenizationOptions.Default;
+            this.TokenizationOptions = tokenizationOptions;
         }
 
         internal FieldTokenizationOptions(string name, Func<TItem, IEnumerable<string>> reader, TokenizationOptions tokenizationOptions = null)
         {
             this.Name = name;
             this.EnumerableReader = reader;
-            this.TokenizationOptions = tokenizationOptions ?? TokenizationOptions.Default;
+            this.TokenizationOptions = tokenizationOptions;
         }
 
         /// <summary>

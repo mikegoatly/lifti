@@ -27,7 +27,7 @@ namespace Lifti.Tests
             this.tokenizerFactoryMock.Setup(f => f.Create(TokenizationOptions.Default)).Returns(defaultTokenizer);
             this.tokenizerFactoryMock.Setup(f => f.Create(It.Is<TokenizationOptions>(o => o.Stemming))).Returns(stemmingTokenizer);
 
-            this.sut = new IndexedFieldLookup(itemConfig.FieldTokenization, this.tokenizerFactoryMock.Object);
+            this.sut = new IndexedFieldLookup(itemConfig.FieldTokenization, this.tokenizerFactoryMock.Object, TokenizationOptions.Default);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Lifti.Tests
                 itemConfigBuilder = itemConfigBuilder.WithField("Field" + i, r => r);
             }
 
-            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(itemConfigBuilder.Build().FieldTokenization, this.tokenizerFactoryMock.Object))
+            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(itemConfigBuilder.Build().FieldTokenization, this.tokenizerFactoryMock.Object, TokenizationOptions.Default))
                 .Message.Should().Be("Only 255 distinct fields can currently be indexed");
         }
 
@@ -83,7 +83,7 @@ namespace Lifti.Tests
                 .WithField("Field1", o => o)
                 .WithKey(i => i);
 
-            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(itemConfigBuilder.Build().FieldTokenization, this.tokenizerFactoryMock.Object))
+            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(itemConfigBuilder.Build().FieldTokenization, this.tokenizerFactoryMock.Object, TokenizationOptions.Default))
                 .Message.Should().Be("Duplicate field name used: Field1. Field names must be unique across all item types registered with an index.");
         }
     }

@@ -55,7 +55,7 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(fieldTextReader));
             }
 
-            var tokenizationOptions = optionsBuilder.BuildOptionsOrDefault();
+            var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
             this.fieldTokenization.Add(new FieldTokenizationOptions<TItem>(name, fieldTextReader, tokenizationOptions));
             return this;
         }

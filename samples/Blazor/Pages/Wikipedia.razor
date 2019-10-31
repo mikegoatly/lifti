@@ -106,6 +106,7 @@
 
         IList<SearchResult<string>> results = null;
         IFullTextIndex<string> index = new FullTextIndexBuilder<string>()
+            .WithDefaultTokenizationOptions(o => o.WithStemming())
             .WithItemTokenization<WikipediaPage>(
                 page => page.WithKey(i => i.Title)
                     .WithField("Content", i => i.Text.Content, o => o.XmlContent().WithStemming()))
@@ -160,8 +161,6 @@
         }
     }
 
-    TokenizationOptions searchTokenizationOptions = new TokenizationOptionsBuilder().WithStemming().Build();
-
     async Task FetchPagesAsync(IEnumerable<PageSummary> pages)
     {
         this.indexing = true;
@@ -215,7 +214,7 @@
         {
             this.IndexText = null;
             this.SyntaxError = null;
-            results = this.index.Search(this.SearchText, searchTokenizationOptions).ToList();
+            results = this.index.Search(this.SearchText).ToList();
         }
         catch (Exception ex)
         {

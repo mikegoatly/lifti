@@ -11,7 +11,10 @@ namespace Lifti
         private readonly Dictionary<byte, string> idToFieldLookup = new Dictionary<byte, string>();
         private int nextId = 0;
 
-        internal IndexedFieldLookup(IEnumerable<IFieldTokenizationOptions> fieldTokenizationOptions, ITokenizerFactory tokenizerFactory)
+        internal IndexedFieldLookup(
+            IEnumerable<IFieldTokenizationOptions> fieldTokenizationOptions, 
+            ITokenizerFactory tokenizerFactory,
+            TokenizationOptions defaultTokenizationOptions)
         {
             if (fieldTokenizationOptions is null)
             {
@@ -23,9 +26,14 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(tokenizerFactory));
             }
 
+            if (defaultTokenizationOptions is null)
+            {
+                throw new ArgumentNullException(nameof(defaultTokenizationOptions));
+            }
+
             foreach (var field in fieldTokenizationOptions)
             {
-                this.RegisterField(field, tokenizerFactory);
+                this.RegisterField(field, tokenizerFactory, defaultTokenizationOptions);
             }
         }
 
@@ -55,7 +63,7 @@ namespace Lifti
             return details;
         }
 
-        private void RegisterField(IFieldTokenizationOptions fieldOptions, ITokenizerFactory tokenizerFactory)
+        private void RegisterField(IFieldTokenizationOptions fieldOptions, ITokenizerFactory tokenizerFactory, TokenizationOptions defaultTokenizationOptions)
         {
             var fieldName = fieldOptions.Name;
             if (this.fieldToDetailsLookup.ContainsKey(fieldOptions.Name))
@@ -70,7 +78,8 @@ namespace Lifti
             }
 
             var id = (byte)newId;
-            this.fieldToDetailsLookup[fieldName] = new IndexedFieldDetails((byte)id, tokenizerFactory.Create(fieldOptions.TokenizationOptions));
+            var fieldTokenizationOptions = fieldOptions.TokenizationOptions ?? defaultTokenizationOptions;
+            this.fieldToDetailsLookup[fieldName] = new IndexedFieldDetails((byte)id, tokenizerFactory.Create(fieldTokenizationOptions));
             this.idToFieldLookup[id] = fieldName;
         }
     }

@@ -11,6 +11,7 @@ namespace Lifti
         private IIndexNodeFactory indexNodeFactory;
         private ITokenizerFactory tokenizerFactory;
         private IQueryParser queryParser;
+        private TokenizationOptions defaultTokenizationOptions = TokenizationOptions.Default;
 
         /// <summary>
         /// Creates an <see cref="ItemTokenizationOptions{TItem, TKey}"/> configuration entry for an item of type <typeparamref name="TItem"/>
@@ -28,6 +29,22 @@ namespace Lifti
 
             var builder = new ItemTokenizationOptionsBuilder<TItem, TKey>();
             this.itemTokenizationOptions.Add(optionsBuilder(builder).Build());
+
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies the default tokenization options that should be used when searching or indexing
+        /// when no other options are provided.
+        /// </summary>
+        public FullTextIndexBuilder<TKey> WithDefaultTokenizationOptions(Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder)
+        {
+            if (optionsBuilder is null)
+            {
+                throw new ArgumentNullException(nameof(optionsBuilder));
+            }
+
+            this.defaultTokenizationOptions = optionsBuilder.BuildOptionsOrDefault();
 
             return this;
         }
@@ -103,7 +120,8 @@ namespace Lifti
                 this.itemTokenizationOptions,
                 this.indexNodeFactory,
                 this.tokenizerFactory ?? new TokenizerFactory(),
-                this.queryParser ?? new QueryParser());
+                this.queryParser ?? new QueryParser(),
+                this.defaultTokenizationOptions);
         }
     }
 }

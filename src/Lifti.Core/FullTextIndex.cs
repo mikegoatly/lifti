@@ -10,6 +10,7 @@ namespace Lifti
         private readonly IIndexNodeFactory indexNodeFactory;
         private readonly ITokenizerFactory tokenizerFactory;
         private readonly IQueryParser queryParser;
+        private readonly TokenizationOptions defaultTokenizationOptions;
         private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions;
         private readonly IdPool<TKey> idPool;
 
@@ -17,15 +18,21 @@ namespace Lifti
             ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions,
             IIndexNodeFactory indexNodeFactory,
             ITokenizerFactory tokenizerFactory,
-            IQueryParser queryParser)
+            IQueryParser queryParser,
+            TokenizationOptions defaultTokenizationOptions)
         {
             this.itemTokenizationOptions = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
             this.indexNodeFactory = indexNodeFactory ?? throw new ArgumentNullException(nameof(indexNodeFactory));
             this.tokenizerFactory = tokenizerFactory ?? throw new ArgumentNullException(nameof(tokenizerFactory));
             this.queryParser = queryParser ?? throw new ArgumentNullException(nameof(queryParser));
+            this.defaultTokenizationOptions = defaultTokenizationOptions ?? throw new ArgumentNullException(nameof(defaultTokenizationOptions));
 
             this.idPool = new IdPool<TKey>();
-            this.FieldLookup = new IndexedFieldLookup(this.itemTokenizationOptions.GetAllConfiguredFields(), tokenizerFactory);
+            this.FieldLookup = new IndexedFieldLookup(
+                this.itemTokenizationOptions.GetAllConfiguredFields(),
+                tokenizerFactory, 
+                defaultTokenizationOptions);
+
             this.Root = this.indexNodeFactory.CreateNode();
         }
 
@@ -113,7 +120,7 @@ namespace Lifti
 
         private ITokenizer GetTokenizer(TokenizationOptions tokenizationOptions)
         {
-            return this.tokenizerFactory.Create(tokenizationOptions ?? TokenizationOptions.Default);
+            return this.tokenizerFactory.Create(tokenizationOptions ?? this.defaultTokenizationOptions);
         }
     }
 }
