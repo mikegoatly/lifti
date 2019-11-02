@@ -2,6 +2,7 @@
 using Lifti.Tokenization.Stemming;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Lifti.Tokenization
@@ -15,6 +16,11 @@ namespace Lifti.Tokenization
 
         public IEnumerable<Token> Process(string input)
         {
+            if (input == null)
+            {
+                return Enumerable.Empty<Token>();
+            }
+
             return this.Process(input.AsSpan());
         }
 
@@ -34,7 +40,7 @@ namespace Lifti.Tokenization
         {
             if (inputs is null)
             {
-                throw new ArgumentNullException(nameof(inputs));
+                return Enumerable.Empty<Token>();
             }
 
             var processedWords = new TokenStore();

@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -14,6 +15,22 @@ namespace Lifti.Tests.Tokenization
         public void ShouldReturnNoTokensForEmptyString()
         {
             var output = this.sut.Process(string.Empty).ToList();
+
+            output.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void ShouldReturnNoTokensForNullString()
+        {
+            var output = this.sut.Process((string)null).ToList();
+
+            output.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void ShouldReturnNoTokensForNullStringEnumerable()
+        {
+            var output = this.sut.Process((IEnumerable<string>)null).ToList();
 
             output.Should().BeEmpty();
         }
