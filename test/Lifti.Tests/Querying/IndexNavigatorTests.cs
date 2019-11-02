@@ -76,6 +76,52 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
+        public void EnumeratingIndexedWords_WhenAtStartOfNode_ShouldReturnAppropriateWords()
+        {
+            this.sut.Process("INDI");
+            this.sut.EnumerateIndexedWords().Should().BeEquivalentTo(
+                "INDIFFERENCE",
+                "INDIVIDUALS");
+        }
+
+        [Fact]
+        public void EnumeratingIndexedWords_WhenAtMidIntraNodeText_ShouldReturnAppropriateWords()
+        {
+            this.sut.Process("WITHERI");
+            this.sut.EnumerateIndexedWords().Should().BeEquivalentTo("WITHERING");
+        }
+
+        [Fact]
+        public void EnumeratingIndexedWords_WhenAtRoot_ShouldReturnAllWords()
+        {
+            this.sut.EnumerateIndexedWords().Should().BeEquivalentTo(
+                new[] 
+                {
+                    "TRIUMPHANT",
+                    "ELEPHANT",
+                    "STRODE",
+                    "ELEGANTLY",
+                    "WITH",
+                    "INDIFFERENCE",
+                    "TO",
+                    "SHOUTING",
+                    "SUBJECTS",
+                    "GIVING",
+                    "WITHERING",
+                    "LOOKS",
+                    "INDIVIDUALS"
+                },
+                o => o.WithoutStrictOrdering());
+        }
+
+        [Fact]
+        public void EnumeratingIndexedWords_WhenNoMatch_ShouldReturnEmptyResults()
+        {
+            this.sut.Process("BLABBBBHHHHHB");
+            this.sut.EnumerateIndexedWords().Should().BeEmpty();
+        }
+
+        [Fact]
         public async Task GettingExactAndChildMatches_ShouldMergeResultsAcrossFields()
         {
             await this.index.AddAsync(("B", "Zoopla Zoo Zammo", "Zany Zippy Llamas"));

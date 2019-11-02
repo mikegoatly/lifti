@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Lifti.Querying
 {
     public class IndexNavigator : IIndexNavigator
     {
+        private readonly StringBuilder navigatedWith = new StringBuilder(16);
         private IndexNode currentNode;
         private int intraNodeTextPosition;
 
@@ -97,6 +100,8 @@ namespace Lifti.Querying
                 return false;
             }
 
+            this.navigatedWith.Append(value);
+
             if (this.HasIntraNodeTextLeftToProcess)
             {
                 if (value == this.currentNode.IntraNodeText[this.intraNodeTextPosition])
@@ -118,6 +123,60 @@ namespace Lifti.Querying
 
             this.currentNode = null;
             return false;
+        }
+
+        public IEnumerable<string> EnumerateIndexedWords()
+        {
+            if (this.currentNode == null)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            if (this.intraNodeTextPosition > 0)
+            {
+                this.navigatedWith.Length -= this.intraNodeTextPosition;
+            }
+
+            var results = this.EnumerateIndexedWords(this.currentNode).ToList();
+
+            if (this.intraNodeTextPosition > 0)
+            {
+                this.navigatedWith.Append(this.currentNode.IntraNodeText, 0, this.intraNodeTextPosition);
+            }
+
+            return results;
+        }
+
+        private IEnumerable<string> EnumerateIndexedWords(IndexNode node)
+        {
+            if (node.IntraNodeText != null)
+            {
+                this.navigatedWith.Append(node.IntraNodeText);
+            }
+
+            if (node.Matches?.Count > 0)
+            {
+                yield return this.navigatedWith.ToString();
+            }
+
+            if (node.ChildNodes?.Count > 0)
+            {
+                foreach (var childNode in node.ChildNodes)
+                {
+                    this.navigatedWith.Append(childNode.Key);
+                    foreach (var result in EnumerateIndexedWords(childNode.Value))
+                    {
+                        yield return result;
+                    }
+
+                    this.navigatedWith.Length -= 1;
+                }
+            }
+
+            if (node.IntraNodeText != null)
+            {
+                this.navigatedWith.Length -= node.IntraNodeText.Length;
+            }
         }
 
         private IEnumerable<FieldMatch> MergeItemMatches(List<FieldMatch> fieldMatches)

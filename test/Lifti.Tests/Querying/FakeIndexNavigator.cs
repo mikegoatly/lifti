@@ -56,5 +56,10 @@ namespace Lifti.Tests.Querying
             this.NavigatedStrings.Add(new string(text));
             return true;
         }
+
+        public IEnumerable<string> EnumerateIndexedWords()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
