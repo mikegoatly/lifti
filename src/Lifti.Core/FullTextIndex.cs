@@ -1,7 +1,9 @@
-﻿using Lifti.Querying;
+﻿using Lifti.ItemTokenization;
+using Lifti.Querying;
 using Lifti.Tokenization;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Lifti
 {
@@ -86,6 +88,38 @@ namespace Lifti
             {
                 var (fieldId, tokenizer) = this.FieldLookup.GetFieldInfo(field.Name);
                 var tokens = field.Tokenize(tokenizer, item);
+
+                foreach (var word in tokens)
+                {
+                    this.Root.Index(itemId, fieldId, word);
+                }
+            }
+        }
+
+        public async ValueTask AddRangeAsync<TItem>(IEnumerable<TItem> items)
+        {
+            if (items is null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+
+            foreach (var item in items)
+            {
+                await this.AddAsync(item);
+            }
+        }
+
+        public async ValueTask AddAsync<TItem>(TItem item)
+        {
+            var options = this.itemTokenizationOptions.Get<TItem>();
+
+            var itemKey = options.KeyReader(item);
+            var itemId = this.idPool.Add(itemKey);
+
+            foreach (var field in options.FieldTokenization)
+            {
+                var (fieldId, tokenizer) = this.FieldLookup.GetFieldInfo(field.Name);
+                var tokens = await field.TokenizeAsync(tokenizer, item);
 
                 foreach (var word in tokens)
                 {

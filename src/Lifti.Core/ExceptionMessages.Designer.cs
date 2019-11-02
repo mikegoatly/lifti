@@ -61,6 +61,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to When fields are configured with async access methods the async Add methods must be used on the index.
+        /// </summary>
+        internal static string AsyncAddMethodsMustBeUsed {
+            get {
+                return ResourceManager.GetString("AsyncAddMethodsMustBeUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to At least one field must be configured for an item.
         /// </summary>
         internal static string AtLeastOneFieldMustBeIndexed {

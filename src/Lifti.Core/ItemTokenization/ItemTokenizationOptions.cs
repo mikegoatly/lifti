@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Lifti
+namespace Lifti.ItemTokenization
 {
     public class ItemTokenizationOptions<TItem, TKey> : IItemTokenizationOptions
     {

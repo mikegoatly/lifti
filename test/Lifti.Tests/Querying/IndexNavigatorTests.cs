@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Lifti.Tests.Querying
@@ -75,10 +76,10 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
-        public void GettingExactAndChildMatches_ShouldMergeResultsAcrossFields()
+        public async Task GettingExactAndChildMatches_ShouldMergeResultsAcrossFields()
         {
-            this.index.Add(("B", "Zoopla Zoo Zammo", "Zany Zippy Llamas"));
-            this.index.Add(("C", "Zak", "Ziggy Stardust"));
+            await this.index.AddAsync(("B", "Zoopla Zoo Zammo", "Zany Zippy Llamas"));
+            await this.index.AddAsync(("C", "Zak", "Ziggy Stardust"));
 
             this.sut.Process("Z").Should().BeTrue();
             var results = this.sut.GetExactAndChildMatches();

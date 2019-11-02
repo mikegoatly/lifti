@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AsyncAddMethodsMustBeUsed" xml:space="preserve">
+    <value>When fields are configured with async access methods the async Add methods must be used on the index</value>
+  </data>
   <data name="AtLeastOneFieldMustBeIndexed" xml:space="preserve">
     <value>At least one field must be configured for an item</value>
   </data>

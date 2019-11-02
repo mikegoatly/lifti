@@ -1,6 +1,7 @@
 ﻿using Lifti.Querying;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Lifti
 {
@@ -48,7 +49,8 @@ namespace Lifti
         void Add<TItem>(TItem item);
 
         /// <summary>
-        /// Indexes the 
+        /// Indexes a set of items of type <typeparamref name="TItem"/>. This type must have been
+        /// configured when the index was built.
         /// </summary>
         /// <typeparam name="TItem">
         /// The type of the item being indexed.
@@ -57,6 +59,32 @@ namespace Lifti
         /// The items to index.
         /// </param>
         void AddRange<TItem>(IEnumerable<TItem> items);
+
+        /// <summary>
+        /// Indexes a single item of type <typeparamref name="TItem"/>. This type must have been
+        /// configured when the index was built. This async method only needs to be used when an
+        /// async accessor for field text has been provided.
+        /// </summary>
+        /// <typeparam name="TItem">
+        /// The type of the item being indexed.
+        /// </typeparam>
+        /// <param name="item">
+        /// The item to index.
+        /// </param>
+        ValueTask AddAsync<TItem>(TItem item);
+
+        /// <summary>
+        /// Indexes a set of items of type <typeparamref name="TItem"/>. This type must have been
+        /// configured when the index was built. This async method only needs to be used when an
+        /// async accessor for field text has been provided.
+        /// </summary>
+        /// <typeparam name="TItem">
+        /// The type of the item being indexed.
+        /// </typeparam>
+        /// <param name="items">
+        /// The items to index.
+        /// </param>
+        ValueTask AddRangeAsync<TItem>(IEnumerable<TItem> items);
 
         /// <summary>
         /// Removes the item with the given key from this index. If the key is not indexed then

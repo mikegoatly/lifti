@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Lifti.ItemTokenization;
+using System.Collections.Generic;
 
 namespace Lifti
 {

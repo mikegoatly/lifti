@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Lifti.Tokenization.Preprocessing
@@ -60,6 +61,11 @@ namespace Lifti.Tokenization.Preprocessing
 
         protected override void OnConfiguring(TokenizationOptions options)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             if (options.AccentInsensitive)
             {
                 this.inputPreprocessors.Add(new LatinCharacterNormalizer());

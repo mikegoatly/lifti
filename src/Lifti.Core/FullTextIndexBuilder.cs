@@ -1,4 +1,5 @@
-﻿using Lifti.Querying;
+﻿using Lifti.ItemTokenization;
+using Lifti.Querying;
 using Lifti.Tokenization;
 using System;
 

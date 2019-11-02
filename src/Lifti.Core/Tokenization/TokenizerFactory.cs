@@ -1,9 +1,16 @@
-﻿namespace Lifti.Tokenization
+﻿using System;
+
+namespace Lifti.Tokenization
 {
     public class TokenizerFactory : ITokenizerFactory
     {
         public virtual ITokenizer Create(TokenizationOptions options)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             var tokenizer = CreateTokenizer(options.TokenizerKind);
             tokenizer.Configure(options);
             return tokenizer;

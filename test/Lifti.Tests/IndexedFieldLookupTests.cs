@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Lifti.ItemTokenization;
 using Lifti.Tokenization;
 using Moq;
 using Xunit;

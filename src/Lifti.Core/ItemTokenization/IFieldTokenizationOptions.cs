@@ -1,4 +1,4 @@
-﻿namespace Lifti
+﻿namespace Lifti.ItemTokenization
 {
     internal interface IFieldTokenizationOptions
     {

@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
 using PerformanceProfiling;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Lifti.Tests
@@ -20,6 +22,10 @@ namespace Lifti.Tests
                 .WithItemTokenization<TestObject2>(
                     o => o.WithKey(i => i.Id)
                         .WithField("MultiText", i => i.Text))
+                .WithItemTokenization<TestObject3>(
+                    o => o.WithKey(i => i.Id)
+                        .WithField("TextAsync", i => Task.Run(() => i.Text))
+                        .WithField("MultiTextAsync", i => Task.Run(() => (IEnumerable<string>)i.MultiText)))
                 .Build();
         }
 
@@ -101,6 +107,23 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task IndexedAsyncFieldsShouldBeRetrievableByTextFromAnyIndexedField()
+        {
+            await this.WithIndexedAsyncFieldObjectsAsync();
+
+            this.index.Search("text").Should().HaveCount(1);
+            this.index.Search("one").Should().HaveCount(2);
+            this.index.Search("two").Should().HaveCount(2);
+            this.index.Search("three").Should().HaveCount(2);
+        }
+
+        [Fact]
+        public void IndexingFieldWithoutAsyncWhenAsyncRequired_ShouldThrowException()
+        {
+            Assert.Throws<LiftiException>(() => this.index.Add(new TestObject3("1", "!", "11")));
+        }
+
+        [Fact]
         public void IndexedMultiStringPropertyObjectsShouldBeRetrievableByTextFromAnyIndexedField()
         {
             this.WithIndexedMultiStringPropertyObjects();
@@ -172,6 +195,12 @@ namespace Lifti.Tests
             this.index.Add(new TestObject2("B", "Not One", "Not Two", "Not Three"));
         }
 
+        private async Task WithIndexedAsyncFieldObjectsAsync()
+        {
+            await this.index.AddAsync(new TestObject3("A", "Text One", "Text Two", "Text Three"));
+            await this.index.AddAsync(new TestObject3("B", "Not One", "Not Two", "Not Three"));
+        }
+
         private void WithIndexedStrings()
         {
             this.index.Add("A", "This is a test");
@@ -206,6 +235,20 @@ namespace Lifti.Tests
 
             public string Id { get; }
             public string[] Text { get; }
+        }
+
+        public class TestObject3
+        {
+            public TestObject3(string id, string text, params string[] multiText)
+            {
+                this.Id = id;
+                this.Text = text;
+                this.MultiText = multiText;
+            }
+
+            public string Id { get; }
+            public string Text { get; }
+            public string[] MultiText { get; }
         }
     }
 }
