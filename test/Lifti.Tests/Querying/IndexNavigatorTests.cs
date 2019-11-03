@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -89,6 +90,13 @@ namespace Lifti.Tests.Querying
         {
             this.sut.Process("WITHERI");
             this.sut.EnumerateIndexedWords().Should().BeEquivalentTo("WITHERING");
+        }
+
+        [Fact]
+        public void EnumeratingIndexedWords_MultipleTimes_ShouldYieldSameResults()
+        {
+            this.sut.Process("WITHERI");
+            this.sut.EnumerateIndexedWords().ToList().Should().BeEquivalentTo(this.sut.EnumerateIndexedWords().ToList());
         }
 
         [Fact]
