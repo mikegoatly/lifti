@@ -37,6 +37,18 @@ namespace Lifti
         void Add(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null);
 
         /// <summary>
+        /// Indexes some text against a given key.
+        /// </summary>
+        /// <param name="itemKey">The key of the item being indexed.</param>
+        /// <param name="text">The text to index against the item.</param>
+        /// <param name="tokenizationOptions">
+        /// An instance of <see cref="TokenizationOptions"/>
+        /// that describes how the text should be treated as it is tokenized.
+        /// When null, <see cref="TokenizationOptions.Default"/> will be used.
+        /// </param>
+        void Add(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null);
+
+        /// <summary>
         /// Indexes a single item of type <typeparamref name="TItem"/>. This type must have been
         /// configured when the index was built.
         /// </summary>

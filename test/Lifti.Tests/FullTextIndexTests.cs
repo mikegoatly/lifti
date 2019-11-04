@@ -206,7 +206,7 @@ namespace Lifti.Tests
             this.index.Add("A", "This is a test");
             this.index.Add("B", "This is another test");
             this.index.Add("C", "Foo is testing this as well");
-            this.index.Add("D", "One last test just for testing sake with hypenated text: third-eye");
+            this.index.Add("D", new[] { "One last test just for testing sake", "with hypenated text: third-eye" });
         }
 
         public class TestObject

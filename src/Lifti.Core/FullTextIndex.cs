@@ -53,6 +53,17 @@ namespace Lifti
             return new IndexNavigator(this.Root);
         }
 
+        public void Add(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null)
+        {
+            var itemId = this.idPool.Add(itemKey);
+
+            var tokenizer = this.GetTokenizer(tokenizationOptions);
+            foreach (var word in tokenizer.Process(text))
+            {
+                this.Root.Index(itemId, this.FieldLookup.DefaultField, word);
+            }
+        }
+
         public void Add(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null)
         {
             var itemId = this.idPool.Add(itemKey);
