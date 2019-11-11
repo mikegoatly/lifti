@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
@@ -22,18 +23,12 @@ namespace Lifti.Querying
 
         public IntermediateQueryResult GetExactMatches()
         {
-            if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess)
+            if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess || !this.currentNode.HasMatches)
             {
                 return IntermediateQueryResult.Empty;
             }
 
-            return new IntermediateQueryResult(this.GetCurrentNodeMatches());
-        }
-
-        private IEnumerable<QueryWordMatch> GetCurrentNodeMatches()
-        {
-            return this.currentNode.Matches?.Select(CreateQueryWordMatch) ??
-                Array.Empty<QueryWordMatch>();
+            return new IntermediateQueryResult(this.currentNode.Matches.Select(CreateQueryWordMatch));
         }
 
         public IntermediateQueryResult GetExactAndChildMatches()
@@ -50,7 +45,7 @@ namespace Lifti.Querying
             while (childNodeStack.Count > 0)
             {
                 var node = childNodeStack.Dequeue();
-                if (node.Matches != null)
+                if (node.HasMatches)
                 {
                     foreach (var match in node.Matches)
                     {
@@ -67,7 +62,7 @@ namespace Lifti.Querying
                     }
                 }
 
-                if (node.ChildNodes != null)
+                if (node.HasChildNodes)
                 {
                     foreach (var childNode in node.ChildNodes.Values)
                     {
@@ -113,7 +108,7 @@ namespace Lifti.Querying
                 return false;
             }
 
-            if (this.currentNode.ChildNodes != null && this.currentNode.ChildNodes.TryGetValue(value, out var nextNode))
+            if (this.currentNode.HasChildNodes && this.currentNode.ChildNodes.TryGetValue(value, out var nextNode))
             {
                 this.currentNode = nextNode;
                 this.intraNodeTextPosition = 0;
@@ -157,12 +152,12 @@ namespace Lifti.Querying
                 this.navigatedWith.Append(node.IntraNodeText);
             }
 
-            if (node.Matches?.Count > 0)
+            if (node.HasMatches)
             {
                 yield return this.navigatedWith.ToString();
             }
 
-            if (node.ChildNodes?.Count > 0)
+            if (node.HasChildNodes)
             {
                 foreach (var childNode in node.ChildNodes)
                 {
@@ -190,7 +185,7 @@ namespace Lifti.Querying
                     m.SelectMany(w => w.Locations).OrderBy(w => w.MinWordIndex).ToList()));
         }
 
-        private static QueryWordMatch CreateQueryWordMatch(KeyValuePair<int, List<IndexedWord>> match)
+        private static QueryWordMatch CreateQueryWordMatch(KeyValuePair<int, ImmutableList<IndexedWord>> match)
         {
             return new QueryWordMatch(match.Key, match.Value.Select(v => new FieldMatch(v)));
         }

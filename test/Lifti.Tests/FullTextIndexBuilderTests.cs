@@ -40,14 +40,15 @@ namespace Lifti.Tests
         public void WithCustomIndexNodeFactory_ShouldPassCustomImplementationToIndex()
         {
             var factory = new Mock<IIndexNodeFactory>();
-            factory.Setup(f => f.CreateNode()).Returns(new IndexNode(factory.Object, 999, IndexSupportLevelKind.CharacterByCharacter));
+            var expectedRoot = new IndexNode(null, null, null);
+            factory.Setup(f => f.CreateRootNode()).Returns(expectedRoot);
 
             this.sut.WithIndexNodeFactory(factory.Object);
 
             var index = this.sut.Build();
 
-            index.Root.Depth.Should().Be(999);
-            factory.Verify(f => f.CreateNode(), Times.Once);
+            index.Root.Should().Be(expectedRoot);
+            factory.Verify(f => f.CreateRootNode(), Times.Once);
         }
 
         [Fact]
@@ -104,7 +105,7 @@ namespace Lifti.Tests
         public void WithConfiguredIntraNodeTextLength_ShouldPassValueAsConfigurationToIndexNodeFactory()
         {
             var factory = new Mock<IIndexNodeFactory>();
-            factory.Setup(f => f.CreateNode()).Returns(new IndexNode(factory.Object, 999, IndexSupportLevelKind.CharacterByCharacter));
+            factory.Setup(f => f.CreateRootNode()).Returns(new IndexNode(null, null, null));
 
             this.sut.WithIndexNodeFactory(factory.Object)
                 .WithIntraNodeTextSupportedAfterIndexDepth(89);

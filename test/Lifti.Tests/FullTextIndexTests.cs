@@ -9,7 +9,7 @@ namespace Lifti.Tests
 {
     public class FullTextIndexTests
     {
-        private readonly IFullTextIndex<string> index;
+        private readonly FullTextIndex<string> index;
 
         public FullTextIndexTests()
         {
@@ -155,6 +155,18 @@ namespace Lifti.Tests
             this.index.Search("foo").Should().HaveCount(1);
 
             this.index.Remove("C").Should().BeTrue();
+
+            this.index.Search("foo").Should().HaveCount(0);
+        }
+
+        [Fact]
+        public void RemovingLastItemFromIndex_ShouldReturnTrue()
+        {
+            this.index.Add("A", "foo");
+
+            this.index.Search("foo").Should().HaveCount(1);
+
+            this.index.Remove("A").Should().BeTrue();
 
             this.index.Search("foo").Should().HaveCount(0);
         }

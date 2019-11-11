@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 
 namespace Lifti
 {
@@ -6,27 +7,27 @@ namespace Lifti
     {
         private int supportIntraNodeTextAtDepth;
 
-        public IndexNode CreateNode()
+        public IndexNode CreateRootNode()
         {
-            return new IndexNode(this, 0, this.GetIndexSupportLevelForDepth(0));
+            return new IndexNode(
+                null,
+                ImmutableDictionary<char, IndexNode>.Empty,
+                ImmutableDictionary<int, ImmutableList<IndexedWord>>.Empty);
         }
 
-        private IndexSupportLevelKind GetIndexSupportLevelForDepth(int depth)
+        public IndexSupportLevelKind GetIndexSupportLevelForDepth(int depth)
         {
             return depth >= this.supportIntraNodeTextAtDepth ?
                 IndexSupportLevelKind.IntraNodeText :
                 IndexSupportLevelKind.CharacterByCharacter;
         }
 
-        public IndexNode CreateNode(IndexNode parent)
+        public IndexNode CreateNode(
+            ReadOnlyMemory<char> intraNodeText,
+            ImmutableDictionary<char, IndexNode> childNodes,
+            ImmutableDictionary<int, ImmutableList<IndexedWord>> matches)
         {
-            if (parent is null)
-            {
-                throw new ArgumentNullException(nameof(parent));
-            }
-
-            var nextDepth = parent.Depth + 1;
-            return new IndexNode(this, nextDepth, this.GetIndexSupportLevelForDepth(nextDepth));
+            return new IndexNode(intraNodeText, childNodes, matches);
         }
 
         protected override void OnConfiguring(AdvancedOptions options)
