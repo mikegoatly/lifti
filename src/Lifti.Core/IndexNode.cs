@@ -22,7 +22,7 @@ namespace Lifti
         }
 
         internal int Depth { get; }
-        internal char[] IntraNodeText { get; set; }
+        internal ReadOnlyMemory<char> IntraNodeText { get; set; }
         internal IReadOnlyDictionary<char, IndexNode> ChildNodes => this.childNodes;
         internal IReadOnlyDictionary<int, List<IndexedWord>> Matches => this.matches;
 
@@ -35,7 +35,7 @@ namespace Lifti
 
             Debug.Assert(word.Locations.Select((l, i) => i == 0 || l.WordIndex > word.Locations[i - 1].WordIndex).All(v => v));
 
-            this.Index(itemId, fieldId, word.Locations, word.Value.AsSpan());
+            this.Index(itemId, fieldId, word.Locations, word.Value.AsMemory());
         }
 
         internal IndexNode CreateChildNode(char indexChar)
@@ -66,7 +66,7 @@ namespace Lifti
             itemFieldLocations.Add(new IndexedWord(fieldId, locations));
         }
 
-        private void Index(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlySpan<char> remainingWordText)
+        private void Index(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlyMemory<char> remainingWordText)
         {
             switch (this.indexSupportLevel)
             {
@@ -108,14 +108,14 @@ namespace Lifti
             return builder.ToString();
         }
 
-        private void IndexWithIntraNodeTextSupport(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlySpan<char> remainingWordText)
+        private void IndexWithIntraNodeTextSupport(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlyMemory<char> remainingWordText)
         {
-            if (this.IntraNodeText == null)
+            if (this.IntraNodeText.Length == 0)
             {
                 if (this.childNodes == null && this.matches == null)
                 {
                     // Currently a leaf node
-                    this.IntraNodeText = remainingWordText.Length == 0 ? null : remainingWordText.ToArray();
+                    this.IntraNodeText = remainingWordText.Length == 0 ? null : remainingWordText;
                     this.AddMatchedItem(itemId, fieldId, locations);
                 }
                 else
@@ -134,9 +134,11 @@ namespace Lifti
                 }
 
                 var testLength = Math.Min(remainingWordText.Length, this.IntraNodeText.Length);
+                var intraNodeText = this.IntraNodeText.Span;
+                var wordSpan = remainingWordText.Span;
                 for (var i = 0; i < testLength; i++)
                 {
-                    if (remainingWordText[i] != this.IntraNodeText[i])
+                    if (wordSpan[i] != intraNodeText[i])
                     {
                         this.SplitIntraNodeText(i);
                         this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingWordText, i);
@@ -154,7 +156,7 @@ namespace Lifti
             }
         }
 
-        private void IndexFromCharacter(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlySpan<char> remainingWordText, int testLength = 0)
+        private void IndexFromCharacter(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlyMemory<char> remainingWordText, int testLength = 0)
         {
             if (remainingWordText.Length > testLength)
             {
@@ -167,9 +169,9 @@ namespace Lifti
             }
         }
 
-        private void ContinueIndexingAtChild(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlySpan<char> remainingWordText, int remainingTextSplitPosition)
+        private void ContinueIndexingAtChild(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations, ReadOnlyMemory<char> remainingWordText, int remainingTextSplitPosition)
         {
-            var indexChar = remainingWordText[remainingTextSplitPosition];
+            var indexChar = remainingWordText.Span[remainingTextSplitPosition];
 
             this.CreateChildNode(indexChar)
                 .Index(itemId, fieldId, locations, remainingWordText.Slice(remainingTextSplitPosition + 1));
@@ -185,24 +187,24 @@ namespace Lifti
 
         private void SplitIntraNodeText(int splitIndex)
         {
-            var intraTextSpan = this.IntraNodeText.AsSpan();
             var splitChildNode = this.indexNodeFactory.CreateNode(this);
-            splitChildNode.IntraNodeText = splitIndex + 1 == intraTextSpan.Length ? null : intraTextSpan.Slice(splitIndex + 1).ToArray();
+            splitChildNode.IntraNodeText = splitIndex + 1 == this.IntraNodeText.Length ? null : this.IntraNodeText.Slice(splitIndex + 1);
             splitChildNode.childNodes = this.childNodes;
             splitChildNode.matches = this.matches;
             this.matches = null;
             this.childNodes = new Dictionary<char, IndexNode>();
 
+            var splitChar = this.IntraNodeText.Span[splitIndex];
             if (splitIndex == 0)
             {
                 this.IntraNodeText = null;
             }
             else
             {
-                this.IntraNodeText = intraTextSpan.Slice(0, splitIndex).ToArray();
+                this.IntraNodeText = this.IntraNodeText.Slice(0, splitIndex);
             }
 
-            this.childNodes.Add(intraTextSpan[splitIndex], splitChildNode);
+            this.childNodes.Add(splitChar, splitChildNode);
         }
 
         private void ToString(StringBuilder builder, char linkChar, int currentDepth)
@@ -231,7 +233,7 @@ namespace Lifti
 
         private void FormatNodeText(StringBuilder builder)
         {
-            if (this.IntraNodeText != null)
+            if (this.IntraNodeText.Length > 0)
             {
                 builder.Append(this.IntraNodeText);
             }

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,14 +39,22 @@ namespace Lifti.Serialization.Binary
         {
             var matchCount = node.Matches?.Count ?? 0;
             var childNodeCount = node.ChildNodes?.Count ?? 0;
-            var intraNodeTextLength = node.IntraNodeText?.Length ?? 0;
+            var intraNodeTextLength = node.IntraNodeText.Length;
             this.writer.Write(intraNodeTextLength);
             this.writer.Write(matchCount);
             this.writer.Write(childNodeCount);
 
             if (intraNodeTextLength > 0)
             {
-                this.writer.Write(node.IntraNodeText);
+                void WriteIntraNodeText(BinaryWriter writer, ReadOnlySpan<char> span)
+                {
+                    for (var i = 0; i < span.Length; i++)
+                    {
+                        writer.Write(span[i]);
+                    }
+                }
+
+                WriteIntraNodeText(this.writer, node.IntraNodeText.Span);
             }
 
             if (childNodeCount > 0)

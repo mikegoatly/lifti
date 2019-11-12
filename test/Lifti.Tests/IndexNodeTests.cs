@@ -42,7 +42,7 @@ namespace Lifti.Tests
         {
             this.sut.Index(item1, fieldId1, new Token("test", this.locations1.Locations));
 
-            VerifySutState(this.sut, "test", new[] { (item1, this.locations1) });
+            VerifyResult(this.sut, "test", new[] { (item1, this.locations1) });
         }
 
         [Theory]
@@ -53,7 +53,7 @@ namespace Lifti.Tests
             this.sut.Index(item1, fieldId1, new Token(word, this.locations1.Locations));
             this.sut.Index(item2, fieldId1, new Token(word, this.locations2.Locations));
 
-            VerifySutState(this.sut, word, new[] { (item1, this.locations1), (item2, this.locations2) });
+            VerifyResult(this.sut, word, new[] { (item1, this.locations1), (item2, this.locations2) });
         }
 
         [Fact]
@@ -64,12 +64,11 @@ namespace Lifti.Tests
             this.sut.Index(item3, fieldId1, new Token("banana", this.locations3.Locations));
             this.sut.Index(item4, fieldId1, new Token("a", this.locations4.Locations));
 
-            this.createdChildNodes.Should().HaveCount(4);
-            VerifySutState(this.sut, null, expectedChildNodes: new[] { ('a', this.createdChildNodes[2]), ('b', this.createdChildNodes[3]) });
-            VerifySutState(this.createdChildNodes[2], null, new[] { (item4, this.locations4) }, new[] { ('p', this.createdChildNodes[0]), ('b', this.createdChildNodes[1]) });
-            VerifySutState(this.createdChildNodes[3], "anana", new[] { (item3, this.locations3) });
-            VerifySutState(this.createdChildNodes[1], "le", new[] { (item2, this.locations2) });
-            VerifySutState(this.createdChildNodes[0], "ple", new[] { (item1, this.locations1) });
+            VerifyResult(this.sut, null, expectedChildNodes: new[] { 'a', 'b' });
+            VerifyResult(this.sut, new[] { 'a' }, null, new[] { (item4, this.locations4) }, new[] { 'p', 'b' });
+            VerifyResult(this.sut, new[] { 'b' }, "anana", new[] { (item3, this.locations3) });
+            VerifyResult(this.sut, new[] { 'a', 'b' }, "le", new[] { (item2, this.locations2) });
+            VerifyResult(this.sut, new[] { 'a', 'p' }, "ple", new[] { (item1, this.locations1) });
         }
 
         [Fact]
@@ -79,11 +78,10 @@ namespace Lifti.Tests
             this.sut.Index(item2, fieldId1, new Token("fred", this.locations2.Locations));
             this.sut.Index(item3, fieldId1, new Token("freddy", this.locations3.Locations));
 
-            this.createdChildNodes.Should().HaveCount(3);
-            VerifySutState(this.sut, "fre", expectedChildNodes: new[] { ('e', this.createdChildNodes[0]), ('d', this.createdChildNodes[1]) });
-            VerifySutState(this.createdChildNodes[0], "dom", new[] { (item1, this.locations1) });
-            VerifySutState(this.createdChildNodes[1], null, new[] { (item2, this.locations2) }, new[] { ('d', this.createdChildNodes[2]) });
-            VerifySutState(this.createdChildNodes[2], "y", new[] { (item3, this.locations3) });
+            VerifyResult(this.sut, "fre", expectedChildNodes: new[] { 'e', 'd' });
+            VerifyResult(this.sut, new[] { 'e' }, "dom", new[] { (item1, this.locations1) });
+            VerifyResult(this.sut, new[] { 'd' }, null, new[] { (item2, this.locations2) }, new[] { 'd' });
+            VerifyResult(this.sut, new[] { 'd', 'd' }, "y", new[] { (item3, this.locations3) });
         }
 
         [Fact]
@@ -93,10 +91,9 @@ namespace Lifti.Tests
             this.sut.Index(item2, fieldId1, new Token("testing", this.locations2.Locations));
             this.sut.Index(item3, fieldId1, new Token("tester", this.locations3.Locations));
 
-            this.createdChildNodes.Should().HaveCount(2);
-            VerifySutState(this.sut, "test", new[] { (item1, this.locations1) }, new[] { ('i', this.createdChildNodes[0]), ('e', this.createdChildNodes[1]) });
-            VerifySutState(this.createdChildNodes[0], "ng", new[] { (item2, this.locations2) });
-            VerifySutState(this.createdChildNodes[1], "r", new[] { (item3, this.locations3) });
+            VerifyResult(this.sut, "test", new[] { (item1, this.locations1) }, new[] { 'i', 'e' });
+            VerifyResult(this.sut, new[] { 'i' }, "ng", new[] { (item2, this.locations2) });
+            VerifyResult(this.sut, new[] { 'e' }, "r", new[] { (item3, this.locations3) });
         }
 
         [Theory]
@@ -114,10 +111,9 @@ namespace Lifti.Tests
             this.sut.Index(item1, fieldId1, new Token("test", this.locations1.Locations));
             this.sut.Index(item2, fieldId1, new Token(indexText, this.locations2.Locations));
 
-            this.createdChildNodes.Should().HaveCount(2);
-            VerifySutState(this.sut, remainingIntraText, expectedChildNodes: new[] { (originalSplitChar, this.createdChildNodes[0]), (newSplitChar, this.createdChildNodes[1]) });
-            VerifySutState(this.createdChildNodes[0], splitIntraText, new[] { (item1, this.locations1) });
-            VerifySutState(this.createdChildNodes[1], newIntraText, new[] { (item2, this.locations2) });
+            VerifyResult(this.sut, remainingIntraText, expectedChildNodes: new[] { originalSplitChar, newSplitChar });
+            VerifyResult(this.sut, new[] { originalSplitChar }, splitIntraText, new[] { (item1, this.locations1) });
+            VerifyResult(this.sut, new[] { newSplitChar }, newIntraText, new[] { (item2, this.locations2) });
         }
 
         [Fact]
@@ -128,8 +124,8 @@ namespace Lifti.Tests
 
             this.createdChildNodes.Should().HaveCount(1);
 
-            VerifySutState(this.sut, "NOITA", new[] { (item2, this.locations2) }, expectedChildNodes: new[] { ('Z', this.createdChildNodes[0]) });
-            VerifySutState(this.createdChildNodes[0], "I", new[] { (item1, this.locations1) });
+            VerifyResult(this.sut, "NOITA", new[] { (item2, this.locations2) }, expectedChildNodes: new[] { 'Z' });
+            VerifyResult(this.sut, new[] { 'Z' }, "I", new[] { (item1, this.locations1) });
         }
 
         [Fact]
@@ -139,11 +135,10 @@ namespace Lifti.Tests
             this.sut.Index(item2, fieldId1, new Token("w3c", this.locations2.Locations));
             this.sut.Index(item3, fieldId1, new Token("w3", this.locations3.Locations));
 
-            this.createdChildNodes.Should().HaveCount(3);
-            VerifySutState(this.sut, "w", expectedChildNodes: new[] { ('w', this.createdChildNodes[0]), ('3', this.createdChildNodes[1]) });
-            VerifySutState(this.createdChildNodes[0], "w", new[] { (item1, this.locations1) });
-            VerifySutState(this.createdChildNodes[1], null, new[] { (item3, this.locations3) }, new[] { ('c', this.createdChildNodes[2]) });
-            VerifySutState(this.createdChildNodes[2], null, new[] { (item2, this.locations2) });
+            VerifyResult(this.sut, "w", expectedChildNodes: new[] { 'w', '3' });
+            VerifyResult(this.sut, new[] { 'w' }, "w", new[] { (item1, this.locations1) });
+            VerifyResult(this.sut, new[] { '3' }, null, new[] { (item3, this.locations3) }, new[] { 'c' });
+            VerifyResult(this.sut, new[] { '3', 'c' }, null, new[] { (item2, this.locations2) });
         }
 
         [Fact]
@@ -156,8 +151,8 @@ namespace Lifti.Tests
 
             this.sut.Remove(item1);
 
-            VerifySutState(this.sut, "www", expectedChildNodes: new[] { ('w', this.createdChildNodes[0]) }, expectedMatches: Array.Empty<(int, IndexedWord)>());
-            VerifySutState(this.createdChildNodes[0], "w", expectedMatches: Array.Empty<(int, IndexedWord)>());
+            VerifyResult(this.sut, "www", expectedChildNodes: new[] { 'w' }, expectedMatches: Array.Empty<(int, IndexedWord)>());
+            VerifyResult(this.sut, new[] { 'w' }, "w", expectedMatches: Array.Empty<(int, IndexedWord)>());
         }
 
         private static IndexedWord CreateLocations(byte fieldId, params (int, int, ushort)[] locations)
@@ -165,16 +160,41 @@ namespace Lifti.Tests
             return new IndexedWord(fieldId, locations.Select(r => new WordLocation(r.Item1, r.Item2, r.Item3)).ToArray());
         }
 
-        private static void VerifySutState(
+        //private static void VerifySutState(
+        //    IndexNode node,
+        //    string intraNodeText,
+        //    (int, IndexedWord)[] expectedMatches = null,
+        //    (char, IndexNode)[] expectedChildNodes = null)
+        //{
+        //    node.IntraNodeText.ToArray().Should().BeEquivalentTo(intraNodeText?.ToCharArray() ?? Array.Empty<char>());
+        //    node.ChildNodes.Should().BeEquivalentTo(expectedChildNodes?.ToDictionary(x => x.Item1, x => x.Item2), o => o.Excluding(t => t.Value.ChildNodes).Excluding(t => t.Value.Matches));
+        //    node.Matches.Should().BeEquivalentTo(expectedMatches?.ToDictionary(x => x.Item1, x => new[] { x.Item2 }));
+        //}
+
+        private static void VerifyResult(
             IndexNode node,
             string intraNodeText,
             (int, IndexedWord)[] expectedMatches = null,
-            (char, IndexNode)[] expectedChildNodes = null)
+            char[] expectedChildNodes = null)
         {
-            node.IntraNodeText.Should().BeEquivalentTo(intraNodeText?.ToCharArray());
-            node.ChildNodes.Should().BeEquivalentTo(expectedChildNodes?.ToDictionary(x => x.Item1, x => x.Item2), o => o.Excluding(t => t.Value.ChildNodes).Excluding(t => t.Value.Matches));
+            node.IntraNodeText.ToArray().Should().BeEquivalentTo(intraNodeText?.ToCharArray() ?? Array.Empty<char>());
+            node.ChildNodes?.Keys.Should().BeEquivalentTo(expectedChildNodes, o => o.WithoutStrictOrdering());
+            node.Matches?.Should().BeEquivalentTo(expectedMatches?.ToDictionary(x => x.Item1, x => new[] { x.Item2 }));
+        }
 
-            node.Matches.Should().BeEquivalentTo(expectedMatches?.ToDictionary(x => x.Item1, x => new[] { x.Item2 }));
+        private static void VerifyResult(
+            IndexNode node,
+            char[] navigationChars,
+            string intraNodeText,
+            (int, IndexedWord)[] expectedMatches = null,
+            char[] expectedChildNodes = null)
+        {
+            foreach (var navigationChar in navigationChars)
+            {
+                node = node.ChildNodes[navigationChar];
+            }
+
+            VerifyResult(node, intraNodeText, expectedMatches, expectedChildNodes);
         }
     }
 }

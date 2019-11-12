@@ -18,8 +18,7 @@ namespace Lifti.Querying
             this.intraNodeTextPosition = 0;
         }
 
-        private bool HasIntraNodeTextLeftToProcess => this.currentNode.IntraNodeText != null &&
-                    this.intraNodeTextPosition < this.currentNode.IntraNodeText.Length;
+        private bool HasIntraNodeTextLeftToProcess => this.intraNodeTextPosition < this.currentNode.IntraNodeText.Length;
 
         public IntermediateQueryResult GetExactMatches()
         {
@@ -104,7 +103,7 @@ namespace Lifti.Querying
 
             if (this.HasIntraNodeTextLeftToProcess)
             {
-                if (value == this.currentNode.IntraNodeText[this.intraNodeTextPosition])
+                if (value == this.currentNode.IntraNodeText.Span[this.intraNodeTextPosition])
                 {
                     this.intraNodeTextPosition++;
                     return true;
@@ -141,7 +140,11 @@ namespace Lifti.Querying
 
             if (this.intraNodeTextPosition > 0)
             {
-                this.navigatedWith.Append(this.currentNode.IntraNodeText, 0, this.intraNodeTextPosition);
+                var span = this.currentNode.IntraNodeText.Span;
+                for (var i = 0; i < this.intraNodeTextPosition; i++)
+                {
+                    this.navigatedWith.Append(span[i]);
+                }
             }
 
             return results;
@@ -149,7 +152,7 @@ namespace Lifti.Querying
 
         private IEnumerable<string> EnumerateIndexedWords(IndexNode node)
         {
-            if (node.IntraNodeText != null)
+            if (node.IntraNodeText.Length > 0)
             {
                 this.navigatedWith.Append(node.IntraNodeText);
             }
@@ -173,7 +176,7 @@ namespace Lifti.Querying
                 }
             }
 
-            if (node.IntraNodeText != null)
+            if (node.IntraNodeText.Length > 0)
             {
                 this.navigatedWith.Length -= node.IntraNodeText.Length;
             }
