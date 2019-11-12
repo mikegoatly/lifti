@@ -4,7 +4,7 @@
     {
         public static void Main()
         {
-            BookSample.Run();
+            WikipediaSample.Run();
         }
     }
 }

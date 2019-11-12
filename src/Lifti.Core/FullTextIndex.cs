@@ -60,7 +60,7 @@ namespace Lifti
 
             Debug.Assert(word.Locations.Select((l, i) => i == 0 || l.WordIndex > word.Locations[i - 1].WordIndex).All(v => v));
 
-            this.Root.Index(itemId, fieldId, word.Locations, word.Value.AsSpan(), this);
+            this.Root.Index(itemId, fieldId, word.Locations, word.Value.AsMemory(), this);
         }
 
         public override string ToString()

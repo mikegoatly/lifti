@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -18,11 +18,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="StemmerTestCases.txt" />
+    <Compile Include="..\..\test\PerformanceProfiling\WikipediaDataLoader.cs" Link="WikipediaDataLoader.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="StemmerTestCases.txt" />
+    <EmbeddedResource Include="..\..\test\PerformanceProfiling\WikipediaPages.dat" Link="WikipediaPages.dat" />
   </ItemGroup>
 
   <ItemGroup>

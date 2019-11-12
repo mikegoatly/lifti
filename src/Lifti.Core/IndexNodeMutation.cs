@@ -81,16 +81,11 @@ namespace Lifti
         ////    }
         ////}
 
-        //internal void SetChildNode(char linkCharacter, IndexNode mutatedChild)
-        //{
-        //    this.ChildNodes[linkCharacter] = mutatedChild;
-        //}
-
         internal void Index(
             int itemId,
             byte fieldId,
             IReadOnlyList<WordLocation> locations,
-            ReadOnlySpan<char> remainingWordText,
+            ReadOnlyMemory<char> remainingWordText,
             IIndexMutation indexMutationTracker)
         {
             var indexSupportLevel = this.indexNodeFactory.GetIndexSupportLevelForDepth(this.depth);
@@ -145,7 +140,7 @@ namespace Lifti
             int itemId,
             byte fieldId,
             IReadOnlyList<WordLocation> locations,
-            ReadOnlySpan<char> remainingWordText,
+            ReadOnlyMemory<char> remainingWordText,
             IIndexMutation indexMutationTracker,
             int testLength = 0)
         {
@@ -164,11 +159,11 @@ namespace Lifti
             int itemId,
             byte fieldId,
             IReadOnlyList<WordLocation> locations,
-            ReadOnlySpan<char> remainingWordText,
+            ReadOnlyMemory<char> remainingWordText,
             int remainingTextSplitPosition,
             IIndexMutation indexMutationTracker)
         {
-            var indexChar = remainingWordText[remainingTextSplitPosition];
+            var indexChar = remainingWordText.Span[remainingTextSplitPosition];
 
             this.EnsureMutatedChildNodesCreated();
             if (!this.MutatedChildNodes.TryGetValue(indexChar, out var childNode))
@@ -204,7 +199,7 @@ namespace Lifti
             int itemId,
             byte fieldId,
             IReadOnlyList<WordLocation> locations,
-            ReadOnlySpan<char> remainingWordText,
+            ReadOnlyMemory<char> remainingWordText,
             IIndexMutation indexMutationTracker)
         {
             if (this.IntraNodeText.Length == 0)
@@ -212,7 +207,7 @@ namespace Lifti
                 if (this.IsEmpty)
                 {
                     // Currently a leaf node
-                    this.IntraNodeText = remainingWordText.Length == 0 ? null : remainingWordText.ToArray();
+                    this.IntraNodeText = remainingWordText.Length == 0 ? null : remainingWordText;
                     this.AddMatchedItem(itemId, fieldId, locations);
                 }
                 else
@@ -232,9 +227,10 @@ namespace Lifti
 
                 var testLength = Math.Min(remainingWordText.Length, this.IntraNodeText.Length);
                 var intraNodeSpan = this.IntraNodeText.Span;
+                var wordSpan = remainingWordText.Span;
                 for (var i = 0; i < testLength; i++)
                 {
-                    if (remainingWordText[i] != intraNodeSpan[i])
+                    if (wordSpan[i] != intraNodeSpan[i])
                     {
                         this.SplitIntraNodeText(i);
                         this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingWordText, i, indexMutationTracker);
