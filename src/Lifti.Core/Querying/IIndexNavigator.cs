@@ -3,8 +3,13 @@ using System.Collections.Generic;
 
 namespace Lifti.Querying
 {
-    public interface IIndexNavigator
+    public interface IIndexNavigator : IDisposable
     {
+        /// <summary>
+        /// Gets a value indicating whether the navigator has matches exactly at its current position.
+        /// </summary>
+        bool HasExactMatches { get; }
+
         /// <summary>
         /// Enumerates all the words that are indexed under the current position in the navigator.
         /// </summary>

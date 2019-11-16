@@ -25,6 +25,8 @@ namespace Lifti.Tests.Querying
         public List<char> NavigatedCharacters { get; } = new List<char>();
         public List<string> NavigatedStrings { get; } = new List<string>();
 
+        public bool HasExactMatches => this.ExpectedExactMatches.Matches.Count > 0;
+
         public static FakeIndexNavigator ReturningExactMatches(params int[] matchedItems)
         {
             return new FakeIndexNavigator(false, matchedItems);
@@ -60,6 +62,10 @@ namespace Lifti.Tests.Querying
         public IEnumerable<string> EnumerateIndexedWords()
         {
             throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

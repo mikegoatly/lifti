@@ -76,6 +76,7 @@ namespace Lifti
         private readonly TokenizationOptions defaultTokenizationOptions;
         private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions;
         private readonly IdPool<TKey> idPool;
+        private readonly IIndexNavigatorPool indexNavigatorPool = new IndexNavigatorPool();
 
         internal FullTextIndex(
             ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions,
@@ -113,7 +114,7 @@ namespace Lifti
 
         public IIndexNavigator CreateNavigator()
         {
-            return new IndexNavigator(this.Root);
+            return this.indexNavigatorPool.Create(this.Root);
         }
 
         public void Add(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null)
