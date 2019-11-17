@@ -58,30 +58,30 @@ namespace Lifti
         public void Add(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null)
         {
             // TODO lock for writing on all mutations
-            var indexMutation = new IndexInsertionMutation(this.Root, this.IndexNodeFactory);
             var itemId = this.idPool.Add(itemKey);
 
             var tokenizer = this.GetTokenizer(tokenizationOptions);
-            foreach (var word in tokenizer.Process(text))
+            this.ApplyIndexInsertionMutations(m =>
             {
-                indexMutation.Index(itemId, this.FieldLookup.DefaultField, word);
-            }
-
-            this.ApplyIndexMutations(indexMutation);
+                foreach (var word in tokenizer.Process(text))
+                {
+                    m.Add(itemId, this.FieldLookup.DefaultField, word);
+                }
+            });
         }
 
         public void Add(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null)
         {
-            var indexMutation = new IndexInsertionMutation(this.Root, this.IndexNodeFactory);
             var itemId = this.idPool.Add(itemKey);
 
             var tokenizer = this.GetTokenizer(tokenizationOptions);
-            foreach (var word in tokenizer.Process(text))
+            this.ApplyIndexInsertionMutations(m =>
             {
-                indexMutation.Index(itemId, this.FieldLookup.DefaultField, word);
-            }
-
-            this.ApplyIndexMutations(indexMutation);
+                foreach (var word in tokenizer.Process(text))
+                {
+                    m.Add(itemId, this.FieldLookup.DefaultField, word);
+                }
+            });
         }
 
         public void AddRange<TItem>(IEnumerable<TItem> items)
@@ -91,29 +91,21 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(items));
             }
 
-            var indexMutation = new IndexInsertionMutation(this.Root, this.IndexNodeFactory);
             var options = this.itemTokenizationOptions.Get<TItem>();
 
-            foreach (var item in items)
+            this.ApplyIndexInsertionMutations(m =>
             {
-                this.Add(item, options, indexMutation);
-            }
-
-            this.ApplyIndexMutations(indexMutation);
+                foreach (var item in items)
+                {
+                    this.Add(item, options, m);
+                }
+            });
         }
 
         public void Add<TItem>(TItem item)
         {
             var options = this.itemTokenizationOptions.Get<TItem>();
-            var indexMutation = new IndexInsertionMutation(this.Root, this.IndexNodeFactory);
-
-            this.Add(item, options, indexMutation);
-            this.ApplyIndexMutations(indexMutation);
-        }
-
-        private void ApplyIndexMutations(IndexMutation indexMutation)
-        {
-            this.Root = indexMutation.ApplyMutations();
+            this.ApplyIndexInsertionMutations(m => this.Add(item, options, m));
         }
 
         public async ValueTask AddRangeAsync<TItem>(IEnumerable<TItem> items)
@@ -124,23 +116,22 @@ namespace Lifti
             }
 
             var options = this.itemTokenizationOptions.Get<TItem>();
-            var indexMutation = new IndexInsertionMutation(this.Root, this.IndexNodeFactory);
-            foreach (var item in items)
-            {
-                await this.AddAsync(item, options, indexMutation);
-            }
 
-            this.ApplyIndexMutations(indexMutation);
+            await this.ApplyIndexInsertionMutationsAsync(async m =>
+            {
+                foreach (var item in items)
+                {
+                    await this.AddAsync(item, options, m);
+                }
+            }).ConfigureAwait(false);
         }
 
         public async ValueTask AddAsync<TItem>(TItem item)
         {
             var options = this.itemTokenizationOptions.Get<TItem>();
-            var indexMutation = new IndexInsertionMutation(this.Root, this.IndexNodeFactory);
 
-            await this.AddAsync(item, options, indexMutation);
-
-            this.ApplyIndexMutations(indexMutation);
+            await this.ApplyIndexInsertionMutationsAsync(async m => await this.AddAsync(item, options, m))
+                .ConfigureAwait(false);
         }
 
         public bool Remove(TKey itemKey)
@@ -152,8 +143,7 @@ namespace Lifti
 
             var indexMutation = new IndexRemovalMutation(this.Root, this.IndexNodeFactory);
             var id = this.idPool.ReleaseItem(itemKey);
-            indexMutation.Remove(id);
-            this.ApplyIndexMutations(indexMutation);
+            this.Root = indexMutation.Remove(id);
 
             return true;
         }
@@ -167,6 +157,24 @@ namespace Lifti
         public override string ToString()
         {
             return this.Root.ToString();
+        }
+
+        private void ApplyIndexInsertionMutations(Action<IndexInsertionMutation> mutationAction)
+        {
+            var indexMutation = new IndexInsertionMutation(this.Root, this.IndexNodeFactory);
+
+            mutationAction(indexMutation);
+
+            this.Root = indexMutation.ApplyInsertions();
+        }
+
+        private async Task ApplyIndexInsertionMutationsAsync(Func<IndexInsertionMutation, Task> asyncMutationAction)
+        {
+            var indexMutation = new IndexInsertionMutation(this.Root, this.IndexNodeFactory);
+
+            await asyncMutationAction(indexMutation).ConfigureAwait(false);
+
+            this.Root = indexMutation.ApplyInsertions();
         }
 
         private ITokenizer GetTokenizer(TokenizationOptions tokenizationOptions)
@@ -191,7 +199,7 @@ namespace Lifti
         {
             foreach (var word in tokens)
             {
-                indexMutation.Index(itemId, fieldId, word);
+                indexMutation.Add(itemId, fieldId, word);
             }
         }
 

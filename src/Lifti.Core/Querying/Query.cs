@@ -49,6 +49,8 @@ namespace Lifti.Querying
 
             foreach (var itemResults in matches)
             {
+                // TODO handle gracefully the case where the item no longer exists, e.g. a mutation has occured while this
+                // copy was being queried
                 var item = index.IdLookup.GetItemForId(itemResults.ItemId);
                 yield return new SearchResult<TKey>(
                     item,

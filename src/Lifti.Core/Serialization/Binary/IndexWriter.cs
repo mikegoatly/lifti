@@ -26,6 +26,8 @@ namespace Lifti.Serialization.Binary
 
         public async Task WriteAsync(FullTextIndex<TKey> index)
         {
+            // TODO read a consistent snapshot from the index consisting of:
+            // Items lookup and Root node
             await this.WriteHeaderAsync(index).ConfigureAwait(false);
 
             await this.WriteItemsAsync(index).ConfigureAwait(false);

@@ -7,28 +7,6 @@ using System.Text;
 
 namespace Lifti
 {
-    internal class LinkedParentMutation
-    {
-        public LinkedParentMutation(char parentLinkCharacter, IndexNodeMutation parentMutation)
-        {
-            this.ParentLinkCharacter = parentLinkCharacter;
-            this.ParentMutation = parentMutation;
-        }
-
-        public char ParentLinkCharacter { get; }
-        public IndexNodeMutation ParentMutation { get; internal set; }
-    }
-
-    //internal interface IIndexNodeState
-    //{
-    //    ReadOnlyMemory<char> IntraNodeText { get; }
-    //    ImmutableDictionary<char, IndexNode> ChildNodes { get; }
-    //    ImmutableDictionary<int, ImmutableList<IndexedWord>> Matches { get; }
-    //    bool IsEmpty { get; }
-    //    bool HasChildNodes { get; }
-    //    bool HasMatches { get; }
-    //}
-
     internal class IndexNodeMutation
     {
         private readonly int depth;
@@ -63,39 +41,20 @@ namespace Lifti
         public Dictionary<char, IndexNodeMutation> MutatedChildNodes { get; private set; }
         public Dictionary<int, ImmutableList<IndexedWord>> MutatedMatches { get; private set; }
 
-        ////internal void Remove(int itemId, IIndexMutation indexMutationTracker)
-        ////{
-        ////    if (this.HasMatches && this.Matches.ContainsKey(itemId))
-        ////    {
-        ////        this.FlagMutation(indexMutationTracker);
-        ////        this.Matches = this.Matches.Remove(itemId);
-        ////    }
-
-        ////    if (this.HasChildNodes)
-        ////    {
-        ////        foreach (var pair in this.ChildNodes)
-        ////        {
-        ////            pair.Value.Mutate(new LinkedParentMutation(pair.Key, this));
-        ////            pair.Value.Mutation.Remove(itemId, indexMutationTracker);
-        ////        }
-        ////    }
-        ////}
-
         internal void Index(
             int itemId,
             byte fieldId,
             IReadOnlyList<WordLocation> locations,
-            ReadOnlyMemory<char> remainingWordText,
-            IIndexMutation indexMutationTracker)
+            ReadOnlyMemory<char> remainingWordText)
         {
             var indexSupportLevel = this.indexNodeFactory.GetIndexSupportLevelForDepth(this.depth);
             switch (indexSupportLevel)
             {
                 case IndexSupportLevelKind.CharacterByCharacter:
-                    this.IndexFromCharacter(itemId, fieldId, locations, remainingWordText, indexMutationTracker);
+                    this.IndexFromCharacter(itemId, fieldId, locations, remainingWordText);
                     break;
                 case IndexSupportLevelKind.IntraNodeText:
-                    this.IndexWithIntraNodeTextSupport(itemId, fieldId, locations, remainingWordText, indexMutationTracker);
+                    this.IndexWithIntraNodeTextSupport(itemId, fieldId, locations, remainingWordText);
                     break;
                 default:
                     throw new LiftiException(ExceptionMessages.UnsupportedIndexSupportLevel, indexSupportLevel);
@@ -141,12 +100,11 @@ namespace Lifti
             byte fieldId,
             IReadOnlyList<WordLocation> locations,
             ReadOnlyMemory<char> remainingWordText,
-            IIndexMutation indexMutationTracker,
             int testLength = 0)
         {
             if (remainingWordText.Length > testLength)
             {
-                this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingWordText, testLength, indexMutationTracker);
+                this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingWordText, testLength);
             }
             else
             {
@@ -160,8 +118,7 @@ namespace Lifti
             byte fieldId,
             IReadOnlyList<WordLocation> locations,
             ReadOnlyMemory<char> remainingWordText,
-            int remainingTextSplitPosition,
-            IIndexMutation indexMutationTracker)
+            int remainingTextSplitPosition)
         {
             var indexChar = remainingWordText.Span[remainingTextSplitPosition];
 
@@ -183,7 +140,7 @@ namespace Lifti
                 this.MutatedChildNodes.Add(indexChar, childNode);
             }
 
-            childNode.Index(itemId, fieldId, locations, remainingWordText.Slice(remainingTextSplitPosition + 1), indexMutationTracker);
+            childNode.Index(itemId, fieldId, locations, remainingWordText.Slice(remainingTextSplitPosition + 1));
         }
 
         private void EnsureMutatedChildNodesCreated()
@@ -199,8 +156,7 @@ namespace Lifti
             int itemId,
             byte fieldId,
             IReadOnlyList<WordLocation> locations,
-            ReadOnlyMemory<char> remainingWordText,
-            IIndexMutation indexMutationTracker)
+            ReadOnlyMemory<char> remainingWordText)
         {
             if (this.IntraNodeText.Length == 0)
             {
@@ -212,7 +168,7 @@ namespace Lifti
                 }
                 else
                 {
-                    this.IndexFromCharacter(itemId, fieldId, locations, remainingWordText, indexMutationTracker);
+                    this.IndexFromCharacter(itemId, fieldId, locations, remainingWordText);
                 }
             }
             else
@@ -233,7 +189,7 @@ namespace Lifti
                     if (wordSpan[i] != intraNodeSpan[i])
                     {
                         this.SplitIntraNodeText(i);
-                        this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingWordText, i, indexMutationTracker);
+                        this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingWordText, i);
                         return;
                     }
                 }
@@ -244,7 +200,7 @@ namespace Lifti
                     this.SplitIntraNodeText(testLength);
                 }
 
-                this.IndexFromCharacter(itemId, fieldId, locations, remainingWordText, indexMutationTracker, testLength);
+                this.IndexFromCharacter(itemId, fieldId, locations, remainingWordText, testLength);
             }
         }
 
