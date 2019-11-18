@@ -2,6 +2,7 @@
 using PerformanceProfiling;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -193,6 +194,29 @@ namespace Lifti.Tests
             this.index.Remove(wikipediaTests[10].name);
             this.index.Remove(wikipediaTests[9].name);
             this.index.Remove(wikipediaTests[8].name);
+        }
+
+        [Fact]
+        public async Task WritingToIndexFromMultipleThreadsSimultaneously_ShouldUpdateIndexCorrectly()
+        {
+            var startBarrier = new Barrier(10);
+            void Index(int id)
+            {
+                startBarrier.SignalAndWait();
+                this.index.Add(id.ToString(), "Test testing another test");
+            }
+
+            var tasks = new List<Task>();
+            for (var i = 0; i < 10; i++)
+            {
+                var id = i;
+                tasks.Add(Task.Run(() => Index(id)));
+            }
+
+            await Task.WhenAll(tasks);
+
+            this.index.Count.Should().Be(10);
+            this.index.Search("test").Should().HaveCount(10);
         }
 
         private void WithIndexedSingleStringPropertyObjects()

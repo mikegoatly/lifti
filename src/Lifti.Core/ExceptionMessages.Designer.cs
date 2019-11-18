@@ -241,6 +241,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A timeout occurred waiting for index write lock.
+        /// </summary>
+        internal static string TimeoutWaitingForWriteLock {
+            get {
+                return ResourceManager.GetString("TimeoutWaitingForWriteLock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to read header data from serialized index content..
         /// </summary>
         internal static string UnableToReadHeaderInformation {

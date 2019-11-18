@@ -68,7 +68,7 @@ namespace PerformanceProfiling
         [Benchmark()]
         public void NewCodeIndexingAlwaysSupportIntraNodeText()
         {
-            var index = CreateNewIndex(-1);
+            var index = CreateNewIndex(0);
             this.PopulateIndex(index);
         }
 
@@ -96,7 +96,7 @@ namespace PerformanceProfiling
         [Benchmark()]
         public void NewCodeIndexingOneByOneAlwaysSupportIntraNodeText()
         {
-            var index = CreateNewIndex(-1);
+            var index = CreateNewIndex(0);
             this.PopulateIndexOneByOne(index);
         }
 
