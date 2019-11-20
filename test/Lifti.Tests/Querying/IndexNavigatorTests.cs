@@ -21,7 +21,7 @@ namespace Lifti.Tests.Querying
                 .Build();
 
             this.index.Add("A", "Triumphant elephant strode elegantly with indifference to shouting subjects, giving withering looks to individuals");
-            this.sut = this.index.CreateNavigator();
+            this.sut = this.index.Snapshot().CreateNavigator();
         }
 
         [Theory]
@@ -135,7 +135,7 @@ namespace Lifti.Tests.Querying
             await this.index.AddAsync(("B", "Zoopla Zoo Zammo", "Zany Zippy Llamas"));
             await this.index.AddAsync(("C", "Zak", "Ziggy Stardust"));
 
-            var navigator = this.index.CreateNavigator();
+            var navigator = this.index.Snapshot().CreateNavigator();
             navigator.Process("Z").Should().BeTrue();
             var results = navigator.GetExactAndChildMatches();
             results.Should().NotBeNull();

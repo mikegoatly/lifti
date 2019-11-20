@@ -7,6 +7,6 @@ namespace Lifti.Querying
     {
         IQueryPart Root { get; }
 
-        IEnumerable<SearchResult<TKey>> Execute<TKey>(IFullTextIndex<TKey> index);
+        IEnumerable<SearchResult<TKey>> Execute<TKey>(IIndexSnapshot<TKey> index);
     }
 }

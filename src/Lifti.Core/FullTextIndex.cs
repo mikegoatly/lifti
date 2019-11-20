@@ -18,7 +18,9 @@ namespace Lifti
         private readonly IIndexNavigatorPool indexNavigatorPool = new IndexNavigatorPool();
         private readonly SemaphoreSlim writeLock = new SemaphoreSlim(1);
         private readonly TimeSpan writeLockTimeout = TimeSpan.FromSeconds(10);
+        private IndexSnapshot<TKey> currentSnapshot;
         private bool isDisposed;
+        private IndexNode root;
 
         internal FullTextIndex(
             ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions,
@@ -42,7 +44,15 @@ namespace Lifti
             this.Root = this.IndexNodeFactory.CreateRootNode();
         }
 
-        internal IndexNode Root { get; set; }
+        public IndexNode Root
+        {
+            get => root;
+            private set
+            {
+                root = value;
+                this.currentSnapshot = new IndexSnapshot<TKey>(this.indexNavigatorPool, this);
+            }
+        }
 
         public IIdLookup<TKey> IdLookup => this.idPool;
 
@@ -54,9 +64,9 @@ namespace Lifti
 
         internal IIndexNodeFactory IndexNodeFactory { get; }
 
-        public IIndexNavigator CreateNavigator()
+        public IIndexSnapshot<TKey> Snapshot()
         {
-            return this.indexNavigatorPool.Create(this.Root);
+            return this.currentSnapshot;
         }
 
         public void Add(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null)
@@ -173,12 +183,17 @@ namespace Lifti
         public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions tokenizationOptions = null)
         {
             var query = this.queryParser.Parse(this.FieldLookup, searchText, this.GetTokenizer(tokenizationOptions));
-            return query.Execute(this);
+            return query.Execute(this.currentSnapshot);
         }
 
         public override string ToString()
         {
             return this.Root.ToString();
+        }
+
+        internal void SetRootWithLock(IndexNode indexNode)
+        {
+            this.PerformWriteLockedAction(() => this.Root = indexNode);
         }
 
         private void PerformWriteLockedAction(Action action)

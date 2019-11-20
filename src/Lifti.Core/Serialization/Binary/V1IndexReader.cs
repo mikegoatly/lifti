@@ -47,7 +47,7 @@ namespace Lifti.Serialization.Binary
                 index.IdPool.Add(id, key);
             }
 
-            index.Root = this.DeserializeNode(index.IndexNodeFactory, 0);
+            index.SetRootWithLock(this.DeserializeNode(index.IndexNodeFactory, 0));
 
             if (this.reader.ReadInt32() != -1)
             {
