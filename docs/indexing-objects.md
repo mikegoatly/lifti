@@ -46,7 +46,7 @@ books = new[]
     },
 }
 
-bookIndex.Index(book);
+bookIndex.AddRange(books);
 ```
 
 When you get search results back, they will be against the key stored in the index, i.e. the book's id:
@@ -60,4 +60,3 @@ Console.WriteLine("Matched items: " + string.Join(", ", results.Select(i => i.Ke
 results = bookIndex.Search("title=the");
 Console.WriteLine("Matched items: " + string.Join(", ", results.Select(i => i.Key)));
 ```
-
