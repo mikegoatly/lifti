@@ -1,6 +1,6 @@
 ---
 title: Indexing text against keys
-permalink: /introduction/
+permalink: /indexing/indexing-text/
 ---
 
 _TODO: Introduce concept of keys in an index_
