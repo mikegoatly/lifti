@@ -2,7 +2,7 @@ title: LIFTI
 source: docs
 description: >- 
   LIFTI is a netstandard2.0 compatible in-memory full text index library
-baseurl: "" 
+baseurl: "lifti" 
 url: "" 
 twitter_username: mikegoatly
 github_username:  mikegoatly
