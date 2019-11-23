@@ -13,10 +13,10 @@
 
     <div class="d-flex flex-row mb-2">
         <input type="text" @bind="SearchText" />
-        <button disabled=@indexing class="btn btn-primary ml-2" @onclick="Search">Search</button>
-        <button disabled=@indexing class="btn btn-secondary ml-2" @onclick="ShowAll">Show all</button>
-        <button disabled=@indexing class="btn btn-secondary ml-2" @onclick="Clear">Clear results</button>
-        <button disabled=@indexing class="btn btn-secondary ml-2" @onclick="ShowIndex">Show me the index</button>
+        <button class="btn btn-primary ml-2" @onclick="Search">Search</button>
+        <button class="btn btn-secondary ml-2" @onclick="ShowAll">Show all</button>
+        <button class="btn btn-secondary ml-2" @onclick="Clear">Clear results</button>
+        <button class="btn btn-secondary ml-2" @onclick="ShowIndex">Show me the index</button>
         <a href="https://github.com/mikegoatly/lifti/wiki/The-LIFTI-query-language" class="align-self-center ml-2" target="_blank">Query language examples</a>
     </div>
 

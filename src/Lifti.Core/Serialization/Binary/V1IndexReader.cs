@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -46,7 +47,7 @@ namespace Lifti.Serialization.Binary
                 index.IdPool.Add(id, key);
             }
 
-            this.DeserializeNode(index.Root);
+            index.SetRootWithLock(this.DeserializeNode(index.IndexNodeFactory, 0));
 
             if (this.reader.ReadInt32() != -1)
             {
@@ -54,17 +55,19 @@ namespace Lifti.Serialization.Binary
             }
         }
 
-        private void DeserializeNode(IndexNode node)
+        private IndexNode DeserializeNode(IIndexNodeFactory nodeFactory, int depth)
         {
             var textLength = this.reader.ReadInt32();
             var matchCount = this.reader.ReadInt32();
             var childNodeCount = this.reader.ReadInt32();
-            node.IntraNodeText = textLength == 0 ? null : this.reader.ReadChars(textLength);
+            var intraNodeText = textLength == 0 ? null : this.reader.ReadChars(textLength);
+            var childNodes = childNodeCount > 0 ? ImmutableDictionary.CreateBuilder<char, IndexNode>() : null;
+            var matches = matchCount > 0 ? ImmutableDictionary.CreateBuilder<int, ImmutableList<IndexedWord>>() : null;
 
             for (var i = 0; i < childNodeCount; i++)
             {
                 var matchChar = this.reader.ReadChar();
-                this.DeserializeNode(node.CreateChildNode(matchChar));
+                childNodes.Add(matchChar, this.DeserializeNode(nodeFactory, depth + 1));
             }
 
             var locationMatches = new List<WordLocation>(50);
@@ -72,6 +75,8 @@ namespace Lifti.Serialization.Binary
             {
                 var itemId = this.reader.ReadInt32();
                 var fieldCount = this.reader.ReadInt32();
+
+                var indexedWords = ImmutableList.CreateBuilder<IndexedWord>();
 
                 for (var fieldMatch = 0; fieldMatch < fieldCount; fieldMatch++)
                 {
@@ -88,9 +93,16 @@ namespace Lifti.Serialization.Binary
 
                     this.ReadLocations(locationCount, locationMatches);
 
-                    node.AddMatchedItem(itemId, fieldId, locationMatches.ToArray());
+                    indexedWords.Add(new IndexedWord(fieldId, locationMatches.ToArray()));
                 }
+
+                matches.Add(itemId, indexedWords.ToImmutable());
             }
+
+            return nodeFactory.CreateNode(
+                intraNodeText, 
+                childNodes?.ToImmutable(), 
+                matches?.ToImmutable());
         }
 
         private void ReadLocations(int locationCount, List<WordLocation> locationMatches)

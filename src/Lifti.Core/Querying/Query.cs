@@ -21,7 +21,7 @@ namespace Lifti.Querying
 
         public IQueryPart Root { get; }
 
-        public IEnumerable<SearchResult<TKey>> Execute<TKey>(IFullTextIndex<TKey> index)
+        public IEnumerable<SearchResult<TKey>> Execute<TKey>(IIndexSnapshot<TKey> index)
         {
             if (index is null)
             {
@@ -33,6 +33,8 @@ namespace Lifti.Querying
                 yield break;
             }
 
+            var idLookup = index.IdLookup;
+            var fieldLookup = index.FieldLookup;
             var matches = this.Root.Evaluate(index.CreateNavigator).Matches;
             var results = new Dictionary<int, List<FieldMatch>>();
 
@@ -49,11 +51,11 @@ namespace Lifti.Querying
 
             foreach (var itemResults in matches)
             {
-                var item = index.IdLookup.GetItemForId(itemResults.ItemId);
+                var item = idLookup.GetItemForId(itemResults.ItemId);
                 yield return new SearchResult<TKey>(
                     item,
                     itemResults.FieldMatches.Select(m => new FieldSearchResult(
-                        index.FieldLookup.GetFieldForId(m.FieldId),
+                        fieldLookup.GetFieldForId(m.FieldId),
                         m.GetWordLocations()))
                     .ToList());
             }

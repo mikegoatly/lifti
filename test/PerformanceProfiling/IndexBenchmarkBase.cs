@@ -27,11 +27,14 @@ namespace PerformanceProfiling
    
         protected void PopulateIndex(LiftiNew.Lifti.IFullTextIndex<string> index)
         {
-            var options = new LiftiNew.Lifti.TokenizationOptionsBuilder().XmlContent().WithStemming().Build();
-                
-            foreach (var entry in WikipediaData.SampleData)
+            index.AddRange(WikipediaData.SampleData);
+        }
+
+        protected void PopulateIndexOneByOne(LiftiNew.Lifti.IFullTextIndex<string> index)
+        {
+            foreach (var page in WikipediaData.SampleData)
             {
-                index.Add(entry.name, entry.text, options);
+                index.Add(page);
             }
         }
 
@@ -39,6 +42,7 @@ namespace PerformanceProfiling
         {
             return new LiftiNew.Lifti.FullTextIndexBuilder<string>()
                 .WithIntraNodeTextSupportedAfterIndexDepth(supportSplitAtIndex)
+                .WithItemTokenization<(string name, string text)>(o => o.WithKey(p => p.name).WithField("Text", p => p.text, t => t.XmlContent().WithStemming()))
                 .Build();
         }
     }

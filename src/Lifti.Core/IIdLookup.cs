@@ -26,5 +26,10 @@ namespace Lifti
         /// Thrown when the id is not known.
         /// </exception>
         T GetItemForId(int id);
+
+        /// <summary>
+        /// Creates a snapshot of this lookup that can be used even if the index is subsequently mutated.
+        /// </summary>
+        IIdLookup<T> Snapshot();
     }
 }

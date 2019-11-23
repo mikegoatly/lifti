@@ -19,9 +19,11 @@ namespace Lifti.Querying.QueryParts
                 throw new ArgumentNullException(nameof(navigatorCreator));
             }
 
-            var navigator = navigatorCreator();
-            navigator.Process(this.Word.AsSpan());
-            return navigator.GetExactMatches();
+            using (var navigator = navigatorCreator())
+            {
+                navigator.Process(this.Word.AsSpan());
+                return navigator.GetExactMatches();
+            }
         }
 
         public override string ToString()

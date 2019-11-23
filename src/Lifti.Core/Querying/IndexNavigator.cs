@@ -1,39 +1,50 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 
 namespace Lifti.Querying
 {
-    public class IndexNavigator : IIndexNavigator
+
+    internal sealed class IndexNavigator : IIndexNavigator
     {
         private readonly StringBuilder navigatedWith = new StringBuilder(16);
+        private IIndexNavigatorPool pool;
         private IndexNode currentNode;
         private int intraNodeTextPosition;
 
-        internal IndexNavigator(IndexNode node)
+        internal void Initialize(IndexNode node, IIndexNavigatorPool pool)
         {
+            this.pool = pool;
             this.currentNode = node;
             this.intraNodeTextPosition = 0;
+            this.navigatedWith.Length = 0;
         }
 
         private bool HasIntraNodeTextLeftToProcess => this.intraNodeTextPosition < this.currentNode.IntraNodeText.Length;
 
+        public bool HasExactMatches
+        {
+            get
+            {
+                if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess || !this.currentNode.HasMatches)
+                {
+                    return false;
+                }
+
+                return this.currentNode.HasMatches;
+            }
+        }
+
         public IntermediateQueryResult GetExactMatches()
         {
-            if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess)
+            if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess || !this.currentNode.HasMatches)
             {
                 return IntermediateQueryResult.Empty;
             }
 
-            return new IntermediateQueryResult(this.GetCurrentNodeMatches());
-        }
-
-        private IEnumerable<QueryWordMatch> GetCurrentNodeMatches()
-        {
-            return this.currentNode.Matches?.Select(CreateQueryWordMatch) ??
-                Array.Empty<QueryWordMatch>();
+            return new IntermediateQueryResult(this.currentNode.Matches.Select(CreateQueryWordMatch));
         }
 
         public IntermediateQueryResult GetExactAndChildMatches()
@@ -50,7 +61,7 @@ namespace Lifti.Querying
             while (childNodeStack.Count > 0)
             {
                 var node = childNodeStack.Dequeue();
-                if (node.Matches != null)
+                if (node.HasMatches)
                 {
                     foreach (var match in node.Matches)
                     {
@@ -67,7 +78,7 @@ namespace Lifti.Querying
                     }
                 }
 
-                if (node.ChildNodes != null)
+                if (node.HasChildNodes)
                 {
                     foreach (var childNode in node.ChildNodes.Values)
                     {
@@ -76,7 +87,7 @@ namespace Lifti.Querying
                 }
             }
 
-            return new IntermediateQueryResult(matches.Select(m => new QueryWordMatch(m.Key, MergeItemMatches(m.Value))));
+            return new IntermediateQueryResult(matches.Select(m => new QueryWordMatch(m.Key, this.MergeItemMatches(m.Value))));
         }
 
         public bool Process(ReadOnlySpan<char> text)
@@ -113,7 +124,7 @@ namespace Lifti.Querying
                 return false;
             }
 
-            if (this.currentNode.ChildNodes != null && this.currentNode.ChildNodes.TryGetValue(value, out var nextNode))
+            if (this.currentNode.HasChildNodes && this.currentNode.ChildNodes.TryGetValue(value, out var nextNode))
             {
                 this.currentNode = nextNode;
                 this.intraNodeTextPosition = 0;
@@ -150,6 +161,11 @@ namespace Lifti.Querying
             return results;
         }
 
+        public void Dispose()
+        {
+            this.pool.Return(this);
+        }
+
         private IEnumerable<string> EnumerateIndexedWords(IndexNode node)
         {
             if (node.IntraNodeText.Length > 0)
@@ -157,17 +173,17 @@ namespace Lifti.Querying
                 this.navigatedWith.Append(node.IntraNodeText);
             }
 
-            if (node.Matches?.Count > 0)
+            if (node.HasMatches)
             {
                 yield return this.navigatedWith.ToString();
             }
 
-            if (node.ChildNodes?.Count > 0)
+            if (node.HasChildNodes)
             {
                 foreach (var childNode in node.ChildNodes)
                 {
                     this.navigatedWith.Append(childNode.Key);
-                    foreach (var result in EnumerateIndexedWords(childNode.Value))
+                    foreach (var result in this.EnumerateIndexedWords(childNode.Value))
                     {
                         yield return result;
                     }
@@ -190,7 +206,7 @@ namespace Lifti.Querying
                     m.SelectMany(w => w.Locations).OrderBy(w => w.MinWordIndex).ToList()));
         }
 
-        private static QueryWordMatch CreateQueryWordMatch(KeyValuePair<int, List<IndexedWord>> match)
+        private static QueryWordMatch CreateQueryWordMatch(KeyValuePair<int, ImmutableList<IndexedWord>> match)
         {
             return new QueryWordMatch(match.Key, match.Value.Select(v => new FieldMatch(v)));
         }

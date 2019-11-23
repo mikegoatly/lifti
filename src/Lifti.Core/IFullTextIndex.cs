@@ -1,6 +1,4 @@
-﻿using Lifti.Querying;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Lifti
@@ -14,7 +12,7 @@ namespace Lifti
         IIdLookup<TKey> IdLookup { get; }
 
         /// <summary>
-        /// Fields are tracked internally as a id of type <see cref="Byte"/>. This lookup can
+        /// Fields are tracked internally as a id of type <see cref="byte"/>. This lookup can
         /// be used to get the field associated to an id, and visa versa.
         /// </summary>
         IIndexedFieldLookup FieldLookup { get; }
@@ -125,9 +123,9 @@ namespace Lifti
         IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions tokenizationOptions = null);
 
         /// <summary>
-        /// Creates an implementation of <see cref="IIndexNavigator"/> that can be used to navigate through the index
-        /// on a character by character basis.
+        /// Creates a self-consistent snapshot of the index that can be used to create navigators and query the index
+        /// whilst it is being mutated.
         /// </summary>
-        IIndexNavigator CreateNavigator();
+        IIndexSnapshot<TKey> Snapshot();
     }
 }

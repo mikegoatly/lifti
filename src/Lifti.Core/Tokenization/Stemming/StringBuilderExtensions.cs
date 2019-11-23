@@ -156,27 +156,28 @@
             var length = builder.Length;
             if (length > 3)
             {
-                var navigator = replacementSetLookup.CreateNavigator();
-                if (navigator.Process(builder[builder.Length - 1]))
+                using (var navigator = replacementSetLookup.Snapshot().CreateNavigator())
                 {
-                    var bestMatch = IntermediateQueryResult.Empty;
-                    for (var i = builder.Length - 2; i >= 0; i--)
+                    if (navigator.Process(builder[builder.Length - 1]))
                     {
-                        if (!navigator.Process(builder[i]))
+                        var bestMatch = IntermediateQueryResult.Empty;
+                        for (var i = builder.Length - 2; i >= 0; i--)
                         {
-                            break;
+                            if (!navigator.Process(builder[i]))
+                            {
+                                break;
+                            }
+
+                            if (navigator.HasExactMatches)
+                            {
+                                bestMatch = navigator.GetExactMatches();
+                            }
                         }
 
-                        var match = navigator.GetExactMatches();
-                        if (match.Matches.Count > 0)
+                        if (bestMatch.Matches.Count > 0)
                         {
-                            bestMatch = match;
+                            return replacementSetLookup.IdLookup.GetItemForId(bestMatch.Matches[0].ItemId);
                         }
-                    }
-
-                    if (bestMatch.Matches.Count > 0)
-                    {
-                        return replacementSetLookup.IdLookup.GetItemForId(bestMatch.Matches[0].ItemId);
                     }
                 }
             }

@@ -9,7 +9,7 @@ namespace Lifti.Tests.Querying
     public class IndexNavigatorTests : QueryTestBase
     {
         private readonly FullTextIndex<string> index;
-        private readonly IndexNavigator sut;
+        private readonly IIndexNavigator sut;
 
         public IndexNavigatorTests()
         {
@@ -21,7 +21,7 @@ namespace Lifti.Tests.Querying
                 .Build();
 
             this.index.Add("A", "Triumphant elephant strode elegantly with indifference to shouting subjects, giving withering looks to individuals");
-            this.sut = new IndexNavigator(this.index.Root);
+            this.sut = this.index.Snapshot().CreateNavigator();
         }
 
         [Theory]
@@ -135,8 +135,9 @@ namespace Lifti.Tests.Querying
             await this.index.AddAsync(("B", "Zoopla Zoo Zammo", "Zany Zippy Llamas"));
             await this.index.AddAsync(("C", "Zak", "Ziggy Stardust"));
 
-            this.sut.Process("Z").Should().BeTrue();
-            var results = this.sut.GetExactAndChildMatches();
+            var navigator = this.index.Snapshot().CreateNavigator();
+            navigator.Process("Z").Should().BeTrue();
+            var results = navigator.GetExactAndChildMatches();
             results.Should().NotBeNull();
             results.Matches.Should()
                 .BeEquivalentTo(

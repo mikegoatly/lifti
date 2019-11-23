@@ -20,7 +20,7 @@ namespace Lifti.Tests.Querying
         public void WithNullRoot_ShouldReturnNoResults()
         {
             var query = new Query(null);
-            query.Execute(this.index).Should().HaveCount(0);
+            query.Execute(this.index.Snapshot()).Should().HaveCount(0);
         }
 
         [Fact]

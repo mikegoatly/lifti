@@ -26,11 +26,13 @@ namespace Lifti.Serialization.Binary
 
         public async Task WriteAsync(FullTextIndex<TKey> index)
         {
-            await this.WriteHeaderAsync(index).ConfigureAwait(false);
+            var snapshot = index.Snapshot();
 
-            await this.WriteItemsAsync(index).ConfigureAwait(false);
+            await this.WriteHeaderAsync(snapshot).ConfigureAwait(false);
 
-            await this.WriteNodeAsync(index.Root).ConfigureAwait(false);
+            await this.WriteItemsAsync(snapshot).ConfigureAwait(false);
+
+            await this.WriteNodeAsync(snapshot.Root).ConfigureAwait(false);
 
             await this.WriteTerminatorAsync().ConfigureAwait(false);
         }
@@ -200,7 +202,7 @@ namespace Lifti.Serialization.Binary
             await this.FlushAsync().ConfigureAwait(false);
         }
 
-        private async Task WriteItemsAsync(IFullTextIndex<TKey> index)
+        private async Task WriteItemsAsync(IIndexSnapshot<TKey> index)
         {
             foreach (var (item, itemId) in index.IdLookup.GetIndexedItems())
             {
@@ -211,11 +213,11 @@ namespace Lifti.Serialization.Binary
             await this.FlushAsync().ConfigureAwait(false);
         }
 
-        private async Task WriteHeaderAsync(IFullTextIndex<TKey> index)
+        private async Task WriteHeaderAsync(IIndexSnapshot<TKey> index)
         {
             this.writer.Write(new byte[] { 0x4C, 0x49 });
             this.writer.Write(Version);
-            this.writer.Write(index.Count);
+            this.writer.Write(index.IdLookup.Count);
 
             await this.FlushAsync().ConfigureAwait(false);
         }
