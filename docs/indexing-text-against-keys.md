@@ -1,4 +1,7 @@
-# Indexing text against keys
+---
+title: Indexing text against keys
+permalink: /introduction/
+---
 
 _TODO: Introduce concept of keys in an index_
 

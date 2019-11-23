@@ -1,4 +1,7 @@
-# History
+---
+title: History
+permalink: /history/
+---
 
 The original version of LIFTI was written in 2010 and hosted on [CodePlex](https://archive.codeplex.com/?p=lifti)
 and evolved to become quite complicated, including automatic persistance to a backing file and support for

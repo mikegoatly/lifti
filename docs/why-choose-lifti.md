@@ -1,4 +1,7 @@
-# Why choose LIFTI
+---
+title: Why choose LIFTI
+permalink: /why-choose-lifti/
+---
 
 If you are building an application that refers to objects that contain lots of text, and you:
 

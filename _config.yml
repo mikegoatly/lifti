@@ -1,2 +1,10 @@
-theme: jekyll-theme-hacker
+title: LIFTI
 source: docs
+description: >- 
+  LIFTI is a netstandard2.0 compatible in-memory full text index library
+baseurl: "" 
+url: "" 
+twitter_username: mikegoatly
+github_username:  mikegoatly
+
+theme: jekyll-theme-tactile

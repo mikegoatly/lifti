@@ -1,4 +1,7 @@
-# Indexing objects with LIFTI
+---
+title: Indexing objects with LIFTI
+permalink: /introduction/
+---
 
 Given a class called `Book`:
 
