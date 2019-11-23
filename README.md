@@ -6,6 +6,8 @@ A lightweight full text indexer for .NET
 
 This is very much a work in progress, and a re-imagining of the [original LIFTI project](https://github.com/mikegoatly/lifti-codeplex) from many years ago.
 
+Read the documentation [here](https://mikegoatly.github.io/lifti)
+
 ## Try it out!
 
 [Use LIFTI in a Blazor app](https://liftidemo.z22.web.core.windows.net/wikipedia-search) - try out various queries against Wikipedia content
