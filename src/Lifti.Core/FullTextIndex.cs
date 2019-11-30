@@ -76,7 +76,7 @@ namespace Lifti
                     var itemId = this.idPool.Add(itemKey);
 
                     var tokenizer = this.GetTokenizer(tokenizationOptions);
-                    this.ApplyIndexInsertionMutations(m =>
+                    this.ApplyMutations(m =>
                     {
                         foreach (var word in tokenizer.Process(text))
                         {
@@ -93,7 +93,7 @@ namespace Lifti
                     var itemId = this.idPool.Add(itemKey);
 
                     var tokenizer = this.GetTokenizer(tokenizationOptions);
-                    this.ApplyIndexInsertionMutations(m =>
+                    this.ApplyMutations(m =>
                     {
                         foreach (var word in tokenizer.Process(text))
                         {
@@ -113,7 +113,7 @@ namespace Lifti
             var options = this.itemTokenizationOptions.Get<TItem>();
             this.PerformWriteLockedAction(() =>
                 {
-                    this.ApplyIndexInsertionMutations(m =>
+                    this.ApplyMutations(m =>
                     {
                         foreach (var item in items)
                         {
@@ -126,7 +126,7 @@ namespace Lifti
         public void Add<TItem>(TItem item)
         {
             var options = this.itemTokenizationOptions.Get<TItem>();
-            this.PerformWriteLockedAction(() => this.ApplyIndexInsertionMutations(m => this.Add(item, options, m)));
+            this.PerformWriteLockedAction(() => this.ApplyMutations(m => this.Add(item, options, m)));
         }
 
         public async ValueTask AddRangeAsync<TItem>(IEnumerable<TItem> items)
@@ -170,9 +170,11 @@ namespace Lifti
                     return;
                 }
 
-                var indexMutation = new IndexRemovalMutation(this.Root, this.IndexNodeFactory);
-                var id = this.idPool.ReleaseItem(itemKey);
-                this.Root = indexMutation.Remove(id);
+                this.ApplyMutations(m =>
+                {
+                    var id = this.idPool.ReleaseItem(itemKey);
+                    m.Remove(id);
+                });
 
                 result = true;
             });
@@ -230,18 +232,18 @@ namespace Lifti
             }
         }
 
-        private void ApplyIndexInsertionMutations(Action<IndexInsertionMutation> mutationAction)
+        private void ApplyMutations(Action<IndexMutation> mutationAction)
         {
-            var indexMutation = new IndexInsertionMutation(this.Root, this.IndexNodeFactory);
+            var indexMutation = new IndexMutation(this.Root, this.IndexNodeFactory);
 
             mutationAction(indexMutation);
 
             this.Root = indexMutation.ApplyInsertions();
         }
 
-        private async Task ApplyIndexInsertionMutationsAsync(Func<IndexInsertionMutation, Task> asyncMutationAction)
+        private async Task ApplyIndexInsertionMutationsAsync(Func<IndexMutation, Task> asyncMutationAction)
         {
-            var indexMutation = new IndexInsertionMutation(this.Root, this.IndexNodeFactory);
+            var indexMutation = new IndexMutation(this.Root, this.IndexNodeFactory);
 
             await asyncMutationAction(indexMutation).ConfigureAwait(false);
 
@@ -253,7 +255,7 @@ namespace Lifti
             return this.tokenizerFactory.Create(tokenizationOptions ?? this.defaultTokenizationOptions);
         }
 
-        private void Add<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> options, IndexInsertionMutation indexMutation)
+        private void Add<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> options, IndexMutation indexMutation)
         {
             var itemKey = options.KeyReader(item);
             var itemId = this.idPool.Add(itemKey);
@@ -266,7 +268,7 @@ namespace Lifti
             }
         }
 
-        private static void IndexTokens(IndexInsertionMutation indexMutation, int itemId, byte fieldId, IEnumerable<Token> tokens)
+        private static void IndexTokens(IndexMutation indexMutation, int itemId, byte fieldId, IEnumerable<Token> tokens)
         {
             foreach (var word in tokens)
             {
@@ -274,7 +276,7 @@ namespace Lifti
             }
         }
 
-        private async ValueTask AddAsync<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> options, IndexInsertionMutation indexMutation)
+        private async ValueTask AddAsync<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> options, IndexMutation indexMutation)
         {
             var itemKey = options.KeyReader(item);
             var itemId = this.idPool.Add(itemKey);

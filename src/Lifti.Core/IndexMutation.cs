@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace Lifti
 {
-    internal class IndexInsertionMutation
+    internal class IndexMutation
     {
         private readonly IndexNodeMutation root;
 
-        public IndexInsertionMutation(IndexNode root, IIndexNodeFactory indexNodeFactory)
+        public IndexMutation(IndexNode root, IIndexNodeFactory indexNodeFactory)
         {
             this.root = new IndexNodeMutation(0, root, indexNodeFactory);
         }
@@ -24,6 +24,11 @@ namespace Lifti
             Debug.Assert(word.Locations.Select((l, i) => i == 0 || l.WordIndex > word.Locations[i - 1].WordIndex).All(v => v));
 
             this.root.Index(itemId, fieldId, word.Locations, word.Value.AsMemory());
+        }
+
+        internal void Remove(int itemId)
+        {
+            this.root.Remove(itemId);
         }
 
         public IndexNode ApplyInsertions()

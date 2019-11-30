@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
@@ -39,6 +40,25 @@ namespace Lifti
         public bool HasMatches { get; private set; }
         public ReadOnlyMemory<char> IntraNodeText { get; private set; }
         public Dictionary<char, IndexNodeMutation> MutatedChildNodes { get; private set; }
+
+        public IEnumerable<KeyValuePair<char, IndexNode>> UnmutatedChildNodes
+        {
+            get
+            {
+                if (this.original == null)
+                {
+                    return Array.Empty<KeyValuePair<char, IndexNode>>();
+                }
+
+                if (this.MutatedChildNodes == null)
+                {
+                    return this.original.ChildNodes;
+                }
+
+                return this.original.ChildNodes.Where(n => !this.MutatedChildNodes.ContainsKey(n.Key));
+            }
+        }
+
         public Dictionary<int, ImmutableList<IndexedWord>> MutatedMatches { get; private set; }
 
         internal void Index(
@@ -73,7 +93,6 @@ namespace Lifti
 
             if (this.original == null)
             {
-
                 childNodes = this.MutatedChildNodes == null ? ImmutableDictionary<char, IndexNode>.Empty : mapNodeMutations().ToImmutableDictionary();
                 matches = this.MutatedMatches == null ? ImmutableDictionary<int, ImmutableList<IndexedWord>>.Empty : this.MutatedMatches.ToImmutableDictionary();
             }
@@ -85,14 +104,102 @@ namespace Lifti
                     childNodes = childNodes.SetItems(mapNodeMutations());
                 }
 
-                matches = this.original.Matches;
-                if (this.MutatedMatches?.Count > 0)
+                if (this.MutatedMatches == null)
                 {
-                    matches = matches.SetItems(this.MutatedMatches);
+                    matches = this.original.Matches;
+                }
+                else
+                {
+                    matches = this.MutatedMatches.ToImmutableDictionary();
                 }
             }
 
             return this.indexNodeFactory.CreateNode(this.IntraNodeText, childNodes, matches);
+        }
+
+        internal void Remove(int itemId)
+        {
+            if (this.HasChildNodes)
+            {
+                // First look through any already mutated child nodes
+                if (this.MutatedChildNodes != null)
+                {
+                    foreach (var child in this.MutatedChildNodes)
+                    {
+                        child.Value.Remove(itemId);
+                    }
+                }
+
+                // Then any unmutated children
+                foreach (var child in this.UnmutatedChildNodes)
+                {
+                    if (this.TryRemove(child.Value, itemId, this.depth + 1, out var mutatedChild))
+                    {
+                        this.EnsureMutatedChildNodesCreated();
+                        this.MutatedChildNodes.Add(child.Key, mutatedChild);
+                    }
+                }
+            }
+
+            if (this.HasMatches)
+            {
+                if (this.MutatedMatches != null)
+                {
+                    this.MutatedMatches.Remove(itemId);
+                }
+                else
+                {
+                    if (this.original.Matches.ContainsKey(itemId))
+                    {
+                        // Mutate and remove
+                        this.EnsureMutatedMatchesCreated();
+                        this.MutatedMatches.Remove(itemId);
+                    }
+                }
+            }
+        }
+
+        private bool TryRemove(IndexNode node, int itemId, int nodeDepth, out IndexNodeMutation mutatedNode)
+        {
+            mutatedNode = null;
+
+            if (node.HasChildNodes)
+            {
+                // Work through the child nodes and recursively determine whether removals are needed from 
+                // them. If they are, then this instance will also become mutated.
+                foreach (var child in node.ChildNodes)
+                {
+                    if (this.TryRemove(child.Value, itemId, nodeDepth + 1, out var mutatedChild))
+                    {
+                        if (mutatedNode == null)
+                        {
+                            mutatedNode = new IndexNodeMutation(nodeDepth, node, this.indexNodeFactory);
+                            mutatedNode.EnsureMutatedChildNodesCreated();
+                        }
+
+                        mutatedNode.MutatedChildNodes.Add(child.Key, mutatedChild);
+                    }
+                }
+            }
+
+            if (node.HasMatches)
+            {
+                // Removing an item from the nodes current matches will return the same dictionary
+                // if the item didn't exist - this removes the need for an extra Exists check
+                var mutatedMatches = node.Matches.Remove(itemId);
+                if (mutatedMatches != node.Matches)
+                {
+                    if (mutatedNode == null)
+                    {
+                        mutatedNode = new IndexNodeMutation(nodeDepth, node, this.indexNodeFactory);
+                    }
+
+                    mutatedNode.EnsureMutatedMatchesCreated();
+                    mutatedNode.MutatedMatches.Remove(itemId);
+                }
+            }
+
+            return mutatedNode != null;
         }
 
         private void IndexFromCharacter(
@@ -234,7 +341,17 @@ namespace Lifti
             if (this.MutatedMatches == null)
             {
                 this.HasMatches = true;
-                this.MutatedMatches = new Dictionary<int, ImmutableList<IndexedWord>>();
+
+                if (this.original?.HasMatches ?? false)
+                {
+                    // Once we're mutating matches, copy everything across
+                    this.MutatedMatches = new Dictionary<int, ImmutableList<IndexedWord>>(
+                        this.original.Matches);
+                }
+                else
+                {
+                    this.MutatedMatches = new Dictionary<int, ImmutableList<IndexedWord>>();
+                }
             }
         }
 
@@ -302,7 +419,7 @@ namespace Lifti
                 var nextDepth = currentDepth + 1;
                 if (this.original != null)
                 {
-                    foreach (var item in this.original.ChildNodes.Where(e => this.MutatedChildNodes == null || !this.MutatedMatches.ContainsKey(e.Key)))
+                    foreach (var item in this.original.ChildNodes.Where(e => this.MutatedChildNodes == null || !this.MutatedChildNodes.ContainsKey(e.Key)))
                     {
                         builder.AppendLine();
                         item.Value.ToString(builder, item.Key, nextDepth);

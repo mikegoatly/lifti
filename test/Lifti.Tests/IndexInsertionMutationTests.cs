@@ -1,8 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
-using Moq;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Xunit;
@@ -13,7 +11,7 @@ namespace Lifti.Tests
     {
         private readonly IndexNodeFactory nodeFactory;
         private readonly IndexNode rootNode;
-        private readonly IndexInsertionMutation sut;
+        private readonly IndexMutation sut;
         private readonly IndexedWord locations1 = CreateLocations(0, (0, 1, 2), (1, 5, 8));
         private readonly IndexedWord locations2 = CreateLocations(0, (2, 9, 2));
         private readonly IndexedWord locations3 = CreateLocations(0, (3, 14, 5));
@@ -28,7 +26,7 @@ namespace Lifti.Tests
         {
             this.nodeFactory = new IndexNodeFactory();
             this.rootNode = this.nodeFactory.CreateRootNode();
-            this.sut = new IndexInsertionMutation(this.rootNode, this.nodeFactory);
+            this.sut = new IndexMutation(this.rootNode, this.nodeFactory);
         }
 
         [Fact]
