@@ -22,6 +22,8 @@ namespace Lifti
         private bool isDisposed;
         private IndexNode root;
 
+        private IndexMutation batchMutation;
+
         internal FullTextIndex(
             ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions,
             IIndexNodeFactory indexNodeFactory,
@@ -60,13 +62,43 @@ namespace Lifti
 
         public IIndexedFieldLookup FieldLookup { get; }
 
-        public int Count => this.IdLookup.Count;
+        public int Count => this.currentSnapshot.IdLookup.Count;
 
         internal IIndexNodeFactory IndexNodeFactory { get; }
 
         public IIndexSnapshot<TKey> Snapshot()
         {
             return this.currentSnapshot;
+        }
+
+        public void BeginBatchChange()
+        {
+            this.PerformWriteLockedAction(() =>
+            {
+                if (this.batchMutation != null)
+                {
+                    throw new LiftiException(ExceptionMessages.BatchChangeAlreadyStarted);
+                }
+
+                this.batchMutation = new IndexMutation(this.Root, this.IndexNodeFactory);
+            });
+        }
+
+        public ValueTask CommitBatchChangeAsync()
+        {
+            return this.PerformWriteLockedActionAsync(() =>
+            {
+                if (this.batchMutation == null)
+                {
+                    throw new LiftiException(ExceptionMessages.NoBatchChangeInProgress);
+                }
+
+                this.Root = this.batchMutation.Apply();
+
+                this.batchMutation = null;
+
+                return new ValueTask();
+            });
         }
 
         public void Add(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null)
@@ -215,7 +247,7 @@ namespace Lifti
             }
         }
 
-        private async Task PerformWriteLockedActionAsync(Func<Task> asyncAction)
+        private async ValueTask PerformWriteLockedActionAsync(Func<ValueTask> asyncAction)
         {
             if (!await this.writeLock.WaitAsync(this.writeLockTimeout).ConfigureAwait(false))
             {
@@ -234,20 +266,23 @@ namespace Lifti
 
         private void ApplyMutations(Action<IndexMutation> mutationAction)
         {
-            var indexMutation = new IndexMutation(this.Root, this.IndexNodeFactory);
+            var indexMutation = this.batchMutation ?? new IndexMutation(this.Root, this.IndexNodeFactory);
 
             mutationAction(indexMutation);
 
-            this.Root = indexMutation.ApplyInsertions();
+            if (indexMutation != this.batchMutation)
+            {
+                this.Root = indexMutation.Apply();
+            }
         }
 
-        private async Task ApplyIndexInsertionMutationsAsync(Func<IndexMutation, Task> asyncMutationAction)
+        private async ValueTask ApplyIndexInsertionMutationsAsync(Func<IndexMutation, Task> asyncMutationAction)
         {
             var indexMutation = new IndexMutation(this.Root, this.IndexNodeFactory);
 
             await asyncMutationAction(indexMutation).ConfigureAwait(false);
 
-            this.Root = indexMutation.ApplyInsertions();
+            this.Root = indexMutation.Apply();
         }
 
         private ITokenizer GetTokenizer(TokenizationOptions tokenizationOptions)

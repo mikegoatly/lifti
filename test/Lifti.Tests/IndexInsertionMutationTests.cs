@@ -33,7 +33,7 @@ namespace Lifti.Tests
         public void IndexingEmptyNode_ShouldResultInItemsDirectlyIndexedAtNode()
         {
             this.sut.Add(item1, fieldId1, new Token("test", this.locations1.Locations));
-            var result = this.sut.ApplyInsertions();
+            var result = this.sut.Apply();
 
             VerifyResult(result, "test", new[] { (item1, this.locations1) });
         }
@@ -45,7 +45,7 @@ namespace Lifti.Tests
         {
             this.sut.Add(item1, fieldId1, new Token(word, this.locations1.Locations));
             this.sut.Add(item2, fieldId1, new Token(word, this.locations2.Locations));
-            var result = this.sut.ApplyInsertions();
+            var result = this.sut.Apply();
 
             VerifyResult(result, word, new[] { (item1, this.locations1), (item2, this.locations2) });
         }
@@ -57,7 +57,7 @@ namespace Lifti.Tests
             this.sut.Add(item2, fieldId1, new Token("able", this.locations2.Locations));
             this.sut.Add(item3, fieldId1, new Token("banana", this.locations3.Locations));
             this.sut.Add(item4, fieldId1, new Token("a", this.locations4.Locations));
-            var result = this.sut.ApplyInsertions();
+            var result = this.sut.Apply();
 
             VerifyResult(result, null, expectedChildNodes: new[] { 'a', 'b' });
             VerifyResult(result, new[] { 'a' }, null, new[] { (item4, this.locations4) }, new[] { 'p', 'b' });
@@ -72,7 +72,7 @@ namespace Lifti.Tests
             this.sut.Add(item1, fieldId1, new Token("freedom", this.locations1.Locations));
             this.sut.Add(item2, fieldId1, new Token("fred", this.locations2.Locations));
             this.sut.Add(item3, fieldId1, new Token("freddy", this.locations3.Locations));
-            var result = this.sut.ApplyInsertions();
+            var result = this.sut.Apply();
 
             VerifyResult(result, "fre", expectedChildNodes: new[] { 'e', 'd' });
             VerifyResult(result, new[] { 'e' }, "dom", new[] { (item1, this.locations1) });
@@ -86,7 +86,7 @@ namespace Lifti.Tests
             this.sut.Add(item1, fieldId1, new Token("test", this.locations1.Locations));
             this.sut.Add(item2, fieldId1, new Token("testing", this.locations2.Locations));
             this.sut.Add(item3, fieldId1, new Token("tester", this.locations3.Locations));
-            var result = this.sut.ApplyInsertions();
+            var result = this.sut.Apply();
 
             VerifyResult(result, "test", new[] { (item1, this.locations1) }, new[] { 'i', 'e' });
             VerifyResult(result, new[] { 'i' }, "ng", new[] { (item2, this.locations2) });
@@ -107,7 +107,7 @@ namespace Lifti.Tests
         {
             this.sut.Add(item1, fieldId1, new Token("test", this.locations1.Locations));
             this.sut.Add(item2, fieldId1, new Token(indexText, this.locations2.Locations));
-            var result = this.sut.ApplyInsertions();
+            var result = this.sut.Apply();
 
             VerifyResult(result, remainingIntraText, expectedChildNodes: new[] { originalSplitChar, newSplitChar });
             VerifyResult(result, new[] { originalSplitChar }, splitIntraText, new[] { (item1, this.locations1) });
@@ -119,7 +119,7 @@ namespace Lifti.Tests
         {
             this.sut.Add(item1, fieldId1, new Token("NOITAZI", this.locations1.Locations));
             this.sut.Add(item2, fieldId1, new Token("NOITA", this.locations2.Locations));
-            var result = this.sut.ApplyInsertions();
+            var result = this.sut.Apply();
 
             VerifyResult(result, "NOITA", new[] { (item2, this.locations2) }, expectedChildNodes: new[] { 'Z' });
             VerifyResult(result, new[] { 'Z' }, "I", new[] { (item1, this.locations1) });
@@ -131,7 +131,7 @@ namespace Lifti.Tests
             this.sut.Add(item1, fieldId1, new Token("www", this.locations1.Locations));
             this.sut.Add(item2, fieldId1, new Token("w3c", this.locations2.Locations));
             this.sut.Add(item3, fieldId1, new Token("w3", this.locations3.Locations));
-            var result = this.sut.ApplyInsertions();
+            var result = this.sut.Apply();
 
             VerifyResult(result, "w", expectedChildNodes: new[] { 'w', '3' });
             VerifyResult(result, new[] { 'w' }, "w", new[] { (item1, this.locations1) });

@@ -79,6 +79,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot start a new batch change while another is already in progress..
+        /// </summary>
+        internal static string BatchChangeAlreadyStarted {
+            get {
+                return ResourceManager.GetString("BatchChangeAlreadyStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected at least one word part to be parsed.
         /// </summary>
         internal static string ExpectedAtLeastOneWordPartParsed {
@@ -210,6 +219,15 @@ namespace Lifti {
         internal static string MissingLiftiHeaderIndicatorBytes {
             get {
                 return ResourceManager.GetString("MissingLiftiHeaderIndicatorBytes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No batch change in progress..
+        /// </summary>
+        internal static string NoBatchChangeInProgress {
+            get {
+                return ResourceManager.GetString("NoBatchChangeInProgress", resourceCulture);
             }
         }
         

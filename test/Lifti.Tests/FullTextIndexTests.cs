@@ -219,6 +219,37 @@ namespace Lifti.Tests
             this.index.Search("test").Should().HaveCount(10);
         }
 
+        [Fact]
+        public async Task WritingToIndexInBatch_WritesShouldOnlyBeReadableOnceBatchCompletes()
+        {
+            this.index.BeginBatchChange();
+
+            this.WithIndexedSingleStringPropertyObjects();
+
+            this.index.Count.Should().Be(0);
+            this.index.Search("three").Count().Should().Be(0);
+
+            await this.index.CommitBatchChangeAsync();
+
+            this.index.Count.Should().Be(2);
+            this.index.Search("three").Count().Should().Be(2);
+        }
+
+        [Fact]
+        public async Task AddingToAndRemovingTheSameItemInOneBatch_ShouldResultInItemNotIndexed()
+        {
+            this.index.BeginBatchChange();
+
+            this.index.Add("A", "Test");
+            this.index.Add("B", "Test");
+            this.index.Remove("A");
+
+            await this.index.CommitBatchChangeAsync();
+
+            this.index.Count.Should().Be(1);
+            this.index.Search("test").Select(t => t.Key).Should().BeEquivalentTo("B");
+        }
+
         private void WithIndexedSingleStringPropertyObjects()
         {
             this.index.Add(new TestObject("A", "Text One", "Text Two", "Text Three Drumming"));

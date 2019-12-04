@@ -31,7 +31,7 @@ namespace Lifti
             this.root.Remove(itemId);
         }
 
-        public IndexNode ApplyInsertions()
+        public IndexNode Apply()
         {
             return this.root.Apply();
         }

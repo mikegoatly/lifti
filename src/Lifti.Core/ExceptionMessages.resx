@@ -123,6 +123,9 @@
   <data name="AtLeastOneFieldMustBeIndexed" xml:space="preserve">
     <value>At least one field must be configured for an item</value>
   </data>
+  <data name="BatchChangeAlreadyStarted" xml:space="preserve">
+    <value>Cannot start a new batch change while another is already in progress.</value>
+  </data>
   <data name="ExpectedAtLeastOneWordPartParsed" xml:space="preserve">
     <value>Expected at least one word part to be parsed</value>
   </data>
@@ -167,6 +170,9 @@
   </data>
   <data name="MissingLiftiHeaderIndicatorBytes" xml:space="preserve">
     <value>The expected header bytes could not be found in the stream - this is probably not a serialized index.</value>
+  </data>
+  <data name="NoBatchChangeInProgress" xml:space="preserve">
+    <value>No batch change in progress.</value>
   </data>
   <data name="NoDeserializerAvailableForIndexVersion" xml:space="preserve">
     <value>No deserializer available for binary serialized version {0}.</value>
