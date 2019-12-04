@@ -2,6 +2,9 @@
 using Lifti.Querying;
 using Lifti.Tokenization;
 using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lifti
 {
@@ -13,6 +16,62 @@ namespace Lifti
         private ITokenizerFactory tokenizerFactory;
         private IQueryParser queryParser;
         private TokenizationOptions defaultTokenizationOptions = TokenizationOptions.Default;
+        private List<Func<IIndexSnapshot<TKey>, ValueTask>> indexModifiedActions;
+
+        /// <summary>
+        /// Registers an async action that needs to occur when mutations to the index are committed and
+        /// a new snapshot is generated.
+        /// </summary>
+        /// <param name="asyncAction">
+        /// The async action to execute. The argument is the new snapshot of the index.
+        /// </param>
+        public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, ValueTask> asyncAction)
+        {
+            if (asyncAction is null)
+            {
+                throw new ArgumentNullException(nameof(asyncAction));
+            }
+
+            if (this.indexModifiedActions == null)
+            {
+                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, ValueTask>>();
+            }
+
+            this.indexModifiedActions.Add(asyncAction);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Registers an action that needs to occur when mutations to the index are committed and
+        /// a new snapshot is generated.
+        /// </summary>
+        /// <param name="action">
+        /// The action to execute. The argument is the new snapshot of the index.
+        /// </param>
+        /// <remarks>
+        /// This is just a convenience wrapper around the async execution.
+        /// </remarks>
+        public FullTextIndexBuilder<TKey> WithIndexModificationAction(Action<IIndexSnapshot<TKey>> action)
+        {
+            if (action is null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            if (this.indexModifiedActions == null)
+            {
+                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, ValueTask>>();
+            }
+
+            this.indexModifiedActions.Add((snapshot) =>
+            {
+                action(snapshot);
+                return new ValueTask();
+            });
+
+            return this;
+        }
 
         /// <summary>
         /// Creates an <see cref="ItemTokenizationOptions{TItem, TKey}"/> configuration entry for an item of type <typeparamref name="TItem"/>
@@ -123,7 +182,7 @@ namespace Lifti
                 this.tokenizerFactory ?? new TokenizerFactory(),
                 this.queryParser ?? new QueryParser(),
                 this.defaultTokenizationOptions,
-                null);
+                this.indexModifiedActions?.ToArray());
         }
     }
 }

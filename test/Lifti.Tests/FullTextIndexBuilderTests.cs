@@ -3,6 +3,8 @@ using Lifti.Querying;
 using Lifti.Tests.Querying;
 using Lifti.Tokenization;
 using Moq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Lifti.Tests
@@ -113,6 +115,23 @@ namespace Lifti.Tests
             var index = this.sut.Build();
 
             factory.Verify(f => f.Configure(It.Is<AdvancedOptions>(o => o.SupportIntraNodeTextAfterIndexDepth == 89)), Times.Once);
+        }
+
+        [Fact]
+        public async Task WithIndexModifiedActions_ShouldPassActionsToIndex()
+        {
+            var action1 = new List<string>();
+            var action2 = new List<int>();
+
+            this.sut.WithIndexModificationAction(i => action1.Add(i.IdLookup.Count.ToString()))
+                .WithIndexModificationAction(i => action2.Add(i.IdLookup.Count));
+
+            var index = this.sut.Build();
+
+            await index.AddAsync(9, "Test");
+
+            action1.Should().BeEquivalentTo("1");
+            action2.Should().BeEquivalentTo(1);
         }
 
         private Mock<IQueryParser> ConfigureQueryParserMock()
