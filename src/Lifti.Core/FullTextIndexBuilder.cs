@@ -122,7 +122,8 @@ namespace Lifti
                 this.indexNodeFactory,
                 this.tokenizerFactory ?? new TokenizerFactory(),
                 this.queryParser ?? new QueryParser(),
-                this.defaultTokenizationOptions);
+                this.defaultTokenizationOptions,
+                null);
         }
     }
 }

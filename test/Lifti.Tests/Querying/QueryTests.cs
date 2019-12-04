@@ -2,25 +2,31 @@
 using Lifti.Querying;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Lifti.Tests.Querying
 {
-    public class QueryTests
+    public class QueryTests : IAsyncLifetime
     {
-        private readonly IFullTextIndex<string> index;
+        private IFullTextIndex<string> index;
 
-        public QueryTests()
+        public async Task InitializeAsync()
         {
             this.index = new FullTextIndexBuilder<string>().Build();
-            this.index.Add("A", "Some test text");
+            await this.index.AddAsync("A", "Some test text");
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
         }
 
         [Fact]
         public void WithNullRoot_ShouldReturnNoResults()
         {
             var query = new Query(null);
-            query.Execute(this.index.Snapshot()).Should().HaveCount(0);
+            query.Execute(this.index.Snapshot).Should().HaveCount(0);
         }
 
         [Fact]

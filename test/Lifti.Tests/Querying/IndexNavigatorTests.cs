@@ -6,12 +6,12 @@ using Xunit;
 
 namespace Lifti.Tests.Querying
 {
-    public class IndexNavigatorTests : QueryTestBase
+    public class IndexNavigatorTests : QueryTestBase, IAsyncLifetime
     {
-        private readonly FullTextIndex<string> index;
-        private readonly IIndexNavigator sut;
+        private FullTextIndex<string> index;
+        private IIndexNavigator sut;
 
-        public IndexNavigatorTests()
+        public async Task InitializeAsync()
         {
             this.index = new FullTextIndexBuilder<string>()
                 .WithItemTokenization<(string, string, string)>(
@@ -20,8 +20,13 @@ namespace Lifti.Tests.Querying
                         .WithField("Field2", i => i.Item3))
                 .Build();
 
-            this.index.Add("A", "Triumphant elephant strode elegantly with indifference to shouting subjects, giving withering looks to individuals");
-            this.sut = this.index.Snapshot().CreateNavigator();
+            await this.index.AddAsync("A", "Triumphant elephant strode elegantly with indifference to shouting subjects, giving withering looks to individuals");
+            this.sut = this.index.Snapshot.CreateNavigator();
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
         }
 
         [Theory]
@@ -135,7 +140,7 @@ namespace Lifti.Tests.Querying
             await this.index.AddAsync(("B", "Zoopla Zoo Zammo", "Zany Zippy Llamas"));
             await this.index.AddAsync(("C", "Zak", "Ziggy Stardust"));
 
-            var navigator = this.index.Snapshot().CreateNavigator();
+            var navigator = this.index.Snapshot.CreateNavigator();
             navigator.Process("Z").Should().BeTrue();
             var results = navigator.GetExactAndChildMatches();
             results.Should().NotBeNull();

@@ -207,7 +207,9 @@ namespace Lifti.Tokenization.Stemming
                                 .AccentInsensitive(false)))
                 .Build();
 
-            index.AddRange(replacements);
+            // This is safe because the only time this could become actually async is if the index
+            // is extended to use some extension that is truly async
+            index.AddRangeAsync(replacements).GetAwaiter().GetResult();
 
             return index;
         }

@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 using Lifti;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
@@ -16,10 +17,10 @@ namespace PerformanceProfiling
         private UpdatableFullTextIndex<string> legacyIndex;
 
         [GlobalSetup]
-        public void SetUp()
+        public async Task SetUp()
         {
             this.index = CreateNewIndex(4);
-            this.PopulateIndex(this.index);
+            await this.PopulateIndexAsync(this.index);
             this.legacyIndex = CreateLegacyIndex();
             this.PopulateIndex(this.legacyIndex);
         }
@@ -66,59 +67,59 @@ namespace PerformanceProfiling
     public class FullTextIndexTests : IndexBenchmarkBase
     {
         //[Benchmark()]
-        //public void NewCodeIndexingAlwaysSupportIntraNodeText()
+        //public async Task NewCodeIndexingAlwaysSupportIntraNodeText()
         //{
         //    var index = CreateNewIndex(0);
-        //    this.PopulateIndex(index);
+        //    await this.PopulateIndexAsync(index);
         //}
 
         //[Benchmark()]
-        //public void NewCodeIndexingAlwaysIndexCharByChar()
+        //public async Task NewCodeIndexingAlwaysIndexCharByChar()
         //{
         //    var index = CreateNewIndex(1000);
-        //    this.PopulateIndex(index);
+        //    await this.PopulateIndexAsync(index);
         //}
 
         [Benchmark()]
-        public void NewCodeIndexingIntraNodeTextAt4Characters()
+        public async Task NewCodeIndexingIntraNodeTextAt4Characters()
         {
             var index = CreateNewIndex(4);
-            this.PopulateIndex(index);
+            await this.PopulateIndexAsync(index);
         }
 
         //[Benchmark()]
-        //public void NewCodeIndexingOneByOneIntraNodeTextAt2Characters()
+        //public async Task NewCodeIndexingOneByOneIntraNodeTextAt2Characters()
         //{
         //    var index = CreateNewIndex(2);
-        //    this.PopulateIndexOneByOne(index);
+        //    await this.PopulateIndexOneByOneAsync(index);
         //}
 
         //[Benchmark()]
-        //public void NewCodeIndexingOneByOneAlwaysSupportIntraNodeText()
+        //public async Task NewCodeIndexingOneByOneAlwaysSupportIntraNodeText()
         //{
         //    var index = CreateNewIndex(0);
-        //    this.PopulateIndexOneByOne(index);
+        //    await this.PopulateIndexOneByOneAsync(index);
         //}
 
         //[Benchmark()]
-        //public void NewCodeIndexingOneByOneAlwaysIndexCharByChar()
+        //public async Task NewCodeIndexingOneByOneAlwaysIndexCharByChar()
         //{
         //    var index = CreateNewIndex(1000);
-        //    this.PopulateIndexOneByOne(index);
+        //    await this.PopulateIndexOneByOneAsync(index);
         //}
 
         //[Benchmark()]
-        //public void NewCodeIndexingOneByOneIntraNodeTextAt4Characters()
+        //public async Task Task NewCodeIndexingOneByOneIntraNodeTextAt4Characters()
         //{
         //    var index = CreateNewIndex(4);
-        //    this.PopulateIndexOneByOne(index);
+        //    await this.PopulateIndexOneByOneAsync(index);
         //}
 
         //[Benchmark()]
-        //public void NewCodeIndexingIntraNodeTextAt2Characters()
+        //public async Task NewCodeIndexingIntraNodeTextAt2Characters()
         //{
         //    var index = CreateNewIndex(2);
-        //    this.PopulateIndex(index);
+        //    await this.PopulateIndexAsync(index);
         //}
 
         [Benchmark()]

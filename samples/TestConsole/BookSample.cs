@@ -2,6 +2,7 @@
 using Lifti.Tokenization;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace TestConsole
 {
@@ -25,7 +26,7 @@ namespace TestConsole
             },
         };
 
-        public static void Run()
+        public static async Task RunAsync()
         {
             var bookIndex = new FullTextIndexBuilder<int>() // Books are indexed by their BookId property, which is an int.
                 .WithItemTokenization<Book>(
@@ -36,7 +37,7 @@ namespace TestConsole
                         .WithField("Synopsis", b => b.Synopsis, tokenOptions => tokenOptions.WithStemming()))
                 .Build();
 
-            bookIndex.AddRange(books);
+            await bookIndex.AddRangeAsync(books);
 
             // Both books contain "first" - prints "Matched items: 1, 2"
             var results = bookIndex.Search("first");

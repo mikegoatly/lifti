@@ -19,9 +19,9 @@ Read the documentation [here](https://mikegoatly.github.io/lifti)
 var index = new FullTextIndexBuilder<string>().Build();
 
 // Index
-index.Add("A", "This is some text associated with A: fizz");
-index.Add("B", "Some buzz text for B");
-index.Add("C", "Text associated with C is both fizz and buzz");
+await index.AddAsync("A", "This is some text associated with A: fizz");
+await index.AddAsync("B", "Some buzz text for B");
+await index.AddAsync("C", "Text associated with C is both fizz and buzz");
 
 // Search for text containing both Fizz *and* Buzz
 var results = index.Search("Fizz Buzz").ToList();

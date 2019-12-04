@@ -26,7 +26,7 @@ namespace Lifti.Serialization.Binary
 
         public async Task WriteAsync(FullTextIndex<TKey> index)
         {
-            var snapshot = index.Snapshot();
+            var snapshot = index.Snapshot;
 
             await this.WriteHeaderAsync(snapshot).ConfigureAwait(false);
 

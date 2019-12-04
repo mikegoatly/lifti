@@ -18,21 +18,16 @@ namespace Lifti
         IIndexedFieldLookup FieldLookup { get; }
 
         /// <summary>
-        /// Gets the number of items contained in the index.
+        /// Gets the number of items contained in the index. This will not reflect any new items
+        /// that are currently being inserted in a batch until the batch completes.
         /// </summary>
         int Count { get; }
 
         /// <summary>
-        /// Indexes some text against a given key.
+        /// Gets a self-consistent snapshot of the index that can be used to create navigators and query the index
+        /// whilst it is being mutated.
         /// </summary>
-        /// <param name="itemKey">The key of the item being indexed.</param>
-        /// <param name="text">The text to index against the item.</param>
-        /// <param name="tokenizationOptions">
-        /// An instance of <see cref="TokenizationOptions"/>
-        /// that describes how the text should be treated as it is tokenized.
-        /// When null, <see cref="TokenizationOptions.Default"/> will be used.
-        /// </param>
-        void Add(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null);
+        IIndexSnapshot<TKey> Snapshot { get; }
 
         /// <summary>
         /// Indexes some text against a given key.
@@ -44,36 +39,23 @@ namespace Lifti
         /// that describes how the text should be treated as it is tokenized.
         /// When null, <see cref="TokenizationOptions.Default"/> will be used.
         /// </param>
-        void Add(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null);
+        ValueTask AddAsync(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null);
+
+        /// <summary>
+        /// Indexes some text against a given key.
+        /// </summary>
+        /// <param name="itemKey">The key of the item being indexed.</param>
+        /// <param name="text">The text to index against the item.</param>
+        /// <param name="tokenizationOptions">
+        /// An instance of <see cref="TokenizationOptions"/>
+        /// that describes how the text should be treated as it is tokenized.
+        /// When null, <see cref="TokenizationOptions.Default"/> will be used.
+        /// </param>
+        ValueTask AddAsync(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null);
 
         /// <summary>
         /// Indexes a single item of type <typeparamref name="TItem"/>. This type must have been
         /// configured when the index was built.
-        /// </summary>
-        /// <typeparam name="TItem">
-        /// The type of the item being indexed.
-        /// </typeparam>
-        /// <param name="item">
-        /// The item to index.
-        /// </param>
-        void Add<TItem>(TItem item);
-
-        /// <summary>
-        /// Indexes a set of items of type <typeparamref name="TItem"/>. This type must have been
-        /// configured when the index was built.
-        /// </summary>
-        /// <typeparam name="TItem">
-        /// The type of the item being indexed.
-        /// </typeparam>
-        /// <param name="items">
-        /// The items to index.
-        /// </param>
-        void AddRange<TItem>(IEnumerable<TItem> items);
-
-        /// <summary>
-        /// Indexes a single item of type <typeparamref name="TItem"/>. This type must have been
-        /// configured when the index was built. This async method only needs to be used when an
-        /// async accessor for field text has been provided.
         /// </summary>
         /// <typeparam name="TItem">
         /// The type of the item being indexed.
@@ -85,8 +67,7 @@ namespace Lifti
 
         /// <summary>
         /// Indexes a set of items of type <typeparamref name="TItem"/>. This type must have been
-        /// configured when the index was built. This async method only needs to be used when an
-        /// async accessor for field text has been provided.
+        /// configured when the index was built.
         /// </summary>
         /// <typeparam name="TItem">
         /// The type of the item being indexed.
@@ -106,7 +87,7 @@ namespace Lifti
         /// <returns>
         /// <c>true</c> if the item was in the index, <c>false</c> if it was not.
         /// </returns>
-        bool Remove(TKey itemKey);
+        ValueTask<bool> RemoveAsync(TKey itemKey);
 
         /// <summary>
         /// Performs a search against this index.
@@ -121,11 +102,5 @@ namespace Lifti
         /// The matching search results.
         /// </returns>
         IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions tokenizationOptions = null);
-
-        /// <summary>
-        /// Creates a self-consistent snapshot of the index that can be used to create navigators and query the index
-        /// whilst it is being mutated.
-        /// </summary>
-        IIndexSnapshot<TKey> Snapshot();
     }
 }

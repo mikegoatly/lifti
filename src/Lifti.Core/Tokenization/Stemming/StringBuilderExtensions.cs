@@ -156,7 +156,7 @@
             var length = builder.Length;
             if (length > 3)
             {
-                using (var navigator = replacementSetLookup.Snapshot().CreateNavigator())
+                using (var navigator = replacementSetLookup.Snapshot.CreateNavigator())
                 {
                     if (navigator.Process(builder[builder.Length - 1]))
                     {

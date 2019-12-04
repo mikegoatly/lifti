@@ -31,9 +31,9 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void IndexedItemsShouldBeRetrievable()
+        public async Task IndexedItemsShouldBeRetrievable()
         {
-            this.WithIndexedStrings();
+            await this.WithIndexedStringsAsync();
 
             var results = this.index.Search("this test");
 
@@ -41,9 +41,9 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void IndexShouldBeSearchableWithHypenatedText()
+        public async Task IndexShouldBeSearchableWithHypenatedText()
         {
-            this.WithIndexedStrings();
+            await this.WithIndexedStringsAsync();
 
             var results = this.index.Search("third-eye");
 
@@ -51,9 +51,9 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void WordsRetrievedBySearchingForTextIndexedBySimpleStringsShouldBeAssociatedToDefaultField()
+        public async Task WordsRetrievedBySearchingForTextIndexedBySimpleStringsShouldBeAssociatedToDefaultField()
         {
-            this.WithIndexedStrings();
+            await this.WithIndexedStringsAsync();
 
             var results = this.index.Search("this");
 
@@ -61,9 +61,9 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void SearchingByMultipleWildcards_ShouldReturnResult()
+        public async Task SearchingByMultipleWildcards_ShouldReturnResult()
         {
-            this.WithIndexedStrings();
+            await this.WithIndexedStringsAsync();
 
             var results = this.index.Search("fo* te*");
 
@@ -71,9 +71,9 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void SearchingWithinFieldsShouldObeyTokenizationOptionsForFields()
+        public async Task SearchingWithinFieldsShouldObeyTokenizationOptionsForFields()
         {
-            this.WithIndexedSingleStringPropertyObjects();
+            await this.WithIndexedSingleStringPropertyObjectsAsync();
 
             this.index.Search("Text1=one").Should().HaveCount(0);
             this.index.Search("Text1=One").Should().HaveCount(2);
@@ -86,18 +86,18 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void IndexedObjectsShouldBeRetrievableByTextFromAnyIndexedField()
+        public async Task IndexedObjectsShouldBeRetrievableByTextFromAnyIndexedField()
         {
-            this.WithIndexedSingleStringPropertyObjects();
+            await this.WithIndexedSingleStringPropertyObjectsAsync();
 
             this.index.Search("two").Should().HaveCount(2);
             this.index.Search("three").Should().HaveCount(2);
         }
 
         [Fact]
-        public void WordsRetrievedBySearchingForTextIndexedByObjectsShouldBeAssociatedToCorrectFields()
+        public async Task WordsRetrievedBySearchingForTextIndexedByObjectsShouldBeAssociatedToCorrectFields()
         {
-            this.WithIndexedSingleStringPropertyObjects();
+            await this.WithIndexedSingleStringPropertyObjectsAsync();
 
             var results = this.index.Search("one");
             results.All(i => i.FieldMatches.All(l => l.FoundIn == "Text1")).Should().BeTrue();
@@ -119,15 +119,9 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void IndexingFieldWithoutAsyncWhenAsyncRequired_ShouldThrowException()
+        public async Task IndexedMultiStringPropertyObjectsShouldBeRetrievableByTextFromAnyIndexedField()
         {
-            Assert.Throws<LiftiException>(() => this.index.Add(new TestObject3("1", "!", "11")));
-        }
-
-        [Fact]
-        public void IndexedMultiStringPropertyObjectsShouldBeRetrievableByTextFromAnyIndexedField()
-        {
-            this.WithIndexedMultiStringPropertyObjects();
+            await this.WithIndexedMultiStringPropertyObjectsAsync();
 
             this.index.Search("text").Should().HaveCount(1);
             this.index.Search("one").Should().HaveCount(2);
@@ -136,9 +130,9 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void WordsRetrievedBySearchingForTextIndexedByMultiStringPropertyObjectsShouldBeAssociatedToCorrectFields()
+        public async Task WordsRetrievedBySearchingForTextIndexedByMultiStringPropertyObjectsShouldBeAssociatedToCorrectFields()
         {
-            this.WithIndexedMultiStringPropertyObjects();
+            await this.WithIndexedMultiStringPropertyObjectsAsync();
 
             var results = this.index.Search("one");
             results.All(i => i.FieldMatches.All(l => l.FoundIn == "MultiText")).Should().BeTrue();
@@ -149,68 +143,68 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void RemovingItemFromIndex_ShouldMakeItUnsearchable()
+        public async Task RemovingItemFromIndex_ShouldMakeItUnsearchable()
         {
-            this.WithIndexedStrings();
+            await this.WithIndexedStringsAsync();
 
             this.index.Search("foo").Should().HaveCount(1);
 
-            this.index.Remove("C").Should().BeTrue();
+            (await this.index.RemoveAsync("C")).Should().BeTrue();
 
             this.index.Search("foo").Should().HaveCount(0);
         }
 
         [Fact]
-        public void RemovingLastItemFromIndex_ShouldReturnTrue()
+        public async Task RemovingLastItemFromIndex_ShouldReturnTrue()
         {
-            this.index.Add("A", "foo");
+            await this.index.AddAsync("A", "foo");
 
             this.index.Search("foo").Should().HaveCount(1);
 
-            this.index.Remove("A").Should().BeTrue();
+            (await this.index.RemoveAsync("A")).Should().BeTrue();
 
             this.index.Search("foo").Should().HaveCount(0);
         }
 
         [Fact]
-        public void RemovingItemFromIndexThatIsntIndexed_ShouldReturnFalse()
+        public async Task RemovingItemFromIndexThatIsntIndexed_ShouldReturnFalse()
         {
-            this.WithIndexedStrings();
+            await this.WithIndexedStringsAsync();
 
-            this.index.Remove("Z").Should().BeFalse();
-            this.index.Remove("C").Should().BeTrue();
-            this.index.Remove("C").Should().BeFalse();
+            (await this.index.RemoveAsync("Z")).Should().BeFalse();
+            (await this.index.RemoveAsync("C")).Should().BeTrue();
+            (await this.index.RemoveAsync("C")).Should().BeFalse();
         }
 
         [Fact]
-        public void WhenLoadingLotsOfDataShouldNotError()
+        public async Task WhenLoadingLotsOfDataShouldNotError()
         {
             var wikipediaTests = WikipediaDataLoader.Load(this.GetType());
             foreach (var (name, text) in wikipediaTests)
             {
-                this.index.Add(name, text);
+                await this.index.AddAsync(name, text);
             }
 
-            this.index.Remove(wikipediaTests[10].name);
-            this.index.Remove(wikipediaTests[9].name);
-            this.index.Remove(wikipediaTests[8].name);
+            await this.index.RemoveAsync(wikipediaTests[10].name);
+            await this.index.RemoveAsync(wikipediaTests[9].name);
+            await this.index.RemoveAsync(wikipediaTests[8].name);
         }
 
         [Fact]
         public async Task WritingToIndexFromMultipleThreadsSimultaneously_ShouldUpdateIndexCorrectly()
         {
             var startBarrier = new Barrier(10);
-            void Index(int id)
+            async Task IndexAsync(int id)
             {
                 startBarrier.SignalAndWait();
-                this.index.Add(id.ToString(), "Test testing another test");
+                await this.index.AddAsync(id.ToString(), "Test testing another test");
             }
 
             var tasks = new List<Task>();
             for (var i = 0; i < 10; i++)
             {
                 var id = i;
-                tasks.Add(Task.Run(() => Index(id)));
+                tasks.Add(Task.Run(async () => await IndexAsync(id)));
             }
 
             await Task.WhenAll(tasks);
@@ -224,7 +218,7 @@ namespace Lifti.Tests
         {
             this.index.BeginBatchChange();
 
-            this.WithIndexedSingleStringPropertyObjects();
+            await this.WithIndexedSingleStringPropertyObjectsAsync();
 
             this.index.Count.Should().Be(0);
             this.index.Search("three").Count().Should().Be(0);
@@ -240,9 +234,9 @@ namespace Lifti.Tests
         {
             this.index.BeginBatchChange();
 
-            this.index.Add("A", "Test");
-            this.index.Add("B", "Test");
-            this.index.Remove("A");
+            await this.index.AddAsync("A", "Test");
+            await this.index.AddAsync("B", "Test");
+            await this.index.RemoveAsync("A");
 
             await this.index.CommitBatchChangeAsync();
 
@@ -250,16 +244,16 @@ namespace Lifti.Tests
             this.index.Search("test").Select(t => t.Key).Should().BeEquivalentTo("B");
         }
 
-        private void WithIndexedSingleStringPropertyObjects()
+        private async Task WithIndexedSingleStringPropertyObjectsAsync()
         {
-            this.index.Add(new TestObject("A", "Text One", "Text Two", "Text Three Drumming"));
-            this.index.Add(new TestObject("B", "Not One", "Not Two", "Not Three Summers"));
+            await this.index.AddAsync(new TestObject("A", "Text One", "Text Two", "Text Three Drumming"));
+            await this.index.AddAsync(new TestObject("B", "Not One", "Not Two", "Not Three Summers"));
         }
 
-        private void WithIndexedMultiStringPropertyObjects()
+        private async Task WithIndexedMultiStringPropertyObjectsAsync()
         {
-            this.index.Add(new TestObject2("A", "Text One", "Text Two", "Text Three"));
-            this.index.Add(new TestObject2("B", "Not One", "Not Two", "Not Three"));
+            await this.index.AddAsync(new TestObject2("A", "Text One", "Text Two", "Text Three"));
+            await this.index.AddAsync(new TestObject2("B", "Not One", "Not Two", "Not Three"));
         }
 
         private async Task WithIndexedAsyncFieldObjectsAsync()
@@ -268,12 +262,12 @@ namespace Lifti.Tests
             await this.index.AddAsync(new TestObject3("B", "Not One", "Not Two", "Not Three"));
         }
 
-        private void WithIndexedStrings()
+        private async Task WithIndexedStringsAsync()
         {
-            this.index.Add("A", "This is a test");
-            this.index.Add("B", "This is another test");
-            this.index.Add("C", "Foo is testing this as well");
-            this.index.Add("D", new[] { "One last test just for testing sake", "with hypenated text: third-eye" });
+            await this.index.AddAsync("A", "This is a test");
+            await this.index.AddAsync("B", "This is another test");
+            await this.index.AddAsync("C", "Foo is testing this as well");
+            await this.index.AddAsync("D", new[] { "One last test just for testing sake", "with hypenated text: third-eye" });
         }
 
         public class TestObject

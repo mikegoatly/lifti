@@ -11,21 +11,29 @@ using Xunit.Abstractions;
 
 namespace Lifti.Tests.Serialization
 {
-    public class BinarySerializerTests
+    public class BinarySerializerTests : IAsyncLifetime
     {
-        private readonly FullTextIndex<string> index;
         private readonly ITestOutputHelper output;
+        private FullTextIndex<string> index;
 
-        public BinarySerializerTests(ITestOutputHelper output)
+        public async Task InitializeAsync()
         {
             this.index = new FullTextIndexBuilder<string>().Build();
             var wikipediaTests = WikipediaDataLoader.Load(typeof(FullTextIndexTests));
             var options = new TokenizationOptionsBuilder().XmlContent().WithStemming().Build();
             foreach (var (name, text) in wikipediaTests)
             {
-                this.index.Add(name, text, options);
+                await this.index.AddAsync(name, text, options);
             }
+        }
 
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        public BinarySerializerTests(ITestOutputHelper output)
+        {
             this.output = output;
         }
 

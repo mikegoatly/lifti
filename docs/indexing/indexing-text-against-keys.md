@@ -14,9 +14,9 @@ In this example, we're just indexing three pieces of text against 3 integer keys
 var index = new FullTextIndexBuilder<int>().Build();
 
 // Index item keys with their associated text
-index.Add(1, "This is some text associated with A: fizz");
-index.Add(2, "Some buzz text for B");
-index.Add(3, "Text associated with C is both fizz and buzz");
+await index.AddAsync(1, "This is some text associated with A: fizz");
+await index.AddAsync(2, "Some buzz text for B");
+await index.AddAsync(3, "Text associated with C is both fizz and buzz");
 
 ```
 

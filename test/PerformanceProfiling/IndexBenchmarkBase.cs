@@ -1,6 +1,7 @@
 ﻿extern alias LiftiNew;
 using Lifti;
 using Lifti.Querying;
+using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
@@ -25,16 +26,16 @@ namespace PerformanceProfiling
             return index;
         }
    
-        protected void PopulateIndex(LiftiNew.Lifti.IFullTextIndex<string> index)
+        protected async ValueTask PopulateIndexAsync(LiftiNew.Lifti.IFullTextIndex<string> index)
         {
-            index.AddRange(WikipediaData.SampleData);
+            await index.AddRangeAsync(WikipediaData.SampleData);
         }
 
-        protected void PopulateIndexOneByOne(LiftiNew.Lifti.IFullTextIndex<string> index)
+        protected async ValueTask PopulateIndexOneByOne(LiftiNew.Lifti.IFullTextIndex<string> index)
         {
             foreach (var page in WikipediaData.SampleData)
             {
-                index.Add(page);
+                await index.AddAsync(page);
             }
         }
 

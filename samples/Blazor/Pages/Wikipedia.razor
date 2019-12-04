@@ -181,7 +181,7 @@
                 this.Message = $"{counter} Indexing...";
                 base.StateHasChanged();
                 loadedPages[results.Page.Title] = results.Page.Text.Content;
-                this.index.Add(results.Page);
+                await this.index.AddAsync(results.Page);
             }
 
             this.Message = "Ready";

@@ -1,11 +1,12 @@
 ﻿using Lifti;
 using PerformanceProfiling;
+using System.Threading.Tasks;
 
 namespace TestConsole
 {
     public static class WikipediaSample
     {
-        public static void Run()
+        public static async Task RunAsync()
         {
             var index = new FullTextIndexBuilder<string>()
                 .WithDefaultTokenizationOptions(o => o.WithStemming().XmlContent())
@@ -14,7 +15,7 @@ namespace TestConsole
             var wikipediaTests = WikipediaDataLoader.Load(typeof(WikipediaSample));
             foreach (var (name, text) in wikipediaTests)
             {
-                index.Add(name, text);
+                await index.AddAsync(name, text);
             }
         }
     }

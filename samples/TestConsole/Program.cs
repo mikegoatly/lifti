@@ -1,10 +1,12 @@
-﻿namespace TestConsole
+﻿using System.Threading.Tasks;
+
+namespace TestConsole
 {
     internal class Program
     {
-        public static void Main()
+        public static async Task Main()
         {
-            WikipediaSample.Run();
+            await WikipediaSample.RunAsync();
         }
     }
 }

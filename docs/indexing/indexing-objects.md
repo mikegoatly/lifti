@@ -52,7 +52,7 @@ books = new[]
     },
 }
 
-bookIndex.AddRange(books);
+await bookIndex.AddRangeAsync(books);
 ```
 
 When you get search results back, they will be against the key stored in the index, i.e. the book's id:
