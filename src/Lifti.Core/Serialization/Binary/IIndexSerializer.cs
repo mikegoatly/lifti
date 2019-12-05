@@ -17,7 +17,21 @@ namespace Lifti.Serialization.Binary
         /// <param name="disposeStream">
         /// Whether the stream should be disposed of after serialization.
         /// </param>
-        Task SerializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true);
+        Task SerializeAsync(FullTextIndex<TKey> snapshot, Stream stream, bool disposeStream = true);
+
+        /// <summary>
+        /// Serializes the an index into a binary format.
+        /// </summary>
+        /// <param name="index">
+        /// A snapshot of the index to serialize.
+        /// </param>
+        /// <param name="stream">
+        /// The stream to serialize into.
+        /// </param>
+        /// <param name="disposeStream">
+        /// Whether the stream should be disposed of after serialization.
+        /// </param>
+        Task SerializeAsync(IIndexSnapshot<TKey> snapshot, Stream stream, bool disposeStream = true);
 
         /// <summary>
         /// Deserializes an index from a binary format into an index.
