@@ -24,10 +24,8 @@ namespace Lifti.Serialization.Binary
             this.writer = new BinaryWriter(this.buffer, Encoding.UTF8);
         }
 
-        public async Task WriteAsync(FullTextIndex<TKey> index)
+        public async Task WriteAsync(IIndexSnapshot<TKey> snapshot)
         {
-            var snapshot = index.Snapshot;
-
             await this.WriteHeaderAsync(snapshot).ConfigureAwait(false);
 
             await this.WriteItemsAsync(snapshot).ConfigureAwait(false);

@@ -27,7 +27,7 @@ namespace Lifti.Serialization.Binary
 
             using (var writer = new IndexWriter<TKey>(stream, disposeStream, this.keySerializer))
             {
-                await writer.WriteAsync(index).ConfigureAwait(false);
+                await writer.WriteAsync(index.Snapshot).ConfigureAwait(false);
             }
         }
 
