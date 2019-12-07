@@ -50,6 +50,11 @@ stages:
         verbosityPack: 'Normal'
         arguments: '--configuration $(buildConfiguration)'
 
+    - task: PublishSymbols@2
+      inputs:
+        SearchPattern: '**/bin/**/*.pdb'
+        SymbolServerType: 'TeamServices'
+
     - task: DotNetCoreCLI@2
       displayName: Pack release nuget version
       inputs:
