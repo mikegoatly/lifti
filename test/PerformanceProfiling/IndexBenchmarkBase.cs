@@ -26,12 +26,12 @@ namespace PerformanceProfiling
             return index;
         }
    
-        protected async ValueTask PopulateIndexAsync(LiftiNew.Lifti.IFullTextIndex<string> index)
+        protected async Task PopulateIndexAsync(LiftiNew.Lifti.IFullTextIndex<string> index)
         {
             await index.AddRangeAsync(WikipediaData.SampleData);
         }
 
-        protected async ValueTask PopulateIndexOneByOne(LiftiNew.Lifti.IFullTextIndex<string> index)
+        protected async Task PopulateIndexOneByOne(LiftiNew.Lifti.IFullTextIndex<string> index)
         {
             foreach (var page in WikipediaData.SampleData)
             {

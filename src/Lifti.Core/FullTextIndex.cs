@@ -13,7 +13,8 @@ namespace Lifti
         private readonly ITokenizerFactory tokenizerFactory;
         private readonly IQueryParser queryParser;
         private readonly TokenizationOptions defaultTokenizationOptions;
-        private readonly Func<IIndexSnapshot<TKey>, ValueTask>[] indexModifiedActions;
+        private readonly Func<IIndexSnapshot<TKey>, Task>[] indexModifiedActions;
+        private readonly IndexOptions indexOptions;
         private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions;
         private readonly IdPool<TKey> idPool;
         private readonly IIndexNavigatorPool indexNavigatorPool = new IndexNavigatorPool();
@@ -26,13 +27,15 @@ namespace Lifti
         private IndexMutation batchMutation;
 
         internal FullTextIndex(
+            IndexOptions indexOptions,
             ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions,
             IIndexNodeFactory indexNodeFactory,
             ITokenizerFactory tokenizerFactory,
             IQueryParser queryParser,
             TokenizationOptions defaultTokenizationOptions,
-            Func<IIndexSnapshot<TKey>, ValueTask>[] indexModifiedActions)
+            Func<IIndexSnapshot<TKey>, Task>[] indexModifiedActions)
         {
+            this.indexOptions = indexOptions;
             this.itemTokenizationOptions = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
             this.IndexNodeFactory = indexNodeFactory ?? throw new ArgumentNullException(nameof(indexNodeFactory));
             this.tokenizerFactory = tokenizerFactory ?? throw new ArgumentNullException(nameof(tokenizerFactory));
@@ -83,7 +86,7 @@ namespace Lifti
             });
         }
 
-        public async ValueTask CommitBatchChangeAsync()
+        public async Task CommitBatchChangeAsync()
         {
             await this.PerformWriteLockedActionAsync(async () =>
             {
@@ -95,14 +98,31 @@ namespace Lifti
                 await this.ApplyMutationsAsync(this.batchMutation).ConfigureAwait(false);
 
                 this.batchMutation = null;
-            });
+            }).ConfigureAwait(false);
         }
 
-        public async ValueTask AddAsync(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null)
+        public async Task AddAsync(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null)
+        {
+            await this.PerformWriteLockedActionAsync(async () =>
+            {
+                var itemId = await this.GetUniqueIdForItemAsync(itemKey);
+
+                var tokenizer = this.GetTokenizer(tokenizationOptions);
+                await this.MutateAsync(m =>
+                {
+                    foreach (var word in tokenizer.Process(text))
+                    {
+                        m.Add(itemId, this.FieldLookup.DefaultField, word);
+                    }
+                }).ConfigureAwait(false);
+            }).ConfigureAwait(false);
+        }
+
+        public async Task AddAsync(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null)
         {
             await this.PerformWriteLockedActionAsync(async () =>
                 {
-                    var itemId = this.idPool.Add(itemKey);
+                    var itemId = await this.GetUniqueIdForItemAsync(itemKey);
 
                     var tokenizer = this.GetTokenizer(tokenizationOptions);
                     await this.MutateAsync(m =>
@@ -111,28 +131,11 @@ namespace Lifti
                         {
                             m.Add(itemId, this.FieldLookup.DefaultField, word);
                         }
-                    });
-                });
+                    }).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
 
-        public async ValueTask AddAsync(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null)
-        {
-            await this.PerformWriteLockedActionAsync(async () =>
-                {
-                    var itemId = this.idPool.Add(itemKey);
-
-                    var tokenizer = this.GetTokenizer(tokenizationOptions);
-                    await this.MutateAsync(m =>
-                    {
-                        foreach (var word in tokenizer.Process(text))
-                        {
-                            m.Add(itemId, this.FieldLookup.DefaultField, word);
-                        }
-                    });
-                });
-        }
-
-        public async ValueTask AddRangeAsync<TItem>(IEnumerable<TItem> items)
+        public async Task AddRangeAsync<TItem>(IEnumerable<TItem> items)
         {
             if (items is null)
             {
@@ -142,24 +145,24 @@ namespace Lifti
             var options = this.itemTokenizationOptions.Get<TItem>();
             await this.PerformWriteLockedActionAsync(async () =>
                 {
-                    await this.MutateAsync(m =>
+                    await this.MutateAsync(async m =>
                     {
                         foreach (var item in items)
                         {
-                            this.Add(item, options, m);
+                            await this.AddAsync(item, options, m).ConfigureAwait(false);
                         }
-                    });
-                });
+                    }).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
 
-        public async ValueTask AddAsync<TItem>(TItem item)
+        public async Task AddAsync<TItem>(TItem item)
         {
             var options = this.itemTokenizationOptions.Get<TItem>();
             await this.PerformWriteLockedActionAsync(
-                async () => await this.MutateAsync(async m => await this.AddAsync(item, options, m)));
+                async () => await this.MutateAsync(async m => await this.AddAsync(item, options, m).ConfigureAwait(false)).ConfigureAwait(false)).ConfigureAwait(false);
         }
 
-        public async ValueTask<bool> RemoveAsync(TKey itemKey)
+        public async Task<bool> RemoveAsync(TKey itemKey)
         {
             var result = false;
             await this.PerformWriteLockedActionAsync(async () =>
@@ -170,14 +173,10 @@ namespace Lifti
                     return;
                 }
 
-                await this.MutateAsync(m =>
-                {
-                    var id = this.idPool.ReleaseItem(itemKey);
-                    m.Remove(id);
-                });
+                await this.RemoveKeyFromIndexAsync(itemKey).ConfigureAwait(false);
 
                 result = true;
-            });
+            }).ConfigureAwait(false);
 
             return result;
         }
@@ -215,7 +214,7 @@ namespace Lifti
             }
         }
 
-        private async ValueTask PerformWriteLockedActionAsync(Func<ValueTask> asyncAction)
+        private async Task PerformWriteLockedActionAsync(Func<Task> asyncAction)
         {
             if (!await this.writeLock.WaitAsync(this.writeLockTimeout).ConfigureAwait(false))
             {
@@ -232,7 +231,7 @@ namespace Lifti
             }
         }
 
-        private async ValueTask MutateAsync(Action<IndexMutation> mutationAction)
+        private async Task MutateAsync(Action<IndexMutation> mutationAction)
         {
             var indexMutation = this.GetCurrentMutationOrCreateTransient();
 
@@ -261,7 +260,7 @@ namespace Lifti
             return this.batchMutation ?? new IndexMutation(this.Root, this.IndexNodeFactory);
         }
 
-        private async ValueTask MutateAsync(Func<IndexMutation, Task> asyncMutationAction)
+        private async Task MutateAsync(Func<IndexMutation, Task> asyncMutationAction)
         {
             var indexMutation = this.GetCurrentMutationOrCreateTransient();
 
@@ -278,19 +277,6 @@ namespace Lifti
             return this.tokenizerFactory.Create(tokenizationOptions ?? this.defaultTokenizationOptions);
         }
 
-        private void Add<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> options, IndexMutation indexMutation)
-        {
-            var itemKey = options.KeyReader(item);
-            var itemId = this.idPool.Add(itemKey);
-
-            foreach (var field in options.FieldTokenization)
-            {
-                var (fieldId, tokenizer) = this.FieldLookup.GetFieldInfo(field.Name);
-                var tokens = field.Tokenize(tokenizer, item);
-                IndexTokens(indexMutation, itemId, fieldId, tokens);
-            }
-        }
-
         private static void IndexTokens(IndexMutation indexMutation, int itemId, byte fieldId, IEnumerable<Token> tokens)
         {
             foreach (var word in tokens)
@@ -299,10 +285,19 @@ namespace Lifti
             }
         }
 
-        private async ValueTask AddAsync<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> options, IndexMutation indexMutation)
+        private async Task RemoveKeyFromIndexAsync(TKey itemKey)
+        {
+            await this.MutateAsync(m =>
+            {
+                var id = this.idPool.ReleaseItem(itemKey);
+                m.Remove(id);
+            }).ConfigureAwait(false);
+        }
+
+        private async Task AddAsync<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> options, IndexMutation indexMutation)
         {
             var itemKey = options.KeyReader(item);
-            var itemId = this.idPool.Add(itemKey);
+            var itemId = await this.GetUniqueIdForItemAsync(itemKey);
 
             foreach (var field in options.FieldTokenization)
             {
@@ -311,6 +306,19 @@ namespace Lifti
 
                 IndexTokens(indexMutation, itemId, fieldId, tokens);
             }
+        }
+
+        private async ValueTask<int> GetUniqueIdForItemAsync(TKey itemKey)
+        {
+            if (this.indexOptions.DuplicateItemBehavior == DuplicateItemBehavior.ReplaceItem)
+            {
+                if (this.idPool.Contains(itemKey))
+                {
+                    await this.RemoveKeyFromIndexAsync(itemKey).ConfigureAwait(false);
+                }
+            }
+
+            return this.idPool.Add(itemKey);
         }
 
 

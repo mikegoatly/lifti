@@ -39,7 +39,7 @@ namespace Lifti
         /// that describes how the text should be treated as it is tokenized.
         /// When null, <see cref="TokenizationOptions.Default"/> will be used.
         /// </param>
-        ValueTask AddAsync(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null);
+        Task AddAsync(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null);
 
         /// <summary>
         /// Indexes some text against a given key.
@@ -51,7 +51,7 @@ namespace Lifti
         /// that describes how the text should be treated as it is tokenized.
         /// When null, <see cref="TokenizationOptions.Default"/> will be used.
         /// </param>
-        ValueTask AddAsync(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null);
+        Task AddAsync(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null);
 
         /// <summary>
         /// Indexes a single item of type <typeparamref name="TItem"/>. This type must have been
@@ -63,7 +63,7 @@ namespace Lifti
         /// <param name="item">
         /// The item to index.
         /// </param>
-        ValueTask AddAsync<TItem>(TItem item);
+        Task AddAsync<TItem>(TItem item);
 
         /// <summary>
         /// Indexes a set of items of type <typeparamref name="TItem"/>. This type must have been
@@ -75,7 +75,7 @@ namespace Lifti
         /// <param name="items">
         /// The items to index.
         /// </param>
-        ValueTask AddRangeAsync<TItem>(IEnumerable<TItem> items);
+        Task AddRangeAsync<TItem>(IEnumerable<TItem> items);
 
         /// <summary>
         /// Removes the item with the given key from this index. If the key is not indexed then
@@ -87,7 +87,7 @@ namespace Lifti
         /// <returns>
         /// <c>true</c> if the item was in the index, <c>false</c> if it was not.
         /// </returns>
-        ValueTask<bool> RemoveAsync(TKey itemKey);
+        Task<bool> RemoveAsync(TKey itemKey);
 
         /// <summary>
         /// Performs a search against this index.

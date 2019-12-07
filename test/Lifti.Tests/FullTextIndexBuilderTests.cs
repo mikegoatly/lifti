@@ -114,7 +114,7 @@ namespace Lifti.Tests
 
             var index = this.sut.Build();
 
-            factory.Verify(f => f.Configure(It.Is<AdvancedOptions>(o => o.SupportIntraNodeTextAfterIndexDepth == 89)), Times.Once);
+            factory.Verify(f => f.Configure(It.Is<IndexOptions>(o => o.SupportIntraNodeTextAfterIndexDepth == 89)), Times.Once);
         }
 
         [Fact]
@@ -132,6 +132,31 @@ namespace Lifti.Tests
 
             action1.Should().BeEquivalentTo("1");
             action2.Should().BeEquivalentTo(1);
+        }
+
+        [Fact]
+        public async Task WithDuplicateItemKeysThrowingExceptions_ShouldPassOptionToIndex()
+        {
+            var index = this.sut.WithDuplicateItemBehavior(DuplicateItemBehavior.ThrowException)
+                .Build();
+
+            await index.AddAsync(1, "Test");
+            await index.AddAsync(2, "Test");
+
+            await Assert.ThrowsAsync<LiftiException>(async () => await index.AddAsync(1, "Test"));
+        }
+
+        [Fact]
+        public async Task WithDuplicateItemKeysReplacingItems_ShouldPassOptionToIndex()
+        {
+            var index = this.sut.WithDuplicateItemBehavior(DuplicateItemBehavior.ReplaceItem)
+                .Build();
+
+            await index.AddAsync(1, "Test");
+            await index.AddAsync(2, "Test");
+            await index.AddAsync(1, "Testing");
+
+            index.Search("Testing").Should().HaveCount(1);
         }
 
         private Mock<IQueryParser> ConfigureQueryParserMock()

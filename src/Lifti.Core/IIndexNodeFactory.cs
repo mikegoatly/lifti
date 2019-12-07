@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace Lifti
 {
-    public interface IIndexNodeFactory : IConfiguredBy<AdvancedOptions>
+    public interface IIndexNodeFactory : IConfiguredBy<IndexOptions>
     {
         IndexNode CreateRootNode();
         IndexNode CreateNode(

@@ -3,7 +3,6 @@ using Lifti.Querying;
 using Lifti.Tokenization;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti
@@ -11,12 +10,22 @@ namespace Lifti
     public class FullTextIndexBuilder<TKey>
     {
         private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions = new ConfiguredItemTokenizationOptions<TKey>();
-        private readonly AdvancedOptions advancedOptions = new AdvancedOptions();
+        private readonly IndexOptions advancedOptions = new IndexOptions();
         private IIndexNodeFactory indexNodeFactory;
         private ITokenizerFactory tokenizerFactory;
         private IQueryParser queryParser;
         private TokenizationOptions defaultTokenizationOptions = TokenizationOptions.Default;
-        private List<Func<IIndexSnapshot<TKey>, ValueTask>> indexModifiedActions;
+        private List<Func<IIndexSnapshot<TKey>, Task>> indexModifiedActions;
+
+        /// <summary>
+        /// Configures the behavior the index should exhibit when an item that already exists in the index is indexed again.
+        /// The default value is <see cref="DuplicateItemBehavior.ReplaceItem"/>.
+        /// </summary>
+        public FullTextIndexBuilder<TKey> WithDuplicateItemBehavior(DuplicateItemBehavior duplicateItemBehavior)
+        {
+            this.advancedOptions.DuplicateItemBehavior = duplicateItemBehavior;
+            return this;
+        }
 
         /// <summary>
         /// Registers an async action that needs to occur when mutations to the index are committed and
@@ -25,7 +34,7 @@ namespace Lifti
         /// <param name="asyncAction">
         /// The async action to execute. The argument is the new snapshot of the index.
         /// </param>
-        public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, ValueTask> asyncAction)
+        public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, Task> asyncAction)
         {
             if (asyncAction is null)
             {
@@ -34,7 +43,7 @@ namespace Lifti
 
             if (this.indexModifiedActions == null)
             {
-                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, ValueTask>>();
+                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, Task>>();
             }
 
             this.indexModifiedActions.Add(asyncAction);
@@ -61,13 +70,13 @@ namespace Lifti
 
             if (this.indexModifiedActions == null)
             {
-                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, ValueTask>>();
+                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, Task>>();
             }
 
             this.indexModifiedActions.Add((snapshot) =>
             {
                 action(snapshot);
-                return new ValueTask();
+                return Task.CompletedTask;
             });
 
             return this;
@@ -112,7 +121,7 @@ namespace Lifti
         /// <summary>
         /// Sets the depth of the index tree after which intra-node text is supported.
         /// A value of zero indicates that intra-node text is always supported. To disable
-        /// intra-node text completely, set this to an arbitrarily large value, e.g. <see cref="Int32.MaxValue"/>.
+        /// intra-node text completely, set this to an arbitrarily large value, e.g. <see cref="int.MaxValue"/>.
         /// </summary>
         public FullTextIndexBuilder<TKey> WithIntraNodeTextSupportedAfterIndexDepth(int depth)
         {
@@ -177,6 +186,7 @@ namespace Lifti
             this.indexNodeFactory.Configure(this.advancedOptions);
 
             return new FullTextIndex<TKey>(
+                this.advancedOptions,
                 this.itemTokenizationOptions,
                 this.indexNodeFactory,
                 this.tokenizerFactory ?? new TokenizerFactory(),

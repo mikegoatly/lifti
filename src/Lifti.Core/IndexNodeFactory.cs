@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace Lifti
 {
-    public class IndexNodeFactory : ConfiguredBy<AdvancedOptions>, IIndexNodeFactory
+    public class IndexNodeFactory : ConfiguredBy<IndexOptions>, IIndexNodeFactory
     {
         private int supportIntraNodeTextAtDepth;
 
@@ -30,7 +30,7 @@ namespace Lifti
             return new IndexNode(intraNodeText, childNodes, matches);
         }
 
-        protected override void OnConfiguring(AdvancedOptions options)
+        protected override void OnConfiguring(IndexOptions options)
         {
             if (options is null)
             {
