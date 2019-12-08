@@ -101,8 +101,8 @@ namespace Lifti.Serialization.Binary
 
             return nodeFactory.CreateNode(
                 intraNodeText, 
-                childNodes?.ToImmutable(), 
-                matches?.ToImmutable());
+                childNodes?.ToImmutable() ?? ImmutableDictionary<char, IndexNode>.Empty, 
+                matches?.ToImmutable() ?? ImmutableDictionary<int, ImmutableList<IndexedWord>>.Empty);
         }
 
         private void ReadLocations(int locationCount, List<WordLocation> locationMatches)
