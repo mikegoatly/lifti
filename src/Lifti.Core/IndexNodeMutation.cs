@@ -322,7 +322,7 @@ namespace Lifti
             }
             else
             {
-                if (this.original != null && this.original.Matches.TryGetValue(itemId, out var originalItemFieldLocations))
+                if (this.MutatedMatches.TryGetValue(itemId, out var originalItemFieldLocations))
                 {
                     this.MutatedMatches[itemId] = originalItemFieldLocations.Add(indexedWord);
                 }

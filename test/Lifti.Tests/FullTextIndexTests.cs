@@ -244,6 +244,22 @@ namespace Lifti.Tests
             this.index.Search("test").Select(t => t.Key).Should().BeEquivalentTo("B");
         }
 
+        [Fact]
+        public async Task RemovingItemAndAddingAgainItTheSameBatch_ShouldResultInTheSameIndex()
+        {
+            await this.index.AddAsync("A", "Test");
+            var previousRoot = this.index.Root;
+
+            this.index.BeginBatchChange();
+
+            await this.index.RemoveAsync("A");
+            await this.index.AddAsync("A", "Test");
+
+            await this.index.CommitBatchChangeAsync();
+
+            this.index.Root.Should().BeEquivalentTo(previousRoot);
+        }
+
         private async Task WithIndexedSingleStringPropertyObjectsAsync()
         {
             await this.index.AddAsync(new TestObject("A", "Text One", "Text Two", "Text Three Drumming"));
