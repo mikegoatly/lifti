@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
+using Lifti.Querying.QueryParts;
 using Lifti.Tests.Querying;
 using Lifti.Tokenization;
 using Moq;
@@ -163,7 +164,7 @@ namespace Lifti.Tests
         {
             var parser = new Mock<IQueryParser>();
             parser.Setup(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), It.IsAny<string>(), It.IsAny<ITokenizer>()))
-                .Returns(new Query(null));
+                .Returns(new Query(EmptyQueryPart.Instance));
 
             this.sut.WithQueryParser(parser.Object);
 

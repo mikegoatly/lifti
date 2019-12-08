@@ -15,7 +15,7 @@ namespace Lifti.Querying
                 throw new ArgumentNullException(nameof(fieldLookup));
             }
 
-            IQueryPart rootPart = null;
+            IQueryPart? rootPart = null;
 
             var state = new QueryParserState(queryText);
             while (state.TryGetNextToken(out var token))
@@ -23,29 +23,29 @@ namespace Lifti.Querying
                 rootPart = CreateQueryPart(fieldLookup, state, token, wordTokenizer, rootPart);
             }
 
-            return new Query(rootPart);
+            return new Query(rootPart ?? EmptyQueryPart.Instance);
         }
 
         private static IQueryPart CreateQueryPart(
-            IIndexedFieldLookup fieldLookup, 
-            QueryParserState state, 
-            QueryToken token, 
-            ITokenizer wordTokenizer, 
-            IQueryPart rootPart)
+            IIndexedFieldLookup fieldLookup,
+            QueryParserState state,
+            QueryToken token,
+            ITokenizer wordTokenizer,
+            IQueryPart? currentQuery)
         {
             switch (token.TokenType)
             {
                 case QueryTokenType.Text:
-                    return ComposePart(rootPart, CreateWordPart(token, wordTokenizer));
+                    return ComposePart(currentQuery, CreateWordPart(token, wordTokenizer));
 
                 case QueryTokenType.FieldFilter:
                     var (fieldId, tokenizer) = fieldLookup.GetFieldInfo(token.TokenText);
                     var filteredPart = CreateQueryPart(fieldLookup, state, state.GetNextToken(), tokenizer, null);
                     return ComposePart(
-                        rootPart,
+                        currentQuery,
                         new FieldFilterQueryOperator(token.TokenText, fieldId, filteredPart));
 
-                    
+
 
                 case QueryTokenType.OrOperator:
                 case QueryTokenType.AndOperator:
@@ -53,22 +53,30 @@ namespace Lifti.Querying
                 case QueryTokenType.PrecedingNearOperator:
                 case QueryTokenType.PrecedingOperator:
                     var rightPart = CreateQueryPart(fieldLookup, state, state.GetNextToken(), wordTokenizer, null);
-                    return CombineParts(rootPart, rightPart, token.TokenType, token.Tolerance);
+                    return CombineParts(currentQuery, rightPart, token.TokenType, token.Tolerance);
 
                 case QueryTokenType.OpenBracket:
                     var bracketedPart = state.GetTokensUntil(QueryTokenType.CloseBracket)
-                        .Aggregate((IQueryPart)null, (current, next) => CreateQueryPart(fieldLookup, state, next, wordTokenizer, current));
+                        .Aggregate((IQueryPart?)null, (current, next) => CreateQueryPart(fieldLookup, state, next, wordTokenizer, current));
 
-                    return bracketedPart == null
-                               ? rootPart
-                               : ComposePart(rootPart, new BracketedQueryPart(bracketedPart));
+                    if (bracketedPart == null)
+                    {
+                        throw new QueryParserException(ExceptionMessages.EmptyBracketedExpressionsAreNotSupported);
+                    }
+
+                    return ComposePart(currentQuery, new BracketedQueryPart(bracketedPart));
 
                 case QueryTokenType.BeginAdjacentTextOperator:
                     var words = state.GetTokensUntil(QueryTokenType.EndAdjacentTextOperator)
                         .SelectMany(t => CreateWordParts(t, wordTokenizer))
                         .ToList();
 
-                    return words.Count == 0 ? rootPart : ComposePart(rootPart, new AdjacentWordsQueryOperator(words));
+                    if (words.Count == 0)
+                    {
+                        throw new QueryParserException(ExceptionMessages.EmptyAdjacentTextPartsAreNotSupported);
+                    }
+
+                    return ComposePart(currentQuery, new AdjacentWordsQueryOperator(words));
 
                 default:
                     throw new QueryParserException(ExceptionMessages.UnexpectedTokenEncountered, token.TokenType);
@@ -108,14 +116,14 @@ namespace Lifti.Querying
                 tokenText = tokenText.Slice(0, tokenText.Length - 1);
             }
 
-            
+
             return wordTokenizer.Process(tokenText)
-                .Select(tokenizedWord => hasWildcard ? 
-                    (IWordQueryPart)new StartsWithWordQueryPart(tokenizedWord.Value) : 
+                .Select(tokenizedWord => hasWildcard ?
+                    (IWordQueryPart)new StartsWithWordQueryPart(tokenizedWord.Value) :
                     new ExactWordQueryPart(tokenizedWord.Value));
         }
 
-        private static IQueryPart ComposePart(IQueryPart existingPart, IQueryPart newPart)
+        private static IQueryPart ComposePart(IQueryPart? existingPart, IQueryPart newPart)
         {
             if (existingPart == null)
             {
@@ -125,7 +133,7 @@ namespace Lifti.Querying
             return CombineParts(existingPart, newPart, QueryTokenType.AndOperator, 0);
         }
 
-        private static IBinaryQueryOperator CombineParts(IQueryPart existingPart, IQueryPart newPart, QueryTokenType operatorType, int tolerance)
+        private static IBinaryQueryOperator CombineParts(IQueryPart? existingPart, IQueryPart newPart, QueryTokenType operatorType, int tolerance)
         {
             if (existingPart == null)
             {
@@ -149,26 +157,15 @@ namespace Lifti.Querying
 
         private static IBinaryQueryOperator CreateOperator(QueryTokenType tokenType, IQueryPart leftPart, IQueryPart rightPart, int tolerance)
         {
-            switch (tokenType)
+            return tokenType switch
             {
-                case QueryTokenType.AndOperator:
-                    return new AndQueryOperator(leftPart, rightPart);
-
-                case QueryTokenType.OrOperator:
-                    return new OrQueryOperator(leftPart, rightPart);
-
-                case QueryTokenType.NearOperator:
-                    return new NearQueryOperator(leftPart, rightPart, tolerance);
-
-                case QueryTokenType.PrecedingNearOperator:
-                    return new PrecedingNearQueryOperator(leftPart, rightPart, tolerance);
-
-                case QueryTokenType.PrecedingOperator:
-                    return new PrecedingQueryOperator(leftPart, rightPart);
-
-                default:
-                    throw new QueryParserException(ExceptionMessages.UnexpectedOperatorInternal, tokenType);
-            }
+                QueryTokenType.AndOperator => new AndQueryOperator(leftPart, rightPart),
+                QueryTokenType.OrOperator => new OrQueryOperator(leftPart, rightPart),
+                QueryTokenType.NearOperator => new NearQueryOperator(leftPart, rightPart, tolerance),
+                QueryTokenType.PrecedingNearOperator => new PrecedingNearQueryOperator(leftPart, rightPart, tolerance),
+                QueryTokenType.PrecedingOperator => new PrecedingQueryOperator(leftPart, rightPart),
+                _ => throw new QueryParserException(ExceptionMessages.UnexpectedOperatorInternal, tokenType),
+            };
         }
 
         private static OperatorPrecedence TokenPrecedence(QueryTokenType tokenType)

@@ -13,18 +13,18 @@ namespace Lifti
         private readonly ITokenizerFactory tokenizerFactory;
         private readonly IQueryParser queryParser;
         private readonly TokenizationOptions defaultTokenizationOptions;
-        private readonly Func<IIndexSnapshot<TKey>, Task>[] indexModifiedActions;
+        private readonly Func<IIndexSnapshot<TKey>, Task>[]? indexModifiedActions;
         private readonly IndexOptions indexOptions;
         private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions;
         private readonly IdPool<TKey> idPool;
         private readonly IIndexNavigatorPool indexNavigatorPool = new IndexNavigatorPool();
         private readonly SemaphoreSlim writeLock = new SemaphoreSlim(1);
         private readonly TimeSpan writeLockTimeout = TimeSpan.FromSeconds(10);
-        private IndexSnapshot<TKey> currentSnapshot;
         private bool isDisposed;
-        private IndexNode root;
+        private IndexSnapshot<TKey> currentSnapshot = null!;
+        private IndexNode root = null!;
 
-        private IndexMutation batchMutation;
+        private IndexMutation? batchMutation;
 
         internal FullTextIndex(
             IndexOptions indexOptions,
@@ -33,7 +33,7 @@ namespace Lifti
             ITokenizerFactory tokenizerFactory,
             IQueryParser queryParser,
             TokenizationOptions defaultTokenizationOptions,
-            Func<IIndexSnapshot<TKey>, Task>[] indexModifiedActions)
+            Func<IIndexSnapshot<TKey>, Task>[]? indexModifiedActions)
         {
             this.indexOptions = indexOptions;
             this.itemTokenizationOptions = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
@@ -101,7 +101,7 @@ namespace Lifti
             }).ConfigureAwait(false);
         }
 
-        public async Task AddAsync(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null)
+        public async Task AddAsync(TKey itemKey, IEnumerable<string> text, TokenizationOptions? tokenizationOptions = null)
         {
             await this.PerformWriteLockedActionAsync(async () =>
             {
@@ -118,7 +118,7 @@ namespace Lifti
             }).ConfigureAwait(false);
         }
 
-        public async Task AddAsync(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null)
+        public async Task AddAsync(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = null)
         {
             await this.PerformWriteLockedActionAsync(async () =>
                 {
@@ -181,7 +181,7 @@ namespace Lifti
             return result;
         }
 
-        public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions tokenizationOptions = null)
+        public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = null)
         {
             var query = this.queryParser.Parse(this.FieldLookup, searchText, this.GetTokenizer(tokenizationOptions));
             return query.Execute(this.currentSnapshot);
@@ -250,7 +250,7 @@ namespace Lifti
             {
                 foreach (var indexModifiedAction in this.indexModifiedActions)
                 {
-                    await indexModifiedAction(this.currentSnapshot);
+                    await indexModifiedAction(this.currentSnapshot).ConfigureAwait(false);
                 }
             }
         }
@@ -272,7 +272,7 @@ namespace Lifti
             }
         }
 
-        private ITokenizer GetTokenizer(TokenizationOptions tokenizationOptions)
+        private ITokenizer GetTokenizer(TokenizationOptions? tokenizationOptions)
         {
             return this.tokenizerFactory.Create(tokenizationOptions ?? this.defaultTokenizationOptions);
         }

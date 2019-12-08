@@ -21,8 +21,8 @@ namespace Lifti
         public ImmutableDictionary<char, IndexNode> ChildNodes { get; }
         public ImmutableDictionary<int, ImmutableList<IndexedWord>> Matches { get; }
         public bool IsEmpty => !this.HasChildNodes && !this.HasMatches;
-        public bool HasChildNodes => this.ChildNodes?.Count > 0;
-        public bool HasMatches => this.Matches?.Count > 0;
+        public bool HasChildNodes => this.ChildNodes.Count > 0;
+        public bool HasMatches => this.Matches.Count > 0;
 
         [Pure]
         public override string ToString()

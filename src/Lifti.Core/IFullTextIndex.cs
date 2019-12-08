@@ -39,7 +39,7 @@ namespace Lifti
         /// that describes how the text should be treated as it is tokenized.
         /// When null, <see cref="TokenizationOptions.Default"/> will be used.
         /// </param>
-        Task AddAsync(TKey itemKey, string text, TokenizationOptions tokenizationOptions = null);
+        Task AddAsync(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = null);
 
         /// <summary>
         /// Indexes some text against a given key.
@@ -51,7 +51,7 @@ namespace Lifti
         /// that describes how the text should be treated as it is tokenized.
         /// When null, <see cref="TokenizationOptions.Default"/> will be used.
         /// </param>
-        Task AddAsync(TKey itemKey, IEnumerable<string> text, TokenizationOptions tokenizationOptions = null);
+        Task AddAsync(TKey itemKey, IEnumerable<string> text, TokenizationOptions? tokenizationOptions = null);
 
         /// <summary>
         /// Indexes a single item of type <typeparamref name="TItem"/>. This type must have been
@@ -101,6 +101,6 @@ namespace Lifti
         /// <returns>
         /// The matching search results.
         /// </returns>
-        IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions tokenizationOptions = null);
+        IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = null);
     }
 }

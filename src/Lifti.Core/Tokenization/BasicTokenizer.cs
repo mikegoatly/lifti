@@ -11,8 +11,8 @@ namespace Lifti.Tokenization
     {
         private readonly IInputPreprocessorPipeline inputPreprocessorPipeline = new InputPreprocessorPipeline();
         private TokenizationOptions tokenizationOptions = TokenizationOptions.Default;
-        private HashSet<char> additionalSplitChars;
-        private IWordStemmer stemmer;
+        private HashSet<char>? additionalSplitChars;
+        private IWordStemmer? stemmer;
 
         public IEnumerable<Token> Process(string input)
         {

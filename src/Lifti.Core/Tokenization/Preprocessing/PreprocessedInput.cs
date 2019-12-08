@@ -18,7 +18,7 @@ namespace Lifti
 
         public char Value { get; }
 
-        public string Replacement { get; }
+        public string? Replacement { get; }
 
         public override bool Equals(object obj)
         {

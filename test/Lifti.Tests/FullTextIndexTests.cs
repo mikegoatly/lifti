@@ -71,6 +71,16 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task SearchingForEmptyString_ShouldReturnEmptyResults()
+        {
+            await this.WithIndexedStringsAsync();
+
+            var results = this.index.Search("");
+
+            results.Should().HaveCount(0);
+        }
+
+        [Fact]
         public async Task SearchingWithinFieldsShouldObeyTokenizationOptionsForFields()
         {
             await this.WithIndexedSingleStringPropertyObjectsAsync();

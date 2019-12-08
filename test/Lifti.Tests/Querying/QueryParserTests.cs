@@ -166,10 +166,16 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
-        public void ParsingEmptyString_ShouldReturnNullQueryRoot()
+        public void ParsingEmptyString_ShouldReturnEmptyQueryPart()
         {
             var result = this.Parse("");
-            result.Root.Should().BeNull();
+            result.Root.Should().Be(EmptyQueryPart.Instance);
+        }
+
+        [Fact]
+        public void ParsingBinaryOperatorWithEmptyBracketedPartOnRight_ShouldThrowInvalidQueryException()
+        {
+            Assert.Throws<QueryParserException>(() => this.Parse("test & ()"));
         }
 
         [Fact]

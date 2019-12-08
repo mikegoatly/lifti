@@ -88,6 +88,24 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Adjacent text query parts cannot be empty.
+        /// </summary>
+        internal static string EmptyAdjacentTextPartsAreNotSupported {
+            get {
+                return ResourceManager.GetString("EmptyAdjacentTextPartsAreNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bracketed query parts cannot be empty.
+        /// </summary>
+        internal static string EmptyBracketedExpressionsAreNotSupported {
+            get {
+                return ResourceManager.GetString("EmptyBracketedExpressionsAreNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected at least one word part to be parsed.
         /// </summary>
         internal static string ExpectedAtLeastOneWordPartParsed {

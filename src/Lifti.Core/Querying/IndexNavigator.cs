@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -10,8 +11,8 @@ namespace Lifti.Querying
     internal sealed class IndexNavigator : IIndexNavigator
     {
         private readonly StringBuilder navigatedWith = new StringBuilder(16);
-        private IIndexNavigatorPool pool;
-        private IndexNode currentNode;
+        private IIndexNavigatorPool? pool;
+        private IndexNode? currentNode;
         private int intraNodeTextPosition;
 
         internal void Initialize(IndexNode node, IIndexNavigatorPool pool)
@@ -22,7 +23,7 @@ namespace Lifti.Querying
             this.navigatedWith.Length = 0;
         }
 
-        private bool HasIntraNodeTextLeftToProcess => this.intraNodeTextPosition < this.currentNode.IntraNodeText.Length;
+        private bool HasIntraNodeTextLeftToProcess => this.currentNode != null && this.intraNodeTextPosition < this.currentNode.IntraNodeText.Length;
 
         public bool HasExactMatches
         {
@@ -163,6 +164,12 @@ namespace Lifti.Querying
 
         public void Dispose()
         {
+            if (this.pool == null)
+            {
+                Debug.Fail("No pool available when disposing IndexNavigator");
+                return;
+            }
+
             this.pool.Return(this);
         }
 

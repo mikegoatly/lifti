@@ -45,7 +45,7 @@
         /// Gets the result to return if the exception word is matched.
         /// </summary>
         /// <value>The exception result.</value>
-        public string MatchResult { get; }
+        public string? MatchResult { get; }
         public int TrimCharacterCount { get; }
     }
 }

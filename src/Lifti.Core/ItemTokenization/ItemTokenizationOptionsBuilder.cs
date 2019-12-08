@@ -7,7 +7,7 @@ namespace Lifti.ItemTokenization
     public class ItemTokenizationOptionsBuilder<TItem, TKey>
     {
         private List<FieldTokenizationOptions<TItem>> fieldTokenization { get; } = new List<FieldTokenizationOptions<TItem>>();
-        private Func<TItem, TKey> keyReader;
+        private Func<TItem, TKey>? keyReader;
 
         /// <summary>
         /// Indicates how the unique key of the item can be read.
@@ -44,7 +44,7 @@ namespace Lifti.ItemTokenization
         public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(
             string name,
             Func<TItem, string> fieldTextReader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder = null)
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
         {
             ValidateFieldParameters(name, fieldTextReader);
             var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
@@ -69,7 +69,7 @@ namespace Lifti.ItemTokenization
         public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(
             string name,
             Func<TItem, IEnumerable<string>> reader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder = null)
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
         {
             ValidateFieldParameters(name, reader);
             var tokenizationOptions = optionsBuilder.BuildOptionsOrDefault();
@@ -94,7 +94,7 @@ namespace Lifti.ItemTokenization
         public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(
             string name,
             Func<TItem, Task<string>> fieldTextReader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder = null)
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
         {
             ValidateFieldParameters(name, fieldTextReader);
             var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
@@ -119,7 +119,7 @@ namespace Lifti.ItemTokenization
         public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(
             string name,
             Func<TItem, Task<IEnumerable<string>>> reader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder = null)
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
         {
             ValidateFieldParameters(name, reader);
             var tokenizationOptions = optionsBuilder.BuildOptionsOrDefault();

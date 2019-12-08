@@ -28,7 +28,7 @@ namespace Lifti.Querying
                 throw new ArgumentNullException(nameof(index));
             }
 
-            if (this.Root == null)
+            if (this.Root == EmptyQueryPart.Instance)
             {
                 yield break;
             }

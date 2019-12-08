@@ -17,7 +17,7 @@ namespace Lifti.Serialization.Binary
         {
             if (standardKeySerializers.TryGetValue(typeof(TKey), out var serializer))
             {
-                return serializer as IKeySerializer<TKey>;
+                return (serializer as IKeySerializer<TKey>)!;
             }
 
             throw new LiftiException($"No standard key serializer exists for type {typeof(TKey).Name} - please provide a custom implementation of IKeySerializer<> when serializing/deserializing");

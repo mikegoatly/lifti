@@ -11,11 +11,11 @@ namespace Lifti
     {
         private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions = new ConfiguredItemTokenizationOptions<TKey>();
         private readonly IndexOptions advancedOptions = new IndexOptions();
-        private IIndexNodeFactory indexNodeFactory;
-        private ITokenizerFactory tokenizerFactory;
-        private IQueryParser queryParser;
+        private IIndexNodeFactory? indexNodeFactory;
+        private ITokenizerFactory? tokenizerFactory;
+        private IQueryParser? queryParser;
         private TokenizationOptions defaultTokenizationOptions = TokenizationOptions.Default;
-        private List<Func<IIndexSnapshot<TKey>, Task>> indexModifiedActions;
+        private List<Func<IIndexSnapshot<TKey>, Task>>? indexModifiedActions;
 
         /// <summary>
         /// Configures the behavior the index should exhibit when an item that already exists in the index is indexed again.
@@ -181,7 +181,7 @@ namespace Lifti
 
         public FullTextIndex<TKey> Build()
         {
-            this.indexNodeFactory = this.indexNodeFactory ?? new IndexNodeFactory();
+            this.indexNodeFactory ??= new IndexNodeFactory();
 
             this.indexNodeFactory.Configure(this.advancedOptions);
 

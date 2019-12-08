@@ -67,7 +67,7 @@ namespace Lifti.Serialization.Binary
             for (var i = 0; i < childNodeCount; i++)
             {
                 var matchChar = this.reader.ReadChar();
-                childNodes.Add(matchChar, this.DeserializeNode(nodeFactory, depth + 1));
+                childNodes!.Add(matchChar, this.DeserializeNode(nodeFactory, depth + 1));
             }
 
             var locationMatches = new List<WordLocation>(50);
@@ -96,7 +96,7 @@ namespace Lifti.Serialization.Binary
                     indexedWords.Add(new IndexedWord(fieldId, locationMatches.ToArray()));
                 }
 
-                matches.Add(itemId, indexedWords.ToImmutable());
+                matches!.Add(itemId, indexedWords.ToImmutable());
             }
 
             return nodeFactory.CreateNode(

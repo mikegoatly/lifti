@@ -10,6 +10,6 @@
         /// <summary>
         /// Gets the tokenization options to be used when reading tokens for this field.
         /// </summary>
-        TokenizationOptions TokenizationOptions { get; }
+        TokenizationOptions? TokenizationOptions { get; }
     }
 }

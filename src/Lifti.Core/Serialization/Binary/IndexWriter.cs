@@ -37,8 +37,8 @@ namespace Lifti.Serialization.Binary
 
         private async Task WriteNodeAsync(IndexNode node)
         {
-            var matchCount = node.Matches?.Count ?? 0;
-            var childNodeCount = node.ChildNodes?.Count ?? 0;
+            var matchCount = node.Matches.Count;
+            var childNodeCount = node.ChildNodes.Count;
             var intraNodeTextLength = node.IntraNodeText.Length;
             this.writer.Write(intraNodeTextLength);
             this.writer.Write(matchCount);

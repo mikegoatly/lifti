@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
+using Lifti.Querying.QueryParts;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,9 +24,9 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
-        public void WithNullRoot_ShouldReturnNoResults()
+        public void WithEmptyQueryPartRoot_ShouldReturnNoResults()
         {
-            var query = new Query(null);
+            var query = new Query(EmptyQueryPart.Instance);
             query.Execute(this.index.Snapshot).Should().HaveCount(0);
         }
 

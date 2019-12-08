@@ -182,7 +182,7 @@
                 }
             }
 
-            return default(WordReplacement);
+            return default;
         }
 
         /// <summary>
@@ -192,7 +192,7 @@
         /// <returns>
         /// The substring that was matched at the end of the string builder, or null if no matches were found.
         /// </returns>
-        public static string EndsWith(this StringBuilder builder, Dictionary<char, string[]> substringLookup)
+        public static string? EndsWith(this StringBuilder builder, Dictionary<char, string[]> substringLookup)
         {
             var length = builder.Length;
             if (length > 0 &&

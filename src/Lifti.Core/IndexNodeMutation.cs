@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
@@ -12,7 +12,7 @@ namespace Lifti
     {
         private readonly int depth;
         private readonly IIndexNodeFactory indexNodeFactory;
-        private IndexNode original;
+        private IndexNode? original;
 
         private IndexNodeMutation(IndexNodeMutation parent)
             : this(parent.depth + 1, parent.indexNodeFactory)
@@ -39,7 +39,7 @@ namespace Lifti
         public bool HasChildNodes { get; private set; }
         public bool HasMatches { get; private set; }
         public ReadOnlyMemory<char> IntraNodeText { get; private set; }
-        public Dictionary<char, IndexNodeMutation> MutatedChildNodes { get; private set; }
+        public Dictionary<char, IndexNodeMutation>? MutatedChildNodes { get; private set; }
 
         public IEnumerable<KeyValuePair<char, IndexNode>> UnmutatedChildNodes
         {
@@ -59,7 +59,7 @@ namespace Lifti
             }
         }
 
-        public Dictionary<int, ImmutableList<IndexedWord>> MutatedMatches { get; private set; }
+        public Dictionary<int, ImmutableList<IndexedWord>>? MutatedMatches { get; private set; }
 
         internal void Index(
             int itemId,
@@ -136,7 +136,7 @@ namespace Lifti
                     if (this.TryRemove(child.Value, itemId, this.depth + 1, out var mutatedChild))
                     {
                         this.EnsureMutatedChildNodesCreated();
-                        this.MutatedChildNodes.Add(child.Key, mutatedChild);
+                        this.MutatedChildNodes!.Add(child.Key, mutatedChild);
                     }
                 }
             }
@@ -149,17 +149,17 @@ namespace Lifti
                 }
                 else
                 {
-                    if (this.original.Matches.ContainsKey(itemId))
+                    if (this.original != null && this.original.Matches.ContainsKey(itemId))
                     {
                         // Mutate and remove
                         this.EnsureMutatedMatchesCreated();
-                        this.MutatedMatches.Remove(itemId);
+                        this.MutatedMatches!.Remove(itemId);
                     }
                 }
             }
         }
 
-        private bool TryRemove(IndexNode node, int itemId, int nodeDepth, out IndexNodeMutation mutatedNode)
+        private bool TryRemove(IndexNode node, int itemId, int nodeDepth, [NotNullWhen(true)]out IndexNodeMutation? mutatedNode)
         {
             mutatedNode = null;
 
@@ -177,7 +177,7 @@ namespace Lifti
                             mutatedNode.EnsureMutatedChildNodesCreated();
                         }
 
-                        mutatedNode.MutatedChildNodes.Add(child.Key, mutatedChild);
+                        mutatedNode.MutatedChildNodes!.Add(child.Key, mutatedChild);
                     }
                 }
             }
@@ -195,7 +195,7 @@ namespace Lifti
                     }
 
                     mutatedNode.EnsureMutatedMatchesCreated();
-                    mutatedNode.MutatedMatches.Remove(itemId);
+                    mutatedNode.MutatedMatches!.Remove(itemId);
                 }
             }
 
@@ -230,7 +230,7 @@ namespace Lifti
             var indexChar = remainingWordText.Span[remainingTextSplitPosition];
 
             this.EnsureMutatedChildNodesCreated();
-            if (!this.MutatedChildNodes.TryGetValue(indexChar, out var childNode))
+            if (!this.MutatedChildNodes!.TryGetValue(indexChar, out var childNode))
             {
                 if (this.original != null && this.original.ChildNodes.TryGetValue(indexChar, out var originalChildNode))
                 {
@@ -316,7 +316,7 @@ namespace Lifti
             this.EnsureMutatedMatchesCreated();
 
             var indexedWord = new IndexedWord(fieldId, locations);
-            if (this.MutatedMatches.TryGetValue(itemId, out var itemFieldLocations))
+            if (this.MutatedMatches!.TryGetValue(itemId, out var itemFieldLocations))
             {
                 this.MutatedMatches[itemId] = itemFieldLocations.Add(new IndexedWord(fieldId, locations));
             }

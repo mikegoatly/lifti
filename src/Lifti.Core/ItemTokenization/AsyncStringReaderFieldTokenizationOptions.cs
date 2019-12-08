@@ -9,7 +9,7 @@ namespace Lifti.ItemTokenization
     {
         private readonly Func<TItem, Task<string>> reader;
 
-        internal AsyncStringReaderFieldTokenizationOptions(string name, Func<TItem, Task<string>> reader, TokenizationOptions tokenizationOptions = null)
+        internal AsyncStringReaderFieldTokenizationOptions(string name, Func<TItem, Task<string>> reader, TokenizationOptions? tokenizationOptions = null)
             : base(name, tokenizationOptions)
         {
             this.reader = reader ?? throw new ArgumentNullException(nameof(reader));

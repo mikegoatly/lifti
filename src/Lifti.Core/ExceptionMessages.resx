@@ -126,6 +126,12 @@
   <data name="BatchChangeAlreadyStarted" xml:space="preserve">
     <value>Cannot start a new batch change while another is already in progress.</value>
   </data>
+  <data name="EmptyAdjacentTextPartsAreNotSupported" xml:space="preserve">
+    <value>Adjacent text query parts cannot be empty</value>
+  </data>
+  <data name="EmptyBracketedExpressionsAreNotSupported" xml:space="preserve">
+    <value>Bracketed query parts cannot be empty</value>
+  </data>
   <data name="ExpectedAtLeastOneWordPartParsed" xml:space="preserve">
     <value>Expected at least one word part to be parsed</value>
   </data>

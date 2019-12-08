@@ -9,7 +9,7 @@ namespace Lifti.ItemTokenization
     {
         private readonly Func<TItem, IEnumerable<string>> reader;
 
-        internal StringArrayReaderFieldTokenizationOptions(string name, Func<TItem, IEnumerable<string>> reader, TokenizationOptions tokenizationOptions = null)
+        internal StringArrayReaderFieldTokenizationOptions(string name, Func<TItem, IEnumerable<string>> reader, TokenizationOptions? tokenizationOptions = null)
             : base(name, tokenizationOptions)
         {
             this.reader = reader ?? throw new ArgumentNullException(nameof(reader));
