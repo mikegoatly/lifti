@@ -105,11 +105,11 @@ namespace Lifti
         {
             await this.PerformWriteLockedActionAsync(async () =>
             {
-                var itemId = await this.GetUniqueIdForItemAsync(itemKey);
-
                 var tokenizer = this.GetTokenizer(tokenizationOptions);
                 await this.MutateAsync(m =>
                 {
+                    var itemId = this.GetUniqueIdForItem(itemKey, m);
+
                     foreach (var word in tokenizer.Process(text))
                     {
                         m.Add(itemId, this.FieldLookup.DefaultField, word);
@@ -122,11 +122,11 @@ namespace Lifti
         {
             await this.PerformWriteLockedActionAsync(async () =>
                 {
-                    var itemId = await this.GetUniqueIdForItemAsync(itemKey);
-
                     var tokenizer = this.GetTokenizer(tokenizationOptions);
                     await this.MutateAsync(m =>
                     {
+                        var itemId = this.GetUniqueIdForItem(itemKey, m);
+
                         foreach (var word in tokenizer.Process(text))
                         {
                             m.Add(itemId, this.FieldLookup.DefaultField, word);
@@ -173,7 +173,8 @@ namespace Lifti
                     return;
                 }
 
-                await this.RemoveKeyFromIndexAsync(itemKey).ConfigureAwait(false);
+                await this.MutateAsync(m => this.RemoveKeyFromIndex(itemKey, m))
+                    .ConfigureAwait(false);
 
                 result = true;
             }).ConfigureAwait(false);
@@ -285,19 +286,16 @@ namespace Lifti
             }
         }
 
-        private async Task RemoveKeyFromIndexAsync(TKey itemKey)
+        private void RemoveKeyFromIndex(TKey itemKey, IndexMutation mutation)
         {
-            await this.MutateAsync(m =>
-            {
-                var id = this.idPool.ReleaseItem(itemKey);
-                m.Remove(id);
-            }).ConfigureAwait(false);
+            var id = this.idPool.ReleaseItem(itemKey);
+            mutation.Remove(id);
         }
 
         private async Task AddAsync<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> options, IndexMutation indexMutation)
         {
             var itemKey = options.KeyReader(item);
-            var itemId = await this.GetUniqueIdForItemAsync(itemKey);
+            var itemId = this.GetUniqueIdForItem(itemKey, indexMutation);
 
             foreach (var field in options.FieldTokenization)
             {
@@ -308,13 +306,13 @@ namespace Lifti
             }
         }
 
-        private async ValueTask<int> GetUniqueIdForItemAsync(TKey itemKey)
+        private int GetUniqueIdForItem(TKey itemKey, IndexMutation mutation)
         {
             if (this.indexOptions.DuplicateItemBehavior == DuplicateItemBehavior.ReplaceItem)
             {
                 if (this.idPool.Contains(itemKey))
                 {
-                    await this.RemoveKeyFromIndexAsync(itemKey).ConfigureAwait(false);
+                    this.RemoveKeyFromIndex(itemKey, mutation);
                 }
             }
 

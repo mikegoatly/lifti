@@ -81,6 +81,16 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task ReindexingItem_ShouldReplaceIndexedTextInIndex()
+        {
+            await this.index.AddAsync("A", "Test");
+            await this.index.AddAsync("A", "Replaced");
+
+            this.index.Search("Test").Should().HaveCount(0);
+            this.index.Search("Replaced").Should().HaveCount(1);
+        }
+
+        [Fact]
         public async Task SearchingWithinFieldsShouldObeyTokenizationOptionsForFields()
         {
             await this.WithIndexedSingleStringPropertyObjectsAsync();
