@@ -15,9 +15,13 @@ namespace Lifti.Querying.QueryParts
 
         public int Tolerance { get; }
 
-        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)
+        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
         {
-            return this.Left.Evaluate(navigatorCreator).CompositePositionalIntersect(this.Right.Evaluate(navigatorCreator), this.Tolerance, this.Tolerance);
+            return this.Left.Evaluate(navigatorCreator, queryContext)
+                .CompositePositionalIntersect(
+                    this.Right.Evaluate(navigatorCreator, queryContext),
+                    this.Tolerance,
+                    this.Tolerance);
         }
 
         public override string ToString()

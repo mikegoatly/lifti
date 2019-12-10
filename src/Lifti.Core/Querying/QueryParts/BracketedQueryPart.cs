@@ -14,9 +14,9 @@ namespace Lifti.Querying.QueryParts
             get;
         }
 
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
         {
-            return this.Statement.Evaluate(navigatorCreator);
+            return this.Statement.Evaluate(navigatorCreator, queryContext);
         }
 
         public override string ToString()

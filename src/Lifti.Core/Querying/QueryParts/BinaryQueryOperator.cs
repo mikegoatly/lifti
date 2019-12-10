@@ -30,7 +30,7 @@ namespace Lifti.Querying.QueryParts
             get;
         }
 
-        public abstract IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator);
+        public abstract IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext);
     }
 
 }

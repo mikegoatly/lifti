@@ -23,7 +23,7 @@ namespace Lifti.Tests.Querying.QueryParts
                         QueryWordMatch(8, FieldMatch(1, 103, 104), FieldMatch(2, 10)))
                     });
 
-            var results = sut.Evaluate(() => new FakeIndexNavigator());
+            var results = sut.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
 
             // Item 7 matches:
             // Field 1: ((8, 9), 10)

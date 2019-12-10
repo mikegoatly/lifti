@@ -15,7 +15,7 @@ namespace Lifti.Tests.Querying.QueryParts
                 new FakeQueryPart(5, 8, 9),
                 new FakeQueryPart(2, 5, 9));
 
-            var result = op.Evaluate(() => new FakeIndexNavigator());
+            var result = op.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
 
             result.Matches.Select(m => m.ItemId).Should().BeEquivalentTo(
                 new[] { 2, 5, 8, 9 });
@@ -32,7 +32,7 @@ namespace Lifti.Tests.Querying.QueryParts
                     QueryWordMatch(5, FieldMatch(1, 1, 103), FieldMatch(2, 2, 18)),
                     QueryWordMatch(7, FieldMatch(1, 18) )));
 
-            var result = op.Evaluate(() => new FakeIndexNavigator());
+            var result = op.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
 
             result.Matches.Should().BeEquivalentTo(
                 new[] {

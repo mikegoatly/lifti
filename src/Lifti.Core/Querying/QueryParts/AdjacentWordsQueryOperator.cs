@@ -12,13 +12,13 @@ namespace Lifti.Querying.QueryParts
 
         public IReadOnlyList<IWordQueryPart> Words { get; }
 
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
         {
             var i = 0;
             var results = IntermediateQueryResult.Empty;
             do
             {
-                var nextResults = this.Words[i].Evaluate(navigatorCreator);
+                var nextResults = this.Words[i].Evaluate(navigatorCreator, queryContext);
                 if (results.Matches.Count == 0)
                 {
                     results = nextResults;

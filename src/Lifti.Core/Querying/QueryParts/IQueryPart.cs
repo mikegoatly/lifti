@@ -12,6 +12,6 @@ namespace Lifti.Querying.QueryParts
         /// <returns>
         /// The query result that contains the matched items.
         /// </returns>
-        IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator);
+        IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext);
     }
 }

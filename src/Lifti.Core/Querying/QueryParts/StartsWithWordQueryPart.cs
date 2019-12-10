@@ -12,7 +12,7 @@ namespace Lifti.Querying.QueryParts
         {
         }
 
-        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)
+        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
         {
             if (navigatorCreator == null)
             {
@@ -22,7 +22,7 @@ namespace Lifti.Querying.QueryParts
             using (var navigator = navigatorCreator())
             {
                 navigator.Process(this.Word.AsSpan());
-                return navigator.GetExactAndChildMatches();
+                return queryContext.ApplyTo(navigator.GetExactAndChildMatches());
             }
         }
 

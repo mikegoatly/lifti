@@ -23,7 +23,7 @@ namespace Lifti.Tests.Querying
 
         public string Word => throw new NotImplementedException();
 
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
         {
             return this.results;
         }

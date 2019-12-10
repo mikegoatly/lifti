@@ -10,7 +10,7 @@ namespace Lifti.Querying.QueryParts
 
         public static EmptyQueryPart Instance { get; } = new EmptyQueryPart();
 
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
         {
             return IntermediateQueryResult.Empty;
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace Lifti.Querying.QueryParts
 {
@@ -18,14 +17,11 @@ namespace Lifti.Querying.QueryParts
 
         public IQueryPart Statement { get; }
 
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
         {
-            return new IntermediateQueryResult(
-                this.Statement.Evaluate(navigatorCreator)
-                    .Matches.Select(m => new QueryWordMatch(
-                        m.ItemId, 
-                        m.FieldMatches.Where(fm => fm.FieldId == this.FieldId)))
-                    .Where(m => m.FieldMatches.Count > 0));
+            return this.Statement.Evaluate(
+                    navigatorCreator,
+                    QueryContext.Create(queryContext, this.FieldId));
         }
 
         public override string ToString()

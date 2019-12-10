@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Lifti.Querying;
 using Lifti.Querying.QueryParts;
 using System.Linq;
 using Xunit;
@@ -15,7 +14,7 @@ namespace Lifti.Tests.Querying.QueryParts
                 new FakeQueryPart(5, 8, 9),
                 new FakeQueryPart(2, 5, 9));
 
-            var result = op.Evaluate(() => new FakeIndexNavigator());
+            var result = op.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
 
             result.Matches.Select(m => m.ItemId).Should().BeEquivalentTo(
                 new[] { 5, 9 });
@@ -28,9 +27,9 @@ namespace Lifti.Tests.Querying.QueryParts
                 new FakeQueryPart(QueryWordMatch(5, FieldMatch(1, 1, 7), FieldMatch(2, 9, 20))),
                 new FakeQueryPart(QueryWordMatch(5, FieldMatch(1, 9), FieldMatch(2, 3, 34))));
 
-            var result = op.Evaluate(() => new FakeIndexNavigator());
+            var result = op.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
 
-            result.Matches.Should().BeEquivalentTo(new[] { 
+            result.Matches.Should().BeEquivalentTo(new[] {
                 QueryWordMatch(
                     5,
                     FieldMatch(1, 1, 7, 9),

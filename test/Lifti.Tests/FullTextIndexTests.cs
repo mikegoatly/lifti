@@ -200,10 +200,13 @@ namespace Lifti.Tests
         public async Task WhenLoadingLotsOfDataShouldNotError()
         {
             var wikipediaTests = WikipediaDataLoader.Load(this.GetType());
+            this.index.BeginBatchChange();
             foreach (var (name, text) in wikipediaTests)
             {
                 await this.index.AddAsync(name, text);
             }
+
+            await this.index.CommitBatchChangeAsync();
 
             await this.index.RemoveAsync(wikipediaTests[10].name);
             await this.index.RemoveAsync(wikipediaTests[9].name);
