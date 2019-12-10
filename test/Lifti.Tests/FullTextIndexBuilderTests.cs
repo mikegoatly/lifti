@@ -5,6 +5,7 @@ using Lifti.Tests.Querying;
 using Lifti.Tokenization;
 using Moq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -37,6 +38,22 @@ namespace Lifti.Tests
             index.FieldLookup.GetFieldInfo("TextField").Id.Should().Be(1);
             index.FieldLookup.GetFieldInfo("Content").Id.Should().Be(2);
             index.FieldLookup.GetFieldInfo("Title").Id.Should().Be(3);
+        }
+
+        [Fact]
+        public void WithItemConfiguration_ShouldUseDefaultTokenizationOptionsIfNotProvided()
+        {
+            this.sut.WithDefaultTokenizationOptions(o => o.CaseInsensitive(false))
+                .WithItemTokenization<TestObject2>(
+                o => o
+                    .WithKey(i => i.Id)
+                    .WithField("Content", i => i.Content)
+                    .WithField("Title", i => i.Title, s => s.CaseInsensitive(true)));
+
+            var index = this.sut.Build();
+
+            index.FieldLookup.GetFieldInfo("Content").Tokenizer.Process("teSt").Select(s => s.Value).Should().BeEquivalentTo("teSt");
+            index.FieldLookup.GetFieldInfo("Title").Tokenizer.Process("teSt").Select(s => s.Value).Should().BeEquivalentTo("TEST");
         }
 
         [Fact]

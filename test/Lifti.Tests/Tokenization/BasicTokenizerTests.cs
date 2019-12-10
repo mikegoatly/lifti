@@ -69,6 +69,18 @@ namespace Lifti.Tests.Tokenization
             }
 
             [Fact]
+            public void ShouldReturnSeparateTokensForWordsSeparatedByNonBreakSpace()
+            {
+                var output = this.sut.Process("test split").ToList();
+
+                output.Should().BeEquivalentTo(new[]
+                {
+                    new Token("test", new WordLocation(0, 0, 4)),
+                    new Token("split", new WordLocation(1, 5, 5))
+                });
+            }
+
+            [Fact]
             public void ShouldReturnSingleTokenForStringContainingOnlyOneWordEnclosedWithWordBreaks()
             {
                 var output = this.sut.Process(" test\r\n").ToList();

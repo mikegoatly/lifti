@@ -72,7 +72,7 @@ namespace Lifti.ItemTokenization
             Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
         {
             ValidateFieldParameters(name, reader);
-            var tokenizationOptions = optionsBuilder.BuildOptionsOrDefault();
+            var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
             this.fieldTokenization.Add(new StringArrayReaderFieldTokenizationOptions<TItem>(name, reader, tokenizationOptions));
             return this;
         }
@@ -122,7 +122,7 @@ namespace Lifti.ItemTokenization
             Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
         {
             ValidateFieldParameters(name, reader);
-            var tokenizationOptions = optionsBuilder.BuildOptionsOrDefault();
+            var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
             this.fieldTokenization.Add(new AsyncStringArrayReaderFieldTokenizationOptions<TItem>(name, reader, tokenizationOptions));
             return this;
         }
