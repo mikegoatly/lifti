@@ -7,6 +7,8 @@ trigger:
     - docs/*
     - README.md
     - _config.yml
+    - Gemfile
+    - Gemfile.lock
 
 variables:
   majorVersion: 2
