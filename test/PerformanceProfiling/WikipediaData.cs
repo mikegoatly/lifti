@@ -1,5 +1,4 @@
-﻿extern alias LiftiNew;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace PerformanceProfiling
 {
