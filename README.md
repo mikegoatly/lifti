@@ -14,6 +14,10 @@ Read the documentation [here](https://mikegoatly.github.io/lifti)
 
 ## Simplest possible quick start
 
+``` powerhshell
+Install-Package Lifti.Core -Version 2.0.0-beta9 -AllowPrereleaseVersions
+```
+
 ``` c#
 // Create a full text index with default settings
 var index = new FullTextIndexBuilder<string>().Build();
