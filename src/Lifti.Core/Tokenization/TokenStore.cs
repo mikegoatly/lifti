@@ -34,7 +34,7 @@ namespace Lifti.Tokenization
             }
         }
 
-        public IList<Token> ToList()
+        public IReadOnlyList<Token> ToList()
         {
             return this.materializedWords.Values.SelectMany(v => v).ToList();
         }

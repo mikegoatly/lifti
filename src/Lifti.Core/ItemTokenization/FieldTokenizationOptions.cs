@@ -23,8 +23,8 @@ namespace Lifti.ItemTokenization
         /// </summary>
         public TokenizationOptions? TokenizationOptions { get; }
 
-        internal abstract ValueTask<IEnumerable<Token>> TokenizeAsync(ITokenizer tokenizer, TItem item);
+        internal abstract ValueTask<IReadOnlyList<Token>> TokenizeAsync(ITokenizer tokenizer, TItem item);
 
-        internal abstract IEnumerable<Token> Tokenize(ITokenizer tokenizer, TItem item);
+        internal abstract IReadOnlyList<Token> Tokenize(ITokenizer tokenizer, TItem item);
     }
 }

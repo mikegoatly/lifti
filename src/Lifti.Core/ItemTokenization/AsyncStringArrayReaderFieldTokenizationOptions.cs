@@ -15,12 +15,12 @@ namespace Lifti.ItemTokenization
             this.reader = reader ?? throw new ArgumentNullException(nameof(reader));
         }
 
-        internal override async ValueTask<IEnumerable<Token>> TokenizeAsync(ITokenizer tokenizer, TItem item)
+        internal override async ValueTask<IReadOnlyList<Token>> TokenizeAsync(ITokenizer tokenizer, TItem item)
         {
             return tokenizer.Process(await this.reader(item).ConfigureAwait(false));
         }
 
-        internal override IEnumerable<Token> Tokenize(ITokenizer tokenizer, TItem item)
+        internal override IReadOnlyList<Token> Tokenize(ITokenizer tokenizer, TItem item)
         {
             throw new LiftiException(ExceptionMessages.AsyncAddMethodsMustBeUsed);
         }
