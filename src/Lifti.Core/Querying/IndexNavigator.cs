@@ -88,7 +88,7 @@ namespace Lifti.Querying
                 }
             }
 
-            return new IntermediateQueryResult(matches.Select(m => new QueryWordMatch(m.Key, this.MergeItemMatches(m.Value))));
+            return new IntermediateQueryResult(matches.Select(m => new QueryWordMatch(m.Key, MergeItemMatches(m.Value))));
         }
 
         public bool Process(ReadOnlySpan<char> text)
@@ -205,7 +205,7 @@ namespace Lifti.Querying
             }
         }
 
-        private IEnumerable<FieldMatch> MergeItemMatches(List<FieldMatch> fieldMatches)
+        private static IEnumerable<FieldMatch> MergeItemMatches(List<FieldMatch> fieldMatches)
         {
             return fieldMatches.ToLookup(m => m.FieldId)
                 .Select(m => new FieldMatch(
