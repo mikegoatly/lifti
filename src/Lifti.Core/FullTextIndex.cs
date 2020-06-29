@@ -3,6 +3,7 @@ using Lifti.Querying;
 using Lifti.Tokenization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,13 +62,13 @@ namespace Lifti
             }
         }
 
-        public IIdLookup<TKey> IdLookup => this.idPool;
+        public IItemStore<TKey> Items => this.idPool;
 
         internal IIdPool<TKey> IdPool => this.idPool;
 
         public IIndexedFieldLookup FieldLookup { get; }
 
-        public int Count => this.currentSnapshot.IdLookup.Count;
+        public int Count => this.currentSnapshot.Items.Count;
 
         internal IIndexNodeFactory IndexNodeFactory { get; }
 
@@ -108,12 +109,8 @@ namespace Lifti
                 var tokenizer = this.GetTokenizer(tokenizationOptions);
                 await this.MutateAsync(m =>
                 {
-                    var itemId = this.GetUniqueIdForItem(itemKey, m);
-
-                    foreach (var word in tokenizer.Process(text))
-                    {
-                        m.Add(itemId, this.FieldLookup.DefaultField, word);
-                    }
+                    var tokens = tokenizer.Process(text);
+                    this.AddForDefaultField(m, itemKey, tokens);
                 }).ConfigureAwait(false);
             }).ConfigureAwait(false);
         }
@@ -121,18 +118,15 @@ namespace Lifti
         public async Task AddAsync(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = null)
         {
             await this.PerformWriteLockedActionAsync(async () =>
+            {
+                var tokenizer = this.GetTokenizer(tokenizationOptions);
+                await this.MutateAsync(m =>
                 {
-                    var tokenizer = this.GetTokenizer(tokenizationOptions);
-                    await this.MutateAsync(m =>
-                    {
-                        var itemId = this.GetUniqueIdForItem(itemKey, m);
+                    var tokens = tokenizer.Process(text);
 
-                        foreach (var word in tokenizer.Process(text))
-                        {
-                            m.Add(itemId, this.FieldLookup.DefaultField, word);
-                        }
-                    }).ConfigureAwait(false);
+                    this.AddForDefaultField(m, itemKey, tokens);
                 }).ConfigureAwait(false);
+            }).ConfigureAwait(false);
         }
 
         public async Task AddRangeAsync<TItem>(IEnumerable<TItem> items)
@@ -196,6 +190,17 @@ namespace Lifti
         internal void SetRootWithLock(IndexNode indexNode)
         {
             this.PerformWriteLockedAction(() => this.Root = indexNode);
+        }
+
+        private void AddForDefaultField(IndexMutation mutation, TKey itemKey, IReadOnlyList<Token> tokens)
+        {
+            var fieldId = this.FieldLookup.DefaultField;
+            var itemId = this.GetUniqueIdForItem(
+                itemKey,
+                new DocumentStatistics(fieldId, CalculateTotalWordCount(tokens)),
+                mutation);
+
+            IndexTokens(mutation, itemId, fieldId, tokens);
         }
 
         private void PerformWriteLockedAction(Action action)
@@ -286,6 +291,11 @@ namespace Lifti
             }
         }
 
+        private static int CalculateTotalWordCount(IReadOnlyList<Token> tokens)
+        {
+            return tokens.Aggregate(0, (current, token) => current + token.Locations.Count);
+        }
+
         private void RemoveKeyFromIndex(TKey itemKey, IndexMutation mutation)
         {
             var id = this.idPool.ReleaseItem(itemKey);
@@ -295,18 +305,28 @@ namespace Lifti
         private async Task AddAsync<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> options, IndexMutation indexMutation)
         {
             var itemKey = options.KeyReader(item);
-            var itemId = this.GetUniqueIdForItem(itemKey, indexMutation);
 
+            var fieldTokens = new List<(byte fieldId, IReadOnlyList<Token> tokens)>(options.FieldTokenization.Count);
             foreach (var field in options.FieldTokenization)
             {
                 var (fieldId, tokenizer) = this.FieldLookup.GetFieldInfo(field.Name);
-                var tokens = await field.TokenizeAsync(tokenizer, item);
+                fieldTokens.Add((fieldId, await field.TokenizeAsync(tokenizer, item).ConfigureAwait(false)));
+            }
 
+            var documentStatistics = new DocumentStatistics(
+                fieldTokens.ToDictionary(
+                    t => t.fieldId,
+                    t => CalculateTotalWordCount(t.tokens)));
+
+            var itemId = this.GetUniqueIdForItem(itemKey, documentStatistics, indexMutation);
+
+            foreach (var (fieldId, tokens) in fieldTokens)
+            {
                 IndexTokens(indexMutation, itemId, fieldId, tokens);
             }
         }
 
-        private int GetUniqueIdForItem(TKey itemKey, IndexMutation mutation)
+        private int GetUniqueIdForItem(TKey itemKey, DocumentStatistics documentStatistics, IndexMutation mutation)
         {
             if (this.indexOptions.DuplicateItemBehavior == DuplicateItemBehavior.ReplaceItem)
             {
@@ -316,7 +336,7 @@ namespace Lifti
                 }
             }
 
-            return this.idPool.Add(itemKey);
+            return this.idPool.Add(itemKey, documentStatistics);
         }
 
 
@@ -336,6 +356,7 @@ namespace Lifti
         public void Dispose()
         {
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

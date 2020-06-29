@@ -31,6 +31,32 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task IndexingItemsAgainstDefaultField_ShouldUpdateTotalWordCountStats()
+        {
+            await this.WithIndexedStringsAsync();
+
+            this.index.Items.IndexStatistics.TotalWordCount.Should().Be(26);
+            this.index.Items.IndexStatistics.WordCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
+            {
+                { 0, 26 }
+            });
+        }
+
+        [Fact]
+        public async Task IndexingItemsAgainstWithMultipleFields_ShouldUpdateTotalWordCountStats()
+        {
+            await this.WithIndexedSingleStringPropertyObjectsAsync();
+
+            this.index.Items.IndexStatistics.TotalWordCount.Should().Be(14);
+            this.index.Items.IndexStatistics.WordCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
+            {
+                { 1, 4 },
+                { 2, 4 },
+                { 3, 6 }
+            });
+        }
+
+        [Fact]
         public async Task IndexedItemsShouldBeRetrievable()
         {
             await this.WithIndexedStringsAsync();

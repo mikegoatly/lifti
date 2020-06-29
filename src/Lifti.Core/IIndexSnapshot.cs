@@ -5,9 +5,9 @@ namespace Lifti
     public interface IIndexSnapshot<TKey>
     {
         /// <summary>
-        /// Gets the ID lookup in the state it was in when the snapshot was taken.
+        /// Gets the <see cref="IItemStore{T}"/> in the state it was in when the snapshot was taken.
         /// </summary>
-        IIdLookup<TKey> IdLookup { get; }
+        IItemStore<TKey> Items { get; }
 
         /// <summary>
         /// Gets the root node of the index at the time the snapshot was taken.

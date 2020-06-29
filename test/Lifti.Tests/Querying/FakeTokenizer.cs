@@ -11,19 +11,19 @@ namespace Lifti.Tests.Querying
         {
         }
 
-        public IEnumerable<Token> Process(string input)
+        public IReadOnlyList<Token> Process(string input)
         {
-            yield return new Token(input, new WordLocation(0, 0, (ushort)input.Length));
+            return new[] { new Token(input, new WordLocation(0, 0, (ushort)input.Length)) };
         }
 
-        public IEnumerable<Token> Process(ReadOnlySpan<char> input)
+        public IReadOnlyList<Token> Process(ReadOnlySpan<char> input)
         {
             return new[] { new Token(input.ToString(), new WordLocation(0, 0, (ushort)input.Length)) };
         }
 
-        public IEnumerable<Token> Process(IEnumerable<string> inputs)
+        public IReadOnlyList<Token> Process(IEnumerable<string> inputs)
         {
-            return inputs.Select(s => new Token(s, new WordLocation(1, 0, (ushort)s.Length)));
+            return inputs.Select(s => new Token(s, new WordLocation(1, 0, (ushort)s.Length))).ToList();
         }
     }
 }

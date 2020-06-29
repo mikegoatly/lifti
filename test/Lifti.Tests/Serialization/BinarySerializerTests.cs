@@ -62,7 +62,7 @@ namespace Lifti.Tests.Serialization
 
                 this.output.WriteLine($"Deserialized in {stopwatch.ElapsedMilliseconds}ms");
 
-                newIndex.IdLookup.GetIndexedItems().Should().BeEquivalentTo(this.index.IdLookup.GetIndexedItems());
+                newIndex.Items.GetIndexedItems().Should().BeEquivalentTo(this.index.Items.GetIndexedItems());
                 newIndex.Count.Should().Be(this.index.Count);
                 newIndex.Root.ToString().Should().Be(this.index.Root.ToString());
 

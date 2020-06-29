@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
-    internal class V1IndexReader<TKey> : IIndexReader<TKey>
+    internal class V2IndexReader<TKey> : IIndexReader<TKey>
     {
         private readonly Stream underlyingStream;
         private readonly bool disposeStream;
@@ -13,7 +13,7 @@ namespace Lifti.Serialization.Binary
         private readonly MemoryStream buffer;
         private readonly BinaryReader reader;
 
-        public V1IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer)
+        public V2IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer)
         {
             this.underlyingStream = stream;
             this.disposeStream = disposeStream;
@@ -43,8 +43,21 @@ namespace Lifti.Serialization.Binary
             {
                 var id = this.reader.ReadInt32();
                 var key = this.keySerializer.Read(this.reader);
+                var fieldStatCount = this.reader.ReadInt32();
+                var fieldWordCounts = ImmutableDictionary.CreateBuilder<byte, int>();
+                int totalWordCount = 0;
+                for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
+                {
+                    var fieldId = this.reader.ReadByte();
+                    var wordCount = this.reader.ReadInt32();
+                    fieldWordCounts.Add(fieldId, wordCount);
+                    totalWordCount += wordCount;
+                }
 
-                index.IdPool.Add(id, key);
+                index.IdPool.Add(
+                    id, 
+                    key,
+                    new DocumentStatistics(fieldWordCounts.ToImmutable(), totalWordCount));
             }
 
             index.SetRootWithLock(this.DeserializeNode(index.IndexNodeFactory, 0));

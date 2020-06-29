@@ -33,7 +33,7 @@ namespace Lifti.Querying
                 yield break;
             }
 
-            var idLookup = index.IdLookup;
+            var idLookup = index.Items;
             var fieldLookup = index.FieldLookup;
             var matches = this.Root.Evaluate(index.CreateNavigator, QueryContext.Empty).Matches;
             var results = new Dictionary<int, List<FieldMatch>>();
@@ -51,9 +51,9 @@ namespace Lifti.Querying
 
             foreach (var itemResults in matches)
             {
-                var item = idLookup.GetItemForId(itemResults.ItemId);
+                var item = idLookup.GetMetadataById(itemResults.ItemId);
                 yield return new SearchResult<TKey>(
-                    item,
+                    item.Item,
                     itemResults.FieldMatches.Select(m => new FieldSearchResult(
                         fieldLookup.GetFieldForId(m.FieldId),
                         m.GetWordLocations()))

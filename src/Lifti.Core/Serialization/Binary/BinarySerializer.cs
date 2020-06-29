@@ -66,7 +66,9 @@ namespace Lifti.Serialization.Binary
             switch (version)
             {
                 case 1:
-                    return new V1IndexReader<TKey>(stream, disposeStream, this.keySerializer);
+                    throw new DeserializationException(ExceptionMessages.EarlierVersionSerializedIndexNotSupported, version);
+                case 2:
+                    return new V2IndexReader<TKey>(stream, disposeStream, this.keySerializer);
                 default:
                     throw new DeserializationException(ExceptionMessages.NoDeserializerAvailableForIndexVersion, version);
             }
