@@ -21,7 +21,7 @@ namespace PerformanceProfiling
             await this.PopulateIndexAsync(this.index);
         }
 
-        [Params("confiscation & and & they")]
+        [Params("(confiscation & th*) | \"and they\"")]
         public string SearchCriteria { get; set; }
 
         [Benchmark]

@@ -18,7 +18,7 @@ namespace Lifti
         private readonly IndexOptions indexOptions;
         private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions;
         private readonly IdPool<TKey> idPool;
-        private readonly IIndexNavigatorPool indexNavigatorPool = new IndexNavigatorPool();
+        private readonly IIndexNavigatorPool indexNavigatorPool;
         private readonly SemaphoreSlim writeLock = new SemaphoreSlim(1);
         private readonly TimeSpan writeLockTimeout = TimeSpan.FromSeconds(10);
         private bool isDisposed;
@@ -36,6 +36,7 @@ namespace Lifti
             TokenizationOptions defaultTokenizationOptions,
             Func<IIndexSnapshot<TKey>, Task>[]? indexModifiedActions)
         {
+            this.indexNavigatorPool = new IndexNavigatorPool(new OkampiBm25Scorer()); // TODO injection
             this.indexOptions = indexOptions;
             this.itemTokenizationOptions = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
             this.IndexNodeFactory = indexNodeFactory ?? throw new ArgumentNullException(nameof(indexNodeFactory));

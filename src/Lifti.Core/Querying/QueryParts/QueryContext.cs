@@ -25,7 +25,7 @@ namespace Lifti.Querying.QueryParts
                 intermediateQueryResult.Matches
                     .Select(m => new QueryWordMatch(
                         m.ItemId,
-                        m.FieldMatches.Where(fm => fm.FieldId == this.filterToFieldId)))
+                        m.FieldMatches.Where(fm => fm.FieldId == this.filterToFieldId).ToList()))
                     .Where(m => m.FieldMatches.Count > 0));
         }
 

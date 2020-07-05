@@ -7,17 +7,18 @@ using System.Text;
 
 namespace Lifti.Querying
 {
-
     internal sealed class IndexNavigator : IIndexNavigator
     {
         private readonly StringBuilder navigatedWith = new StringBuilder(16);
         private IIndexNavigatorPool? pool;
+        private IIndexScorer scorer;
         private IndexNode? currentNode;
         private int intraNodeTextPosition;
 
-        internal void Initialize(IndexNode node, IIndexNavigatorPool pool)
+        internal void Initialize(IndexNode node, IIndexNavigatorPool pool, IIndexScorer scorer)
         {
             this.pool = pool;
+            this.scorer = scorer;
             this.currentNode = node;
             this.intraNodeTextPosition = 0;
             this.navigatedWith.Length = 0;
@@ -88,7 +89,10 @@ namespace Lifti.Querying
                 }
             }
 
-            return new IntermediateQueryResult(matches.Select(m => new QueryWordMatch(m.Key, MergeItemMatches(m.Value))));
+            return new IntermediateQueryResult(
+                matches.Select(m => new QueryWordMatch(
+                    m.Key,
+                    MergeItemMatches(m.Value).ToList())));
         }
 
         public bool Process(ReadOnlySpan<char> text)
@@ -213,9 +217,12 @@ namespace Lifti.Querying
                     m.SelectMany(w => w.Locations).OrderBy(w => w.MinWordIndex).ToList()));
         }
 
-        private static QueryWordMatch CreateQueryWordMatch(KeyValuePair<int, ImmutableList<IndexedWord>> match)
+        private static QueryWordMatch CreateQueryWordMatch(
+            KeyValuePair<int, ImmutableList<IndexedWord>> match)
         {
-            return new QueryWordMatch(match.Key, match.Value.Select(v => new FieldMatch(v)));
+            return new QueryWordMatch(
+                match.Key,
+                match.Value.Select(v => new FieldMatch(v)).ToList());
         }
     }
 }

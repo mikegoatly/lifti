@@ -6,10 +6,10 @@ namespace Lifti.Querying
 {
     public struct QueryWordMatch : IEquatable<QueryWordMatch>
     {
-        public QueryWordMatch(int itemId, IEnumerable<FieldMatch> fieldMatches)
+        public QueryWordMatch(int itemId, IReadOnlyList<FieldMatch> fieldMatches)
         {
             this.ItemId = itemId;
-            this.FieldMatches = fieldMatches as IReadOnlyList<FieldMatch> ?? fieldMatches.ToList();
+            this.FieldMatches = fieldMatches;
         }
 
         public int ItemId { get; }

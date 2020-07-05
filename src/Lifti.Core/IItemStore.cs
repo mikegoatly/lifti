@@ -2,13 +2,29 @@
 
 namespace Lifti
 {
-    public interface IItemStore<T>
+    public interface IItemStore
     {
         /// <summary>
         /// Gets the number of items managed by this instance.
         /// </summary>
         int Count { get; }
 
+        /// <summary>
+        /// Gets the item metadata for the given id.
+        /// </summary>
+        /// <exception cref="LiftiException">
+        /// Thrown when the id is not known.
+        /// </exception>
+        IItemMetadata GetMetadata(int id);
+
+        /// <summary>
+        /// Gets the aggregated statistics for all the indexed documents, including total word count.
+        /// </summary>
+        IndexStatistics IndexStatistics { get; }
+    }
+
+    public interface IItemStore<T> : IItemStore
+    {
         /// <summary>
         /// Gets each of the items and their associated ids managed by this instance.
         /// </summary>
@@ -25,7 +41,7 @@ namespace Lifti
         /// <exception cref="LiftiException">
         /// Thrown when the id is not known.
         /// </exception>
-        ItemMetadata<T> GetMetadataById(int id);
+        IItemMetadata<T> GetMetadata(int id);
 
         /// <summary>
         /// Gets the item metadata for the given item.
@@ -33,12 +49,7 @@ namespace Lifti
         /// <exception cref="LiftiException">
         /// Thrown when the item is not known.
         /// </exception>
-        ItemMetadata<T> GetMetadata(T item);
-
-        /// <summary>
-        /// Gets the aggregated statistics for all the indexed documents, including total word count.
-        /// </summary>
-        IndexStatistics IndexStatistics { get; }
+        IItemMetadata<T> GetMetadata(T item);
 
         /// <summary>
         /// Creates a snapshot of this instance that can be used even if the index is subsequently mutated.

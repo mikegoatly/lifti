@@ -51,7 +51,7 @@ namespace Lifti.Querying
 
             foreach (var itemResults in matches)
             {
-                var item = idLookup.GetMetadataById(itemResults.ItemId);
+                var item = idLookup.GetMetadata(itemResults.ItemId);
                 yield return new SearchResult<TKey>(
                     item.Item,
                     itemResults.FieldMatches.Select(m => new FieldSearchResult(

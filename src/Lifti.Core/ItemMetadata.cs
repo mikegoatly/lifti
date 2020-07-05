@@ -1,6 +1,7 @@
 ﻿namespace Lifti
 {
-    public class ItemMetadata<T>
+
+    public class ItemMetadata<T> : IItemMetadata<T>
     {
         public ItemMetadata(int id, T item, DocumentStatistics documentStatistics)
         {
@@ -9,19 +10,13 @@
             this.DocumentStatistics = documentStatistics;
         }
 
-        /// <summary>
-        /// Gets the reference ID of the indexed item used internally in the index.
-        /// </summary>
-        public int Id { get; }
-
-        /// <summary>
-        /// Gets the indexed item.
-        /// </summary>
+        /// <inheritdoc />
         public T Item { get; }
 
-        /// <summary>
-        /// Gets the statistics for the indexed document, including word count.
-        /// </summary>
+        /// <inheritdoc />
+        public int Id { get; }
+
+        /// <inheritdoc />
         public DocumentStatistics DocumentStatistics { get; }
     }
 }

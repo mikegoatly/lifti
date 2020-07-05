@@ -38,7 +38,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public ItemMetadata<T> GetMetadataById(int id)
+        public IItemMetadata<T> GetMetadata(int id)
         {
             if (!this.ItemIdLookup.TryGetValue(id, out var itemMetadata))
             {
@@ -49,7 +49,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public ItemMetadata<T> GetMetadata(T item)
+        public IItemMetadata<T> GetMetadata(T item)
         {
             if (!this.ItemLookup.TryGetValue(item, out var itemMetadata))
             {
@@ -68,11 +68,15 @@ namespace Lifti
         /// <inheritdoc />
         public IItemStore<T> Snapshot()
         {
-            return new ItemStore<T>(
-                this.ItemLookup,
+            return new ItemStore<T>(this.ItemLookup,
                 this.ItemIdLookup,
                 this.IndexStatistics
             );
+        }
+
+        IItemMetadata IItemStore.GetMetadata(int id)
+        {
+            return this.GetMetadata(id);
         }
     }
 }

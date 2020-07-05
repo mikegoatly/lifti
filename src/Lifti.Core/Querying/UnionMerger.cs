@@ -21,7 +21,7 @@ namespace Lifti.Querying
                     // Exists in both
                     yield return new QueryWordMatch(
                         leftMatch.ItemId,
-                        MergeFields(leftMatch, rightMatch));
+                        MergeFields(leftMatch, rightMatch).ToList());
 
                     rightDictionary.Remove(leftMatch.ItemId);
                 }

@@ -22,7 +22,7 @@ namespace Lifti.Querying
                 {
                     yield return new QueryWordMatch(
                         leftMatch.ItemId,
-                        MergeFields(leftMatch, rightMatch));
+                        MergeFields(leftMatch, rightMatch).ToList());
                 }
             }
         }

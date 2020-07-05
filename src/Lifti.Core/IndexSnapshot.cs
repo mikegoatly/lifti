@@ -2,7 +2,7 @@
 
 namespace Lifti
 {
-    public class IndexSnapshot<TKey> : IIndexSnapshot<TKey>
+    public class IndexSnapshot<TKey> : IIndexSnapshot<TKey>, IIndexSnapshot
     {
         private readonly IIndexNavigatorPool indexNavigatorPool;
 
@@ -25,10 +25,12 @@ namespace Lifti
         /// <inheritdoc />
         public IIndexedFieldLookup FieldLookup { get; }
 
+        IItemStore IIndexSnapshot.Items => this.Items;
+
         /// <inheritdoc />
         public IIndexNavigator CreateNavigator()
         {
-            return this.indexNavigatorPool.Create(this.Root);
+            return this.indexNavigatorPool.Create(this);
         }
     }
 }
