@@ -277,6 +277,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempting to score a query result with no scorer initialized.
+        /// </summary>
+        internal static string NoScorerInitialized {
+            get {
+                return ResourceManager.GetString("NoScorerInitialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No tokenization options have been provided for type {0}.
         /// </summary>
         internal static string NoTokenizationOptionsProvidedForType {

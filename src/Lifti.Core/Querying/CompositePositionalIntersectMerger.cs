@@ -7,7 +7,7 @@ namespace Lifti.Querying
     {
         public static readonly CompositePositionalIntersectMerger Instance = new CompositePositionalIntersectMerger();
 
-        public IEnumerable<QueryWordMatch> Apply(IntermediateQueryResult left, IntermediateQueryResult right, int leftTolerance, int rightTolerance)
+        public IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right, int leftTolerance, int rightTolerance)
         {
             // TODO Verify this assumption - forcing RIGHT to contain more will cause a bigger dictionary to be built
             // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
@@ -28,23 +28,23 @@ namespace Lifti.Querying
 
                     if (positionalMatches.Count > 0)
                     {
-                        yield return new QueryWordMatch(leftMatch.ItemId, positionalMatches);
+                        yield return new ScoredToken(leftMatch.ItemId, positionalMatches);
                     }
                 }
             }
         }
 
-        private static IReadOnlyList<FieldMatch> PositionallyMatchAndCombineWords(
-            IEnumerable<FieldMatch> leftFields,
-            IEnumerable<FieldMatch> rightFields,
+        private static IReadOnlyList<ScoredFieldMatch> PositionallyMatchAndCombineWords(
+            IEnumerable<ScoredFieldMatch> leftFields,
+            IEnumerable<ScoredFieldMatch> rightFields,
             int leftTolerance,
             int rightTolerance)
         {
             var matchedFields = JoinFields(leftFields, rightFields);
 
-            var fieldResults = new List<FieldMatch>(matchedFields.Count);
+            var fieldResults = new List<ScoredFieldMatch>(matchedFields.Count);
             var fieldWordMatches = new List<IWordLocationMatch>();
-            foreach (var (fieldId, currentLocations, nextLocations) in matchedFields)
+            foreach (var (fieldId, score, currentLocations, nextLocations) in matchedFields)
             {
                 fieldWordMatches.Clear();
 
@@ -73,7 +73,10 @@ namespace Lifti.Querying
 
                 if (fieldWordMatches.Count > 0)
                 {
-                    fieldResults.Add(new FieldMatch(fieldId, fieldWordMatches.ToList()));
+                    fieldResults.Add(
+                        new ScoredFieldMatch(
+                            score,
+                            new FieldMatch(fieldId, fieldWordMatches.ToList())));
                 }
             }
 

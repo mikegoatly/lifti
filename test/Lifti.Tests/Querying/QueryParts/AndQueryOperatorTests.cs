@@ -24,16 +24,16 @@ namespace Lifti.Tests.Querying.QueryParts
         public void ShouldMergeIndexedWordsInCorrectOrderForMatchingFields()
         {
             var op = new AndQueryOperator(
-                new FakeQueryPart(QueryWordMatch(5, FieldMatch(1, 1, 7), FieldMatch(2, 9, 20))),
-                new FakeQueryPart(QueryWordMatch(5, FieldMatch(1, 9), FieldMatch(2, 3, 34))));
+                new FakeQueryPart(ScoredToken(5, ScoredFieldMatch(1D, 1, 1, 7), ScoredFieldMatch(3D, 2, 9, 20))),
+                new FakeQueryPart(ScoredToken(5, ScoredFieldMatch(2D, 1, 9), ScoredFieldMatch(4D, 2, 3, 34))));
 
             var result = op.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
 
             result.Matches.Should().BeEquivalentTo(new[] {
-                QueryWordMatch(
+                ScoredToken(
                     5,
-                    FieldMatch(1, 1, 7, 9),
-                    FieldMatch(2, 3, 9, 20, 34))});
+                    ScoredFieldMatch(3D, 1, 1, 7, 9),
+                    ScoredFieldMatch(7D, 2, 3, 9, 20, 34))});
         }
     }
 }

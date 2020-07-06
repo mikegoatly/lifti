@@ -47,7 +47,7 @@
                     <ul class="col-3 search-results pr-2 pt-2 border-primary border-right">
                         @foreach (var result in results)
                         {
-                            <li class="p-1" @onclick="() => this.ShowItem(result)">@result.Key</li>
+                            <li class="p-1" @onclick="() => this.ShowItem(result)">@result.Key <br/> Score @result.Score.ToString("0.####")</li>
                         }
                     </ul>
                     @if (this.selectedContent != null)

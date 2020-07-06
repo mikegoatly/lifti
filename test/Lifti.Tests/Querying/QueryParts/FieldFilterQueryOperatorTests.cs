@@ -10,16 +10,16 @@ namespace Lifti.Tests.Querying.QueryParts
         public void ShouldFilterAllItemResultsToRequiredField()
         {
             var navigator = FakeIndexNavigator.ReturningExactMatches(
-                QueryWordMatch(2, FieldMatch(2, 1, 2), FieldMatch(4, 1)),
-                QueryWordMatch(4, FieldMatch(3, 3), FieldMatch(4, 44, 99), FieldMatch(5, 2)));
+                ScoredToken(2, ScoredFieldMatch(1D, 2, 1, 2), ScoredFieldMatch(2D, 4, 1)),
+                ScoredToken(4, ScoredFieldMatch(3D, 3, 3), ScoredFieldMatch(4D, 4, 44, 99), ScoredFieldMatch(5D, 5, 2)));
 
             var sut = new FieldFilterQueryOperator("Test", 4, new ExactWordQueryPart("x"));
 
             var results = sut.Evaluate(() => navigator, QueryContext.Empty);
 
             results.Matches.Should().BeEquivalentTo(
-                    QueryWordMatch(2, FieldMatch(4, 1)),
-                    QueryWordMatch(4, FieldMatch(4, 44, 99))
+                    ScoredToken(2, ScoredFieldMatch(2D, 4, 1)),
+                    ScoredToken(4, ScoredFieldMatch(4D, 4, 44, 99))
                 );
         }
     }

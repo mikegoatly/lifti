@@ -63,7 +63,9 @@ namespace Lifti.Tests.Querying
             results.Matches.Should().BeEquivalentTo(
                 new[]
                 {
-                    QueryWordMatch(0, new FieldMatch(0, new SingleWordLocationMatch(new WordLocation(5, 42, 12))))
+                    ScoredToken(
+                        0, 
+                        ScoredFieldMatch(double.Epsilon, 0, new SingleWordLocationMatch(new WordLocation(5, 42, 12))))
                 });
         }
 
@@ -146,19 +148,19 @@ namespace Lifti.Tests.Querying
             results.Should().NotBeNull();
             results.Matches.Should()
                 .BeEquivalentTo(
-                new QueryWordMatch(
+                ScoredToken(
                     1, 
                     new[]
                     {
-                        new FieldMatch(1, WordMatch(0, 0, 6), WordMatch(1, 7, 3), WordMatch(2, 11, 5)),
-                        new FieldMatch(2, WordMatch(0, 0, 4), WordMatch(1, 5, 5))
+                        ScoredFieldMatch(double.Epsilon, 1, WordMatch(0, 0, 6), WordMatch(1, 7, 3), WordMatch(2, 11, 5)),
+                        ScoredFieldMatch(double.Epsilon, 2, WordMatch(0, 0, 4), WordMatch(1, 5, 5))
                     }),
-                new QueryWordMatch(
+                ScoredToken(
                     2,
                     new[]
                     {
-                        new FieldMatch(1, WordMatch(0, 0, 3)),
-                        new FieldMatch(2, WordMatch(0, 0, 5))
+                        ScoredFieldMatch(double.Epsilon, 1, WordMatch(0, 0, 3)),
+                        ScoredFieldMatch(double.Epsilon, 2, WordMatch(0, 0, 5))
                     }));
         }
 

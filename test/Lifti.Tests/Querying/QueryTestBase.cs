@@ -23,6 +23,13 @@ namespace Lifti.Tests.Querying
             return match;
         }
 
+        protected static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params int[] wordIndexes)
+        {
+            return new ScoredFieldMatch(
+                    score,
+                    FieldMatch(fieldId, wordIndexes));
+        }
+
         protected static FieldMatch FieldMatch(byte fieldId, params int[] wordIndexes)
         {
             return new FieldMatch(
@@ -30,11 +37,19 @@ namespace Lifti.Tests.Querying
                     wordIndexes.Select(i => WordMatch(i)).ToList());
         }
 
-        protected static FieldMatch FieldMatch(byte fieldId, params (int, int)[] compositeMatches)
+        protected static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params (int, int)[] compositeMatches)
         {
-            return new FieldMatch(
-                    fieldId,
-                    compositeMatches.Select(i => (IWordLocationMatch)CompositeMatch(i.Item1, i.Item2)).ToList());
+            return ScoredFieldMatch(
+                score, 
+                fieldId,
+                compositeMatches.Select(i => (IWordLocationMatch)CompositeMatch(i.Item1, i.Item2)).ToArray());
+        }
+
+        protected static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params IWordLocationMatch[] compositeMatches)
+        {
+            return new ScoredFieldMatch(
+                score,
+                new FieldMatch(fieldId, compositeMatches));
         }
 
         protected static IWordLocationMatch WordMatch(int index)
@@ -47,14 +62,16 @@ namespace Lifti.Tests.Querying
             return new SingleWordLocationMatch(new WordLocation(index, start, (ushort)length));
         }
 
-        protected static IntermediateQueryResult IntermediateQueryResult(params QueryWordMatch[] matches)
+        protected static IntermediateQueryResult IntermediateQueryResult(params ScoredToken[] matches)
         {
             return new IntermediateQueryResult(matches);
         }
 
-        protected static QueryWordMatch QueryWordMatch(int itemId, params FieldMatch[] matches)
+        protected static ScoredToken ScoredToken(int itemId, params ScoredFieldMatch[] matches)
         {
-            return new QueryWordMatch(itemId, matches);
+            return new ScoredToken(
+                itemId, 
+                matches);
         }
     }
 }

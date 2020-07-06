@@ -34,16 +34,15 @@ namespace Lifti.Querying
                 throw new ArgumentNullException(nameof(tokens));
             }
 
-            var documentsContainingToken = tokens.Count + 0.5D;
-            var idf = Math.Log((this.documentCount - documentsContainingToken)
-                            / documentsContainingToken);
+            var idf = Math.Log((this.documentCount - tokens.Count + 0.5D)
+                            / (tokens.Count + 0.5D));
 
             idf = Math.Max(idf, double.Epsilon);
 
             return tokens.Select(t =>
             {
                 var itemWordCounts = this.snapshot.GetMetadata(t.ItemId).DocumentStatistics.WordCountByField;
-                var itemScore = 0D;
+                var scoredFieldMatches = new List<ScoredFieldMatch>(t.FieldMatches.Count);
                 foreach (var fieldMatch in t.FieldMatches)
                 {
                     var frequencyInDocument = fieldMatch.Locations.Count;
@@ -56,10 +55,10 @@ namespace Lifti.Querying
 
                     var fieldScore = idf * (numerator / denominator);
 
-                    itemScore += fieldScore;
+                    scoredFieldMatches.Add(new ScoredFieldMatch(fieldScore, fieldMatch));
                 }
 
-                return new ScoredToken(t, itemScore);
+                return new ScoredToken(t.ItemId, scoredFieldMatches);
             }).ToList();
         }
     }

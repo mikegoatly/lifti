@@ -223,7 +223,27 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task QueringIndex_ShouldOrderResultsByScore()
+        {
+            await PopulateIndexWithWikipediaData();
+
+            var results = this.index.Search("data").ToList();
+            results.Should().BeInDescendingOrder(r => r.Score);
+            results.First().Score.Should().BeApproximately(1.844865D, 0.0001D);
+            results.Last().Score.Should().BeApproximately(0.931771D, 0.0001D);
+        }
+
+        [Fact]
         public async Task WhenLoadingLotsOfDataShouldNotError()
+        {
+            var wikipediaTests = await PopulateIndexWithWikipediaData();
+
+            await this.index.RemoveAsync(wikipediaTests[10].name);
+            await this.index.RemoveAsync(wikipediaTests[9].name);
+            await this.index.RemoveAsync(wikipediaTests[8].name);
+        }
+
+        private async Task<IList<(string name, string text)>> PopulateIndexWithWikipediaData()
         {
             var wikipediaTests = WikipediaDataLoader.Load(this.GetType());
             this.index.BeginBatchChange();
@@ -233,10 +253,7 @@ namespace Lifti.Tests
             }
 
             await this.index.CommitBatchChangeAsync();
-
-            await this.index.RemoveAsync(wikipediaTests[10].name);
-            await this.index.RemoveAsync(wikipediaTests[9].name);
-            await this.index.RemoveAsync(wikipediaTests[8].name);
+            return wikipediaTests;
         }
 
         [Fact]

@@ -7,14 +7,14 @@ namespace Lifti.Querying
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Should not be compared")]
     public struct IntermediateQueryResult
     {
-        public static IntermediateQueryResult Empty { get; } = new IntermediateQueryResult(Array.Empty<QueryWordMatch>());
-
-        public IntermediateQueryResult(IEnumerable<QueryWordMatch> matches)
+        public IntermediateQueryResult(IEnumerable<ScoredToken> matches)
         {
-            this.Matches = matches.ToList();
+            this.Matches = matches as IReadOnlyList<ScoredToken> ?? matches.ToList();
         }
 
-        public IReadOnlyList<QueryWordMatch> Matches { get; }
+        public static IntermediateQueryResult Empty { get; } = new IntermediateQueryResult(Array.Empty<ScoredToken>());
+
+        public IReadOnlyList<ScoredToken> Matches { get; }
 
         /// <summary>
         /// Intersects this and the specified instance, but only when the positions of the matched words on the left are preceding the words on the right.

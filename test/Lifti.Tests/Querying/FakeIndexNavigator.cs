@@ -15,12 +15,14 @@ namespace Lifti.Tests.Querying
         {
             this.ExpectedExactAndChildMatches = new IntermediateQueryResult(
                 matchedItems.Select(
-                    m => new QueryWordMatch(m, new[] { FieldMatch((byte)m, m) })));
+                    m => ScoredToken(
+                        m, 
+                        new[] { ScoredFieldMatch(1D, (byte)m, m) })));
 
             this.ExpectedExactMatches = exactAndChildMatchOnly ? Lifti.Querying.IntermediateQueryResult.Empty : this.ExpectedExactAndChildMatches;
         }
 
-        private FakeIndexNavigator(bool exactAndChildMatchOnly, params QueryWordMatch[] matches)
+        private FakeIndexNavigator(bool exactAndChildMatchOnly, params ScoredToken[] matches)
         {
             this.ExpectedExactAndChildMatches = new IntermediateQueryResult(matches);
 
@@ -44,12 +46,12 @@ namespace Lifti.Tests.Querying
             return new FakeIndexNavigator(true, matchedItems);
         }
 
-        public static FakeIndexNavigator ReturningExactMatches(params QueryWordMatch[] matches)
+        public static FakeIndexNavigator ReturningExactMatches(params ScoredToken[] matches)
         {
             return new FakeIndexNavigator(false, matches);
         }
 
-        public static FakeIndexNavigator ReturningExactAndChildMatches(params QueryWordMatch[] matches)
+        public static FakeIndexNavigator ReturningExactAndChildMatches(params ScoredToken[] matches)
         {
             return new FakeIndexNavigator(true, matches);
         }

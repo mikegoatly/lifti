@@ -1,14 +1,45 @@
-﻿namespace Lifti.Querying
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Lifti.Querying
 {
-    public struct ScoredToken
+    public struct ScoredToken : IEquatable<ScoredToken>
     {
-        public ScoredToken(QueryWordMatch match, double score)
+        public ScoredToken(int itemId, IReadOnlyList<ScoredFieldMatch> fieldMatches)
         {
-            this.Match = match;
-            this.Score = score;
+            this.ItemId = itemId;
+            this.FieldMatches = fieldMatches;
         }
 
-        public QueryWordMatch Match { get; }
-        public double Score { get; }
+        public int ItemId { get; }
+        public IReadOnlyList<ScoredFieldMatch> FieldMatches { get; }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ScoredToken match &&
+                   this.Equals(match);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(this.ItemId, this.FieldMatches);
+        }
+
+        public static bool operator ==(ScoredToken left, ScoredToken right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ScoredToken left, ScoredToken right)
+        {
+            return !(left == right);
+        }
+
+        public bool Equals(ScoredToken other)
+        {
+            return this.ItemId == other.ItemId &&
+                   this.FieldMatches.SequenceEqual(other.FieldMatches);
+        }
     }
 }

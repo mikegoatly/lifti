@@ -4,14 +4,16 @@ namespace Lifti
 {
     public class FieldSearchResult
     {
-        public FieldSearchResult(string foundIn, IReadOnlyList<WordLocation> locations)
+        public FieldSearchResult(string foundIn, double score, IReadOnlyList<WordLocation> locations)
         {
             this.FoundIn = foundIn;
+            this.Score = score;
             this.Locations = locations;
         }
 
-        public string FoundIn { get; set; }
-        public IReadOnlyList<WordLocation> Locations { get; set; }
+        public string FoundIn { get; }
+        public double Score { get; }
+        public IReadOnlyList<WordLocation> Locations { get; }
 
         public override string ToString()
         {

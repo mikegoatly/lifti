@@ -12,11 +12,11 @@ namespace Lifti.Tests.Querying.QueryParts
         {
             var sut = new PrecedingQueryOperator(
                 new FakeQueryPart(
-                    QueryWordMatch(7, FieldMatch(1, 8, 20, 100), FieldMatch(2, 9, 14)),
-                    QueryWordMatch(8, FieldMatch(1, 11, 101), FieldMatch(2, 8, 104))),
+                    ScoredToken(7, ScoredFieldMatch(1D, 1, 8, 20, 100), ScoredFieldMatch(5D, 2, 9, 14)),
+                    ScoredToken(8, ScoredFieldMatch(2D, 1, 11, 101), ScoredFieldMatch(6D, 2, 8, 104))),
                 new FakeQueryPart(
-                    QueryWordMatch(7, FieldMatch(1, 6, 14, 102)),
-                    QueryWordMatch(8, FieldMatch(1, 5, 106), FieldMatch(2, 3, 105))));
+                    ScoredToken(7, ScoredFieldMatch(3D, 1, 6, 14, 102)),
+                    ScoredToken(8, ScoredFieldMatch(4D, 1, 5, 106), ScoredFieldMatch(7D, 2, 3, 105))));
 
             var results = sut.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
 
@@ -27,13 +27,13 @@ namespace Lifti.Tests.Querying.QueryParts
             // Field 1: 11, 106, 101
             // Field 2: 8, 105, 104
             results.Matches.Should().BeEquivalentTo(
-                QueryWordMatch(
+                ScoredToken(
                     7,
-                    new FieldMatch(1, WordMatch(8), WordMatch(14), WordMatch(20), WordMatch(100), WordMatch(102))),
-                QueryWordMatch(
+                    ScoredFieldMatch(4D, 1, WordMatch(8), WordMatch(14), WordMatch(20), WordMatch(100), WordMatch(102))),
+                ScoredToken(
                     8,
-                    new FieldMatch(1, WordMatch(11), WordMatch(101), WordMatch(106)),
-                    new FieldMatch(2, WordMatch(8), WordMatch(104), WordMatch(105))));
+                    ScoredFieldMatch(6D, 1, WordMatch(11), WordMatch(101), WordMatch(106)),
+                    ScoredFieldMatch(13D, 2, WordMatch(8), WordMatch(104), WordMatch(105))));
         }
     }
 }

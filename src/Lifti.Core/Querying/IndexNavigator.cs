@@ -11,7 +11,7 @@ namespace Lifti.Querying
     {
         private readonly StringBuilder navigatedWith = new StringBuilder(16);
         private IIndexNavigatorPool? pool;
-        private IIndexScorer scorer;
+        private IIndexScorer? scorer;
         private IndexNode? currentNode;
         private int intraNodeTextPosition;
 
@@ -46,7 +46,9 @@ namespace Lifti.Querying
                 return IntermediateQueryResult.Empty;
             }
 
-            return new IntermediateQueryResult(this.currentNode.Matches.Select(CreateQueryWordMatch));
+            var matches = this.currentNode.Matches.Select(CreateQueryWordMatch);
+
+            return CreateIntermediateQueryResult(matches);
         }
 
         public IntermediateQueryResult GetExactAndChildMatches()
@@ -89,10 +91,11 @@ namespace Lifti.Querying
                 }
             }
 
-            return new IntermediateQueryResult(
-                matches.Select(m => new QueryWordMatch(
+            var queryWordMatches = matches.Select(m => new QueryWordMatch(
                     m.Key,
-                    MergeItemMatches(m.Value).ToList())));
+                    MergeItemMatches(m.Value).ToList()));
+
+            return CreateIntermediateQueryResult(queryWordMatches);
         }
 
         public bool Process(ReadOnlySpan<char> text)
@@ -175,6 +178,18 @@ namespace Lifti.Querying
             }
 
             this.pool.Return(this);
+        }
+
+        private IntermediateQueryResult CreateIntermediateQueryResult(IEnumerable<QueryWordMatch> matches)
+        {
+            if (this.scorer == null)
+            {
+                throw new InvalidOperationException(ExceptionMessages.NoScorerInitialized);
+            }
+
+            var matchList = matches as IReadOnlyList<QueryWordMatch> ?? matches.ToList();
+            var scoredMatches = this.scorer.Score(matchList);
+            return new IntermediateQueryResult(scoredMatches);
         }
 
         private IEnumerable<string> EnumerateIndexedWords(IndexNode node)

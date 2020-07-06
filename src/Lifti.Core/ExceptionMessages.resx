@@ -189,6 +189,9 @@
   <data name="NoReaderDelegatesConfigured" xml:space="preserve">
     <value>No reader delegates configured</value>
   </data>
+  <data name="NoScorerInitialized" xml:space="preserve">
+    <value>Attempting to score a query result with no scorer initialized</value>
+  </data>
   <data name="NoTokenizationOptionsProvidedForType" xml:space="preserve">
     <value>No tokenization options have been provided for type {0}</value>
   </data>
