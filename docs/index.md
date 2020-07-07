@@ -15,6 +15,8 @@ LIFTI is a simple to use netstandard2 compatible in-memory full text indexing AP
 
 ### Querying
 
+[Search results](searching/search-results.md)
+
 [Query syntax](searching/query-syntax.md)
 
 ### Reference
