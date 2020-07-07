@@ -66,7 +66,10 @@ namespace Lifti.Tests.Querying
                     ScoredToken(
                         0, 
                         ScoredFieldMatch(double.Epsilon, 0, new SingleWordLocationMatch(new WordLocation(5, 42, 12))))
-                });
+                },
+                o => o.ComparingByMembers<ScoredToken>()
+                      .ComparingByMembers<ScoredFieldMatch>()
+                      .Excluding(i => i.SelectedMemberPath.EndsWith("Score")));
         }
 
         [Theory]
@@ -146,22 +149,29 @@ namespace Lifti.Tests.Querying
             navigator.Process("Z").Should().BeTrue();
             var results = navigator.GetExactAndChildMatches();
             results.Should().NotBeNull();
-            results.Matches.Should()
-                .BeEquivalentTo(
+
+            var expectedTokens = new[] {
                 ScoredToken(
-                    1, 
+                    1,
                     new[]
                     {
-                        ScoredFieldMatch(double.Epsilon, 1, WordMatch(0, 0, 6), WordMatch(1, 7, 3), WordMatch(2, 11, 5)),
-                        ScoredFieldMatch(double.Epsilon, 2, WordMatch(0, 0, 4), WordMatch(1, 5, 5))
+                        ScoredFieldMatch(0D, 1, WordMatch(0, 0, 6), WordMatch(1, 7, 3), WordMatch(2, 11, 5)),
+                        ScoredFieldMatch(0D, 2, WordMatch(0, 0, 4), WordMatch(1, 5, 5))
                     }),
                 ScoredToken(
                     2,
                     new[]
                     {
-                        ScoredFieldMatch(double.Epsilon, 1, WordMatch(0, 0, 3)),
-                        ScoredFieldMatch(double.Epsilon, 2, WordMatch(0, 0, 5))
-                    }));
+                        ScoredFieldMatch(0D, 1, WordMatch(0, 0, 3)),
+                        ScoredFieldMatch(0D, 2, WordMatch(0, 0, 5))
+                    })
+                };
+
+            results.Matches.Should().BeEquivalentTo(
+                expectedTokens,
+                o => o.ComparingByMembers<ScoredToken>()
+                      .ComparingByMembers<ScoredFieldMatch>()
+                      .Excluding(i => i.SelectedMemberPath.EndsWith("Score")));
         }
 
         [Theory]

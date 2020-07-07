@@ -27,19 +27,16 @@ namespace Lifti.Querying
             this.snapshot = snapshot;
         }
 
-        public IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryWordMatch> tokens)
+        public IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryWordMatch> tokenMatches)
         {
-            if (tokens is null)
+            if (tokenMatches is null)
             {
-                throw new ArgumentNullException(nameof(tokens));
+                throw new ArgumentNullException(nameof(tokenMatches));
             }
 
-            var idf = Math.Log((this.documentCount - tokens.Count + 0.5D)
-                            / (tokens.Count + 0.5D));
+            var idf = CalculateInverseDocumentFrequency(tokenMatches);
 
-            idf = Math.Max(idf, double.Epsilon);
-
-            return tokens.Select(t =>
+            return tokenMatches.Select(t =>
             {
                 var itemWordCounts = this.snapshot.GetMetadata(t.ItemId).DocumentStatistics.WordCountByField;
                 var scoredFieldMatches = new List<ScoredFieldMatch>(t.FieldMatches.Count);
@@ -60,6 +57,16 @@ namespace Lifti.Querying
 
                 return new ScoredToken(t.ItemId, scoredFieldMatches);
             }).ToList();
+        }
+
+        private double CalculateInverseDocumentFrequency(IReadOnlyList<QueryWordMatch> tokens)
+        {
+            var idf = (this.documentCount - tokens.Count + 0.5D)
+                    / (tokens.Count + 0.5D);
+
+            idf = Math.Log(1D + idf);
+
+            return idf;
         }
     }
 }

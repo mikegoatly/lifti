@@ -41,7 +41,11 @@ namespace TestConsole
 
             // Both books contain "first" - prints "Matched items: 1, 2"
             var results = bookIndex.Search("first");
-            Console.WriteLine("Matched items: " + string.Join(", ", results.Select(i => i.Key)));
+            Console.WriteLine(
+                "Matched items: " +
+                string.Join(", ", results.Select(i => i.Key)) +
+                " with respective scores: " +
+                string.Join(", ", results.Select(i => i.Score)));
 
             // Only first book contains "the" in the title - prints "Matched items: 1"
             results = bookIndex.Search("title=the");

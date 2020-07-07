@@ -20,8 +20,20 @@ namespace Lifti
             this.Score = score;
         }
 
+        /// <summary>
+        /// Gets the item that matched the search criteria.
+        /// </summary>
         public T Key { get; }
+
+        /// <summary>
+        /// Gets the fields that were matched for the item. Each of these is scored independently and provides detailed information
+        /// about the location of the words that were matched.
+        /// </summary>
         public IReadOnlyList<FieldSearchResult> FieldMatches { get; }
+
+        /// <summary>
+        /// Gets the overall score for this match. This is a sum of the scores for this instance's <see cref="FieldMatches"/>.
+        /// </summary>
         public double Score { get; }
 
         public override string ToString()
