@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Lifti.Querying
 {
-    public class OkampiBm25IndexScorer : IIndexScorer
+    public class OkapiBm25IndexScorer : IIndexScorer
     {
         private readonly Dictionary<byte, double> averageWordCountByField;
         private readonly double documentCount;
@@ -12,7 +12,7 @@ namespace Lifti.Querying
         private readonly double b;
         private readonly IItemStore snapshot;
 
-        public OkampiBm25IndexScorer(double k1, double b, IItemStore snapshot)
+        public OkapiBm25IndexScorer(double k1, double b, IItemStore snapshot)
         {
             if (snapshot is null)
             {

@@ -2,12 +2,12 @@
 
 namespace Lifti.Querying
 {
-    public class OkampiBm25Scorer : IScorer
+    public class OkapiBm25Scorer : IScorer
     {
         private readonly double k1;
         private readonly double b;
 
-        public OkampiBm25Scorer(double k1 = 1.2D, double b = 0.75D)
+        public OkapiBm25Scorer(double k1 = 1.2D, double b = 0.75D)
         {
             this.k1 = k1;
             this.b = b;
@@ -20,7 +20,7 @@ namespace Lifti.Querying
                 throw new ArgumentNullException(nameof(indexSnapshot));
             }
 
-            return new OkampiBm25IndexScorer(this.k1, this.b,  indexSnapshot.Items);
+            return new OkapiBm25IndexScorer(this.k1, this.b,  indexSnapshot.Items);
         }
     }
 }
