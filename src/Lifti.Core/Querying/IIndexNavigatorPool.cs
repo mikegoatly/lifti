@@ -2,7 +2,7 @@
 {
     internal interface IIndexNavigatorPool
     {
-        IIndexNavigator Create(IndexNode node);
+        IIndexNavigator Create(IIndexSnapshot snapshot);
         void Return(IndexNavigator indexNavigator);
     }
 }

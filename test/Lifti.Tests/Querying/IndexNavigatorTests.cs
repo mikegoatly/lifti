@@ -63,8 +63,13 @@ namespace Lifti.Tests.Querying
             results.Matches.Should().BeEquivalentTo(
                 new[]
                 {
-                    QueryWordMatch(0, new FieldMatch(0, new SingleWordLocationMatch(new WordLocation(5, 42, 12))))
-                });
+                    ScoredToken(
+                        0, 
+                        ScoredFieldMatch(double.Epsilon, 0, new SingleWordLocationMatch(new WordLocation(5, 42, 12))))
+                },
+                o => o.ComparingByMembers<ScoredToken>()
+                      .ComparingByMembers<ScoredFieldMatch>()
+                      .Excluding(i => i.SelectedMemberPath.EndsWith("Score")));
         }
 
         [Theory]
@@ -144,22 +149,29 @@ namespace Lifti.Tests.Querying
             navigator.Process("Z").Should().BeTrue();
             var results = navigator.GetExactAndChildMatches();
             results.Should().NotBeNull();
-            results.Matches.Should()
-                .BeEquivalentTo(
-                new QueryWordMatch(
-                    1, 
+
+            var expectedTokens = new[] {
+                ScoredToken(
+                    1,
                     new[]
                     {
-                        new FieldMatch(1, WordMatch(0, 0, 6), WordMatch(1, 7, 3), WordMatch(2, 11, 5)),
-                        new FieldMatch(2, WordMatch(0, 0, 4), WordMatch(1, 5, 5))
+                        ScoredFieldMatch(0D, 1, WordMatch(0, 0, 6), WordMatch(1, 7, 3), WordMatch(2, 11, 5)),
+                        ScoredFieldMatch(0D, 2, WordMatch(0, 0, 4), WordMatch(1, 5, 5))
                     }),
-                new QueryWordMatch(
+                ScoredToken(
                     2,
                     new[]
                     {
-                        new FieldMatch(1, WordMatch(0, 0, 3)),
-                        new FieldMatch(2, WordMatch(0, 0, 5))
-                    }));
+                        ScoredFieldMatch(0D, 1, WordMatch(0, 0, 3)),
+                        ScoredFieldMatch(0D, 2, WordMatch(0, 0, 5))
+                    })
+                };
+
+            results.Matches.Should().BeEquivalentTo(
+                expectedTokens,
+                o => o.ComparingByMembers<ScoredToken>()
+                      .ComparingByMembers<ScoredFieldMatch>()
+                      .Excluding(i => i.SelectedMemberPath.EndsWith("Score")));
         }
 
         [Theory]

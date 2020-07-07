@@ -30,35 +30,41 @@ namespace Lifti.Querying
 
             if (this.Root == EmptyQueryPart.Instance)
             {
-                yield break;
+                return Enumerable.Empty<SearchResult<TKey>>();
             }
 
-            var idLookup = index.IdLookup;
+            var idLookup = index.Items;
             var fieldLookup = index.FieldLookup;
             var matches = this.Root.Evaluate(index.CreateNavigator, QueryContext.Empty).Matches;
-            var results = new Dictionary<int, List<FieldMatch>>();
+            var results = new Dictionary<int, List<ScoredFieldMatch>>();
 
             foreach (var match in matches)
             {
                 if (!results.TryGetValue(match.ItemId, out var itemResults))
                 {
-                    itemResults = new List<FieldMatch>();
+                    itemResults = new List<ScoredFieldMatch>();
                     results[match.ItemId] = itemResults;
                 }
 
                 itemResults.AddRange(match.FieldMatches);
             }
 
+            var searchResults = new List<SearchResult<TKey>>(matches.Count);
             foreach (var itemResults in matches)
             {
-                var item = idLookup.GetItemForId(itemResults.ItemId);
-                yield return new SearchResult<TKey>(
-                    item,
-                    itemResults.FieldMatches.Select(m => new FieldSearchResult(
-                        fieldLookup.GetFieldForId(m.FieldId),
-                        m.GetWordLocations()))
-                    .ToList());
+                var item = idLookup.GetMetadata(itemResults.ItemId);
+
+                searchResults.Add(
+                    new SearchResult<TKey>(
+                        item.Item,
+                        itemResults.FieldMatches.Select(m => new FieldSearchResult(
+                            fieldLookup.GetFieldForId(m.FieldId),
+                            m.Score,
+                            m.FieldMatch.GetWordLocations()))
+                        .ToList()));
             }
+
+            return searchResults.OrderByDescending(r => r.Score);
         }
     }
 

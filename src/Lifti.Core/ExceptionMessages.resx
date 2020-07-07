@@ -126,6 +126,9 @@
   <data name="BatchChangeAlreadyStarted" xml:space="preserve">
     <value>Cannot start a new batch change while another is already in progress.</value>
   </data>
+  <data name="EarlierVersionSerializedIndexNotSupported" xml:space="preserve">
+    <value>The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI.</value>
+  </data>
   <data name="EmptyAdjacentTextPartsAreNotSupported" xml:space="preserve">
     <value>Adjacent text query parts cannot be empty</value>
   </data>
@@ -185,6 +188,9 @@
   </data>
   <data name="NoReaderDelegatesConfigured" xml:space="preserve">
     <value>No reader delegates configured</value>
+  </data>
+  <data name="NoScorerInitialized" xml:space="preserve">
+    <value>Attempting to score a query result with no scorer initialized</value>
   </data>
   <data name="NoTokenizationOptionsProvidedForType" xml:space="preserve">
     <value>No tokenization options have been provided for type {0}</value>

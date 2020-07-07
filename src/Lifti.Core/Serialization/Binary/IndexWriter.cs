@@ -8,7 +8,7 @@ namespace Lifti.Serialization.Binary
 {
     internal class IndexWriter<TKey> : IIndexWriter<TKey>
     {
-        private const ushort Version = 1;
+        private const ushort Version = 2;
         private readonly Stream underlyingStream;
         private readonly bool disposeStream;
         private readonly IKeySerializer<TKey> keySerializer;
@@ -202,10 +202,16 @@ namespace Lifti.Serialization.Binary
 
         private async Task WriteItemsAsync(IIndexSnapshot<TKey> index)
         {
-            foreach (var (item, itemId) in index.IdLookup.GetIndexedItems())
+            foreach (var itemMetadata in index.Items.GetIndexedItems())
             {
-                this.writer.Write(itemId);
-                this.keySerializer.Write(this.writer, item);
+                this.writer.Write(itemMetadata.Id);
+                this.keySerializer.Write(this.writer, itemMetadata.Item);
+                this.writer.Write(itemMetadata.DocumentStatistics.WordCountByField.Count);
+                foreach (var fieldWordCount in itemMetadata.DocumentStatistics.WordCountByField)
+                {
+                    this.writer.Write(fieldWordCount.Key);
+                    this.writer.Write(fieldWordCount.Value);
+                }
             }
 
             await this.FlushAsync().ConfigureAwait(false);
@@ -215,7 +221,7 @@ namespace Lifti.Serialization.Binary
         {
             this.writer.Write(new byte[] { 0x4C, 0x49 });
             this.writer.Write(Version);
-            this.writer.Write(index.IdLookup.Count);
+            this.writer.Write(index.Items.Count);
 
             await this.FlushAsync().ConfigureAwait(false);
         }

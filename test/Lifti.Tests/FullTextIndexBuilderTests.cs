@@ -141,8 +141,8 @@ namespace Lifti.Tests
             var action1 = new List<string>();
             var action2 = new List<int>();
 
-            this.sut.WithIndexModificationAction(i => action1.Add(i.IdLookup.Count.ToString()))
-                .WithIndexModificationAction(i => action2.Add(i.IdLookup.Count));
+            this.sut.WithIndexModificationAction(i => action1.Add(i.Items.Count.ToString()))
+                .WithIndexModificationAction(i => action2.Add(i.Items.Count));
 
             var index = this.sut.Build();
 

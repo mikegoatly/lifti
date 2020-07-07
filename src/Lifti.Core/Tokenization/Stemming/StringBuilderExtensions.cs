@@ -176,7 +176,7 @@
 
                         if (bestMatch.Matches.Count > 0)
                         {
-                            return replacementSetLookup.IdLookup.GetItemForId(bestMatch.Matches[0].ItemId);
+                            return replacementSetLookup.Items.GetMetadata(bestMatch.Matches[0].ItemId).Item;
                         }
                     }
                 }

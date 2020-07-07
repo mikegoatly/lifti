@@ -88,6 +88,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI..
+        /// </summary>
+        internal static string EarlierVersionSerializedIndexNotSupported {
+            get {
+                return ResourceManager.GetString("EarlierVersionSerializedIndexNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Adjacent text query parts cannot be empty.
         /// </summary>
         internal static string EmptyAdjacentTextPartsAreNotSupported {
@@ -264,6 +273,15 @@ namespace Lifti {
         internal static string NoReaderDelegatesConfigured {
             get {
                 return ResourceManager.GetString("NoReaderDelegatesConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attempting to score a query result with no scorer initialized.
+        /// </summary>
+        internal static string NoScorerInitialized {
+            get {
+                return ResourceManager.GetString("NoScorerInitialized", resourceCulture);
             }
         }
         

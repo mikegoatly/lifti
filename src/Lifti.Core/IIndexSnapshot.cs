@@ -2,13 +2,8 @@
 
 namespace Lifti
 {
-    public interface IIndexSnapshot<TKey>
+    public interface IIndexSnapshot
     {
-        /// <summary>
-        /// Gets the ID lookup in the state it was in when the snapshot was taken.
-        /// </summary>
-        IIdLookup<TKey> IdLookup { get; }
-
         /// <summary>
         /// Gets the root node of the index at the time the snapshot was taken.
         /// </summary>
@@ -24,5 +19,18 @@ namespace Lifti
         /// on a character by character basis.
         /// </summary>
         IIndexNavigator CreateNavigator();
+
+        /// <summary>
+        /// Gets the <see cref="IItemStore"/> in the state it was in when the snapshot was taken.
+        /// </summary>
+        IItemStore Items { get; }
+    }
+
+    public interface IIndexSnapshot<TKey> : IIndexSnapshot
+    {
+        /// <summary>
+        /// Gets the <see cref="IItemStore{T}"/> in the state it was in when the snapshot was taken.
+        /// </summary>
+        IItemStore<TKey> Items { get; }
     }
 }

@@ -7,7 +7,7 @@ namespace Lifti.Querying
     {
         public static readonly IntersectMerger Instance = new IntersectMerger();
 
-        public IEnumerable<QueryWordMatch> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
+        public IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
             // TODO Verify this assumption - forcing RIGHT to contain more will cause a bigger dictionary to be built
             // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
@@ -20,9 +20,9 @@ namespace Lifti.Querying
             {
                 if (rightItems.TryGetValue(leftMatch.ItemId, out var rightMatch))
                 {
-                    yield return new QueryWordMatch(
+                    yield return new ScoredToken(
                         leftMatch.ItemId,
-                        MergeFields(leftMatch, rightMatch));
+                        MergeFields(leftMatch, rightMatch).ToList());
                 }
             }
         }

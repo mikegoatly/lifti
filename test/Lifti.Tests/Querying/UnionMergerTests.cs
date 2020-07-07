@@ -9,15 +9,15 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void ShouldReturnMergedMatchesInWordIndexOrder()
         {
-            var left = IntermediateQueryResult(QueryWordMatch(7, FieldMatch(1, 30, 41)));
-            var right = IntermediateQueryResult(QueryWordMatch(7, FieldMatch(1, 35, 37, 42)));
+            var left = IntermediateQueryResult(ScoredToken(7, ScoredFieldMatch(1D, 1, 30, 41)));
+            var right = IntermediateQueryResult(ScoredToken(7, ScoredFieldMatch(2D, 1, 35, 37, 42)));
             var result = UnionMerger.Instance.Apply(left, right);
 
             result.Should().BeEquivalentTo(new[]
             {
-                QueryWordMatch(
+                ScoredToken(
                     7,
-                    FieldMatch(1, 30, 35, 37, 41, 42))
+                    ScoredFieldMatch(3D, 1, 30, 35, 37, 41, 42))
             });
         }
 
@@ -25,20 +25,20 @@ namespace Lifti.Tests.Querying
         public void LeftOrRightOrderShouldNotMatter()
         {
             var left = IntermediateQueryResult(
-                QueryWordMatch(1, FieldMatch(1, 30)),
-                QueryWordMatch(6, FieldMatch(1, 60)),
-                QueryWordMatch(9, FieldMatch(1, 10)));
+                ScoredToken(1, ScoredFieldMatch(1D, 1, 30)),
+                ScoredToken(6, ScoredFieldMatch(2D, 1, 60)),
+                ScoredToken(9, ScoredFieldMatch(3D, 1, 10)));
             var right = IntermediateQueryResult(
-                QueryWordMatch(6, FieldMatch(1, 20)),
-                QueryWordMatch(9, FieldMatch(1, 80)));
+                ScoredToken(6, ScoredFieldMatch(4D, 1, 20)),
+                ScoredToken(9, ScoredFieldMatch(5D, 1, 80)));
 
             var leftRightResult = UnionMerger.Instance.Apply(left, right);
             var rightLeftResult = UnionMerger.Instance.Apply(right, left);
 
             leftRightResult.Should().BeEquivalentTo(
-                QueryWordMatch(1, FieldMatch(1, 30)),
-                QueryWordMatch(6, FieldMatch(1, 20, 60)),
-                QueryWordMatch(9, FieldMatch(1, 10, 80)));
+                ScoredToken(1, ScoredFieldMatch(1D, 1, 30)),
+                ScoredToken(6, ScoredFieldMatch(6D, 1, 20, 60)),
+                ScoredToken(9, ScoredFieldMatch(8D, 1, 10, 80)));
 
             leftRightResult.Should().BeEquivalentTo(rightLeftResult);
         }

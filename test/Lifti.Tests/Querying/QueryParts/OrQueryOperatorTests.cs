@@ -26,19 +26,19 @@ namespace Lifti.Tests.Querying.QueryParts
         {
             var op = new OrQueryOperator(
                 new FakeQueryPart(
-                    QueryWordMatch(4, FieldMatch(1, 5, 6) ),
-                    QueryWordMatch(5, FieldMatch(1, 9, 11))),
+                    ScoredToken(4, ScoredFieldMatch(1D, 1, 5, 6) ),
+                    ScoredToken(5, ScoredFieldMatch(2D, 1, 9, 11))),
                 new FakeQueryPart(
-                    QueryWordMatch(5, FieldMatch(1, 1, 103), FieldMatch(2, 2, 18)),
-                    QueryWordMatch(7, FieldMatch(1, 18) )));
+                    ScoredToken(5, ScoredFieldMatch(3D, 1, 1, 103), ScoredFieldMatch(9D, 2, 2, 18)),
+                    ScoredToken(7, ScoredFieldMatch(4D, 1, 18) )));
 
             var result = op.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
 
             result.Matches.Should().BeEquivalentTo(
                 new[] {
-                    QueryWordMatch(4, FieldMatch(1, 5, 6)),
-                    QueryWordMatch(5, FieldMatch(1, 1, 9, 11, 103), FieldMatch(2, 2, 18)),
-                    QueryWordMatch(7, FieldMatch(1, 18))
+                    ScoredToken(4, ScoredFieldMatch(1D, 1, 5, 6)),
+                    ScoredToken(5, ScoredFieldMatch(5D, 1, 1, 9, 11, 103), ScoredFieldMatch(9D, 2, 2, 18)),
+                    ScoredToken(7, ScoredFieldMatch(4D, 1, 18))
                 });
         }
     }

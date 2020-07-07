@@ -7,7 +7,7 @@ namespace Lifti.Querying
     {
         public static readonly UnionMerger Instance = new UnionMerger();
 
-        public IEnumerable<QueryWordMatch> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
+        public IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
             // TODO Verify this assumption - forcing RIGHT to contain more will cause a bigger dictionary to be built
             // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
@@ -19,23 +19,23 @@ namespace Lifti.Querying
                 if (rightDictionary.TryGetValue(leftMatch.ItemId, out var rightMatch))
                 {
                     // Exists in both
-                    yield return new QueryWordMatch(
+                    yield return new ScoredToken(
                         leftMatch.ItemId,
-                        MergeFields(leftMatch, rightMatch));
+                        MergeFields(leftMatch, rightMatch).ToList());
 
                     rightDictionary.Remove(leftMatch.ItemId);
                 }
                 else
                 {
                     // Exists only in current
-                    yield return new QueryWordMatch(leftMatch.ItemId, leftMatch.FieldMatches);
+                    yield return leftMatch;
                 }
             }
 
             // Any items still remaining in nextDictionary exist only in the new results so can just be yielded
             foreach (var rightMatch in rightDictionary.Values)
             {
-                yield return new QueryWordMatch(rightMatch.ItemId, rightMatch.FieldMatches);
+                yield return rightMatch;
             }
         }
     }

@@ -7,7 +7,7 @@ namespace Lifti.Querying
     {
         public static readonly PrecedingIntersectMerger Instance = new PrecedingIntersectMerger();
 
-        public IEnumerable<QueryWordMatch> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
+        public IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
             // TODO Verify this assumption - forcing RIGHT to contain more will cause a bigger dictionary to be built
             // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
@@ -26,19 +26,19 @@ namespace Lifti.Querying
 
                     if (positionalMatches.Count > 0)
                     {
-                        yield return new QueryWordMatch(leftMatch.ItemId, positionalMatches);
+                        yield return new ScoredToken(leftMatch.ItemId, positionalMatches);
                     }
                 }
             }
         }
 
-        private static IReadOnlyList<FieldMatch> EnumerateFieldMatches(IEnumerable<FieldMatch> leftFields, IEnumerable<FieldMatch> rightFields)
+        private static IReadOnlyList<ScoredFieldMatch> EnumerateFieldMatches(IEnumerable<ScoredFieldMatch> leftFields, IEnumerable<ScoredFieldMatch> rightFields)
         {
             var matchedFields = JoinFields(leftFields, rightFields);
 
-            var fieldResults = new List<FieldMatch>(matchedFields.Count);
+            var fieldResults = new List<ScoredFieldMatch>(matchedFields.Count);
             var fieldWordMatches = new List<IWordLocationMatch>();
-            foreach (var (fieldId, leftLocations, rightLocations) in matchedFields)
+            foreach (var (fieldId, score, leftLocations, rightLocations) in matchedFields)
             {
                 fieldWordMatches.Clear();
 
@@ -62,7 +62,10 @@ namespace Lifti.Querying
 
                 if (fieldWordMatches.Count > 0)
                 {
-                    fieldResults.Add(new FieldMatch(fieldId, fieldWordMatches.OrderBy(f => f.MinWordIndex).ToList()));
+                    fieldResults.Add(
+                        new ScoredFieldMatch(
+                            score,
+                            new FieldMatch(fieldId, fieldWordMatches.OrderBy(f => f.MinWordIndex).ToList())));
                 }
             }
 

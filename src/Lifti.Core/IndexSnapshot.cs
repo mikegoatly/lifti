@@ -2,13 +2,13 @@
 
 namespace Lifti
 {
-    public class IndexSnapshot<TKey> : IIndexSnapshot<TKey>
+    public class IndexSnapshot<TKey> : IIndexSnapshot<TKey>, IIndexSnapshot
     {
         private readonly IIndexNavigatorPool indexNavigatorPool;
 
         internal IndexSnapshot(IIndexNavigatorPool indexNavigatorPool, FullTextIndex<TKey> index)
         {
-            this.IdLookup = index.IdLookup.Snapshot();
+            this.Items = index.Items.Snapshot();
             this.Root = index.Root;
             this.indexNavigatorPool = indexNavigatorPool;
 
@@ -16,14 +16,21 @@ namespace Lifti
             this.FieldLookup = index.FieldLookup;
         }
 
-        public IIdLookup<TKey> IdLookup { get; }
+        /// <inheritdoc />
+        public IItemStore<TKey> Items { get; }
+
+        /// <inheritdoc />
         public IndexNode Root { get; }
 
+        /// <inheritdoc />
         public IIndexedFieldLookup FieldLookup { get; }
 
+        IItemStore IIndexSnapshot.Items => this.Items;
+
+        /// <inheritdoc />
         public IIndexNavigator CreateNavigator()
         {
-            return this.indexNavigatorPool.Create(this.Root);
+            return this.indexNavigatorPool.Create(this);
         }
     }
 }

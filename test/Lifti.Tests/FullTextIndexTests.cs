@@ -31,6 +31,32 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task IndexingItemsAgainstDefaultField_ShouldUpdateTotalWordCountStats()
+        {
+            await this.WithIndexedStringsAsync();
+
+            this.index.Items.IndexStatistics.TotalWordCount.Should().Be(26);
+            this.index.Items.IndexStatistics.WordCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
+            {
+                { 0, 26 }
+            });
+        }
+
+        [Fact]
+        public async Task IndexingItemsAgainstWithMultipleFields_ShouldUpdateTotalWordCountStats()
+        {
+            await this.WithIndexedSingleStringPropertyObjectsAsync();
+
+            this.index.Items.IndexStatistics.TotalWordCount.Should().Be(14);
+            this.index.Items.IndexStatistics.WordCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
+            {
+                { 1, 4 },
+                { 2, 4 },
+                { 3, 6 }
+            });
+        }
+
+        [Fact]
         public async Task IndexedItemsShouldBeRetrievable()
         {
             await this.WithIndexedStringsAsync();
@@ -197,7 +223,27 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task QueringIndex_ShouldOrderResultsByScore()
+        {
+            await PopulateIndexWithWikipediaData();
+
+            var results = this.index.Search("data").ToList();
+            results.Should().BeInDescendingOrder(r => r.Score);
+            results.First().Score.Should().BeApproximately(2.4349517D, 0.0001D);
+            results.Last().Score.Should().BeApproximately(1.2298017D, 0.0001D);
+        }
+
+        [Fact]
         public async Task WhenLoadingLotsOfDataShouldNotError()
+        {
+            var wikipediaTests = await PopulateIndexWithWikipediaData();
+
+            await this.index.RemoveAsync(wikipediaTests[10].name);
+            await this.index.RemoveAsync(wikipediaTests[9].name);
+            await this.index.RemoveAsync(wikipediaTests[8].name);
+        }
+
+        private async Task<IList<(string name, string text)>> PopulateIndexWithWikipediaData()
         {
             var wikipediaTests = WikipediaDataLoader.Load(this.GetType());
             this.index.BeginBatchChange();
@@ -207,10 +253,7 @@ namespace Lifti.Tests
             }
 
             await this.index.CommitBatchChangeAsync();
-
-            await this.index.RemoveAsync(wikipediaTests[10].name);
-            await this.index.RemoveAsync(wikipediaTests[9].name);
-            await this.index.RemoveAsync(wikipediaTests[8].name);
+            return wikipediaTests;
         }
 
         [Fact]

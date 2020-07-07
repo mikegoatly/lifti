@@ -1,6 +1,6 @@
 ﻿namespace Lifti
 {
-    internal interface IIdPool<T> : IIdLookup<T>
+    internal interface IIdPool<T> : IItemStore<T>
     {
         /// <summary>
         /// Returns the id associated to the given item back to the pool.
@@ -17,7 +17,7 @@
         /// <exception cref="LiftiException">
         /// Thrown when the id is already used or the item is already indexed.
         /// </exception>
-        void Add(int id, T item);
+        void Add(int id, T item, DocumentStatistics documentStatistics);
 
         /// <summary>
         /// Adds the given item, generating a new id for it as it is stored.
@@ -28,6 +28,6 @@
         /// <exception cref="LiftiException">
         /// Thrown when the item is already indexed.
         /// </exception>
-        int Add(T item);
+        int Add(T item, DocumentStatistics documentStatistics);
     }
 }

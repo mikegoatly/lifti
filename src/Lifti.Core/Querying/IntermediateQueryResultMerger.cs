@@ -5,35 +5,43 @@ namespace Lifti.Querying
 {
     public abstract class IntermediateQueryResultMerger
     {
-        protected static List<(byte FieldId, IReadOnlyList<IWordLocationMatch> leftLocations, IReadOnlyList<IWordLocationMatch> rightLocations)> 
+        protected static List<(
+            byte fieldId,
+            double score,
+            IReadOnlyList<IWordLocationMatch> leftLocations,
+            IReadOnlyList<IWordLocationMatch> rightLocations
+        )>
             JoinFields(
-                IEnumerable<FieldMatch> leftFields, 
-                IEnumerable<FieldMatch> rightFields)
-        {
-            return leftFields.Join(
+                IEnumerable<ScoredFieldMatch> leftFields,
+                IEnumerable<ScoredFieldMatch> rightFields) => leftFields.Join(
                             rightFields,
                             o => o.FieldId,
                             o => o.FieldId,
-                            (inner, outer) => (inner.FieldId, currentLocations: inner.Locations, nextLocations: outer.Locations))
+                            (inner, outer) => (
+                                fieldId: inner.FieldId,
+                                score: inner.Score + outer.Score,
+                                leftLocations: inner.Locations,
+                                rightLocations: outer.Locations))
                             .ToList();
-        }
 
-        protected static IEnumerable<FieldMatch> MergeFields(QueryWordMatch leftMatch, QueryWordMatch rightMatch)
+        protected static IEnumerable<ScoredFieldMatch> MergeFields(ScoredToken leftMatch, ScoredToken rightMatch)
         {
             // TODO Verify this assumption - keeping the RIGHT dictionary small will cause more dictionary lookups as LEFT is iterated through
             // We will always iterate through the total number of merged field records, so we want to optimise
             // for the smallest number of fields on the right to keep the dictionary as small as possible
             SwapIf(leftMatch.FieldMatches.Count < rightMatch.FieldMatches.Count, ref leftMatch, ref rightMatch);
 
-            var rightFields = rightMatch.FieldMatches.ToDictionary(m => m.FieldId);
+            var rightFields = rightMatch.FieldMatches.ToDictionary(m => m.FieldMatch.FieldId);
 
             foreach (var leftField in leftMatch.FieldMatches)
             {
-                if (rightFields.TryGetValue(leftField.FieldId, out var rightField))
+                if (rightFields.TryGetValue(leftField.FieldMatch.FieldId, out var rightField))
                 {
-                    yield return new FieldMatch(
-                        leftField.FieldId,
-                        leftField.Locations.Concat(rightField.Locations).OrderBy(f => f.MinWordIndex).ToList());
+                    yield return new ScoredFieldMatch(
+                        leftField.Score + rightField.Score,
+                        new FieldMatch(
+                            leftField.FieldId,
+                            leftField.Locations.Concat(rightField.Locations).OrderBy(f => f.MinWordIndex).ToList()));
 
                     rightFields.Remove(leftField.FieldId);
                 }

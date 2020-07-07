@@ -7,17 +7,18 @@ using System.Text;
 
 namespace Lifti.Querying
 {
-
     internal sealed class IndexNavigator : IIndexNavigator
     {
         private readonly StringBuilder navigatedWith = new StringBuilder(16);
         private IIndexNavigatorPool? pool;
+        private IIndexScorer? scorer;
         private IndexNode? currentNode;
         private int intraNodeTextPosition;
 
-        internal void Initialize(IndexNode node, IIndexNavigatorPool pool)
+        internal void Initialize(IndexNode node, IIndexNavigatorPool pool, IIndexScorer scorer)
         {
             this.pool = pool;
+            this.scorer = scorer;
             this.currentNode = node;
             this.intraNodeTextPosition = 0;
             this.navigatedWith.Length = 0;
@@ -45,7 +46,9 @@ namespace Lifti.Querying
                 return IntermediateQueryResult.Empty;
             }
 
-            return new IntermediateQueryResult(this.currentNode.Matches.Select(CreateQueryWordMatch));
+            var matches = this.currentNode.Matches.Select(CreateQueryWordMatch);
+
+            return CreateIntermediateQueryResult(matches);
         }
 
         public IntermediateQueryResult GetExactAndChildMatches()
@@ -88,7 +91,11 @@ namespace Lifti.Querying
                 }
             }
 
-            return new IntermediateQueryResult(matches.Select(m => new QueryWordMatch(m.Key, this.MergeItemMatches(m.Value))));
+            var queryWordMatches = matches.Select(m => new QueryWordMatch(
+                    m.Key,
+                    MergeItemMatches(m.Value).ToList()));
+
+            return CreateIntermediateQueryResult(queryWordMatches);
         }
 
         public bool Process(ReadOnlySpan<char> text)
@@ -173,6 +180,18 @@ namespace Lifti.Querying
             this.pool.Return(this);
         }
 
+        private IntermediateQueryResult CreateIntermediateQueryResult(IEnumerable<QueryWordMatch> matches)
+        {
+            if (this.scorer == null)
+            {
+                throw new InvalidOperationException(ExceptionMessages.NoScorerInitialized);
+            }
+
+            var matchList = matches as IReadOnlyList<QueryWordMatch> ?? matches.ToList();
+            var scoredMatches = this.scorer.Score(matchList);
+            return new IntermediateQueryResult(scoredMatches);
+        }
+
         private IEnumerable<string> EnumerateIndexedWords(IndexNode node)
         {
             if (node.IntraNodeText.Length > 0)
@@ -205,7 +224,7 @@ namespace Lifti.Querying
             }
         }
 
-        private IEnumerable<FieldMatch> MergeItemMatches(List<FieldMatch> fieldMatches)
+        private static IEnumerable<FieldMatch> MergeItemMatches(List<FieldMatch> fieldMatches)
         {
             return fieldMatches.ToLookup(m => m.FieldId)
                 .Select(m => new FieldMatch(
@@ -213,9 +232,12 @@ namespace Lifti.Querying
                     m.SelectMany(w => w.Locations).OrderBy(w => w.MinWordIndex).ToList()));
         }
 
-        private static QueryWordMatch CreateQueryWordMatch(KeyValuePair<int, ImmutableList<IndexedWord>> match)
+        private static QueryWordMatch CreateQueryWordMatch(
+            KeyValuePair<int, ImmutableList<IndexedWord>> match)
         {
-            return new QueryWordMatch(match.Key, match.Value.Select(v => new FieldMatch(v)));
+            return new QueryWordMatch(
+                match.Key,
+                match.Value.Select(v => new FieldMatch(v)).ToList());
         }
     }
 }

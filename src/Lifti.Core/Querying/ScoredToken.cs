@@ -4,20 +4,20 @@ using System.Linq;
 
 namespace Lifti.Querying
 {
-    public struct QueryWordMatch : IEquatable<QueryWordMatch>
+    public struct ScoredToken : IEquatable<ScoredToken>
     {
-        public QueryWordMatch(int itemId, IReadOnlyList<FieldMatch> fieldMatches)
+        public ScoredToken(int itemId, IReadOnlyList<ScoredFieldMatch> fieldMatches)
         {
             this.ItemId = itemId;
             this.FieldMatches = fieldMatches;
         }
 
         public int ItemId { get; }
-        public IReadOnlyList<FieldMatch> FieldMatches { get; }
+        public IReadOnlyList<ScoredFieldMatch> FieldMatches { get; }
 
         public override bool Equals(object obj)
         {
-            return obj is QueryWordMatch match &&
+            return obj is ScoredToken match &&
                    this.Equals(match);
         }
 
@@ -26,17 +26,17 @@ namespace Lifti.Querying
             return HashCode.Combine(this.ItemId, this.FieldMatches);
         }
 
-        public static bool operator ==(QueryWordMatch left, QueryWordMatch right)
+        public static bool operator ==(ScoredToken left, ScoredToken right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(QueryWordMatch left, QueryWordMatch right)
+        public static bool operator !=(ScoredToken left, ScoredToken right)
         {
             return !(left == right);
         }
 
-        public bool Equals(QueryWordMatch other)
+        public bool Equals(ScoredToken other)
         {
             return this.ItemId == other.ItemId &&
                    this.FieldMatches.SequenceEqual(other.FieldMatches);

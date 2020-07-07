@@ -2,7 +2,7 @@
 using Lifti.Tokenization.Stemming;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace Lifti.Tokenization
@@ -14,33 +14,33 @@ namespace Lifti.Tokenization
         private HashSet<char>? additionalSplitChars;
         private IWordStemmer? stemmer;
 
-        public IEnumerable<Token> Process(string input)
+        public IReadOnlyList<Token> Process(string input)
         {
             if (input == null)
             {
-                return Enumerable.Empty<Token>();
+                return ImmutableList<Token>.Empty;
             }
 
             return this.Process(input.AsSpan());
         }
 
-        public IEnumerable<Token> Process(ReadOnlySpan<char> input)
+        public IReadOnlyList<Token> Process(ReadOnlySpan<char> input)
         {
             var processedWords = new TokenStore();
             var wordIndex = 0;
             var start = 0;
             var wordBuilder = new StringBuilder();
 
-            Process(processedWords, ref wordIndex, ref start, 0, wordBuilder, input);
+            this.Process(processedWords, ref wordIndex, ref start, 0, wordBuilder, input);
 
             return processedWords.ToList();
         }
 
-        public IEnumerable<Token> Process(IEnumerable<string> inputs)
+        public IReadOnlyList<Token> Process(IEnumerable<string> inputs)
         {
             if (inputs is null)
             {
-                return Enumerable.Empty<Token>();
+                return ImmutableList<Token>.Empty;
             }
 
             var processedWords = new TokenStore();
@@ -51,7 +51,7 @@ namespace Lifti.Tokenization
 
             foreach (var input in inputs)
             {
-                Process(processedWords, ref wordIndex, ref start, endOffset, wordBuilder, input.AsSpan());
+                this.Process(processedWords, ref wordIndex, ref start, endOffset, wordBuilder, input.AsSpan());
                 endOffset += input.Length;
             }
 
@@ -108,7 +108,7 @@ namespace Lifti.Tokenization
                 (this.additionalSplitChars?.Contains(current) == true);
         }
 
-        
+
         private void CaptureWord(TokenStore processedWords, int wordIndex, int start, int end, StringBuilder wordBuilder)
         {
             var length = end - start;

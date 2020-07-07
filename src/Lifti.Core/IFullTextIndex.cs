@@ -6,10 +6,10 @@ namespace Lifti
     public interface IFullTextIndex<TKey>
     {
         /// <summary>
-        /// Internally an index keeps track of an item as a integer ID reference. This lookup
-        /// can be used get ids for items and visa-versa.
+        /// Internally an index keeps track of items and their metadata. Can be used get ids for items and 
+        /// visa-versa, along with other derived metadata such as word counts.
         /// </summary>
-        IIdLookup<TKey> IdLookup { get; }
+        IItemStore<TKey> Items { get; }
 
         /// <summary>
         /// Fields are tracked internally as a id of type <see cref="byte"/>. This lookup can

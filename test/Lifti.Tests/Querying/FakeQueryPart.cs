@@ -9,7 +9,7 @@ namespace Lifti.Tests.Querying
     {
         private readonly IntermediateQueryResult results;
 
-        public FakeQueryPart(params QueryWordMatch[] matches)
+        public FakeQueryPart(params ScoredToken[] matches)
         {
             this.results = new IntermediateQueryResult(matches);
         }
@@ -18,7 +18,9 @@ namespace Lifti.Tests.Querying
         {
             this.results = new IntermediateQueryResult(
                 matchedItems.Select(
-                    m => new QueryWordMatch(m, new[] { FieldMatch((byte)m, m) })));
+                    m => new ScoredToken(
+                        m,
+                        new[] { ScoredFieldMatch(m, (byte)m, m) })));
         }
 
         public string Word => throw new NotImplementedException();
