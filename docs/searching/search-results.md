@@ -1,6 +1,6 @@
 ---
 title: LIFTI Search Results
-permalink: /searching/query-syntax/
+permalink: /searching/search-results/
 ---
 
 Results from `FullTextIndex<T>.Search` are an enumeration of `SearchResult<T>`
