@@ -15,7 +15,7 @@ Read the documentation [here](https://mikegoatly.github.io/lifti)
 ## Simplest possible quick start
 
 ``` powerhshell
-Install-Package Lifti.Core -Version 2.0.0-beta9 -AllowPrereleaseVersions
+Install-Package Lifti.Core -Version 2.0.0-beta17 -AllowPrereleaseVersions
 ```
 
 ``` c#
