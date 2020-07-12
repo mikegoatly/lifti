@@ -123,9 +123,9 @@ namespace Lifti.Serialization.Binary
             TokenLocation? lastLocation = null;
             for (var locationMatch = 0; locationMatch < locationCount; locationMatch++)
             {
-                var structureType = (LocationEntryStructure)this.reader.ReadByte();
+                var structureType = (LocationEntrySerializationOptimizations)this.reader.ReadByte();
                 TokenLocation location;
-                if (structureType == LocationEntryStructure.Full)
+                if (structureType == LocationEntrySerializationOptimizations.Full)
                 {
                     location = new TokenLocation(this.reader.ReadInt32(), this.reader.ReadInt32(), this.reader.ReadUInt16());
                 }
@@ -144,23 +144,23 @@ namespace Lifti.Serialization.Binary
             }
         }
 
-        private TokenLocation DeserializeLocationData(TokenLocation previous, LocationEntryStructure structureType)
+        private TokenLocation DeserializeLocationData(TokenLocation previous, LocationEntrySerializationOptimizations structureType)
         {
             return new TokenLocation(
                 previous.TokenIndex + this.DeserializeAbbreviatedData(
                     structureType,
-                    LocationEntryStructure.TokenIndexByte,
-                    LocationEntryStructure.TokenIndexUInt16),
+                    LocationEntrySerializationOptimizations.TokenIndexByte,
+                    LocationEntrySerializationOptimizations.TokenIndexUInt16),
                 previous.Start + this.DeserializeAbbreviatedData(
                     structureType,
-                    LocationEntryStructure.TokenStartByte,
-                    LocationEntryStructure.TokenStartUInt16),
-                ((structureType & LocationEntryStructure.LengthSameAsLast) == LocationEntryStructure.LengthSameAsLast) ?
+                    LocationEntrySerializationOptimizations.TokenStartByte,
+                    LocationEntrySerializationOptimizations.TokenStartUInt16),
+                ((structureType & LocationEntrySerializationOptimizations.LengthSameAsLast) == LocationEntrySerializationOptimizations.LengthSameAsLast) ?
                     previous.Length :
                     this.reader.ReadUInt16());
         }
 
-        private int DeserializeAbbreviatedData(LocationEntryStructure structureType, LocationEntryStructure byteSize, LocationEntryStructure uint16Size)
+        private int DeserializeAbbreviatedData(LocationEntrySerializationOptimizations structureType, LocationEntrySerializationOptimizations byteSize, LocationEntrySerializationOptimizations uint16Size)
         {
             if ((structureType & byteSize) == byteSize)
             {

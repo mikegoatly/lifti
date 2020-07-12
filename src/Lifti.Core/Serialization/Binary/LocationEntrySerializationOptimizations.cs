@@ -6,7 +6,7 @@ namespace Lifti.Serialization.Binary
     /// Used to indicate optimisations in serialized data structures.
     /// </summary>
     [Flags]
-    internal enum LocationEntryStructure
+    internal enum LocationEntrySerializationOptimizations
     {
         /// <summary>
         /// No optimizations written for this entry.
