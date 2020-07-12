@@ -33,10 +33,11 @@ namespace Lifti
             IIndexNodeFactory indexNodeFactory,
             ITokenizerFactory tokenizerFactory,
             IQueryParser queryParser,
+            IScorer scorer,
             TokenizationOptions defaultTokenizationOptions,
             Func<IIndexSnapshot<TKey>, Task>[]? indexModifiedActions)
         {
-            this.indexNavigatorPool = new IndexNavigatorPool(new OkapiBm25Scorer()); // TODO injection
+            this.indexNavigatorPool = new IndexNavigatorPool(scorer);
             this.indexOptions = indexOptions;
             this.itemTokenizationOptions = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
             this.IndexNodeFactory = indexNodeFactory ?? throw new ArgumentNullException(nameof(indexNodeFactory));

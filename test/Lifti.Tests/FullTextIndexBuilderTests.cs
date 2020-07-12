@@ -84,6 +84,29 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task WithScorer_ShouldPassImplementationToIndex()
+        {
+            var score = 999999999D;
+            var indexScorer = new Mock<IIndexScorer>();
+            indexScorer.Setup(s => s.Score(It.IsAny<IReadOnlyList<QueryTokenMatch>>()))
+                .Returns((IReadOnlyList<QueryTokenMatch> t) => t.Select(m => new ScoredToken(m.ItemId, m.FieldMatches.Select(fm => new ScoredFieldMatch(score, fm)).ToList())).ToList());
+
+            var scorer = new Mock<IScorer>();
+            scorer.Setup(s => s.CreateIndexScorer(It.IsAny<IIndexSnapshot>())).Returns(indexScorer.Object);
+
+            this.sut.WithScorer(scorer.Object);
+
+            var index = this.sut.Build();
+
+            await index.AddAsync(1, "test");
+
+            var results = index.Search("test");
+
+            results.Should().HaveCount(1);
+            results.Single().Score.Should().Be(score);
+        }
+
+        [Fact]
         public void WithCustomTokenizerFactory_ShouldPassCustomImplementationToIndex()
         {
             var tokenizer = new FakeTokenizer();

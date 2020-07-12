@@ -13,6 +13,7 @@ namespace Lifti
         private readonly IndexOptions advancedOptions = new IndexOptions();
         private IIndexNodeFactory? indexNodeFactory;
         private ITokenizerFactory? tokenizerFactory;
+        private IScorer? scorer;
         private IQueryParser? queryParser;
         private TokenizationOptions defaultTokenizationOptions = TokenizationOptions.Default;
         private List<Func<IIndexSnapshot<TKey>, Task>>? indexModifiedActions;
@@ -24,6 +25,16 @@ namespace Lifti
         public FullTextIndexBuilder<TKey> WithDuplicateItemBehavior(DuplicateItemBehavior duplicateItemBehavior)
         {
             this.advancedOptions.DuplicateItemBehavior = duplicateItemBehavior;
+            return this;
+        }
+
+        /// <summary>
+        /// Registers the <see cref="IScorer"/> implementation to use when scoring search results. By default the scorer
+        /// will be <see cref="OkapiBm25Scorer"/> with the parameters k1 = 1.2 and b = 0.75.
+        /// </summary>
+        public FullTextIndexBuilder<TKey> WithScorer(IScorer scorer)
+        {
+            this.scorer = scorer;
             return this;
         }
 
@@ -191,6 +202,7 @@ namespace Lifti
                 this.indexNodeFactory,
                 this.tokenizerFactory ?? new TokenizerFactory(),
                 this.queryParser ?? new QueryParser(),
+                this.scorer ?? new OkapiBm25Scorer(),
                 this.defaultTokenizationOptions,
                 this.indexModifiedActions?.ToArray());
         }
