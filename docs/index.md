@@ -23,4 +23,6 @@ LIFTI is a simple to use netstandard2 compatible in-memory full text indexing AP
 
 [Why use LIFTI in your project](why-choose-lifti.md)
 
+[LIFTI file serialization format](serialization/serialization-format.md)
+
 [History](history.md)
