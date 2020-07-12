@@ -27,7 +27,7 @@ namespace Lifti
 
         /// <summary>
         /// Gets the fields that were matched for the item. Each of these is scored independently and provides detailed information
-        /// about the location of the words that were matched.
+        /// about the location of the tokens that were matched.
         /// </summary>
         public IReadOnlyList<FieldSearchResult> FieldMatches { get; }
 

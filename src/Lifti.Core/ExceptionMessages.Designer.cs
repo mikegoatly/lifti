@@ -115,11 +115,11 @@ namespace Lifti {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expected at least one word part to be parsed.
+        ///   Looks up a localized string similar to Expected at least one query part to be parsed.
         /// </summary>
-        internal static string ExpectedAtLeastOneWordPartParsed {
+        internal static string ExpectedAtLeastOneQueryPartParsed {
             get {
-                return ResourceManager.GetString("ExpectedAtLeastOneWordPartParsed", resourceCulture);
+                return ResourceManager.GetString("ExpectedAtLeastOneQueryPartParsed", resourceCulture);
             }
         }
         
@@ -228,6 +228,15 @@ namespace Lifti {
         internal static string MaximumDistinctFieldsIndexReached {
             get {
                 return ResourceManager.GetString("MaximumDistinctFieldsIndexReached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only tokens up to {0} characters long can be indexed..
+        /// </summary>
+        internal static string MaxTokenLengthExceeded {
+            get {
+                return ResourceManager.GetString("MaxTokenLengthExceeded", resourceCulture);
             }
         }
         

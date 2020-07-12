@@ -16,7 +16,7 @@
         public int Id { get; }
 
         /// <summary>
-        /// Gets the statistics for the indexed document, including word count.
+        /// Gets the statistics for the indexed document, including token count.
         /// </summary>
         public DocumentStatistics DocumentStatistics { get; }
     }

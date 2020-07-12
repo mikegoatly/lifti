@@ -59,22 +59,22 @@ namespace Lifti
             }
         }
 
-        public Dictionary<int, ImmutableList<IndexedWord>>? MutatedMatches { get; private set; }
+        public Dictionary<int, ImmutableList<IndexedToken>>? MutatedMatches { get; private set; }
 
         internal void Index(
             int itemId,
             byte fieldId,
-            IReadOnlyList<WordLocation> locations,
-            ReadOnlyMemory<char> remainingWordText)
+            IReadOnlyList<TokenLocation> locations,
+            ReadOnlyMemory<char> remainingTokenText)
         {
             var indexSupportLevel = this.indexNodeFactory.GetIndexSupportLevelForDepth(this.depth);
             switch (indexSupportLevel)
             {
                 case IndexSupportLevelKind.CharacterByCharacter:
-                    this.IndexFromCharacter(itemId, fieldId, locations, remainingWordText);
+                    this.IndexFromCharacter(itemId, fieldId, locations, remainingTokenText);
                     break;
                 case IndexSupportLevelKind.IntraNodeText:
-                    this.IndexWithIntraNodeTextSupport(itemId, fieldId, locations, remainingWordText);
+                    this.IndexWithIntraNodeTextSupport(itemId, fieldId, locations, remainingTokenText);
                     break;
                 default:
                     throw new LiftiException(ExceptionMessages.UnsupportedIndexSupportLevel, indexSupportLevel);
@@ -84,7 +84,7 @@ namespace Lifti
         internal IndexNode Apply()
         {
             ImmutableDictionary<char, IndexNode> childNodes;
-            ImmutableDictionary<int, ImmutableList<IndexedWord>> matches;
+            ImmutableDictionary<int, ImmutableList<IndexedToken>> matches;
 
             IEnumerable<KeyValuePair<char, IndexNode>> mapNodeMutations()
             {
@@ -94,7 +94,7 @@ namespace Lifti
             if (this.original == null)
             {
                 childNodes = this.MutatedChildNodes == null ? ImmutableDictionary<char, IndexNode>.Empty : mapNodeMutations().ToImmutableDictionary();
-                matches = this.MutatedMatches == null ? ImmutableDictionary<int, ImmutableList<IndexedWord>>.Empty : this.MutatedMatches.ToImmutableDictionary();
+                matches = this.MutatedMatches == null ? ImmutableDictionary<int, ImmutableList<IndexedToken>>.Empty : this.MutatedMatches.ToImmutableDictionary();
             }
             else
             {
@@ -205,13 +205,13 @@ namespace Lifti
         private void IndexFromCharacter(
             int itemId,
             byte fieldId,
-            IReadOnlyList<WordLocation> locations,
-            ReadOnlyMemory<char> remainingWordText,
+            IReadOnlyList<TokenLocation> locations,
+            ReadOnlyMemory<char> remainingTokenText,
             int testLength = 0)
         {
-            if (remainingWordText.Length > testLength)
+            if (remainingTokenText.Length > testLength)
             {
-                this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingWordText, testLength);
+                this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingTokenText, testLength);
             }
             else
             {
@@ -223,11 +223,11 @@ namespace Lifti
         private void ContinueIndexingAtChild(
             int itemId,
             byte fieldId,
-            IReadOnlyList<WordLocation> locations,
-            ReadOnlyMemory<char> remainingWordText,
+            IReadOnlyList<TokenLocation> locations,
+            ReadOnlyMemory<char> remainingTokenText,
             int remainingTextSplitPosition)
         {
-            var indexChar = remainingWordText.Span[remainingTextSplitPosition];
+            var indexChar = remainingTokenText.Span[remainingTextSplitPosition];
 
             this.EnsureMutatedChildNodesCreated();
             if (!this.MutatedChildNodes!.TryGetValue(indexChar, out var childNode))
@@ -247,7 +247,7 @@ namespace Lifti
                 this.MutatedChildNodes.Add(indexChar, childNode);
             }
 
-            childNode.Index(itemId, fieldId, locations, remainingWordText.Slice(remainingTextSplitPosition + 1));
+            childNode.Index(itemId, fieldId, locations, remainingTokenText.Slice(remainingTextSplitPosition + 1));
         }
 
         private void EnsureMutatedChildNodesCreated()
@@ -262,25 +262,25 @@ namespace Lifti
         private void IndexWithIntraNodeTextSupport(
             int itemId,
             byte fieldId,
-            IReadOnlyList<WordLocation> locations,
-            ReadOnlyMemory<char> remainingWordText)
+            IReadOnlyList<TokenLocation> locations,
+            ReadOnlyMemory<char> remainingTokenText)
         {
             if (this.IntraNodeText.Length == 0)
             {
                 if (this.IsEmpty)
                 {
                     // Currently a leaf node
-                    this.IntraNodeText = remainingWordText.Length == 0 ? null : remainingWordText;
+                    this.IntraNodeText = remainingTokenText.Length == 0 ? null : remainingTokenText;
                     this.AddMatchedItem(itemId, fieldId, locations);
                 }
                 else
                 {
-                    this.IndexFromCharacter(itemId, fieldId, locations, remainingWordText);
+                    this.IndexFromCharacter(itemId, fieldId, locations, remainingTokenText);
                 }
             }
             else
             {
-                if (remainingWordText.Length == 0)
+                if (remainingTokenText.Length == 0)
                 {
                     // The indexing ends before the start of the intranode text so we need to split
                     this.SplitIntraNodeText(0);
@@ -288,49 +288,49 @@ namespace Lifti
                     return;
                 }
 
-                var testLength = Math.Min(remainingWordText.Length, this.IntraNodeText.Length);
+                var testLength = Math.Min(remainingTokenText.Length, this.IntraNodeText.Length);
                 var intraNodeSpan = this.IntraNodeText.Span;
-                var wordSpan = remainingWordText.Span;
+                var tokenSpan = remainingTokenText.Span;
                 for (var i = 0; i < testLength; i++)
                 {
-                    if (wordSpan[i] != intraNodeSpan[i])
+                    if (tokenSpan[i] != intraNodeSpan[i])
                     {
                         this.SplitIntraNodeText(i);
-                        this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingWordText, i);
+                        this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingTokenText, i);
                         return;
                     }
                 }
 
                 if (this.IntraNodeText.Length > testLength)
                 {
-                    // This word is indexed in the middle of intra-node text. Split it and index here
+                    // This token is indexed in the middle of intra-node text. Split it and index here
                     this.SplitIntraNodeText(testLength);
                 }
 
-                this.IndexFromCharacter(itemId, fieldId, locations, remainingWordText, testLength);
+                this.IndexFromCharacter(itemId, fieldId, locations, remainingTokenText, testLength);
             }
         }
 
-        private void AddMatchedItem(int itemId, byte fieldId, IReadOnlyList<WordLocation> locations)
+        private void AddMatchedItem(int itemId, byte fieldId, IReadOnlyList<TokenLocation> locations)
         {
             this.EnsureMutatedMatchesCreated();
 
-            var indexedWord = new IndexedWord(fieldId, locations);
+            var indexedToken = new IndexedToken(fieldId, locations);
             if (this.MutatedMatches!.TryGetValue(itemId, out var itemFieldLocations))
             {
-                this.MutatedMatches[itemId] = itemFieldLocations.Add(new IndexedWord(fieldId, locations));
+                this.MutatedMatches[itemId] = itemFieldLocations.Add(new IndexedToken(fieldId, locations));
             }
             else
             {
                 if (this.MutatedMatches.TryGetValue(itemId, out var originalItemFieldLocations))
                 {
-                    this.MutatedMatches[itemId] = originalItemFieldLocations.Add(indexedWord);
+                    this.MutatedMatches[itemId] = originalItemFieldLocations.Add(indexedToken);
                 }
                 else
                 {
                     // This item has not been indexed at this location previously
-                    var builder = ImmutableList.CreateBuilder<IndexedWord>();
-                    builder.Add(indexedWord);
+                    var builder = ImmutableList.CreateBuilder<IndexedToken>();
+                    builder.Add(indexedToken);
                     this.MutatedMatches.Add(itemId, builder.ToImmutable());
                 }
             }
@@ -345,12 +345,12 @@ namespace Lifti
                 if (this.original?.HasMatches ?? false)
                 {
                     // Once we're mutating matches, copy everything across
-                    this.MutatedMatches = new Dictionary<int, ImmutableList<IndexedWord>>(
+                    this.MutatedMatches = new Dictionary<int, ImmutableList<IndexedToken>>(
                         this.original.Matches);
                 }
                 else
                 {
-                    this.MutatedMatches = new Dictionary<int, ImmutableList<IndexedWord>>();
+                    this.MutatedMatches = new Dictionary<int, ImmutableList<IndexedToken>>();
                 }
             }
         }

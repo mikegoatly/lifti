@@ -4,16 +4,16 @@ namespace Lifti.Tokenization
 {
     internal static class SpanExtensions
     {
-        public static bool SequenceEqual(this ReadOnlySpan<char> word, string chars)
+        public static bool SequenceEqual(this ReadOnlySpan<char> text, string chars)
         {
-            if (chars.Length != word.Length)
+            if (chars.Length != text.Length)
             {
                 return false;
             }
 
             for (var i = 0; i < chars.Length; i++)
             {
-                if (chars[i] != word[i])
+                if (chars[i] != text[i])
                 {
                     return false;
                 }

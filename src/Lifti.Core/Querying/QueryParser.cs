@@ -8,7 +8,8 @@ namespace Lifti.Querying
 {
     public class QueryParser : IQueryParser
     {
-        public IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, ITokenizer wordTokenizer)
+        /// <inheritdoc />
+        public IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, ITokenizer tokenizer)
         {
             if (fieldLookup is null)
             {
@@ -20,7 +21,7 @@ namespace Lifti.Querying
             var state = new QueryParserState(queryText);
             while (state.TryGetNextToken(out var token))
             {
-                rootPart = CreateQueryPart(fieldLookup, state, token, wordTokenizer, rootPart);
+                rootPart = CreateQueryPart(fieldLookup, state, token, tokenizer, rootPart);
             }
 
             return new Query(rootPart ?? EmptyQueryPart.Instance);
@@ -30,17 +31,17 @@ namespace Lifti.Querying
             IIndexedFieldLookup fieldLookup,
             QueryParserState state,
             QueryToken token,
-            ITokenizer wordTokenizer,
+            ITokenizer tokenizer,
             IQueryPart? currentQuery)
         {
             switch (token.TokenType)
             {
                 case QueryTokenType.Text:
-                    return ComposePart(currentQuery, CreateWordPart(token, wordTokenizer));
+                    return ComposePart(currentQuery, CreateQueryPart(token, tokenizer));
 
                 case QueryTokenType.FieldFilter:
-                    var (fieldId, tokenizer) = fieldLookup.GetFieldInfo(token.TokenText);
-                    var filteredPart = CreateQueryPart(fieldLookup, state, state.GetNextToken(), tokenizer, null);
+                    var (fieldId, fieldTokenizer) = fieldLookup.GetFieldInfo(token.TokenText);
+                    var filteredPart = CreateQueryPart(fieldLookup, state, state.GetNextToken(), fieldTokenizer, null);
                     return ComposePart(
                         currentQuery,
                         new FieldFilterQueryOperator(token.TokenText, fieldId, filteredPart));
@@ -52,12 +53,12 @@ namespace Lifti.Querying
                 case QueryTokenType.NearOperator:
                 case QueryTokenType.PrecedingNearOperator:
                 case QueryTokenType.PrecedingOperator:
-                    var rightPart = CreateQueryPart(fieldLookup, state, state.GetNextToken(), wordTokenizer, null);
+                    var rightPart = CreateQueryPart(fieldLookup, state, state.GetNextToken(), tokenizer, null);
                     return CombineParts(currentQuery, rightPart, token.TokenType, token.Tolerance);
 
                 case QueryTokenType.OpenBracket:
                     var bracketedPart = state.GetTokensUntil(QueryTokenType.CloseBracket)
-                        .Aggregate((IQueryPart?)null, (current, next) => CreateQueryPart(fieldLookup, state, next, wordTokenizer, current));
+                        .Aggregate((IQueryPart?)null, (current, next) => CreateQueryPart(fieldLookup, state, next, tokenizer, current));
 
                     if (bracketedPart == null)
                     {
@@ -67,41 +68,41 @@ namespace Lifti.Querying
                     return ComposePart(currentQuery, new BracketedQueryPart(bracketedPart));
 
                 case QueryTokenType.BeginAdjacentTextOperator:
-                    var words = state.GetTokensUntil(QueryTokenType.EndAdjacentTextOperator)
-                        .SelectMany(t => CreateWordParts(t, wordTokenizer))
+                    var tokens = state.GetTokensUntil(QueryTokenType.EndAdjacentTextOperator)
+                        .SelectMany(t => CreateQueryParts(t, tokenizer))
                         .ToList();
 
-                    if (words.Count == 0)
+                    if (tokens.Count == 0)
                     {
                         throw new QueryParserException(ExceptionMessages.EmptyAdjacentTextPartsAreNotSupported);
                     }
 
-                    return ComposePart(currentQuery, new AdjacentWordsQueryOperator(words));
+                    return ComposePart(currentQuery, new AdjacentWordsQueryOperator(tokens));
 
                 default:
                     throw new QueryParserException(ExceptionMessages.UnexpectedTokenEncountered, token.TokenType);
             }
         }
 
-        private static IQueryPart CreateWordPart(QueryToken queryToken, ITokenizer wordTokenizer)
+        private static IQueryPart CreateQueryPart(QueryToken queryToken, ITokenizer wordTokenizer)
         {
-            var wordParts = CreateWordParts(queryToken, wordTokenizer).ToList();
+            var queryParts = CreateQueryParts(queryToken, wordTokenizer).ToList();
 
-            if (wordParts.Count == 0)
+            if (queryParts.Count == 0)
             {
-                throw new QueryParserException(ExceptionMessages.ExpectedAtLeastOneWordPartParsed);
+                throw new QueryParserException(ExceptionMessages.ExpectedAtLeastOneQueryPartParsed);
             }
 
-            IQueryPart part = wordParts[0];
-            for (var i = 1; i < wordParts.Count; i++)
+            IQueryPart part = queryParts[0];
+            for (var i = 1; i < queryParts.Count; i++)
             {
-                part = ComposePart(part, wordParts[i]);
+                part = ComposePart(part, queryParts[i]);
             }
 
             return part;
         }
 
-        private static IEnumerable<IWordQueryPart> CreateWordParts(QueryToken queryToken, ITokenizer wordTokenizer)
+        private static IEnumerable<IWordQueryPart> CreateQueryParts(QueryToken queryToken, ITokenizer tokenizer)
         {
             if (queryToken.TokenType != QueryTokenType.Text)
             {
@@ -117,10 +118,10 @@ namespace Lifti.Querying
             }
 
 
-            return wordTokenizer.Process(tokenText)
-                .Select(tokenizedWord => hasWildcard ?
-                    (IWordQueryPart)new StartsWithWordQueryPart(tokenizedWord.Value) :
-                    new ExactWordQueryPart(tokenizedWord.Value));
+            return tokenizer.Process(tokenText)
+                .Select(token => hasWildcard ?
+                    (IWordQueryPart)new StartsWithWordQueryPart(token.Value) :
+                    new ExactWordQueryPart(token.Value));
         }
 
         private static IQueryPart ComposePart(IQueryPart? existingPart, IQueryPart newPart)

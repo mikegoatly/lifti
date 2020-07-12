@@ -88,14 +88,14 @@ namespace Lifti.Serialization.Binary
                 {
                     this.writer.Write(fieldMatch.FieldId);
                     this.writer.Write(fieldMatch.Locations.Count);
-                    this.WriteWordLocations(fieldMatch);
+                    this.WriteTokenLocations(fieldMatch);
                 }
             }
         }
 
-        private void WriteWordLocations(IndexedWord fieldMatch)
+        private void WriteTokenLocations(IndexedToken fieldMatch)
         {
-            WordLocation? lastLocation = null;
+            TokenLocation? lastLocation = null;
             foreach (var location in fieldMatch.Locations)
             {
                 if (lastLocation != null)
@@ -120,34 +120,34 @@ namespace Lifti.Serialization.Binary
             }
         }
 
-        private static (LocationEntryStructure structure, int wordIndexValue, int startValue) DeriveEntryStructureInformation(WordLocation lastLocation, WordLocation location)
+        private static (LocationEntryStructure structure, int tokenIndexValue, int startValue) DeriveEntryStructureInformation(TokenLocation lastLocation, TokenLocation location)
         {
-            var relativeWordIndex = location.WordIndex - lastLocation.WordIndex;
+            var relativeTokenIndex = location.TokenIndex - lastLocation.TokenIndex;
             var relativeStart = location.Start - lastLocation.Start;
 
-            if (relativeWordIndex < 0 || relativeStart < 0)
+            if (relativeTokenIndex < 0 || relativeStart < 0)
             {
                 Debug.Fail("Warning: This shouldn't happen");
-                return (LocationEntryStructure.Full, location.WordIndex, location.Start);
+                return (LocationEntryStructure.Full, location.TokenIndex, location.Start);
             }
 
             var entryStructure = LocationEntryStructure.Full;
-            if (relativeWordIndex <= byte.MaxValue)
+            if (relativeTokenIndex <= byte.MaxValue)
             {
-                entryStructure |= LocationEntryStructure.WordIndexByte;
+                entryStructure |= LocationEntryStructure.TokenIndexByte;
             }
-            else if (relativeWordIndex <= ushort.MaxValue)
+            else if (relativeTokenIndex <= ushort.MaxValue)
             {
-                entryStructure |= LocationEntryStructure.WordIndexUInt16;
+                entryStructure |= LocationEntryStructure.TokenIndexUInt16;
             }
 
             if (relativeStart <= byte.MaxValue)
             {
-                entryStructure |= LocationEntryStructure.WordStartByte;
+                entryStructure |= LocationEntryStructure.TokenStartByte;
             }
             else if (relativeStart <= ushort.MaxValue)
             {
-                entryStructure |= LocationEntryStructure.WordStartUInt16;
+                entryStructure |= LocationEntryStructure.TokenStartUInt16;
             }
 
             if (lastLocation.Length == location.Length)
@@ -155,18 +155,18 @@ namespace Lifti.Serialization.Binary
                 entryStructure |= LocationEntryStructure.LengthSameAsLast;
             }
 
-            return (entryStructure, relativeWordIndex, relativeStart);
+            return (entryStructure, relativeTokenIndex, relativeStart);
         }
 
-        private void WriteAbbreviatedLocationDetails(ushort wordLength, (LocationEntryStructure structure, int wordIndex, int start) locationData)
+        private void WriteAbbreviatedLocationDetails(ushort length, (LocationEntryStructure structure, int tokenIndex, int start) locationData)
         {
             this.writer.Write((byte)locationData.structure);
-            this.WriteAbbreviatedData(locationData.wordIndex, locationData.structure, LocationEntryStructure.WordIndexByte, LocationEntryStructure.WordIndexUInt16);
-            this.WriteAbbreviatedData(locationData.start, locationData.structure, LocationEntryStructure.WordStartByte, LocationEntryStructure.WordStartUInt16);
+            this.WriteAbbreviatedData(locationData.tokenIndex, locationData.structure, LocationEntryStructure.TokenIndexByte, LocationEntryStructure.TokenIndexUInt16);
+            this.WriteAbbreviatedData(locationData.start, locationData.structure, LocationEntryStructure.TokenStartByte, LocationEntryStructure.TokenStartUInt16);
 
             if ((locationData.structure & LocationEntryStructure.LengthSameAsLast) != LocationEntryStructure.LengthSameAsLast)
             {
-                this.writer.Write(wordLength);
+                this.writer.Write(length);
             }
         }
 
@@ -186,10 +186,10 @@ namespace Lifti.Serialization.Binary
             }
         }
 
-        private void WriteLocationInFull(WordLocation location)
+        private void WriteLocationInFull(TokenLocation location)
         {
             this.writer.Write((byte)LocationEntryStructure.Full);
-            this.writer.Write(location.WordIndex);
+            this.writer.Write(location.TokenIndex);
             this.writer.Write(location.Start);
             this.writer.Write(location.Length);
         }
@@ -206,11 +206,11 @@ namespace Lifti.Serialization.Binary
             {
                 this.writer.Write(itemMetadata.Id);
                 this.keySerializer.Write(this.writer, itemMetadata.Item);
-                this.writer.Write(itemMetadata.DocumentStatistics.WordCountByField.Count);
-                foreach (var fieldWordCount in itemMetadata.DocumentStatistics.WordCountByField)
+                this.writer.Write(itemMetadata.DocumentStatistics.TokenCountByField.Count);
+                foreach (var fieldTokenCount in itemMetadata.DocumentStatistics.TokenCountByField)
                 {
-                    this.writer.Write(fieldWordCount.Key);
-                    this.writer.Write(fieldWordCount.Value);
+                    this.writer.Write(fieldTokenCount.Key);
+                    this.writer.Write(fieldTokenCount.Value);
                 }
             }
 

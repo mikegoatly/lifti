@@ -3,6 +3,7 @@ using Lifti.Tokenization.Stemming;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Text;
 
 namespace Lifti.Tokenization
@@ -12,7 +13,7 @@ namespace Lifti.Tokenization
         private readonly IInputPreprocessorPipeline inputPreprocessorPipeline = new InputPreprocessorPipeline();
         private TokenizationOptions tokenizationOptions = TokenizationOptions.Default;
         private HashSet<char>? additionalSplitChars;
-        private IWordStemmer? stemmer;
+        private IStemmer? stemmer;
 
         public IReadOnlyList<Token> Process(string input)
         {
@@ -26,14 +27,14 @@ namespace Lifti.Tokenization
 
         public IReadOnlyList<Token> Process(ReadOnlySpan<char> input)
         {
-            var processedWords = new TokenStore();
-            var wordIndex = 0;
+            var processedTokens = new TokenStore();
+            var tokenIndex = 0;
             var start = 0;
-            var wordBuilder = new StringBuilder();
+            var tokenBuilder = new StringBuilder();
 
-            this.Process(processedWords, ref wordIndex, ref start, 0, wordBuilder, input);
+            this.Process(processedTokens, ref tokenIndex, ref start, 0, tokenBuilder, input);
 
-            return processedWords.ToList();
+            return processedTokens.ToList();
         }
 
         public IReadOnlyList<Token> Process(IEnumerable<string> inputs)
@@ -43,39 +44,39 @@ namespace Lifti.Tokenization
                 return ImmutableList<Token>.Empty;
             }
 
-            var processedWords = new TokenStore();
-            var wordIndex = 0;
+            var processedTokens = new TokenStore();
+            var tokenIndex = 0;
             var start = 0;
-            var wordBuilder = new StringBuilder();
+            var tokenBuilder = new StringBuilder();
             var endOffset = 0;
 
             foreach (var input in inputs)
             {
-                this.Process(processedWords, ref wordIndex, ref start, endOffset, wordBuilder, input.AsSpan());
+                this.Process(processedTokens, ref tokenIndex, ref start, endOffset, tokenBuilder, input.AsSpan());
                 endOffset += input.Length;
             }
 
-            return processedWords.ToList();
+            return processedTokens.ToList();
         }
 
         private void Process(
-            TokenStore processedWords,
-            ref int wordIndex,
+            TokenStore processedTokens,
+            ref int tokenIndex,
             ref int start,
             int endOffset,
-            StringBuilder wordBuilder,
+            StringBuilder tokenBuilder,
             ReadOnlySpan<char> input)
         {
             for (var i = 0; i < input.Length; i++)
             {
                 var current = input[i];
-                if (this.IsWordSplitCharacter(current))
+                if (this.IsSplitCharacter(current))
                 {
-                    if (wordBuilder.Length > 0)
+                    if (tokenBuilder.Length > 0)
                     {
-                        this.CaptureWord(processedWords, wordIndex, start, i + endOffset, wordBuilder);
-                        wordIndex++;
-                        wordBuilder.Length = 0;
+                        this.CaptureToken(processedTokens, tokenIndex, start, i + endOffset, tokenBuilder);
+                        tokenIndex++;
+                        tokenBuilder.Length = 0;
                     }
 
                     start = i + endOffset + 1;
@@ -84,23 +85,23 @@ namespace Lifti.Tokenization
                 {
                     foreach (var processed in this.inputPreprocessorPipeline.Process(current))
                     {
-                        wordBuilder.Append(processed);
+                        tokenBuilder.Append(processed);
                     }
                 }
             }
 
-            if (wordBuilder.Length > 0)
+            if (tokenBuilder.Length > 0)
             {
-                this.CaptureWord(processedWords, wordIndex, start, input.Length + endOffset, wordBuilder);
-                wordIndex++;
-                wordBuilder.Length = 0;
+                this.CaptureToken(processedTokens, tokenIndex, start, input.Length + endOffset, tokenBuilder);
+                tokenIndex++;
+                tokenBuilder.Length = 0;
             }
 
             endOffset += input.Length;
             start = endOffset;
         }
 
-        protected virtual bool IsWordSplitCharacter(char current)
+        protected virtual bool IsSplitCharacter(char current)
         {
             return char.IsSeparator(current) ||
                 char.IsControl(current) ||
@@ -109,21 +110,21 @@ namespace Lifti.Tokenization
         }
 
 
-        private void CaptureWord(TokenStore processedWords, int wordIndex, int start, int end, StringBuilder wordBuilder)
+        private void CaptureToken(TokenStore processedTokens, int tokenIndex, int start, int end, StringBuilder tokenBuilder)
         {
             var length = end - start;
 
             if (length > ushort.MaxValue)
             {
-                throw new LiftiException($"Only words up to {ushort.MaxValue} characters long can be indexed");
+                throw new LiftiException(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.MaxTokenLengthExceeded, ushort.MaxValue));
             }
 
             if (this.stemmer != null)
             {
-                this.stemmer.Stem(wordBuilder);
+                this.stemmer.Stem(tokenBuilder);
             }
 
-            processedWords.MergeOrAdd(new TokenHash(wordBuilder), wordBuilder, new WordLocation(wordIndex, start, (ushort)length));
+            processedTokens.MergeOrAdd(new TokenHash(tokenBuilder), tokenBuilder, new TokenLocation(tokenIndex, start, (ushort)length));
         }
 
         protected override void OnConfiguring(TokenizationOptions options)

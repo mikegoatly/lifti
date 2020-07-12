@@ -65,7 +65,7 @@ namespace Lifti.Tests.Querying
                 {
                     ScoredToken(
                         0, 
-                        ScoredFieldMatch(double.Epsilon, 0, new SingleWordLocationMatch(new WordLocation(5, 42, 12))))
+                        ScoredFieldMatch(double.Epsilon, 0, new SingleTokenLocationMatch(new TokenLocation(5, 42, 12))))
                 },
                 o => o.ComparingByMembers<ScoredToken>()
                       .ComparingByMembers<ScoredFieldMatch>()
@@ -90,7 +90,7 @@ namespace Lifti.Tests.Querying
         public void EnumeratingIndexedWords_WhenAtStartOfNode_ShouldReturnAppropriateWords()
         {
             this.sut.Process("INDI");
-            this.sut.EnumerateIndexedWords().Should().BeEquivalentTo(
+            this.sut.EnumerateIndexedTokens().Should().BeEquivalentTo(
                 "INDIFFERENCE",
                 "INDIVIDUALS");
         }
@@ -99,20 +99,20 @@ namespace Lifti.Tests.Querying
         public void EnumeratingIndexedWords_WhenAtMidIntraNodeText_ShouldReturnAppropriateWords()
         {
             this.sut.Process("WITHERI");
-            this.sut.EnumerateIndexedWords().Should().BeEquivalentTo("WITHERING");
+            this.sut.EnumerateIndexedTokens().Should().BeEquivalentTo("WITHERING");
         }
 
         [Fact]
         public void EnumeratingIndexedWords_MultipleTimes_ShouldYieldSameResults()
         {
             this.sut.Process("WITHERI");
-            this.sut.EnumerateIndexedWords().ToList().Should().BeEquivalentTo(this.sut.EnumerateIndexedWords().ToList());
+            this.sut.EnumerateIndexedTokens().ToList().Should().BeEquivalentTo(this.sut.EnumerateIndexedTokens().ToList());
         }
 
         [Fact]
         public void EnumeratingIndexedWords_WhenAtRoot_ShouldReturnAllWords()
         {
-            this.sut.EnumerateIndexedWords().Should().BeEquivalentTo(
+            this.sut.EnumerateIndexedTokens().Should().BeEquivalentTo(
                 new[] 
                 {
                     "TRIUMPHANT",
@@ -136,7 +136,7 @@ namespace Lifti.Tests.Querying
         public void EnumeratingIndexedWords_WhenNoMatch_ShouldReturnEmptyResults()
         {
             this.sut.Process("BLABBBBHHHHHB");
-            this.sut.EnumerateIndexedWords().Should().BeEmpty();
+            this.sut.EnumerateIndexedTokens().Should().BeEmpty();
         }
 
         [Fact]

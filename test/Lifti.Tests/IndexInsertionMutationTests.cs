@@ -12,10 +12,10 @@ namespace Lifti.Tests
         private readonly IndexNodeFactory nodeFactory;
         private readonly IndexNode rootNode;
         private readonly IndexMutation sut;
-        private readonly IndexedWord locations1 = CreateLocations(0, (0, 1, 2), (1, 5, 8));
-        private readonly IndexedWord locations2 = CreateLocations(0, (2, 9, 2));
-        private readonly IndexedWord locations3 = CreateLocations(0, (3, 14, 5));
-        private readonly IndexedWord locations4 = CreateLocations(0, (4, 4, 5));
+        private readonly IndexedToken locations1 = CreateLocations(0, (0, 1, 2), (1, 5, 8));
+        private readonly IndexedToken locations2 = CreateLocations(0, (2, 9, 2));
+        private readonly IndexedToken locations3 = CreateLocations(0, (3, 14, 5));
+        private readonly IndexedToken locations4 = CreateLocations(0, (4, 4, 5));
         private const int item1 = 1;
         private const int item2 = 2;
         private const int item3 = 3;
@@ -153,19 +153,19 @@ namespace Lifti.Tests
         //    VerifyResult(result, new[] { 'w' }, "w", expectedMatches: Array.Empty<(int, IndexedWord)>());
         //}
 
-        private static IndexedWord CreateLocations(byte fieldId, params (int, int, ushort)[] locations)
+        private static IndexedToken CreateLocations(byte fieldId, params (int, int, ushort)[] locations)
         {
-            return new IndexedWord(fieldId, locations.Select(r => new WordLocation(r.Item1, r.Item2, r.Item3)).ToArray());
+            return new IndexedToken(fieldId, locations.Select(r => new TokenLocation(r.Item1, r.Item2, r.Item3)).ToArray());
         }
 
         private static void VerifyResult(
             IndexNode node,
             string intraNodeText,
-            (int, IndexedWord)[] expectedMatches = null,
+            (int, IndexedToken)[] expectedMatches = null,
             char[] expectedChildNodes = null)
         {
             expectedChildNodes = expectedChildNodes ?? Array.Empty<char>();
-            expectedMatches = expectedMatches ?? Array.Empty<(int, IndexedWord)>();
+            expectedMatches = expectedMatches ?? Array.Empty<(int, IndexedToken)>();
 
             node.IntraNodeText.ToArray().Should().BeEquivalentTo(intraNodeText?.ToCharArray() ?? Array.Empty<char>());
             node.ChildNodes.Keys.Should().BeEquivalentTo(expectedChildNodes, o => o.WithoutStrictOrdering());
@@ -176,7 +176,7 @@ namespace Lifti.Tests
             IndexNode node,
             char[] navigationChars,
             string intraNodeText,
-            (int, IndexedWord)[] expectedMatches = null,
+            (int, IndexedToken)[] expectedMatches = null,
             char[] expectedChildNodes = null)
         {
             foreach (var navigationChar in navigationChars)

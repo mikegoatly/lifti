@@ -38,8 +38,10 @@ namespace Lifti
             }
         }
 
+        /// <inheritdoc />
         public byte DefaultField { get; } = 0;
 
+        /// <inheritdoc />
         public string GetFieldForId(byte id)
         {
             if (id == 0)
@@ -54,6 +56,7 @@ namespace Lifti
             throw new LiftiException(ExceptionMessages.FieldHasNoAssociatedFieldName, id);
         }
 
+        /// <inheritdoc />
         public IndexedFieldDetails GetFieldInfo(string fieldName)
         {
             if (!this.fieldToDetailsLookup.TryGetValue(fieldName, out var details))

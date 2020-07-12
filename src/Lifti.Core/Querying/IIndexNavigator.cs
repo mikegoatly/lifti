@@ -11,9 +11,9 @@ namespace Lifti.Querying
         bool HasExactMatches { get; }
 
         /// <summary>
-        /// Enumerates all the words that are indexed under the current position in the navigator.
+        /// Enumerates all the tokens that are indexed under the current position in the navigator.
         /// </summary>
-        IEnumerable<string> EnumerateIndexedWords();
+        IEnumerable<string> EnumerateIndexedTokens();
 
         /// <summary>
         /// Gets all the items that are indexed under from where the navigator is located.

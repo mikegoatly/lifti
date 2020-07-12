@@ -13,7 +13,7 @@ namespace Lifti.Querying
 
         public double Score { get; }
         public byte FieldId => this.FieldMatch.FieldId;
-        public IReadOnlyList<IWordLocationMatch> Locations => this.FieldMatch.Locations;
+        public IReadOnlyList<ITokenLocationMatch> Locations => this.FieldMatch.Locations;
 
         public FieldMatch FieldMatch { get; }
 

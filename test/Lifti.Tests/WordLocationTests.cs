@@ -12,8 +12,8 @@ namespace Lifti.Tests
         [InlineData(10000, 10001)]
         public void WordsWithLowerStartValues_ShouldBeLessThanWordsWithHigherStartValues(int firstWordStart, int secondWordStart)
         {
-            var firstWord = new WordLocation(1, firstWordStart, 100);
-            var secondWord = new WordLocation(1, secondWordStart, 100);
+            var firstWord = new TokenLocation(1, firstWordStart, 100);
+            var secondWord = new TokenLocation(1, secondWordStart, 100);
 
             (firstWord < secondWord).Should().BeTrue();
             (secondWord < firstWord).Should().BeFalse();
@@ -32,8 +32,8 @@ namespace Lifti.Tests
         [Fact]
         public void WordsWithTheSameValues_ShouldBeEqual()
         {
-            var firstWord = new WordLocation(1, 3, 100);
-            var secondWord = new WordLocation(1, 3, 100);
+            var firstWord = new TokenLocation(1, 3, 100);
+            var secondWord = new TokenLocation(1, 3, 100);
 
             (firstWord == secondWord).Should().BeTrue();
             (firstWord != secondWord).Should().BeFalse();
@@ -43,8 +43,8 @@ namespace Lifti.Tests
         [Fact]
         public void WordsWithDifferentValues_ShouldNotBeEqual()
         {
-            var firstWord = new WordLocation(1, 3, 100);
-            var secondWord = new WordLocation(1, 4, 100);
+            var firstWord = new TokenLocation(1, 3, 100);
+            var secondWord = new TokenLocation(1, 4, 100);
 
             (firstWord == secondWord).Should().BeFalse();
             (firstWord != secondWord).Should().BeTrue();

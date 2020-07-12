@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Lifti.Tokenization.Stemming
 {
-    internal class PorterStemmer : IWordStemmer
+    internal class PorterStemmer : IStemmer
     {
         /// <summary>
         /// The list of apostrophe based endings that can be pruned in step 0.

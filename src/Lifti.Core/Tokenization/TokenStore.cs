@@ -6,37 +6,37 @@ namespace Lifti.Tokenization
 {
     internal class TokenStore
     {
-        private readonly Dictionary<int, List<Token>> materializedWords = new Dictionary<int, List<Token>>(); // Pooling? Configuration for expected unique words per document?
+        private readonly Dictionary<int, List<Token>> materializedTokens = new Dictionary<int, List<Token>>(); // Pooling? Configuration for expected unique tokens per document?
 
-        public void MergeOrAdd(TokenHash hash, StringBuilder word, WordLocation location)
+        public void MergeOrAdd(TokenHash hash, StringBuilder token, TokenLocation location)
         {
-            if (this.materializedWords.TryGetValue(hash.HashValue, out var existingEntries))
+            if (this.materializedTokens.TryGetValue(hash.HashValue, out var existingEntries))
             {
                 foreach (var existingEntry in existingEntries)
                 {
-                    if (word.SequenceEqual(existingEntry.Value))
+                    if (token.SequenceEqual(existingEntry.Value))
                     {
                         existingEntry.AddLocation(location);
                         return;
                     }
                 }
 
-                existingEntries.Add(new Token(word.ToString(), location));
+                existingEntries.Add(new Token(token.ToString(), location));
             }
             else
             {
-                this.materializedWords.Add(
+                this.materializedTokens.Add(
                     hash.HashValue,
                     new List<Token>()
                     {
-                        new Token(word.ToString(), location)
+                        new Token(token.ToString(), location)
                     });
             }
         }
 
         public IReadOnlyList<Token> ToList()
         {
-            return this.materializedWords.Values.SelectMany(v => v).ToList();
+            return this.materializedTokens.Values.SelectMany(v => v).ToList();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Lifti
             return new IndexNode(
                 null,
                 ImmutableDictionary<char, IndexNode>.Empty,
-                ImmutableDictionary<int, ImmutableList<IndexedWord>>.Empty);
+                ImmutableDictionary<int, ImmutableList<IndexedToken>>.Empty);
         }
 
         public IndexSupportLevelKind GetIndexSupportLevelForDepth(int depth)
@@ -25,7 +25,7 @@ namespace Lifti
         public IndexNode CreateNode(
             ReadOnlyMemory<char> intraNodeText,
             ImmutableDictionary<char, IndexNode> childNodes,
-            ImmutableDictionary<int, ImmutableList<IndexedWord>> matches)
+            ImmutableDictionary<int, ImmutableList<IndexedToken>> matches)
         {
             return new IndexNode(intraNodeText, childNodes, matches);
         }

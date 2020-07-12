@@ -12,7 +12,7 @@
         private State state;
         private char expectedCloseQuoteForAttributeValue;
 
-        protected override bool IsWordSplitCharacter(char current)
+        protected override bool IsSplitCharacter(char current)
         {
             switch (this.state)
             {
@@ -49,7 +49,7 @@
                     return true;
             }
 
-            return base.IsWordSplitCharacter(current);
+            return base.IsSplitCharacter(current);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Lifti.Querying
 {
     public class OkapiBm25IndexScorer : IIndexScorer
     {
-        private readonly Dictionary<byte, double> averageWordCountByField;
+        private readonly Dictionary<byte, double> averageTokenCountByField;
         private readonly double documentCount;
         private readonly double k1;
         private readonly double b;
@@ -20,14 +20,14 @@ namespace Lifti.Querying
             }
 
             var documentCount = (double)snapshot.Count;
-            this.averageWordCountByField = snapshot.IndexStatistics.WordCountByField.ToDictionary(k => k.Key, k => k.Value / documentCount);
+            this.averageTokenCountByField = snapshot.IndexStatistics.TokenCountByField.ToDictionary(k => k.Key, k => k.Value / documentCount);
             this.documentCount = documentCount;
             this.k1 = k1;
             this.b = b;
             this.snapshot = snapshot;
         }
 
-        public IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryWordMatch> tokenMatches)
+        public IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryTokenMatch> tokenMatches)
         {
             if (tokenMatches is null)
             {
@@ -38,14 +38,14 @@ namespace Lifti.Querying
 
             return tokenMatches.Select(t =>
             {
-                var itemWordCounts = this.snapshot.GetMetadata(t.ItemId).DocumentStatistics.WordCountByField;
+                var itemTokenCounts = this.snapshot.GetMetadata(t.ItemId).DocumentStatistics.TokenCountByField;
                 var scoredFieldMatches = new List<ScoredFieldMatch>(t.FieldMatches.Count);
                 foreach (var fieldMatch in t.FieldMatches)
                 {
                     var frequencyInDocument = fieldMatch.Locations.Count;
                     var fieldId = fieldMatch.FieldId;
-                    var tokensInDocument = itemWordCounts[fieldId];
-                    var tokensInDocumentWeighting = tokensInDocument / this.averageWordCountByField[fieldId];
+                    var tokensInDocument = itemTokenCounts[fieldId];
+                    var tokensInDocumentWeighting = tokensInDocument / this.averageTokenCountByField[fieldId];
 
                     var numerator = frequencyInDocument * (this.k1 + 1D);
                     var denominator = frequencyInDocument + this.k1 * (1 - this.b + this.b * tokensInDocumentWeighting);
@@ -59,7 +59,7 @@ namespace Lifti.Querying
             }).ToList();
         }
 
-        private double CalculateInverseDocumentFrequency(IReadOnlyList<QueryWordMatch> tokens)
+        private double CalculateInverseDocumentFrequency(IReadOnlyList<QueryTokenMatch> tokens)
         {
             var idf = (this.documentCount - tokens.Count + 0.5D)
                     / (tokens.Count + 0.5D);

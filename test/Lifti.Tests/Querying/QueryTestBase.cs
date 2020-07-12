@@ -6,18 +6,18 @@ namespace Lifti.Tests.Querying
 {
     public abstract class QueryTestBase
     {
-        protected static CompositeWordMatchLocation CompositeMatch(int leftWordIndex, int rightWordIndex)
+        protected static CompositeTokenMatchLocation CompositeMatch(int leftWordIndex, int rightWordIndex)
         {
-            return new CompositeWordMatchLocation(WordMatch(leftWordIndex), WordMatch(rightWordIndex));
+            return new CompositeTokenMatchLocation(TokenMatch(leftWordIndex), TokenMatch(rightWordIndex));
         }
 
-        protected static CompositeWordMatchLocation CompositeMatch(params int[] wordIndexes)
+        protected static CompositeTokenMatchLocation CompositeMatch(params int[] wordIndexes)
         {
             var match = CompositeMatch(wordIndexes[0], wordIndexes[1]);
 
             for (var i = 2; i < wordIndexes.Length; i++)
             {
-                match = new CompositeWordMatchLocation(match, WordMatch(wordIndexes[i]));
+                match = new CompositeTokenMatchLocation(match, TokenMatch(wordIndexes[i]));
             }
 
             return match;
@@ -34,7 +34,7 @@ namespace Lifti.Tests.Querying
         {
             return new FieldMatch(
                     fieldId,
-                    wordIndexes.Select(i => WordMatch(i)).ToList());
+                    wordIndexes.Select(i => TokenMatch(i)).ToList());
         }
 
         protected static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params (int, int)[] compositeMatches)
@@ -42,24 +42,24 @@ namespace Lifti.Tests.Querying
             return ScoredFieldMatch(
                 score, 
                 fieldId,
-                compositeMatches.Select(i => (IWordLocationMatch)CompositeMatch(i.Item1, i.Item2)).ToArray());
+                compositeMatches.Select(i => (ITokenLocationMatch)CompositeMatch(i.Item1, i.Item2)).ToArray());
         }
 
-        protected static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params IWordLocationMatch[] compositeMatches)
+        protected static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params ITokenLocationMatch[] compositeMatches)
         {
             return new ScoredFieldMatch(
                 score,
                 new FieldMatch(fieldId, compositeMatches));
         }
 
-        protected static IWordLocationMatch WordMatch(int index)
+        protected static ITokenLocationMatch TokenMatch(int index)
         {
-            return new SingleWordLocationMatch(new WordLocation(index, index, (ushort)index));
+            return new SingleTokenLocationMatch(new TokenLocation(index, index, (ushort)index));
         }
 
-        protected static IWordLocationMatch WordMatch(int index, int start, int length)
+        protected static ITokenLocationMatch WordMatch(int index, int start, int length)
         {
-            return new SingleWordLocationMatch(new WordLocation(index, start, (ushort)length));
+            return new SingleTokenLocationMatch(new TokenLocation(index, start, (ushort)length));
         }
 
         protected static IntermediateQueryResult IntermediateQueryResult(params ScoredToken[] matches)

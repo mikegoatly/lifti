@@ -31,24 +31,24 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public async Task IndexingItemsAgainstDefaultField_ShouldUpdateTotalWordCountStats()
+        public async Task IndexingItemsAgainstDefaultField_ShouldUpdateTotalTokenCountStats()
         {
             await this.WithIndexedStringsAsync();
 
-            this.index.Items.IndexStatistics.TotalWordCount.Should().Be(26);
-            this.index.Items.IndexStatistics.WordCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
+            this.index.Items.IndexStatistics.TotalTokenCount.Should().Be(26);
+            this.index.Items.IndexStatistics.TokenCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
             {
                 { 0, 26 }
             });
         }
 
         [Fact]
-        public async Task IndexingItemsAgainstWithMultipleFields_ShouldUpdateTotalWordCountStats()
+        public async Task IndexingItemsAgainstWithMultipleFields_ShouldUpdateTotalTokenCountStats()
         {
             await this.WithIndexedSingleStringPropertyObjectsAsync();
 
-            this.index.Items.IndexStatistics.TotalWordCount.Should().Be(14);
-            this.index.Items.IndexStatistics.WordCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
+            this.index.Items.IndexStatistics.TotalTokenCount.Should().Be(14);
+            this.index.Items.IndexStatistics.TokenCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
             {
                 { 1, 4 },
                 { 2, 4 },

@@ -150,16 +150,16 @@ namespace Lifti.Tests
             this.sut.Contains("9").Should().BeFalse();
         }
 
-        private static DocumentStatistics DocumentStatistics(params (byte fieldId, int wordCount)[] fieldWordCounts)
+        private static DocumentStatistics DocumentStatistics(params (byte fieldId, int tokenCount)[] fieldWordCounts)
         {
-            return new DocumentStatistics(fieldWordCounts.ToDictionary(f => f.fieldId, f => f.wordCount));
+            return new DocumentStatistics(fieldWordCounts.ToDictionary(f => f.fieldId, f => f.tokenCount));
         }
 
-        private static IndexStatistics IndexStatistics(params (byte fieldId, int wordCount)[] fieldWordCounts)
+        private static IndexStatistics IndexStatistics(params (byte fieldId, int wordCount)[] fieldTokenCounts)
         {
             return new IndexStatistics(
-                fieldWordCounts.ToImmutableDictionary(f => f.fieldId, f => (long)f.wordCount),
-                fieldWordCounts.Sum(c => c.wordCount));
+                fieldTokenCounts.ToImmutableDictionary(f => f.fieldId, f => (long)f.wordCount),
+                fieldTokenCounts.Sum(c => c.wordCount));
         }
     }
 }

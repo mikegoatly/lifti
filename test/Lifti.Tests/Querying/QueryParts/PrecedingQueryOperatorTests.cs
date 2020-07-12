@@ -29,11 +29,11 @@ namespace Lifti.Tests.Querying.QueryParts
             results.Matches.Should().BeEquivalentTo(
                 ScoredToken(
                     7,
-                    ScoredFieldMatch(4D, 1, WordMatch(8), WordMatch(14), WordMatch(20), WordMatch(100), WordMatch(102))),
+                    ScoredFieldMatch(4D, 1, TokenMatch(8), TokenMatch(14), TokenMatch(20), TokenMatch(100), TokenMatch(102))),
                 ScoredToken(
                     8,
-                    ScoredFieldMatch(6D, 1, WordMatch(11), WordMatch(101), WordMatch(106)),
-                    ScoredFieldMatch(13D, 2, WordMatch(8), WordMatch(104), WordMatch(105))));
+                    ScoredFieldMatch(6D, 1, TokenMatch(11), TokenMatch(101), TokenMatch(106)),
+                    ScoredFieldMatch(13D, 2, TokenMatch(8), TokenMatch(104), TokenMatch(105))));
         }
     }
 }

@@ -4,26 +4,26 @@ using System.Linq;
 
 namespace Lifti
 {
-    public struct IndexedWord : IEquatable<IndexedWord>
+    public struct IndexedToken : IEquatable<IndexedToken>
     {
-        public IndexedWord(byte fieldId, params WordLocation[] locations)
+        public IndexedToken(byte fieldId, params TokenLocation[] locations)
         {
             this.FieldId = fieldId;
             this.Locations = locations;
         }
 
-        public IndexedWord(byte fieldId, IReadOnlyList<WordLocation> locations)
+        public IndexedToken(byte fieldId, IReadOnlyList<TokenLocation> locations)
         {
             this.FieldId = fieldId;
             this.Locations = locations;
         }
 
         public byte FieldId { get; }
-        public IReadOnlyList<WordLocation> Locations { get; }
+        public IReadOnlyList<TokenLocation> Locations { get; }
 
         public override bool Equals(object obj)
         {
-            return obj is IndexedWord location &&
+            return obj is IndexedToken location &&
                 this.Equals(location);
         }
 
@@ -38,18 +38,18 @@ namespace Lifti
             return hashCode;
         }
 
-        public bool Equals(IndexedWord other)
+        public bool Equals(IndexedToken other)
         {
             return this.FieldId == other.FieldId &&
                    this.Locations.SequenceEqual(other.Locations);
         }
 
-        public static bool operator ==(IndexedWord left, IndexedWord right)
+        public static bool operator ==(IndexedToken left, IndexedToken right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(IndexedWord left, IndexedWord right)
+        public static bool operator !=(IndexedToken left, IndexedToken right)
         {
             return !(left == right);
         }

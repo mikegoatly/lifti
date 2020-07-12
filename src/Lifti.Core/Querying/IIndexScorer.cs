@@ -4,6 +4,6 @@ namespace Lifti.Querying
 {
     public interface IIndexScorer
     {
-        IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryWordMatch> tokens);
+        IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryTokenMatch> tokens);
     }
 }

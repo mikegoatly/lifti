@@ -4,7 +4,7 @@ namespace Lifti
 {
     public class FieldSearchResult
     {
-        public FieldSearchResult(string foundIn, double score, IReadOnlyList<WordLocation> locations)
+        public FieldSearchResult(string foundIn, double score, IReadOnlyList<TokenLocation> locations)
         {
             this.FoundIn = foundIn;
             this.Score = score;
@@ -24,9 +24,9 @@ namespace Lifti
         public double Score { get; }
 
         /// <summary>
-        /// Gets the <see cref="WordLocation"/> instances for the locations of the matched words in the field.
+        /// Gets the <see cref="TokenLocation"/> instances for the locations of the matched tokens in the field.
         /// </summary>
-        public IReadOnlyList<WordLocation> Locations { get; }
+        public IReadOnlyList<TokenLocation> Locations { get; }
 
         public override string ToString()
         {

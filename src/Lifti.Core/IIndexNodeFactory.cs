@@ -9,7 +9,7 @@ namespace Lifti
         IndexNode CreateNode(
             ReadOnlyMemory<char> intraNodeText,
             ImmutableDictionary<char, IndexNode> childNodes,
-            ImmutableDictionary<int, ImmutableList<IndexedWord>> matches);
+            ImmutableDictionary<int, ImmutableList<IndexedToken>> matches);
         IndexSupportLevelKind GetIndexSupportLevelForDepth(int depth);
     }
 }

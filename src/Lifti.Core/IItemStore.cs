@@ -18,7 +18,7 @@ namespace Lifti
         IItemMetadata GetMetadata(int id);
 
         /// <summary>
-        /// Gets the aggregated statistics for all the indexed documents, including total word count.
+        /// Gets the aggregated statistics for all the indexed documents, including total token count.
         /// </summary>
         IndexStatistics IndexStatistics { get; }
     }

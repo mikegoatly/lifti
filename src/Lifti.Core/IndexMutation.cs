@@ -1,7 +1,5 @@
 ﻿using Lifti.Tokenization;
 using System;
-using System.Diagnostics;
-using System.Linq;
 
 namespace Lifti
 {
@@ -14,14 +12,14 @@ namespace Lifti
             this.root = new IndexNodeMutation(0, root, indexNodeFactory);
         }
 
-        internal void Add(int itemId, byte fieldId, Token word)
+        internal void Add(int itemId, byte fieldId, Token token)
         {
-            if (word is null)
+            if (token is null)
             {
-                throw new ArgumentNullException(nameof(word));
+                throw new ArgumentNullException(nameof(token));
             }
 
-            this.root.Index(itemId, fieldId, word.Locations, word.Value.AsMemory());
+            this.root.Index(itemId, fieldId, token.Locations, token.Value.AsMemory());
         }
 
         internal void Remove(int itemId)

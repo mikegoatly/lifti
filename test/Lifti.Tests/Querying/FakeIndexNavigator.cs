@@ -78,7 +78,7 @@ namespace Lifti.Tests.Querying
             return true;
         }
 
-        public IEnumerable<string> EnumerateIndexedWords()
+        public IEnumerable<string> EnumerateIndexedTokens()
         {
             throw new NotImplementedException();
         }

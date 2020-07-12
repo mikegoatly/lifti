@@ -44,20 +44,20 @@ namespace Lifti.Serialization.Binary
                 var id = this.reader.ReadInt32();
                 var key = this.keySerializer.Read(this.reader);
                 var fieldStatCount = this.reader.ReadInt32();
-                var fieldWordCounts = ImmutableDictionary.CreateBuilder<byte, int>();
-                int totalWordCount = 0;
+                var fieldTokenCounts = ImmutableDictionary.CreateBuilder<byte, int>();
+                int totalTokenCount = 0;
                 for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
                 {
                     var fieldId = this.reader.ReadByte();
                     var wordCount = this.reader.ReadInt32();
-                    fieldWordCounts.Add(fieldId, wordCount);
-                    totalWordCount += wordCount;
+                    fieldTokenCounts.Add(fieldId, wordCount);
+                    totalTokenCount += wordCount;
                 }
 
                 index.IdPool.Add(
                     id, 
                     key,
-                    new DocumentStatistics(fieldWordCounts.ToImmutable(), totalWordCount));
+                    new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount));
             }
 
             index.SetRootWithLock(this.DeserializeNode(index.IndexNodeFactory, 0));
@@ -75,7 +75,7 @@ namespace Lifti.Serialization.Binary
             var childNodeCount = this.reader.ReadInt32();
             var intraNodeText = textLength == 0 ? null : this.reader.ReadChars(textLength);
             var childNodes = childNodeCount > 0 ? ImmutableDictionary.CreateBuilder<char, IndexNode>() : null;
-            var matches = matchCount > 0 ? ImmutableDictionary.CreateBuilder<int, ImmutableList<IndexedWord>>() : null;
+            var matches = matchCount > 0 ? ImmutableDictionary.CreateBuilder<int, ImmutableList<IndexedToken>>() : null;
 
             for (var i = 0; i < childNodeCount; i++)
             {
@@ -83,13 +83,13 @@ namespace Lifti.Serialization.Binary
                 childNodes!.Add(matchChar, this.DeserializeNode(nodeFactory, depth + 1));
             }
 
-            var locationMatches = new List<WordLocation>(50);
+            var locationMatches = new List<TokenLocation>(50);
             for (var itemMatch = 0; itemMatch < matchCount; itemMatch++)
             {
                 var itemId = this.reader.ReadInt32();
                 var fieldCount = this.reader.ReadInt32();
 
-                var indexedWords = ImmutableList.CreateBuilder<IndexedWord>();
+                var indexedTokens = ImmutableList.CreateBuilder<IndexedToken>();
 
                 for (var fieldMatch = 0; fieldMatch < fieldCount; fieldMatch++)
                 {
@@ -106,28 +106,28 @@ namespace Lifti.Serialization.Binary
 
                     this.ReadLocations(locationCount, locationMatches);
 
-                    indexedWords.Add(new IndexedWord(fieldId, locationMatches.ToArray()));
+                    indexedTokens.Add(new IndexedToken(fieldId, locationMatches.ToArray()));
                 }
 
-                matches!.Add(itemId, indexedWords.ToImmutable());
+                matches!.Add(itemId, indexedTokens.ToImmutable());
             }
 
             return nodeFactory.CreateNode(
                 intraNodeText, 
                 childNodes?.ToImmutable() ?? ImmutableDictionary<char, IndexNode>.Empty, 
-                matches?.ToImmutable() ?? ImmutableDictionary<int, ImmutableList<IndexedWord>>.Empty);
+                matches?.ToImmutable() ?? ImmutableDictionary<int, ImmutableList<IndexedToken>>.Empty);
         }
 
-        private void ReadLocations(int locationCount, List<WordLocation> locationMatches)
+        private void ReadLocations(int locationCount, List<TokenLocation> locationMatches)
         {
-            WordLocation? lastLocation = null;
+            TokenLocation? lastLocation = null;
             for (var locationMatch = 0; locationMatch < locationCount; locationMatch++)
             {
                 var structureType = (LocationEntryStructure)this.reader.ReadByte();
-                WordLocation location;
+                TokenLocation location;
                 if (structureType == LocationEntryStructure.Full)
                 {
-                    location = new WordLocation(this.reader.ReadInt32(), this.reader.ReadInt32(), this.reader.ReadUInt16());
+                    location = new TokenLocation(this.reader.ReadInt32(), this.reader.ReadInt32(), this.reader.ReadUInt16());
                 }
                 else
                 {
@@ -144,17 +144,17 @@ namespace Lifti.Serialization.Binary
             }
         }
 
-        private WordLocation DeserializeLocationData(WordLocation previous, LocationEntryStructure structureType)
+        private TokenLocation DeserializeLocationData(TokenLocation previous, LocationEntryStructure structureType)
         {
-            return new WordLocation(
-                previous.WordIndex + this.DeserializeAbbreviatedData(
+            return new TokenLocation(
+                previous.TokenIndex + this.DeserializeAbbreviatedData(
                     structureType,
-                    LocationEntryStructure.WordIndexByte,
-                    LocationEntryStructure.WordIndexUInt16),
+                    LocationEntryStructure.TokenIndexByte,
+                    LocationEntryStructure.TokenIndexUInt16),
                 previous.Start + this.DeserializeAbbreviatedData(
                     structureType,
-                    LocationEntryStructure.WordStartByte,
-                    LocationEntryStructure.WordStartUInt16),
+                    LocationEntryStructure.TokenStartByte,
+                    LocationEntryStructure.TokenStartUInt16),
                 ((structureType & LocationEntryStructure.LengthSameAsLast) == LocationEntryStructure.LengthSameAsLast) ?
                     previous.Length :
                     this.reader.ReadUInt16());

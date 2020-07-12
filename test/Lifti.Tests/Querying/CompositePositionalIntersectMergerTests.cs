@@ -26,7 +26,7 @@ namespace Lifti.Tests.Querying
                     ScoredFieldMatch(5D, 2, 75)));
 
         [Fact]
-        public void ShouldReturnMatchesInMinWordIndexOrder()
+        public void ShouldReturnMatchesInMinTokenIndexOrder()
         {
             var left = IntermediateQueryResult(ScoredToken(7, ScoredFieldMatch(1D, 1, 30, 41)));
             var right = IntermediateQueryResult(ScoredToken(7, ScoredFieldMatch(1D, 1, 35, 37, 42)));
@@ -34,7 +34,7 @@ namespace Lifti.Tests.Querying
 
             var matchedLocations = result.SelectMany(r => r.FieldMatches.SelectMany(m => m.Locations)).ToList();
             matchedLocations.Should().HaveCount(3);
-            matchedLocations.Select(l => l.MinWordIndex)
+            matchedLocations.Select(l => l.MinTokenIndex)
                 .Should().BeInAscendingOrder();
         }
 
@@ -51,7 +51,7 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
-        public void WhenExactRightToleranceMatchesOnlyForSomeFields_ShouldOnlyReturnCompositeMatchesForCorrectWords()
+        public void WhenExactRightToleranceMatchesOnlyForSomeFields_ShouldOnlyReturnCompositeMatchesForCorrectTokens()
         {
             var result = CompositePositionalIntersectMerger.Instance.Apply(exactMatchLeft, exactMatchRight, 0, 5);
 
@@ -63,7 +63,7 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
-        public void WhenExactLeftToleranceMatchesOnlyForSomeFields_ShouldOnlyReturnCompositeMatchesForCorrectWords()
+        public void WhenExactLeftToleranceMatchesOnlyForSomeFields_ShouldOnlyReturnCompositeMatchesForCorrectTokens()
         {
             var result = CompositePositionalIntersectMerger.Instance.Apply(exactMatchLeft, exactMatchRight, 5, 0);
 
@@ -79,7 +79,7 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
-        public void WhenExactToleranceMatchesOnlyForSomeFields_ShouldOnlyReturnCompositeMatchesForCorrectWords()
+        public void WhenExactToleranceMatchesOnlyForSomeFields_ShouldOnlyReturnCompositeMatchesForCorrectTokens()
         {
             var result = CompositePositionalIntersectMerger.Instance.Apply(exactMatchLeft, exactMatchRight, 5, 5);
 

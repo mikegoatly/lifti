@@ -13,17 +13,17 @@ namespace Lifti.Tests.Querying
 
         public IReadOnlyList<Token> Process(string input)
         {
-            return new[] { new Token(input, new WordLocation(0, 0, (ushort)input.Length)) };
+            return new[] { new Token(input, new TokenLocation(0, 0, (ushort)input.Length)) };
         }
 
         public IReadOnlyList<Token> Process(ReadOnlySpan<char> input)
         {
-            return new[] { new Token(input.ToString(), new WordLocation(0, 0, (ushort)input.Length)) };
+            return new[] { new Token(input.ToString(), new TokenLocation(0, 0, (ushort)input.Length)) };
         }
 
         public IReadOnlyList<Token> Process(IEnumerable<string> inputs)
         {
-            return inputs.Select(s => new Token(s, new WordLocation(1, 0, (ushort)s.Length))).ToList();
+            return inputs.Select(s => new Token(s, new TokenLocation(1, 0, (ushort)s.Length))).ToList();
         }
     }
 }

@@ -6,32 +6,32 @@ namespace Lifti.Querying
 {
     public struct FieldMatch : IEquatable<FieldMatch>
     {
-        public FieldMatch(IndexedWord word)
-            : this(word.FieldId, word.Locations)
+        public FieldMatch(IndexedToken token)
+            : this(token.FieldId, token.Locations)
         {
         }
 
-        public FieldMatch(byte fieldId, IReadOnlyList<IWordLocationMatch> locations)
+        public FieldMatch(byte fieldId, IReadOnlyList<ITokenLocationMatch> locations)
         {
             this.FieldId = fieldId;
             this.Locations = locations;
         }
 
-        public FieldMatch(byte fieldId, params IWordLocationMatch[] locations)
+        public FieldMatch(byte fieldId, params ITokenLocationMatch[] locations)
         {
             this.FieldId = fieldId;
             this.Locations = locations;
         }
 
-        private FieldMatch(byte fieldId, IReadOnlyList<WordLocation> locations)
+        private FieldMatch(byte fieldId, IReadOnlyList<TokenLocation> locations)
         {
             this.FieldId = fieldId;
-            this.Locations = locations.Select(l => (IWordLocationMatch)new SingleWordLocationMatch(l)).ToList();
+            this.Locations = locations.Select(l => (ITokenLocationMatch)new SingleTokenLocationMatch(l)).ToList();
         }
 
         public byte FieldId { get; }
 
-        public IReadOnlyList<IWordLocationMatch> Locations { get; }
+        public IReadOnlyList<ITokenLocationMatch> Locations { get; }
 
         public override bool Equals(object obj)
         {
@@ -60,11 +60,11 @@ namespace Lifti.Querying
             return !(left == right);
         }
 
-        public IReadOnlyList<WordLocation> GetWordLocations()
+        public IReadOnlyList<TokenLocation> GetTokenLocations()
         {
             return this.Locations.SelectMany(l => l.GetLocations())
                 .Distinct()
-                .OrderBy(l => l.WordIndex)
+                .OrderBy(l => l.TokenIndex)
                 .ToList();
         }
     }

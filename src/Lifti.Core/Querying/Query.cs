@@ -60,7 +60,7 @@ namespace Lifti.Querying
                         itemResults.FieldMatches.Select(m => new FieldSearchResult(
                             fieldLookup.GetFieldForId(m.FieldId),
                             m.Score,
-                            m.FieldMatch.GetWordLocations()))
+                            m.FieldMatch.GetTokenLocations()))
                         .ToList()));
             }
 

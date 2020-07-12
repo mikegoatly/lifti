@@ -23,11 +23,11 @@ namespace Lifti.Querying
             var tokenStart = (int?)null;
             var tolerance = 0;
 
-            QueryToken? createWordForYielding(int endIndex)
+            QueryToken? createTokenForYielding(int endIndex)
             {
                 if (tokenStart != null)
                 {
-                    var token = QueryToken.ForWord(queryText.Substring(tokenStart.Value, endIndex - tokenStart.Value));
+                    var token = QueryToken.ForText(queryText.Substring(tokenStart.Value, endIndex - tokenStart.Value));
                     tokenStart = null;
                     return token;
                 }
@@ -40,7 +40,7 @@ namespace Lifti.Querying
                 var current = queryText[i];
                 if (char.IsWhiteSpace(current))
                 {
-                    var token = createWordForYielding(i);
+                    var token = createTokenForYielding(i);
                     if (token != null)
                     {
                         yield return token.Value;
@@ -72,7 +72,7 @@ namespace Lifti.Querying
                                     tokenStart = null;
                                     break;
                                 case ')':
-                                    var token = createWordForYielding(i);
+                                    var token = createTokenForYielding(i);
                                     if (token != null)
                                     {
                                         yield return token.Value;
@@ -102,7 +102,7 @@ namespace Lifti.Querying
                             {
                                 case '"':
                                     state = State.None;
-                                    var token = createWordForYielding(i);
+                                    var token = createTokenForYielding(i);
                                     if (token != null)
                                     {
                                         yield return token.Value;
@@ -152,7 +152,7 @@ namespace Lifti.Querying
 
             if (tokenStart != null)
             {
-                yield return QueryToken.ForWord(queryText.Substring(tokenStart.Value, queryText.Length - tokenStart.Value));
+                yield return QueryToken.ForText(queryText.Substring(tokenStart.Value, queryText.Length - tokenStart.Value));
             }
         }
     }

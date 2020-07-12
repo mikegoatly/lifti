@@ -8,8 +8,8 @@ namespace Lifti.Tests.Tokenization
     public class TokenStoreTests
     {
         private readonly TokenStore sut;
-        private readonly WordLocation location1 = new WordLocation(0, 4, 8);
-        private readonly WordLocation location2 = new WordLocation(1, 9, 2);
+        private readonly TokenLocation location1 = new TokenLocation(0, 4, 8);
+        private readonly TokenLocation location2 = new TokenLocation(1, 9, 2);
 
         public TokenStoreTests()
         {

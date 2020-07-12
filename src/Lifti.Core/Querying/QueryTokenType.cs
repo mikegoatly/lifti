@@ -41,22 +41,22 @@
         EndAdjacentTextOperator,
 
         /// <summary>
-        /// The token is a Near operator - the words must be near each other in either direction.
+        /// The token is a Near operator - the tokens must be near each other in either direction.
         /// </summary>
         NearOperator,
 
         /// <summary>
-        /// The token is a Preceding Near operator - the left word must be near and precede the right word.
+        /// The token is a Preceding Near operator - the left token must be near and precede the right token.
         /// </summary>
         PrecedingNearOperator,
 
         /// <summary>
-        /// The token is a preceding operator - the left word must precede the right word.
+        /// The token is a preceding operator - the left token must precede the right token.
         /// </summary>
         PrecedingOperator,
 
         /// <summary>
-        /// The token is a field filter - the captured word is the field that results should be restricted to.
+        /// The token is a field filter - the captured token is the field that results should be restricted to.
         /// </summary>
         FieldFilter
     }

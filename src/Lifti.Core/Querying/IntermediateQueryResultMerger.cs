@@ -8,8 +8,8 @@ namespace Lifti.Querying
         protected static List<(
             byte fieldId,
             double score,
-            IReadOnlyList<IWordLocationMatch> leftLocations,
-            IReadOnlyList<IWordLocationMatch> rightLocations
+            IReadOnlyList<ITokenLocationMatch> leftLocations,
+            IReadOnlyList<ITokenLocationMatch> rightLocations
         )>
             JoinFields(
                 IEnumerable<ScoredFieldMatch> leftFields,
@@ -41,7 +41,7 @@ namespace Lifti.Querying
                         leftField.Score + rightField.Score,
                         new FieldMatch(
                             leftField.FieldId,
-                            leftField.Locations.Concat(rightField.Locations).OrderBy(f => f.MinWordIndex).ToList()));
+                            leftField.Locations.Concat(rightField.Locations).OrderBy(f => f.MinTokenIndex).ToList()));
 
                     rightFields.Remove(leftField.FieldId);
                 }

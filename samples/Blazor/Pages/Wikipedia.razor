@@ -26,7 +26,7 @@
             @this.IndexText
         </pre>
     }
-     else if (this.SyntaxError != null)
+    else if (this.SyntaxError != null)
     {
         <div class="alert alert-danger d-flex">
             <span class="align-self-center">@this.SyntaxError</span>
@@ -115,7 +115,7 @@
     private bool errored;
     private bool indexing;
     private string selectedContent;
-    private IReadOnlyList<WordLocation> wordLocations;
+    private IReadOnlyList<TokenLocation> wordLocations;
 
     private string IndexText { get; set; }
     private string SyntaxError { get; set; }

@@ -37,17 +37,17 @@ namespace Lifti.Querying
             var matchedFields = JoinFields(leftFields, rightFields);
 
             var fieldResults = new List<ScoredFieldMatch>(matchedFields.Count);
-            var fieldWordMatches = new List<IWordLocationMatch>();
+            var fieldTokenMatches = new List<ITokenLocationMatch>();
             foreach (var (fieldId, score, leftLocations, rightLocations) in matchedFields)
             {
-                fieldWordMatches.Clear();
+                fieldTokenMatches.Clear();
 
-                // TODO could be optimised if order of words was guaranteed
-                var furthestRightWordStart = rightLocations.Max(l => l.MinWordIndex);
-                var earliestLeftWordStart = leftLocations.Min(l => l.MinWordIndex);
+                // TODO could be optimised if order of tokens was guaranteed
+                var furthestRightTokenStart = rightLocations.Max(l => l.MinTokenIndex);
+                var earliestLeftTokenStart = leftLocations.Min(l => l.MinTokenIndex);
 
-                // We're only interested in words on the LEFT that start BEFORE the furthest RIGHT word
-                // and words on the RIGHT thast start AFTER the earliest LEFT word
+                // We're only interested in tokens on the LEFT that start BEFORE the furthest RIGHT token
+                // and tokens on the RIGHT thast start AFTER the earliest LEFT token
                 // E.g. searching "B A B A B A" with "A > B":
                 // B(0) - excluded - before first A
                 // A(1) - included - the first A - exists before a B
@@ -56,16 +56,16 @@ namespace Lifti.Querying
                 // B(4) - included - the last B exists after an A
                 // A(5) - excluded - does not exist before a B
 
-                fieldWordMatches.AddRange(
-                    leftLocations.Where(l => l.MaxWordIndex < furthestRightWordStart)
-                    .Concat(rightLocations.Where(l => l.MaxWordIndex > earliestLeftWordStart)));
+                fieldTokenMatches.AddRange(
+                    leftLocations.Where(l => l.MaxTokenIndex < furthestRightTokenStart)
+                    .Concat(rightLocations.Where(l => l.MaxTokenIndex > earliestLeftTokenStart)));
 
-                if (fieldWordMatches.Count > 0)
+                if (fieldTokenMatches.Count > 0)
                 {
                     fieldResults.Add(
                         new ScoredFieldMatch(
                             score,
-                            new FieldMatch(fieldId, fieldWordMatches.OrderBy(f => f.MinWordIndex).ToList())));
+                            new FieldMatch(fieldId, fieldTokenMatches.OrderBy(f => f.MinTokenIndex).ToList())));
                 }
             }
 

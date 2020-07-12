@@ -7,20 +7,20 @@ namespace Lifti
     {
         private IndexStatistics()
         {
-            this.WordCountByField = ImmutableDictionary<byte, long>.Empty;
+            this.TokenCountByField = ImmutableDictionary<byte, long>.Empty;
         }
 
-        internal IndexStatistics(ImmutableDictionary<byte, long> wordCountByField, long totalWordCount)
+        internal IndexStatistics(ImmutableDictionary<byte, long> tokenCountByField, long totalTokenCount)
         {
-            this.WordCountByField = wordCountByField;
-            this.TotalWordCount = totalWordCount;
+            this.TokenCountByField = tokenCountByField;
+            this.TotalTokenCount = totalTokenCount;
         }
 
         public static IndexStatistics Empty { get; } = new IndexStatistics();
 
-        public ImmutableDictionary<byte, long> WordCountByField { get; }
+        public ImmutableDictionary<byte, long> TokenCountByField { get; }
 
-        public long TotalWordCount { get; }
+        public long TotalTokenCount { get; }
 
         public IndexStatistics Remove(DocumentStatistics documentStatistics)
         {
@@ -39,16 +39,16 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(documentStatistics));
             }
 
-            var updatedFieldWordCount = this.WordCountByField;
-            foreach (var fieldWordCount in documentStatistics.WordCountByField)
+            var updatedFieldTokenCount = this.TokenCountByField;
+            foreach (var fieldTokenCount in documentStatistics.TokenCountByField)
             {
-                updatedFieldWordCount.TryGetValue(fieldWordCount.Key, out var previousCount);
-                updatedFieldWordCount = updatedFieldWordCount.SetItem(fieldWordCount.Key, previousCount + (fieldWordCount.Value * direction));
+                updatedFieldTokenCount.TryGetValue(fieldTokenCount.Key, out var previousCount);
+                updatedFieldTokenCount = updatedFieldTokenCount.SetItem(fieldTokenCount.Key, previousCount + (fieldTokenCount.Value * direction));
             }
 
             return new IndexStatistics(
-                updatedFieldWordCount,
-                this.TotalWordCount + (documentStatistics.TotalWordCount * direction));
+                updatedFieldTokenCount,
+                this.TotalTokenCount + (documentStatistics.TotalTokenCount * direction));
         }
     }
 }

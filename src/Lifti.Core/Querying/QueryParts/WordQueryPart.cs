@@ -17,7 +17,10 @@ namespace Lifti.Querying.QueryParts
             get;
         }
 
-
+        /// <summary>
+        /// Evaluates this instance against the index within the given <see cref="IQueryContext"/>, returning an <see cref="IntermediateQueryResult"/>
+        /// that contains the matches.
+        /// </summary>
         public abstract IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext);
     }
 }

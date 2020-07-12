@@ -198,7 +198,7 @@ namespace Lifti
             var fieldId = this.FieldLookup.DefaultField;
             var itemId = this.GetUniqueIdForItem(
                 itemKey,
-                new DocumentStatistics(fieldId, CalculateTotalWordCount(tokens)),
+                new DocumentStatistics(fieldId, CalculateTotalTokenCount(tokens)),
                 mutation);
 
             IndexTokens(mutation, itemId, fieldId, tokens);
@@ -286,13 +286,13 @@ namespace Lifti
 
         private static void IndexTokens(IndexMutation indexMutation, int itemId, byte fieldId, IEnumerable<Token> tokens)
         {
-            foreach (var word in tokens)
+            foreach (var token in tokens)
             {
-                indexMutation.Add(itemId, fieldId, word);
+                indexMutation.Add(itemId, fieldId, token);
             }
         }
 
-        private static int CalculateTotalWordCount(IReadOnlyList<Token> tokens)
+        private static int CalculateTotalTokenCount(IReadOnlyList<Token> tokens)
         {
             return tokens.Aggregate(0, (current, token) => current + token.Locations.Count);
         }
@@ -317,7 +317,7 @@ namespace Lifti
             var documentStatistics = new DocumentStatistics(
                 fieldTokens.ToDictionary(
                     t => t.fieldId,
-                    t => CalculateTotalWordCount(t.tokens)));
+                    t => CalculateTotalTokenCount(t.tokens)));
 
             var itemId = this.GetUniqueIdForItem(itemKey, documentStatistics, indexMutation);
 

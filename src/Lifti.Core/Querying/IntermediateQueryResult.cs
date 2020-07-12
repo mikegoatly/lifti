@@ -17,7 +17,7 @@ namespace Lifti.Querying
         public IReadOnlyList<ScoredToken> Matches { get; }
 
         /// <summary>
-        /// Intersects this and the specified instance, but only when the positions of the matched words on the left are preceding the words on the right.
+        /// Intersects this and the specified instance, but only when the positions of the matched tokens on the left are preceding the tokens on the right.
         /// </summary>
         public IntermediateQueryResult PrecedingIntersect(IntermediateQueryResult results)
         {
@@ -25,8 +25,8 @@ namespace Lifti.Querying
         }
 
         /// <summary>
-        /// Intersects this and the specified instance, but only when the positions of the matched words are within a given tolerance. Matching words are combined
-        /// into <see cref="CompositeWordMatchLocation"/> instances.
+        /// Intersects this and the specified instance, but only when the positions of the matched tokens are within a given tolerance. Matching tokens are combined
+        /// into <see cref="CompositeTokenMatchLocation"/> instances.
         /// </summary>
         public IntermediateQueryResult CompositePositionalIntersect(IntermediateQueryResult results, int leftTolerance, int rightTolerance)
         {

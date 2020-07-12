@@ -10,7 +10,7 @@ namespace Lifti
         internal IndexNode(
             ReadOnlyMemory<char> intraNodeText,
             ImmutableDictionary<char, IndexNode> childNodes,
-            ImmutableDictionary<int, ImmutableList<IndexedWord>> matches)
+            ImmutableDictionary<int, ImmutableList<IndexedToken>> matches)
         {
             this.IntraNodeText = intraNodeText;
             this.ChildNodes = childNodes;
@@ -19,7 +19,7 @@ namespace Lifti
 
         public ReadOnlyMemory<char> IntraNodeText { get; }
         public ImmutableDictionary<char, IndexNode> ChildNodes { get; }
-        public ImmutableDictionary<int, ImmutableList<IndexedWord>> Matches { get; }
+        public ImmutableDictionary<int, ImmutableList<IndexedToken>> Matches { get; }
         public bool IsEmpty => !this.HasChildNodes && !this.HasMatches;
         public bool HasChildNodes => this.ChildNodes.Count > 0;
         public bool HasMatches => this.Matches.Count > 0;

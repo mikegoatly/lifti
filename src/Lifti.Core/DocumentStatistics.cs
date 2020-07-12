@@ -7,24 +7,24 @@ namespace Lifti
 {
     public class DocumentStatistics
     {
-        internal DocumentStatistics(byte fieldId, int wordCount)
+        internal DocumentStatistics(byte fieldId, int tokenCount)
         {
-            this.WordCountByField = ImmutableDictionary<byte, int>.Empty.Add(fieldId, wordCount);
-            this.TotalWordCount = wordCount;
+            this.TokenCountByField = ImmutableDictionary<byte, int>.Empty.Add(fieldId, tokenCount);
+            this.TotalTokenCount = tokenCount;
         }
 
-        internal DocumentStatistics(IReadOnlyDictionary<byte, int> wordCountByField)
-            : this(wordCountByField, wordCountByField.Values.Sum())
+        internal DocumentStatistics(IReadOnlyDictionary<byte, int> tokenCountByField)
+            : this(tokenCountByField, tokenCountByField.Values.Sum())
         {
         }
 
-        internal DocumentStatistics(IReadOnlyDictionary<byte, int> wordCountByField, int totalWordCount)
+        internal DocumentStatistics(IReadOnlyDictionary<byte, int> tokenCountByField, int totalTokenCount)
         {
-            this.WordCountByField = wordCountByField ?? throw new ArgumentNullException(nameof(wordCountByField));
-            this.TotalWordCount = totalWordCount;
+            this.TokenCountByField = tokenCountByField ?? throw new ArgumentNullException(nameof(tokenCountByField));
+            this.TotalTokenCount = totalTokenCount;
         }
 
-        public IReadOnlyDictionary<byte, int> WordCountByField { get; }
-        public int TotalWordCount { get; }
+        public IReadOnlyDictionary<byte, int> TokenCountByField { get; }
+        public int TotalTokenCount { get; }
     }
 }

@@ -11,24 +11,69 @@ namespace Lifti.Querying
             this.Tolerance = tolerance;
         }
 
+        /// <summary>
+        /// The text that this instance represents. The value will be:
+        /// - For text tokens: the text to search for.
+        /// - For field filters: the name of the field to filter to. 
+        /// - For operators: <see cref="string.Empty"/>.
+        /// </summary>
         public string TokenText { get; }
-        
+
+        /// <summary>
+        /// For operators that have tolerance, the number of tokens to use as the tolerance for the operator. For all other token types
+        /// this field is ignored.
+        /// </summary>
         public int Tolerance { get; }
 
+        /// <summary>
+        /// Gets the <see cref="QueryTokenType"/> that this instance represents.
+        /// </summary>
         public QueryTokenType TokenType { get; }
 
-        public static QueryToken ForWord(string text) => new QueryToken(text, QueryTokenType.Text, 0);
-        public static QueryToken ForFieldFilter(string text) => new QueryToken(text, QueryTokenType.FieldFilter, 0);
+        /// <summary>
+        /// Creates a new <see cref="QueryToken"/> instance representing a textual part of the query.
+        /// </summary>
+        /// <param name="text">
+        /// The text to be matched by the query.
+        /// </param>
+        public static QueryToken ForText(string text) => new QueryToken(text, QueryTokenType.Text, 0);
+
+        /// <summary>
+        /// Creates a new <see cref="QueryToken"/> instance representing a field filter.
+        /// </summary>
+        /// <param name="fieldName">
+        /// The name of the field to match.
+        /// </param>
+        public static QueryToken ForFieldFilter(string fieldName) => new QueryToken(fieldName, QueryTokenType.FieldFilter, 0);
+
+        /// <summary>
+        /// Creates a new <see cref="QueryToken"/> instance representing a query operator.
+        /// </summary>
+        /// <param name="operatorType">
+        /// The type of operator the token should represent.
+        /// </param>
         public static QueryToken ForOperator(QueryTokenType operatorType) => new QueryToken(string.Empty, operatorType, 0);
+
+        /// <summary>
+        /// Creates a new <see cref="QueryToken"/> instance representing a query operator that has additional positional constraints.
+        /// </summary>
+        /// <param name="operatorType">
+        /// The type of operator the token should represent.
+        /// </param>
+        /// <param name="tolerance">
+        /// The number of tokens to use as the tolerance for the operator.
+        /// </param>
         public static QueryToken ForOperatorWithTolerance(QueryTokenType operatorType, int tolerance) => 
             new QueryToken(string.Empty, operatorType, tolerance == 0 ? 5 : tolerance);
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return obj is QueryToken token &&
                    this.Equals(token);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return HashCode.Combine(this.TokenText, this.TokenType, this.Tolerance);

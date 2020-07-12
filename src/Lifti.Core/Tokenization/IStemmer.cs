@@ -2,7 +2,7 @@
 
 namespace Lifti.Tokenization
 {
-    internal interface IWordStemmer
+    internal interface IStemmer
     {
         void Stem(StringBuilder builder);
     }

@@ -20,7 +20,7 @@ namespace Lifti.Querying
             {
                 if (rightItems.TryGetValue(leftMatch.ItemId, out var rightMatch))
                 {
-                    var positionalMatches = PositionallyMatchAndCombineWords(
+                    var positionalMatches = PositionallyMatchAndCombineTokens(
                         leftMatch.FieldMatches,
                         rightMatch.FieldMatches,
                         leftTolerance,
@@ -34,7 +34,7 @@ namespace Lifti.Querying
             }
         }
 
-        private static IReadOnlyList<ScoredFieldMatch> PositionallyMatchAndCombineWords(
+        private static IReadOnlyList<ScoredFieldMatch> PositionallyMatchAndCombineTokens(
             IEnumerable<ScoredFieldMatch> leftFields,
             IEnumerable<ScoredFieldMatch> rightFields,
             int leftTolerance,
@@ -43,40 +43,40 @@ namespace Lifti.Querying
             var matchedFields = JoinFields(leftFields, rightFields);
 
             var fieldResults = new List<ScoredFieldMatch>(matchedFields.Count);
-            var fieldWordMatches = new List<IWordLocationMatch>();
+            var fieldTokenMatches = new List<ITokenLocationMatch>();
             foreach (var (fieldId, score, currentLocations, nextLocations) in matchedFields)
             {
-                fieldWordMatches.Clear();
+                fieldTokenMatches.Clear();
 
                 // TODO Unoptimised O(n^2) implementation for now - big optimisations be made when location order can be guaranteed
-                foreach (var currentWord in currentLocations)
+                foreach (var currentToken in currentLocations)
                 {
-                    foreach (var nextWord in nextLocations)
+                    foreach (var nextToken in nextLocations)
                     {
                         if (leftTolerance > 0)
                         {
-                            if ((currentWord.MinWordIndex - nextWord.MaxWordIndex).IsPositiveAndLessThanOrEqualTo(leftTolerance))
+                            if ((currentToken.MinTokenIndex - nextToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(leftTolerance))
                             {
-                                fieldWordMatches.Add(new CompositeWordMatchLocation(currentWord, nextWord));
+                                fieldTokenMatches.Add(new CompositeTokenMatchLocation(currentToken, nextToken));
                             }
                         }
 
                         if (rightTolerance > 0)
                         {
-                            if ((nextWord.MinWordIndex - currentWord.MaxWordIndex).IsPositiveAndLessThanOrEqualTo(rightTolerance))
+                            if ((nextToken.MinTokenIndex - currentToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(rightTolerance))
                             {
-                                fieldWordMatches.Add(new CompositeWordMatchLocation(currentWord, nextWord));
+                                fieldTokenMatches.Add(new CompositeTokenMatchLocation(currentToken, nextToken));
                             }
                         }
                     }
                 }
 
-                if (fieldWordMatches.Count > 0)
+                if (fieldTokenMatches.Count > 0)
                 {
                     fieldResults.Add(
                         new ScoredFieldMatch(
                             score,
-                            new FieldMatch(fieldId, fieldWordMatches.ToList())));
+                            new FieldMatch(fieldId, fieldTokenMatches.ToList())));
                 }
             }
 

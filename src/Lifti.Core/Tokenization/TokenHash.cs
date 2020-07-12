@@ -5,23 +5,23 @@ namespace Lifti.Tokenization
 {
     internal struct TokenHash : IEquatable<TokenHash>
     {
-        public TokenHash(ReadOnlySpan<char> word)
+        public TokenHash(ReadOnlySpan<char> token)
         {
             var hash = 0;
-            for (var i = 0; i < word.Length; i++)
+            for (var i = 0; i < token.Length; i++)
             {
-                hash = CalculateNext(hash, word[i]);
+                hash = CalculateNext(hash, token[i]);
             }
 
             this.HashValue = hash;
         }
 
-        public TokenHash(StringBuilder word)
+        public TokenHash(StringBuilder token)
         {
             var hash = 0;
-            for (var i = 0; i < word.Length; i++)
+            for (var i = 0; i < token.Length; i++)
             {
-                hash = CalculateNext(hash, word[i]);
+                hash = CalculateNext(hash, token[i]);
             }
 
             this.HashValue = hash;

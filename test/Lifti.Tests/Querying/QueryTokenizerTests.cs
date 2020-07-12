@@ -31,14 +31,14 @@ namespace Lifti.Tests.Querying
         public void SingleWordYieldsOneResult()
         {
             this.sut.ParseQueryTokens("Testing").Should().BeEquivalentTo(
-                QueryToken.ForWord("Testing"));
+                QueryToken.ForText("Testing"));
         }
 
         [Fact]
         public void SingleWordWithSpacePaddingYieldsOneResult()
         {
             this.sut.ParseQueryTokens("  \t  Testing   \t ").Should().BeEquivalentTo(
-                QueryToken.ForWord("Testing"));
+                QueryToken.ForText("Testing"));
         }
 
         [Fact]
@@ -46,9 +46,9 @@ namespace Lifti.Tests.Querying
         {
             this.sut.ParseQueryTokens("\"Jack be quick\"").Should().BeEquivalentTo(
                 QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator),
-                QueryToken.ForWord("Jack"),
-                QueryToken.ForWord("be"),
-                QueryToken.ForWord("quick"),
+                QueryToken.ForText("Jack"),
+                QueryToken.ForText("be"),
+                QueryToken.ForText("quick"),
                 QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator));
         }
 
@@ -57,12 +57,12 @@ namespace Lifti.Tests.Querying
         {
             this.sut.ParseQueryTokens(@"""First string"" ""Second string""").Should().BeEquivalentTo(
                 QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator),
-                QueryToken.ForWord("First"),
-                QueryToken.ForWord("string"),
+                QueryToken.ForText("First"),
+                QueryToken.ForText("string"),
                 QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator),
                 QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator),
-                QueryToken.ForWord("Second"),
-                QueryToken.ForWord("string"),
+                QueryToken.ForText("Second"),
+                QueryToken.ForText("string"),
                 QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator));
         }
 

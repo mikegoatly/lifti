@@ -7,7 +7,7 @@ namespace Lifti
     {
         /// <summary>
         /// Internally an index keeps track of items and their metadata. Can be used get ids for items and 
-        /// visa-versa, along with other derived metadata such as word counts.
+        /// visa-versa, along with other derived metadata such as token counts.
         /// </summary>
         IItemStore<TKey> Items { get; }
 
@@ -96,7 +96,7 @@ namespace Lifti
         /// The query to use when searching in the index.
         /// </param>
         /// <param name="tokenizationOptions">
-        /// The <see cref="TokenizationOptions"/> to use when tokenizing words in the <paramref name="searchText"/>.
+        /// The <see cref="TokenizationOptions"/> to use when tokenizing tokens in the <paramref name="searchText"/>.
         /// </param>
         /// <returns>
         /// The matching search results.

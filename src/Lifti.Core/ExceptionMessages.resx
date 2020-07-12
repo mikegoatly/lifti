@@ -135,8 +135,8 @@
   <data name="EmptyBracketedExpressionsAreNotSupported" xml:space="preserve">
     <value>Bracketed query parts cannot be empty</value>
   </data>
-  <data name="ExpectedAtLeastOneWordPartParsed" xml:space="preserve">
-    <value>Expected at least one word part to be parsed</value>
+  <data name="ExpectedAtLeastOneQueryPartParsed" xml:space="preserve">
+    <value>Expected at least one query part to be parsed</value>
   </data>
   <data name="ExpectedTextToken" xml:space="preserve">
     <value>Expected a text token - got {0}</value>
@@ -173,6 +173,9 @@
   </data>
   <data name="MaximumDistinctFieldsIndexReached" xml:space="preserve">
     <value>Only 255 distinct fields can currently be indexed</value>
+  </data>
+  <data name="MaxTokenLengthExceeded" xml:space="preserve">
+    <value>Only tokens up to {0} characters long can be indexed.</value>
   </data>
   <data name="MissingIndexTerminator" xml:space="preserve">
     <value>The index terminator was not found at the end of the file.</value>
