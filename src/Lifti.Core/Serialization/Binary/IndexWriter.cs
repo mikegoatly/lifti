@@ -46,7 +46,7 @@ namespace Lifti.Serialization.Binary
 
             if (intraNodeTextLength > 0)
             {
-                void WriteIntraNodeText(BinaryWriter writer, ReadOnlySpan<char> span)
+                static void WriteIntraNodeText(BinaryWriter writer, ReadOnlySpan<char> span)
                 {
                     for (var i = 0; i < span.Length; i++)
                     {
@@ -102,7 +102,7 @@ namespace Lifti.Serialization.Binary
                 {
                     var locationData = DeriveEntryStructureInformation(lastLocation.Value, location);
 
-                    if (locationData.structure == LocationEntryStructure.Full)
+                    if (locationData.structure == LocationEntrySerializationOptimizations.Full)
                     {
                         this.WriteLocationInFull(location);
                     }
@@ -120,7 +120,7 @@ namespace Lifti.Serialization.Binary
             }
         }
 
-        private static (LocationEntryStructure structure, int tokenIndexValue, int startValue) DeriveEntryStructureInformation(TokenLocation lastLocation, TokenLocation location)
+        private static (LocationEntrySerializationOptimizations structure, int tokenIndexValue, int startValue) DeriveEntryStructureInformation(TokenLocation lastLocation, TokenLocation location)
         {
             var relativeTokenIndex = location.TokenIndex - lastLocation.TokenIndex;
             var relativeStart = location.Start - lastLocation.Start;
@@ -128,49 +128,49 @@ namespace Lifti.Serialization.Binary
             if (relativeTokenIndex < 0 || relativeStart < 0)
             {
                 Debug.Fail("Warning: This shouldn't happen");
-                return (LocationEntryStructure.Full, location.TokenIndex, location.Start);
+                return (LocationEntrySerializationOptimizations.Full, location.TokenIndex, location.Start);
             }
 
-            var entryStructure = LocationEntryStructure.Full;
+            var entryStructure = LocationEntrySerializationOptimizations.Full;
             if (relativeTokenIndex <= byte.MaxValue)
             {
-                entryStructure |= LocationEntryStructure.TokenIndexByte;
+                entryStructure |= LocationEntrySerializationOptimizations.TokenIndexByte;
             }
             else if (relativeTokenIndex <= ushort.MaxValue)
             {
-                entryStructure |= LocationEntryStructure.TokenIndexUInt16;
+                entryStructure |= LocationEntrySerializationOptimizations.TokenIndexUInt16;
             }
 
             if (relativeStart <= byte.MaxValue)
             {
-                entryStructure |= LocationEntryStructure.TokenStartByte;
+                entryStructure |= LocationEntrySerializationOptimizations.TokenStartByte;
             }
             else if (relativeStart <= ushort.MaxValue)
             {
-                entryStructure |= LocationEntryStructure.TokenStartUInt16;
+                entryStructure |= LocationEntrySerializationOptimizations.TokenStartUInt16;
             }
 
             if (lastLocation.Length == location.Length)
             {
-                entryStructure |= LocationEntryStructure.LengthSameAsLast;
+                entryStructure |= LocationEntrySerializationOptimizations.LengthSameAsLast;
             }
 
             return (entryStructure, relativeTokenIndex, relativeStart);
         }
 
-        private void WriteAbbreviatedLocationDetails(ushort length, (LocationEntryStructure structure, int tokenIndex, int start) locationData)
+        private void WriteAbbreviatedLocationDetails(ushort length, (LocationEntrySerializationOptimizations structure, int tokenIndex, int start) locationData)
         {
             this.writer.Write((byte)locationData.structure);
-            this.WriteAbbreviatedData(locationData.tokenIndex, locationData.structure, LocationEntryStructure.TokenIndexByte, LocationEntryStructure.TokenIndexUInt16);
-            this.WriteAbbreviatedData(locationData.start, locationData.structure, LocationEntryStructure.TokenStartByte, LocationEntryStructure.TokenStartUInt16);
+            this.WriteAbbreviatedData(locationData.tokenIndex, locationData.structure, LocationEntrySerializationOptimizations.TokenIndexByte, LocationEntrySerializationOptimizations.TokenIndexUInt16);
+            this.WriteAbbreviatedData(locationData.start, locationData.structure, LocationEntrySerializationOptimizations.TokenStartByte, LocationEntrySerializationOptimizations.TokenStartUInt16);
 
-            if ((locationData.structure & LocationEntryStructure.LengthSameAsLast) != LocationEntryStructure.LengthSameAsLast)
+            if ((locationData.structure & LocationEntrySerializationOptimizations.LengthSameAsLast) != LocationEntrySerializationOptimizations.LengthSameAsLast)
             {
                 this.writer.Write(length);
             }
         }
 
-        private void WriteAbbreviatedData(int data, LocationEntryStructure structure, LocationEntryStructure byteSize, LocationEntryStructure uint16Size)
+        private void WriteAbbreviatedData(int data, LocationEntrySerializationOptimizations structure, LocationEntrySerializationOptimizations byteSize, LocationEntrySerializationOptimizations uint16Size)
         {
             if ((structure & byteSize) == byteSize)
             {
@@ -188,7 +188,7 @@ namespace Lifti.Serialization.Binary
 
         private void WriteLocationInFull(TokenLocation location)
         {
-            this.writer.Write((byte)LocationEntryStructure.Full);
+            this.writer.Write((byte)LocationEntrySerializationOptimizations.Full);
             this.writer.Write(location.TokenIndex);
             this.writer.Write(location.Start);
             this.writer.Write(location.Length);
