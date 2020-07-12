@@ -7,4 +7,4 @@ permalink: /serialization/format/
 
 The current serialization format is version 2. Previous versions were beta versions and are no longer supported.
 
-<img src="{{site.github.url}}/serialization/v2-serialization.svg">
+![Lifti Binary Serialization Format](./v2-serialization.svg)
