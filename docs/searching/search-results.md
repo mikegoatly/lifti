@@ -11,7 +11,7 @@ Results from `FullTextIndex<T>.Search` are an enumeration of `SearchResult<T>`
 
 The item that matched the search criteria.
 
-### IReadOnlyList<FieldSearchResult> FieldMatches { get; }
+### IReadOnlyList&lt;FieldSearchResult&gt; FieldMatches { get; }
 
 The fields that were matched for the item. Each of these is scored independently and provides detailed information
 about the location of the words that were matched.
@@ -30,7 +30,7 @@ The name of the field that the search results were found in. This will be one of
 
 The score for this particular field.
 
-### IReadOnlyList<WordLocation> Locations { get; }
+### IReadOnlyList&lt;WordLocation&gt; Locations { get; }
 
 The `WordLocation` instances for the locations of the matched words in the field.
 
