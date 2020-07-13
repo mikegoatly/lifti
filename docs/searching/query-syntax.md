@@ -19,7 +19,7 @@ west&nbsp;~>&nbsp;wing|**west** must be followed by **wing** closely (within 5 w
 west&nbsp;~3>&nbsp;wing|**west** must be followed by **wing** closely (within **3** words) in the text.
 west&nbsp;>&nbsp;wing|**west** must precede **wing** anywhere in the text
 "the&nbsp;west&nbsp;wing"|The words **the west wing** must appear in sequence in the indexed text.
-"notr*&nbsp;dam*"|A word starting with notr must be immediately followed by a word starting with dam, e.g. **Notre Dame**.
+"notr\*&nbsp;dam\*"|A word starting with notr must be immediately followed by a word starting with dam, e.g. **Notre Dame**.
 
 Search terms can be combined and placed in parenthesis:
 
@@ -38,7 +38,7 @@ enforcing the same word stemming, case/accent sensitivity rules as used in the i
 
 ### Starts with (`*`)
 
-Adding a * to the end of a word searches for words starting with the given text.
+Adding a `*` to the end of a word searches for words starting with the given text.
 
 `foo*` would match occurrences of `food` and `football`
 
@@ -100,6 +100,7 @@ The `~` operator requires that words must be within 5 words of one another. This
 ---
 
 ### Near following (`~>` and `~n>`)
+
 Same as Near (`~`) except that order is important in the positional intersection.
 
 `cheese ~> cake` will match `"cheese and cake"` but not `"cake and cheese"`
@@ -107,6 +108,7 @@ Same as Near (`~`) except that order is important in the positional intersection
 ---
 
 ### Following (`>`)
+
 Same as Near Following (`~>`) except there are no constraints on how far apart the words can be.
 
 `cheese > cake` will match any text where `"cheese"` precedes `"cake"` in a given field.
