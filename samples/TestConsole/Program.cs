@@ -6,7 +6,7 @@ namespace TestConsole
     {
         public static async Task Main()
         {
-            await WikipediaSample.RunAsync();
+            await ProgramaticallyNavigatingIndex.RunAsync();
         }
     }
 }

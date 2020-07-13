@@ -9,6 +9,7 @@ trigger:
     - _config.yml
     - Gemfile
     - Gemfile.lock
+    - samples/*
 
 variables:
   majorVersion: 2
