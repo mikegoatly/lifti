@@ -11,7 +11,8 @@ namespace Lifti.Querying
         bool HasExactMatches { get; }
 
         /// <summary>
-        /// Enumerates all the tokens that are indexed under the current position in the navigator.
+        /// Enumerates all the tokens that are indexed under the current position in the navigator. This method can be used
+        /// to reverse-engineer the words (tokens) that have been indexed.
         /// </summary>
         IEnumerable<string> EnumerateIndexedTokens();
 

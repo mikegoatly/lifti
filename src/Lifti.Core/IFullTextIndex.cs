@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Lifti.Querying;
 
 namespace Lifti
 {
@@ -28,6 +29,13 @@ namespace Lifti
         /// whilst it is being mutated.
         /// </summary>
         IIndexSnapshot<TKey> Snapshot { get; }
+
+        /// <summary>
+        /// Uses the current snapshot of the index to create an implementation of <see cref="IIndexNavigator"/> that can be used to 
+        /// navigate through the index on a character by character basis. Provided as convenience for use instead of calling
+        /// <see cref="IFullTextIndex.Snapshot.CreateNavigator" /> directly
+        /// </summary>
+        IIndexNavigator CreateNavigator();
 
         /// <summary>
         /// Indexes some text against a given key.

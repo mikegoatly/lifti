@@ -64,18 +64,29 @@ namespace Lifti
             }
         }
 
+        /// <inheritdoc />
         public IItemStore<TKey> Items => this.idPool;
 
         internal IIdPool<TKey> IdPool => this.idPool;
 
+        /// <inheritdoc />
         public IIndexedFieldLookup FieldLookup { get; }
 
+        /// <inheritdoc />
         public int Count => this.currentSnapshot.Items.Count;
 
         internal IIndexNodeFactory IndexNodeFactory { get; }
 
+        /// <inheritdoc />
         public IIndexSnapshot<TKey> Snapshot => this.currentSnapshot;
 
+        /// <inheritdoc />
+        public IIndexNavigator CreateNavigator()
+        {
+            return this.Snapshot.CreateNavigator();
+        }
+
+        /// <inheritdoc />
         public void BeginBatchChange()
         {
             this.PerformWriteLockedAction(() =>
@@ -89,6 +100,7 @@ namespace Lifti
             });
         }
 
+        /// <inheritdoc />
         public async Task CommitBatchChangeAsync()
         {
             await this.PerformWriteLockedActionAsync(async () =>
@@ -104,6 +116,7 @@ namespace Lifti
             }).ConfigureAwait(false);
         }
 
+        /// <inheritdoc />
         public async Task AddAsync(TKey itemKey, IEnumerable<string> text, TokenizationOptions? tokenizationOptions = null)
         {
             await this.PerformWriteLockedActionAsync(async () =>
@@ -117,6 +130,7 @@ namespace Lifti
             }).ConfigureAwait(false);
         }
 
+        /// <inheritdoc />
         public async Task AddAsync(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = null)
         {
             await this.PerformWriteLockedActionAsync(async () =>
@@ -131,6 +145,7 @@ namespace Lifti
             }).ConfigureAwait(false);
         }
 
+        /// <inheritdoc />
         public async Task AddRangeAsync<TItem>(IEnumerable<TItem> items)
         {
             if (items is null)
@@ -151,6 +166,7 @@ namespace Lifti
                 }).ConfigureAwait(false);
         }
 
+        /// <inheritdoc />
         public async Task AddAsync<TItem>(TItem item)
         {
             var options = this.itemTokenizationOptions.Get<TItem>();
@@ -158,6 +174,7 @@ namespace Lifti
                 async () => await this.MutateAsync(async m => await this.AddAsync(item, options, m).ConfigureAwait(false)).ConfigureAwait(false)).ConfigureAwait(false);
         }
 
+        /// <inheritdoc />
         public async Task<bool> RemoveAsync(TKey itemKey)
         {
             var result = false;
@@ -178,12 +195,14 @@ namespace Lifti
             return result;
         }
 
+        /// <inheritdoc />
         public IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = null)
         {
             var query = this.queryParser.Parse(this.FieldLookup, searchText, this.GetTokenizer(tokenizationOptions));
             return query.Execute(this.currentSnapshot);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return this.Root.ToString();
