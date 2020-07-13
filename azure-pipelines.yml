@@ -14,7 +14,7 @@ trigger:
 variables:
   majorVersion: 2
   minorVersion: 0
-  patchVersion: 0-beta17
+  patchVersion: 0-beta18
   project: src/Lifti.Core/Lifti.Core.csproj
   testProject: test/Lifti.Tests/Lifti.Tests.csproj
   buildConfiguration: 'Release'
