@@ -3,6 +3,10 @@ using System.Globalization;
 
 namespace Lifti.Querying.QueryParts
 {
+    /// <summary>
+    /// Requires that the <see cref="BinaryQueryOperator.Left" /> part be before
+    /// the <see cref="BinaryQueryOperator.Right"/> part, and within <see cref="PrecedingNearQueryOperator.Tolerance"/> tokens.
+    /// </summary>
     public class PrecedingNearQueryOperator : BinaryQueryOperator
     {
         public PrecedingNearQueryOperator(IQueryPart left, IQueryPart right, int tolerance = 5)

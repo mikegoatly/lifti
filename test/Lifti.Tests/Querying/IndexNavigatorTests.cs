@@ -155,15 +155,15 @@ namespace Lifti.Tests.Querying
                     1,
                     new[]
                     {
-                        ScoredFieldMatch(0D, 1, WordMatch(0, 0, 6), WordMatch(1, 7, 3), WordMatch(2, 11, 5)),
-                        ScoredFieldMatch(0D, 2, WordMatch(0, 0, 4), WordMatch(1, 5, 5))
+                        ScoredFieldMatch(0D, 1, SingleTokenLocationMatch(0, 0, 6), SingleTokenLocationMatch(1, 7, 3), SingleTokenLocationMatch(2, 11, 5)),
+                        ScoredFieldMatch(0D, 2, SingleTokenLocationMatch(0, 0, 4), SingleTokenLocationMatch(1, 5, 5))
                     }),
                 ScoredToken(
                     2,
                     new[]
                     {
-                        ScoredFieldMatch(0D, 1, WordMatch(0, 0, 3)),
-                        ScoredFieldMatch(0D, 2, WordMatch(0, 0, 5))
+                        ScoredFieldMatch(0D, 1, SingleTokenLocationMatch(0, 0, 3)),
+                        ScoredFieldMatch(0D, 2, SingleTokenLocationMatch(0, 0, 5))
                     })
                 };
 

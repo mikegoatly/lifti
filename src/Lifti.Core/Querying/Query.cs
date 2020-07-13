@@ -35,7 +35,8 @@ namespace Lifti.Querying
 
             var idLookup = index.Items;
             var fieldLookup = index.FieldLookup;
-            var matches = this.Root.Evaluate(index.CreateNavigator, QueryContext.Empty).Matches;
+            var evaluationResult = this.Root.Evaluate(index.CreateNavigator, QueryContext.Empty);
+            var matches = evaluationResult.Matches;
             var results = new Dictionary<int, List<ScoredFieldMatch>>();
 
             foreach (var match in matches)

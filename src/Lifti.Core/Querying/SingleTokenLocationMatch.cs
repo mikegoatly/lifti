@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Lifti.Querying
 {
@@ -45,6 +46,11 @@ namespace Lifti.Querying
         public static bool operator !=(SingleTokenLocationMatch left, SingleTokenLocationMatch right)
         {
             return !(left == right);
+        }
+
+        public override string ToString()
+        {
+            return "Single index: " + this.original.TokenIndex.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

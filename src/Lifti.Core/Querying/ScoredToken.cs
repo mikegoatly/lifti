@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 
 namespace Lifti.Querying
 {
@@ -40,6 +42,26 @@ namespace Lifti.Querying
         {
             return this.ItemId == other.ItemId &&
                    this.FieldMatches.SequenceEqual(other.FieldMatches);
+        }
+
+        internal void ToString(StringBuilder builder)
+        {
+            if (builder is null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            builder.Append("Item: ").AppendLine(this.ItemId.ToString(CultureInfo.InvariantCulture));
+            builder.AppendLine("Field matches:");
+            foreach (var fieldMatch in this.FieldMatches)
+            {
+                builder.Append("  Field: ").AppendLine(fieldMatch.FieldId.ToString(CultureInfo.InvariantCulture));
+                builder.Append("  Score: ").AppendLine(fieldMatch.Score.ToString(CultureInfo.InvariantCulture));
+                foreach (var location in fieldMatch.Locations)
+                {
+                    builder.Append("  ").AppendLine(location.ToString());
+                }
+            }
         }
     }
 }

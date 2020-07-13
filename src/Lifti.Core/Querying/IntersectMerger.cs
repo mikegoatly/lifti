@@ -9,9 +9,8 @@ namespace Lifti.Querying
 
         public IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
-            // TODO Verify this assumption - forcing RIGHT to contain more will cause a bigger dictionary to be built
-            // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
-            // "left" and "right" have no special meaning when performing an intersection
+            // Swap over left and right to ensure we're performing as few iterations as possible in the intersection
+            // The trade-off here is that we're building a larger dictionary
             SwapIf(left.Matches.Count > right.Matches.Count, ref left, ref right);
 
             var rightItems = right.Matches.ToDictionary(m => m.ItemId);

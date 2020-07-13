@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Lifti.Querying
 {
@@ -47,6 +48,17 @@ namespace Lifti.Querying
         public IntermediateQueryResult Union(IntermediateQueryResult results)
         {
             return new IntermediateQueryResult(UnionMerger.Instance.Apply(this, results));
+        }
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+            foreach (var match in this.Matches)
+            {
+                match.ToString(builder);
+            }
+
+            return builder.ToString();
         }
     }
 }

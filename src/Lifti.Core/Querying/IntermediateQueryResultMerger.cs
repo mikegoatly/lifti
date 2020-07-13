@@ -26,7 +26,6 @@ namespace Lifti.Querying
 
         protected static IEnumerable<ScoredFieldMatch> MergeFields(ScoredToken leftMatch, ScoredToken rightMatch)
         {
-            // TODO Verify this assumption - keeping the RIGHT dictionary small will cause more dictionary lookups as LEFT is iterated through
             // We will always iterate through the total number of merged field records, so we want to optimise
             // for the smallest number of fields on the right to keep the dictionary as small as possible
             SwapIf(leftMatch.FieldMatches.Count < rightMatch.FieldMatches.Count, ref leftMatch, ref rightMatch);

@@ -1,9 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace Lifti.Querying
 {
+    /// <summary>
+    /// The result of a positional query intersection. This keeps track of all the locations
+    /// that matched positionally, giving quick access to the max and min locations for reference
+    /// in further positional intersections if needed.
+    /// </summary>
     public struct CompositeTokenMatchLocation : ITokenLocationMatch, IEquatable<CompositeTokenMatchLocation>
     {
         private readonly ITokenLocationMatch leftToken;
@@ -15,7 +21,7 @@ namespace Lifti.Querying
         {
             this.leftToken = leftToken;
             this.rightToken = rightToken;
-            this.minTokenIndex = new Lazy<int>(() => Math.Max(leftToken.MinTokenIndex, rightToken.MinTokenIndex));
+            this.minTokenIndex = new Lazy<int>(() => Math.Min(leftToken.MinTokenIndex, rightToken.MinTokenIndex));
             this.maxTokenIndex = new Lazy<int>(() => Math.Max(leftToken.MaxTokenIndex, rightToken.MaxTokenIndex));
         }
 
@@ -53,6 +59,12 @@ namespace Lifti.Querying
         public static bool operator !=(CompositeTokenMatchLocation left, CompositeTokenMatchLocation right)
         {
             return !(left == right);
+        }
+
+        public override string ToString()
+        {
+            return "Composite location - min:" + this.MinTokenIndex.ToString(CultureInfo.InvariantCulture) +
+                " max: " + this.MaxTokenIndex.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

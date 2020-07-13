@@ -9,10 +9,11 @@ namespace Lifti.Querying
 
         public IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right, int leftTolerance, int rightTolerance)
         {
-            // TODO Verify this assumption - forcing RIGHT to contain more will cause a bigger dictionary to be built
             // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
-            // "left" and "right" have no special meaning when performing an intersection
-            SwapIf(left.Matches.Count > right.Matches.Count, ref left, ref right);
+            // Also swap the tolerance values around, otherwise we reverse the tolerance directionality.
+            var swapLeftAndRight = left.Matches.Count > right.Matches.Count;
+            SwapIf(swapLeftAndRight, ref left, ref right);
+            SwapIf(swapLeftAndRight, ref leftTolerance, ref rightTolerance);
 
             var rightItems = right.Matches.ToDictionary(m => m.ItemId);
 
@@ -44,14 +45,14 @@ namespace Lifti.Querying
 
             var fieldResults = new List<ScoredFieldMatch>(matchedFields.Count);
             var fieldTokenMatches = new List<ITokenLocationMatch>();
-            foreach (var (fieldId, score, currentLocations, nextLocations) in matchedFields)
+            foreach (var (fieldId, score, leftLocations, rightLocations) in matchedFields)
             {
                 fieldTokenMatches.Clear();
 
                 // TODO Unoptimised O(n^2) implementation for now - big optimisations be made when location order can be guaranteed
-                foreach (var currentToken in currentLocations)
+                foreach (var currentToken in leftLocations)
                 {
-                    foreach (var nextToken in nextLocations)
+                    foreach (var nextToken in rightLocations)
                     {
                         if (leftTolerance > 0)
                         {

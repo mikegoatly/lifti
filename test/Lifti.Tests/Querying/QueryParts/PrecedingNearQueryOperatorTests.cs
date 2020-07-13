@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
-using Lifti.Querying;
 using Lifti.Querying.QueryParts;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Lifti.Tests.Querying.QueryParts
@@ -34,6 +35,37 @@ namespace Lifti.Tests.Querying.QueryParts
                     8,
                     ScoredFieldMatch(6D, 1, CompositeMatch(101, 106)),
                     ScoredFieldMatch(13D, 2, CompositeMatch(104, 105))));
+        }
+
+        [Fact]
+        public async Task ShouldOnlyReturnResultsWhereFirstWordIsBeforeSecond()
+        {
+            var index = await CreateTestIndexAsync();
+
+            var results = index.Search("critical ~> acclaim");
+
+            results.Should().HaveCount(1);
+            var result = results.Single();
+            result.Key.Should().Be(4);
+
+            var fieldMatch = result.FieldMatches.Single();
+            fieldMatch.Locations.Should().BeEquivalentTo(
+                new TokenLocation(11, 67, 8),
+                new TokenLocation(12, 76, 7));
+        }
+
+        protected static async Task<IFullTextIndex<int>> CreateTestIndexAsync()
+        {
+            var index = new FullTextIndexBuilder<int>()
+                .WithDefaultTokenizationOptions(o => o.WithStemming())
+                .Build();
+
+            await index.AddAsync(1, "One two three four five");
+            await index.AddAsync(2, "Five four three two one");
+            await index.AddAsync(3, "One Nine six");
+            await index.AddAsync(4, "During a career spanning more than 20 years, Porcupine Tree earned critical acclaim from critics and fellow musicians, developed a cult following, and became an influence for new artists");
+
+            return index;
         }
     }
 }

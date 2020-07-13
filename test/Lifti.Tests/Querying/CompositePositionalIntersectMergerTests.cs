@@ -104,5 +104,47 @@ namespace Lifti.Tests.Querying
 
             result.Should().BeEmpty();
         }
+
+        [Fact]
+        public void WhenMoreItemsAppearOnLeft_ResultsShouldStillBeReturnedCorrectly()
+        {
+            var left = IntermediateQueryResult(
+                ScoredToken(
+                    2,
+                    ScoredFieldMatch(1D, 1, 322, 325, 960)),
+                ScoredToken(
+                    3,
+                    ScoredFieldMatch(1D, 1, 433, 556, 566, 1272)),
+                ScoredToken(
+                    5,
+                    ScoredFieldMatch(1D, 1, 291, 293)),
+                ScoredToken(
+                    8,
+                    ScoredFieldMatch(3D, 1, 497, 523, 529, 606)));
+
+            var right = IntermediateQueryResult(
+                ScoredToken(
+                    2,
+                    ScoredFieldMatch(1D, 1, 323)),
+                ScoredToken(
+                    3,
+                    ScoredFieldMatch(1D, 1, 436)),
+                ScoredToken(
+                    5,
+                    ScoredFieldMatch(1D, 1, 292)));
+
+
+            var results = CompositePositionalIntersectMerger.Instance.Apply(left, right, 0, 5).ToList();
+
+            // TODO reverse composite results once fields ordered during querying
+            var expected = new[]
+            {
+                ScoredToken(2, ScoredFieldMatch(2D, 1, (323, 322))),
+                ScoredToken(3, ScoredFieldMatch(2D, 1, (436, 433))),
+                ScoredToken(5, ScoredFieldMatch(2D, 1, (292, 291)))
+            };
+
+            results.Should().BeEquivalentTo(expected);
+        }
     }
 }

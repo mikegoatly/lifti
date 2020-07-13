@@ -57,7 +57,7 @@ namespace Lifti.Tests.Querying
             return new SingleTokenLocationMatch(new TokenLocation(index, index, (ushort)index));
         }
 
-        protected static ITokenLocationMatch WordMatch(int index, int start, int length)
+        protected static ITokenLocationMatch SingleTokenLocationMatch(int index, int start, int length)
         {
             return new SingleTokenLocationMatch(new TokenLocation(index, start, (ushort)length));
         }
