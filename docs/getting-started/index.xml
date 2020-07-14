@@ -1,11 +1,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>LIFTI – Getting Started</title>
-    <link>mikegoatly.github.io/lifti/docs/getting-started/</link>
+    <link>/lifti/docs/getting-started/</link>
     <description>Recent content in Getting Started on LIFTI</description>
     <generator>Hugo -- gohugo.io</generator>
     
-	  <atom:link href="mikegoatly.github.io/lifti/docs/getting-started/index.xml" rel="self" type="application/rss+xml" />
+	  <atom:link href="/lifti/docs/getting-started/index.xml" rel="self" type="application/rss+xml" />
     
     
       
@@ -15,10 +15,10 @@
     
     <item>
       <title>Docs: Indexing Objects</title>
-      <link>mikegoatly.github.io/lifti/docs/getting-started/indexing-objects/</link>
+      <link>/lifti/docs/getting-started/indexing-objects/</link>
       <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>mikegoatly.github.io/lifti/docs/getting-started/indexing-objects/</guid>
+      <guid>/lifti/docs/getting-started/indexing-objects/</guid>
       <description>
         
         
