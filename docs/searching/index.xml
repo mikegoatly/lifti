@@ -1,11 +1,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>LIFTI – Searching</title>
-    <link>/docs/searching/</link>
+    <link>mikegoatly.github.io/lifti/docs/searching/</link>
     <description>Recent content in Searching on LIFTI</description>
     <generator>Hugo -- gohugo.io</generator>
     
-	  <atom:link href="/docs/searching/index.xml" rel="self" type="application/rss+xml" />
+	  <atom:link href="mikegoatly.github.io/lifti/docs/searching/index.xml" rel="self" type="application/rss+xml" />
     
     
       
@@ -15,10 +15,10 @@
     
     <item>
       <title>Docs: IndexNavigator</title>
-      <link>/docs/searching/using-the-index-navigator/</link>
+      <link>mikegoatly.github.io/lifti/docs/searching/using-the-index-navigator/</link>
       <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>/docs/searching/using-the-index-navigator/</guid>
+      <guid>mikegoatly.github.io/lifti/docs/searching/using-the-index-navigator/</guid>
       <description>
         
         
@@ -90,10 +90,10 @@ navigation of the index.&lt;/p&gt;
     
     <item>
       <title>Docs: Search Results</title>
-      <link>/docs/searching/search-results/</link>
+      <link>mikegoatly.github.io/lifti/docs/searching/search-results/</link>
       <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>/docs/searching/search-results/</guid>
+      <guid>mikegoatly.github.io/lifti/docs/searching/search-results/</guid>
       <description>
         
         

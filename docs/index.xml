@@ -1,11 +1,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>LIFTI – Documentation</title>
-    <link>/docs/</link>
+    <link>mikegoatly.github.io/lifti/docs/</link>
     <description>Recent content in Documentation on LIFTI</description>
     <generator>Hugo -- gohugo.io</generator>
     
-	  <atom:link href="/docs/index.xml" rel="self" type="application/rss+xml" />
+	  <atom:link href="mikegoatly.github.io/lifti/docs/index.xml" rel="self" type="application/rss+xml" />
     
     
       
@@ -15,10 +15,10 @@
     
     <item>
       <title>Docs: Indexing Objects</title>
-      <link>/docs/getting-started/indexing-objects/</link>
+      <link>mikegoatly.github.io/lifti/docs/getting-started/indexing-objects/</link>
       <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>/docs/getting-started/indexing-objects/</guid>
+      <guid>mikegoatly.github.io/lifti/docs/getting-started/indexing-objects/</guid>
       <description>
         
         
@@ -80,10 +80,10 @@
     
     <item>
       <title>Docs: IndexNavigator</title>
-      <link>/docs/searching/using-the-index-navigator/</link>
+      <link>mikegoatly.github.io/lifti/docs/searching/using-the-index-navigator/</link>
       <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>/docs/searching/using-the-index-navigator/</guid>
+      <guid>mikegoatly.github.io/lifti/docs/searching/using-the-index-navigator/</guid>
       <description>
         
         
@@ -155,10 +155,10 @@ navigation of the index.&lt;/p&gt;
     
     <item>
       <title>Docs: Search Results</title>
-      <link>/docs/searching/search-results/</link>
+      <link>mikegoatly.github.io/lifti/docs/searching/search-results/</link>
       <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>/docs/searching/search-results/</guid>
+      <guid>mikegoatly.github.io/lifti/docs/searching/search-results/</guid>
       <description>
         
         
@@ -183,14 +183,14 @@ about the location of the words that were matched.&lt;/p&gt;
     
     <item>
       <title>Docs: Serialization File Format</title>
-      <link>/docs/reference/serialization-format/</link>
+      <link>mikegoatly.github.io/lifti/docs/reference/serialization-format/</link>
       <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>/docs/reference/serialization-format/</guid>
+      <guid>mikegoatly.github.io/lifti/docs/reference/serialization-format/</guid>
       <description>
         
         
-        &lt;p&gt;&lt;img src=&#34;/images/v2-serialization.svg&#34; alt=&#34;LIFTI Serialization Format&#34;&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&#34;mikegoatly.github.io/lifti/images/v2-serialization.svg&#34; alt=&#34;LIFTI Serialization Format&#34;&gt;&lt;/p&gt;
 
       </description>
     </item>

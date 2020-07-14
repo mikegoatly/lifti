@@ -1,11 +1,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>LIFTI – Search Result Scoring</title>
-    <link>/docs/scoring/</link>
+    <link>mikegoatly.github.io/lifti/docs/scoring/</link>
     <description>Recent content in Search Result Scoring on LIFTI</description>
     <generator>Hugo -- gohugo.io</generator>
     
-	  <atom:link href="/docs/scoring/index.xml" rel="self" type="application/rss+xml" />
+	  <atom:link href="mikegoatly.github.io/lifti/docs/scoring/index.xml" rel="self" type="application/rss+xml" />
     
     
       
