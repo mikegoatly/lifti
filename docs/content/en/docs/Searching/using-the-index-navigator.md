@@ -1,9 +1,10 @@
 ---
-title: LIFTI - Using The IndexNavigator
-permalink: /searching/index-navigator/
+title: "IndexNavigator"
+linkTitle: "IndexNavigator"
+date: 2020-07-14
+description: >
+    You can use an IndexNavigator to navigate the index character by character.
 ---
-
-## The IndexNavigator class
 
 When processing a search query, LIFTI leverages a class called `IndexNavigator` which allows for a character-by-character
 navigation of the index.

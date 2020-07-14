@@ -1,6 +1,11 @@
 ---
-title: Indexing objects with LIFTI
-permalink: /indexing/indexing-objects/
+title: "Indexing Objects"
+linkTitle: "Indexing Objects"
+date: 2020-07-14
+description: >
+  You're not restricted to indexing strings against ids - you can also configure
+  an index to extract text out of one or more properties of an object. Each
+  configured property is a *field*.
 ---
 
 Given a class called `Book`:

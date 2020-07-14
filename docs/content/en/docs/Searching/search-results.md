@@ -1,9 +1,10 @@
 ---
-title: LIFTI Search Results
-permalink: /searching/search-results/
+title: Search Results
+linkTitle: "Search Results"
+date: 2020-07-14
+description:
+    Results from `FullTextIndex<T>.Search` are an enumeration of `SearchResult<T>`
 ---
-
-Results from `FullTextIndex<T>.Search` are an enumeration of `SearchResult<T>`
 
 ## SearchResult&lt;T&gt;
 
@@ -33,7 +34,3 @@ The score for this particular field.
 ### IReadOnlyList&lt;WordLocation&gt; Locations { get; }
 
 The `WordLocation` instances for the locations of the matched words in the field.
-
-## Scoring
-
-LIFTI uses a version of the [Okapi BM25](https://en.wikipedia.org/wiki/Okapi_BM25) algorithm to score search results. At the simplest level this means that search results will come back ordered by relevance.

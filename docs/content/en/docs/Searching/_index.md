@@ -1,7 +1,11 @@
 ---
-title: LIFTI query syntax
-permalink: /searching/query-syntax/
+title: "Searching"
+linkTitle: "Searching"
+weight: 5
+description: >
+  The LIFTI query syntax
 ---
+
 
 ## Quick examples
 
