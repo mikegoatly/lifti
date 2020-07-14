@@ -1,0 +1,199 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>LIFTI – Documentation</title>
+    <link>/docs/</link>
+    <description>Recent content in Documentation on LIFTI</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	  <atom:link href="/docs/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: Indexing Objects</title>
+      <link>/docs/getting-started/indexing-objects/</link>
+      <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/docs/getting-started/indexing-objects/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Given a class called &lt;code&gt;Book&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Book&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;BookId&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;get&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;set&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;string&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Title&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;get&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;set&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;string&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[]&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Authors&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;get&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;set&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;string&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Content&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;get&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;set&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Where you want users to be able to search for text in all three Title, Abstract and Content fields, you can build an index as:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Books are indexed by their BookId property, which is an int.
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;bookIndex&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;FullTextIndexBuilder&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;()&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithItemTokenization&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Book&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;(&lt;/span&gt;
+        &lt;span style=&#34;color:#000&#34;&gt;itemOptions&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;itemOptions&lt;/span&gt;
+            &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithKey&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;BookId&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+            &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithField&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Title&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Title&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+                &lt;span style=&#34;color:#000&#34;&gt;tokenOptions&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;tokenOptions&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithStemming&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;())&lt;/span&gt;
+            &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithField&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Authors&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Authors&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+            &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithField&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Synopsis&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Synopsis&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+                &lt;span style=&#34;color:#000&#34;&gt;tokenOptions&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;tokenOptions&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithStemming&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()))&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Build&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Indexing a set of books is as easy as:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span style=&#34;color:#000&#34;&gt;books&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[]&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Book&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#000&#34;&gt;BookId&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+        &lt;span style=&#34;color:#000&#34;&gt;Title&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;The Three Body Problem&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+        &lt;span style=&#34;color:#000&#34;&gt;Authors&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[]&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Liu Cixin&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+        &lt;span style=&#34;color:#000&#34;&gt;Synopsis&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;The Three-Body Problem (Chinese: 三体; literally: &amp;#39;Three-Body&amp;#39;; pinyin: sān tǐ) is a hard science fiction novel...&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Book&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#000&#34;&gt;BookId&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+        &lt;span style=&#34;color:#000&#34;&gt;Title&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Dragons of Autumn Twilight&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+        &lt;span style=&#34;color:#000&#34;&gt;Authors&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[]&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Margaret Weis&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Tracy Hickman&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+        &lt;span style=&#34;color:#000&#34;&gt;Synopsis&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Dragons of Autumn Twilight is a 1984 fantasy novel by American writers Margaret Weis and Tracy Hickman...&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+
+&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;await&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;bookIndex&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;AddRangeAsync&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;books&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;When you get search results back, they will be against the key stored in the index, i.e. the book&amp;rsquo;s id:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Both books contain &amp;#34;first&amp;#34; - prints &amp;#34;Matched items: 1, 2 with respective scores 0.274884808704732, 0.265418822719626&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;results&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;bookIndex&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Search&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;first&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color:#000&#34;&gt;Console&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WriteLine&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;
+    &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Matched items: &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;+&lt;/span&gt; 
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;string&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Join&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;, &amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;results&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Select&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Key&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;))&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;+&lt;/span&gt;
+    &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34; with respective scores: &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;+&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;string&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Join&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;, &amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;results&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Select&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Score&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)));&lt;/span&gt;
+
+&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Only first book contains &amp;#34;the&amp;#34; in the title - prints &amp;#34;Matched items: 1&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;results&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;bookIndex&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Search&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;title=the&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color:#000&#34;&gt;Console&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WriteLine&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Matched items: &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;string&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Join&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;, &amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;results&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Select&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Key&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)));&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: IndexNavigator</title>
+      <link>/docs/searching/using-the-index-navigator/</link>
+      <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/docs/searching/using-the-index-navigator/</guid>
+      <description>
+        
+        
+        &lt;p&gt;When processing a search query, LIFTI leverages a class called &lt;code&gt;IndexNavigator&lt;/code&gt; which allows for a character-by-character
+navigation of the index.&lt;/p&gt;
+&lt;p&gt;You can use an &lt;code&gt;IndexNavigator&lt;/code&gt; to do the same thing yourself. The example below demonstrates the following methods:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;IIndexNavigator.Process&lt;/code&gt; Navigates (forward only) the nodes in the index.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;IIndexNavigator.GetExactMatches&lt;/code&gt; Gets all the matches at the current location in the index.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;IIndexNavigator.GetExactAndChildMatches&lt;/code&gt; Gets the exact matches &lt;em&gt;and&lt;/em&gt; any matches in subsequent child nodes. This is the equivalent to a wildcard search.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;IIndexNavigator.EnumerateIndexedTokens&lt;/code&gt; Enumerates the words (tokens) that were indexed under the current location. This essentaially allows for a reverse-engineering of words stored in the index, albeit in their index normalized form.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;async&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Task&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;RunAsync&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Create a full text index with default settings
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;index&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;FullTextIndexBuilder&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;string&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;().&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Build&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;
+
+    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Index some sample data
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;await&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;index&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;AddAsync&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Item1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Catastrophe&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;await&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;index&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;AddAsync&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Item2&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Casualty&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;await&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;index&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;AddAsync&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Item3&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Cat&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+
+    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// To programatically search the index, create an index navigator instance 
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// from the index snapshot.
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;using&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;navigator&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;index&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;CreateNavigator&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;())&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Navigate through the letters &amp;#39;C&amp;#39; and &amp;#39;A&amp;#39; (these will be the characters in their 
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// *index normalized* form)
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#000&#34;&gt;navigator&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;CA&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;AsSpan&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;());&lt;/span&gt;
+
+        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// There will be no exact matches at the current position in the index, but 3 matches 
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// when considering child matches, i.e. words starting with &amp;#34;ca&amp;#34;
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Writes: Exact matches: 0 Exact and child matches: 3
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#000&#34;&gt;WriteMatchState&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;navigator&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+
+        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Navigating through the &amp;#39;T&amp;#39; of Catastrophe and Cat, but not Casualty
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#000&#34;&gt;navigator&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;T&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+
+        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Writes: Exact matches: 1 Exact and child matches: 2
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#000&#34;&gt;WriteMatchState&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;navigator&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+
+        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Use EnumerateIndexedTokens to reverse-engineer the words that have been indexed
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// under the current location in the index, in their normalized form.
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Writes:
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// CAT
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// CATASTROPHE
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;foreach&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;token&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;in&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;navigator&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;EnumerateIndexedTokens&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;())&lt;/span&gt;
+        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color:#000&#34;&gt;Console&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WriteLine&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;token&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+
+        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// The Process method returns true if navigation was successful, and false otherwise:
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Writes: True
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#000&#34;&gt;Console&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WriteLine&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;navigator&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;A&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;));&lt;/span&gt;
+
+        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Writes: False
+&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#000&#34;&gt;Console&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WriteLine&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;navigator&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;ZOOOOM&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;));&lt;/span&gt;
+    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+
+&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;WriteMatchState&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;IIndexNavigator&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;navigator&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#000&#34;&gt;Console&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WriteLine&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;$@&amp;#34;Exact matches: {navigator.GetExactMatches().Matches.Count} 
+&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;Exact and child matches: {navigator.GetExactAndChildMatches().Matches.Count}&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Search Results</title>
+      <link>/docs/searching/search-results/</link>
+      <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/docs/searching/search-results/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;searchresultlttgt&#34;&gt;SearchResult&amp;lt;T&amp;gt;&lt;/h2&gt;
+&lt;h3 id=&#34;t-item--get-&#34;&gt;T Item { get; }&lt;/h3&gt;
+&lt;p&gt;The item that matched the search criteria.&lt;/p&gt;
+&lt;h3 id=&#34;ireadonlylistltfieldsearchresultgt-fieldmatches--get-&#34;&gt;IReadOnlyList&amp;lt;FieldSearchResult&amp;gt; FieldMatches { get; }&lt;/h3&gt;
+&lt;p&gt;The fields that were matched for the item. Each of these is scored independently and provides detailed information
+about the location of the words that were matched.&lt;/p&gt;
+&lt;h3 id=&#34;double-score--get-&#34;&gt;double Score { get; }&lt;/h3&gt;
+&lt;p&gt;The overall score for this match. This is a sum of the scores for this instance&amp;rsquo;s FieldMatches.&lt;/p&gt;
+&lt;h2 id=&#34;fieldsearchresult&#34;&gt;FieldSearchResult&lt;/h2&gt;
+&lt;h3 id=&#34;string-foundin--get-&#34;&gt;string FoundIn { get; }&lt;/h3&gt;
+&lt;p&gt;The name of the field that the search results were found in. This will be one of the field names configured when the index was built, or &lt;code&gt;Unspecified&lt;/code&gt; if no fields were configured.&lt;/p&gt;
+&lt;h3 id=&#34;double-score--get--1&#34;&gt;double Score { get; }&lt;/h3&gt;
+&lt;p&gt;The score for this particular field.&lt;/p&gt;
+&lt;h3 id=&#34;ireadonlylistltwordlocationgt-locations--get-&#34;&gt;IReadOnlyList&amp;lt;WordLocation&amp;gt; Locations { get; }&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;WordLocation&lt;/code&gt; instances for the locations of the matched words in the field.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Serialization File Format</title>
+      <link>/docs/reference/serialization-format/</link>
+      <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/docs/reference/serialization-format/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;/images/v2-serialization.svg&#34; alt=&#34;LIFTI Serialization Format&#34;&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>
