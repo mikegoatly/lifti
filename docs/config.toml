@@ -1,4 +1,4 @@
-baseURL = "mikegoatly.github.io/lifti"
+baseURL = "/lifti/"
 title = "LIFTI"
 
 enableRobotsTXT = true
