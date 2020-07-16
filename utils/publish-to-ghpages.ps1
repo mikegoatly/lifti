@@ -10,6 +10,10 @@ If (-Not (git status --porcelain)) {
 	exit
 }
 
+$scriptPath = split-path $SCRIPT:MyInvocation.MyCommand.Path -parent
+
+Push-Location (Join-Path $scriptPath ".." -Resolve)
+
 "Deleting old publication"
 Remove-Item .\docs\public -Force -Recurse -ErrorAction Ignore
 mkdir public | out-null
@@ -46,5 +50,8 @@ git push origin gh-pages
 # pop back to Hugo folder
 Pop-Location
 
-# and back to the repo root
+# back to the repo root
+Pop-Location
+
+# back to wherever we were before
 Pop-Location

@@ -3,13 +3,8 @@ trigger:
     include:
     - master
   paths:
-    exclude:
-    - docs/*
-    - README.md
-    - _config.yml
-    - Gemfile
-    - Gemfile.lock
-    - samples/*
+    include:
+    - src
 
 variables:
   majorVersion: 2
