@@ -6,4 +6,4 @@ description: >
     The current serialization format is version 2. Previous versions were beta versions and are no longer supported.
 ---
 
-![LIFTI Serialization Format](/images/v2-serialization.svg)
+![LIFTI Serialization Format](../../../images/v2-serialization.svg)
