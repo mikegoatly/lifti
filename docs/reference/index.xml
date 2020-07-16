@@ -1,11 +1,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>LIFTI – Reference</title>
-    <link>/lifti/docs/reference/</link>
+    <link>https://mikegoatly.github.io/lifti/docs/reference/</link>
     <description>Recent content in Reference on LIFTI</description>
     <generator>Hugo -- gohugo.io</generator>
     
-	  <atom:link href="/lifti/docs/reference/index.xml" rel="self" type="application/rss+xml" />
+	  <atom:link href="https://mikegoatly.github.io/lifti/docs/reference/index.xml" rel="self" type="application/rss+xml" />
     
     
       
@@ -15,14 +15,14 @@
     
     <item>
       <title>Docs: Serialization File Format</title>
-      <link>/lifti/docs/reference/serialization-format/</link>
+      <link>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/</link>
       <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>/lifti/docs/reference/serialization-format/</guid>
+      <guid>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/</guid>
       <description>
         
         
-        &lt;p&gt;&lt;img src=&#34;/lifti/images/v2-serialization.svg&#34; alt=&#34;LIFTI Serialization Format&#34;&gt;&lt;/p&gt;
+        &lt;p&gt;&lt;img src=&#34;../../../images/v2-serialization.svg&#34; alt=&#34;LIFTI Serialization Format&#34;&gt;&lt;/p&gt;
 
       </description>
     </item>
