@@ -7,6 +7,7 @@
 
 <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
 
+<link rel="alternate" type="application/rss&#43;xml" href="https://mikegoatly.github.io/lifti/docs/serialization/index.xml">
 
 
 <link rel="shortcut icon" href="/favicons/favicon.ico" >
@@ -20,25 +21,17 @@
 <link rel="icon" type="image/png" href="/lifti/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
 
-<title>Serialization File Format | LIFTI</title><meta property="og:title" content="Serialization File Format" />
-<meta property="og:description" content="The current serialization format is version 2. Previous versions were beta versions and are no longer supported.
+<title>Serialization | LIFTI</title><meta property="og:title" content="Serialization" />
+<meta property="og:description" content="A LIFTI index can be serialized to a stream, and deserialized at a later date.
 " />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/reference/serialization-format/" />
-<meta property="article:published_time" content="2020-07-14T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-07-16T07:52:33+01:00" /><meta property="og:site_name" content="LIFTI" />
-<meta itemprop="name" content="Serialization File Format">
-<meta itemprop="description" content="The current serialization format is version 2. Previous versions were beta versions and are no longer supported.
-">
-<meta itemprop="datePublished" content="2020-07-14T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-07-16T07:52:33&#43;01:00" />
-<meta itemprop="wordCount" content="0">
-
-
-
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Serialization File Format"/>
-<meta name="twitter:description" content="The current serialization format is version 2. Previous versions were beta versions and are no longer supported.
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/serialization/" />
+<meta property="og:site_name" content="LIFTI" />
+<meta itemprop="name" content="Serialization">
+<meta itemprop="description" content="A LIFTI index can be serialized to a stream, and deserialized at a later date.
+"><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Serialization"/>
+<meta name="twitter:description" content="A LIFTI index can be serialized to a stream, and deserialized at a later date.
 "/>
 
 
@@ -57,7 +50,7 @@
 
 
   </head>
-  <body class="td-page">
+  <body class="td-section">
     <header>
       
 <nav class="js-navbar-scroll navbar navbar-expand navbar-dark flex-column flex-md-row td-navbar">
@@ -234,10 +227,10 @@
 
 <ul class="td-sidebar-nav__section pr-md-3">
   <li class="td-sidebar-nav__section-title">
-    <a  href="/lifti/docs/serialization/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Serialization</a>
+    <a  href="/lifti/docs/serialization/" class="align-left pl-0 pr-2 active td-sidebar-link td-sidebar-link__section">Serialization</a>
   </li>
   <ul>
-    <li class="collapse " id="liftidocsserialization">
+    <li class="collapse show" id="liftidocsserialization">
       
       
       
@@ -257,17 +250,17 @@
 
 <ul class="td-sidebar-nav__section pr-md-3">
   <li class="td-sidebar-nav__section-title">
-    <a  href="/lifti/docs/reference/" class="align-left pl-0 pr-2 active td-sidebar-link td-sidebar-link__section">Reference</a>
+    <a  href="/lifti/docs/reference/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Reference</a>
   </li>
   <ul>
-    <li class="collapse show" id="liftidocsreference">
+    <li class="collapse " id="liftidocsreference">
       
       
       
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsreferenceserialization-format" href="/lifti/docs/reference/serialization-format/">Serialization File Format</a>
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsreferenceserialization-format" href="/lifti/docs/reference/serialization-format/">Serialization File Format</a>
       
       
     </li>
@@ -301,8 +294,8 @@
 
 
 
-<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Reference/serialization-format.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
-<a href="https://github.com/mikegoatly/lifti/issues/new?title=Serialization%20File%20Format" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
+<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Serialization/_index.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
+<a href="https://github.com/mikegoatly/lifti/issues/new?title=Serialization" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
 
 </div>
 
@@ -328,9 +321,6 @@
 
 
 
-
-
-
 <li class="breadcrumb-item" >
 	<a href="https://mikegoatly.github.io/lifti/docs/">Documentation</a>
 </li>
@@ -338,15 +328,8 @@
 
 
 
-<li class="breadcrumb-item" >
-	<a href="https://mikegoatly.github.io/lifti/docs/reference/">Reference</a>
-</li>
-
-
-
-
 <li class="breadcrumb-item active" aria-current="page">
-	<a href="https://mikegoatly.github.io/lifti/docs/reference/serialization-format/">Serialization File Format</a>
+	<a href="https://mikegoatly.github.io/lifti/docs/serialization/">Serialization</a>
 </li>
 
 	</ol>
@@ -354,17 +337,73 @@
 
             
 <div class="td-content">
-	<h1>Serialization File Format</h1>
-    <div class="lead">The current serialization format is version 2. Previous versions were beta versions and are no longer supported.</div>
-	       
-	<p><img src="../../../images/v2-serialization.svg" alt="LIFTI Serialization Format"></p>
+	<h1>Serialization</h1>
+        <div class="lead">A LIFTI index can be serialized to a stream, and deserialized at a later date.</div>
+	
+	<p>Given an index:</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#8f5902;font-style:italic">// Create a full text index with default settings
+</span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;().</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
+
+<span style="color:#8f5902;font-style:italic">// Index some sample data
+</span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;This is some text associated with A: fizz&#34;</span><span style="color:#000;font-weight:bold">);</span>
+<span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Some buzz text for B&#34;</span><span style="color:#000;font-weight:bold">);</span>
+<span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Text associated with C is both fizz and buzz&#34;</span><span style="color:#000;font-weight:bold">);</span>
+
+</code></pre></div><p>You can serialize it to a stream using the <code>Lifti.Serialization.Binary.BinarySerializer</code> class:</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">serializer</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">BinarySerializer</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;();</span>
+<span style="color:#204a87;font-weight:bold">using</span> <span style="color:#000">var</span> <span style="color:#000">stream</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">MemoryStream</span><span style="color:#000;font-weight:bold">();</span>
+
+<span style="color:#8f5902;font-style:italic">// Serialize the index
+</span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">serializer</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SerializeAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">index</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">stream</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">disposeStream</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">false</span><span style="color:#000;font-weight:bold">);</span>
+
+<span style="color:#8f5902;font-style:italic">// Reset the stream back to the beginning so we can deserialize from it
+</span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">stream</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Position</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span> 
+</code></pre></div><p>After you have created a new index instance, you can use the <code>BinarySerializer</code> class again to bring its state in line with the serialized index:</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#8f5902;font-style:italic">// Deserialize the index into a new instance
+</span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">newIndex</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;().</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
+<span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">serializer</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">DeserializeAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">newIndex</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">stream</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">disposeStream</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">false</span><span style="color:#000;font-weight:bold">);</span>
+
+<span style="color:#8f5902;font-style:italic">// Prove that the new index has the same contents
+</span><span style="color:#8f5902;font-style:italic">// Emits: 3 items contain text in the new index
+</span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">matches</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">newIndex</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Search</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;text&#34;</span><span style="color:#000;font-weight:bold">);</span>
+<span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">$&#34;{matches.Count()} items contain text in the new index&#34;</span><span style="color:#000;font-weight:bold">);</span>
+</code></pre></div><p>If you want to understand how the binary data is laid out, you can have a look at the <a href="../reference/serialization-format">Serialization Format</a> reference page.</p>
+
+        <div class="section-index">
+    
+    
+    
+    
+    <hr class="panel-line">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+    
+</div>
 
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified July 16, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/0069735c90f33de0d8995b421068b1b9316afffb">Updated image location (0069735)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified January 1, 0001
 </div>
 </div>
-
 
           </main>
         </div>
