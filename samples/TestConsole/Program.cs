@@ -6,7 +6,7 @@ namespace TestConsole
     {
         public static async Task Main()
         {
-            await ProgramaticallyNavigatingIndex.RunAsync();
+            await IndexSerialization.RunAsync();
         }
     }
 }
