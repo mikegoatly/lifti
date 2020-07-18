@@ -3,11 +3,16 @@ using System.Collections.Generic;
 
 namespace Lifti
 {
+    /// <summary>
+    /// Extends <see cref="ItemStore{T}"/> by adding additional methods for controlling
+    /// the addition and removal of items, caching and reusing the item ids.
+    /// </summary>
     public class IdPool<T> : ItemStore<T>, IIdPool<T>
     {
         private readonly Queue<int> reusableIds = new Queue<int>();
         private int nextId;
 
+        /// <inheritdoc />
         public int Add(T item, DocumentStatistics documentStatistics)
         {
             if (this.ItemLookup.ContainsKey(item))
@@ -20,6 +25,7 @@ namespace Lifti
             return id;
         }
 
+        /// <inheritdoc />
         public int ReleaseItem(T item)
         {
             var itemMetadata = this.ItemLookup[item];
@@ -33,6 +39,7 @@ namespace Lifti
             return id;
         }
 
+        /// <inheritdoc />
         public void Add(int id, T item, DocumentStatistics documentStatistics)
         {
             if (this.ItemLookup.ContainsKey(item))

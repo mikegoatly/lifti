@@ -3,6 +3,9 @@ using System.Collections.Immutable;
 
 namespace Lifti
 {
+    /// <summary>
+    /// Describes statistics for the index in aggregate.
+    /// </summary>
     public class IndexStatistics
     {
         private IndexStatistics()
@@ -16,18 +19,24 @@ namespace Lifti
             this.TotalTokenCount = totalTokenCount;
         }
 
-        public static IndexStatistics Empty { get; } = new IndexStatistics();
+        internal static IndexStatistics Empty { get; } = new IndexStatistics();
 
+        /// <summary>
+        /// Gets a dictionary containing the token count for each field indexed in the index.
+        /// </summary>
         public ImmutableDictionary<byte, long> TokenCountByField { get; }
 
+        /// <summary>
+        /// Gets the total token count for all documents in the index.
+        /// </summary>
         public long TotalTokenCount { get; }
 
-        public IndexStatistics Remove(DocumentStatistics documentStatistics)
+        internal IndexStatistics Remove(DocumentStatistics documentStatistics)
         {
             return Adjust(documentStatistics, -1);
         }
 
-        public IndexStatistics Add(DocumentStatistics documentStatistics)
+        internal IndexStatistics Add(DocumentStatistics documentStatistics)
         {
             return Adjust(documentStatistics, 1);
         }

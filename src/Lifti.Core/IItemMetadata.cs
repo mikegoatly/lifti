@@ -1,13 +1,20 @@
 ﻿namespace Lifti
 {
-    public interface IItemMetadata<T> : IItemMetadata
+    /// <summary>
+    /// Describes metadata for an indexed item.
+    /// </summary>
+    /// <typeparam name="TKey">The type of the key in the index.</typeparam>
+    public interface IItemMetadata<TKey> : IItemMetadata
     {
         /// <summary>
         /// Gets the indexed item.
         /// </summary>
-        public T Item { get; }
+        public TKey Item { get; }
     }
 
+    /// <summary>
+    /// Describes metadata for an indexed item.
+    /// </summary>
     public interface IItemMetadata
     {
         /// <summary>

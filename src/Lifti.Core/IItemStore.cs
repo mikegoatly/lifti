@@ -2,6 +2,9 @@
 
 namespace Lifti
 {
+    /// <summary>
+    /// Describes methods for accessing information about items stored in an index.
+    /// </summary>
     public interface IItemStore
     {
         /// <summary>
@@ -23,17 +26,23 @@ namespace Lifti
         IndexStatistics IndexStatistics { get; }
     }
 
-    public interface IItemStore<T> : IItemStore
+    /// <summary>
+    /// Describes methods for accessing information about items stored in an index.
+    /// </summary>
+    /// <typeparam name="TKey">
+    /// The type of the key in the index.
+    /// </typeparam>
+    public interface IItemStore<TKey> : IItemStore
     {
         /// <summary>
         /// Gets each of the items and their associated ids managed by this instance.
         /// </summary>
-        IEnumerable<ItemMetadata<T>> GetIndexedItems();
+        IEnumerable<ItemMetadata<TKey>> GetIndexedItems();
 
         /// <summary>
         /// Gets a value indicating whether the given item is managed by this instance.
         /// </summary>
-        bool Contains(T item);
+        bool Contains(TKey item);
 
         /// <summary>
         /// Gets the item metadata for the given id.
@@ -41,7 +50,7 @@ namespace Lifti
         /// <exception cref="LiftiException">
         /// Thrown when the id is not known.
         /// </exception>
-        IItemMetadata<T> GetMetadata(int id);
+        IItemMetadata<TKey> GetMetadata(int id);
 
         /// <summary>
         /// Gets the item metadata for the given item.
@@ -49,11 +58,11 @@ namespace Lifti
         /// <exception cref="LiftiException">
         /// Thrown when the item is not known.
         /// </exception>
-        IItemMetadata<T> GetMetadata(T item);
+        IItemMetadata<TKey> GetMetadata(TKey item);
 
         /// <summary>
         /// Creates a snapshot of this instance that can be used even if the index is subsequently mutated.
         /// </summary>
-        IItemStore<T> Snapshot();
+        IItemStore<TKey> Snapshot();
     }
 }

@@ -1,5 +1,8 @@
 ﻿namespace Lifti
 {
+    /// <summary>
+    /// Options that are passed to the index at construction time.
+    /// </summary>
     public class IndexOptions
     {
         internal IndexOptions()

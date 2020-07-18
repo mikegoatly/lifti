@@ -2,6 +2,9 @@
 
 namespace Lifti
 {
+    /// <summary>
+    /// Implemented by classes that provide a point-in-time, read-only snapshot of an index.
+    /// </summary>
     public interface IIndexSnapshot
     {
         /// <summary>
@@ -26,6 +29,9 @@ namespace Lifti
         IItemStore Items { get; }
     }
 
+    /// <summary>
+    /// Implemented by classes that provide a point-in-time, read-only snapshot of an index.
+    /// </summary>
     public interface IIndexSnapshot<TKey> : IIndexSnapshot
     {
         /// <summary>

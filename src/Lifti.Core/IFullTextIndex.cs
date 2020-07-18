@@ -4,6 +4,8 @@ using Lifti.Querying;
 
 namespace Lifti
 {
+    /// <summary>
+    /// </summary>
     public interface IFullTextIndex<TKey>
     {
         /// <summary>
@@ -33,7 +35,7 @@ namespace Lifti
         /// <summary>
         /// Uses the current snapshot of the index to create an implementation of <see cref="IIndexNavigator"/> that can be used to 
         /// navigate through the index on a character by character basis. Provided as convenience for use instead of calling
-        /// <see cref="IFullTextIndex.Snapshot.CreateNavigator" /> directly
+        /// <see cref="IIndexSnapshot.CreateNavigator()" /> on <see cref="IFullTextIndex{T}.Snapshot" /> directly
         /// </summary>
         IIndexNavigator CreateNavigator();
 

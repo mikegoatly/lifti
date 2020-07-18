@@ -1,5 +1,8 @@
 ﻿namespace Lifti
 {
+    /// <summary>
+    /// Describes the behavior of the index when indexing an item that is already present in the index.
+    /// </summary>
     public enum DuplicateItemBehavior
     {
         /// <summary>

@@ -2,6 +2,7 @@
 
 namespace Lifti
 {
+    /// <inheritdoc />
     public class IndexSnapshot<TKey> : IIndexSnapshot<TKey>, IIndexSnapshot
     {
         private readonly IIndexNavigatorPool indexNavigatorPool;

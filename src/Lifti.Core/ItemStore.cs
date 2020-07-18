@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 
 namespace Lifti
 {
+    /// <inheritdoc />
     public class ItemStore<T> : IItemStore<T>
     {
         internal ItemStore()
@@ -23,13 +24,15 @@ namespace Lifti
             this.IndexStatistics = indexStatistics;
         }
 
+        /// <inheritdoc />
         public int Count => this.ItemLookup.Count;
+
+        /// <inheritdoc />
+        public IndexStatistics IndexStatistics { get; protected set; } = IndexStatistics.Empty;
 
         protected ImmutableDictionary<T, ItemMetadata<T>> ItemLookup { get; set; }
 
         protected ImmutableDictionary<int, ItemMetadata<T>> ItemIdLookup { get; set; }
-
-        public IndexStatistics IndexStatistics { get; protected set; } = IndexStatistics.Empty;
 
         /// <inheritdoc />\
         public IEnumerable<ItemMetadata<T>> GetIndexedItems()

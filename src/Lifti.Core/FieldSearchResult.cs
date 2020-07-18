@@ -2,8 +2,14 @@
 
 namespace Lifti
 {
+    /// <summary>
+    /// Search results for a specific field of a matched <see cref="SearchResult{T}"/>.
+    /// </summary>
     public class FieldSearchResult
     {
+        /// <summary>
+        /// Constructs a new instance of <see cref="FieldSearchResult"/>.
+        /// </summary>
         public FieldSearchResult(string foundIn, double score, IReadOnlyList<TokenLocation> locations)
         {
             this.FoundIn = foundIn;

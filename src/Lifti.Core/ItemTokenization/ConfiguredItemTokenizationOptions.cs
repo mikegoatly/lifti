@@ -23,7 +23,7 @@ namespace Lifti.ItemTokenization
             throw new LiftiException(ExceptionMessages.NoTokenizationOptionsProvidedForType, typeof(TItem));
         }
 
-        internal IEnumerable<IFieldTokenizationOptions> GetAllConfiguredFields()
+        internal IEnumerable<IFieldTokenization> GetAllConfiguredFields()
         {
             return this.options.Values.SelectMany(o => o.GetConfiguredFields());
         }

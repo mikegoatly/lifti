@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Lifti
 {
+    /// <inheritdoc />
     public class FullTextIndex<TKey> : IFullTextIndex<TKey>, IDisposable
     {
         private readonly ITokenizerFactory tokenizerFactory;
@@ -54,6 +55,7 @@ namespace Lifti
             this.Root = this.IndexNodeFactory.CreateRootNode();
         }
 
+        /// <inheritdoc />
         public IndexNode Root
         {
             get => this.root;
@@ -360,7 +362,12 @@ namespace Lifti
             return this.idPool.Add(itemKey, documentStatistics);
         }
 
-
+        /// <summary>
+        /// Dispose this instance.
+        /// </summary>
+        /// <param name="disposing">
+        /// <c>true</c> if this instance is being called from the <see cref="Dispose()"/> method.
+        /// </param>
         protected virtual void Dispose(bool disposing)
         {
             if (!this.isDisposed)
@@ -374,6 +381,7 @@ namespace Lifti
             }
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             this.Dispose(true);

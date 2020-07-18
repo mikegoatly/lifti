@@ -1,8 +1,11 @@
 ﻿namespace Lifti
 {
-
+    /// <inheritdoc />
     public class ItemMetadata<T> : IItemMetadata<T>
     {
+        /// <summary>
+        /// Constructs a new instance of <see cref="IItemMetadata{TKey}"/>.
+        /// </summary>
         public ItemMetadata(int id, T item, DocumentStatistics documentStatistics)
         {
             this.Id = id;

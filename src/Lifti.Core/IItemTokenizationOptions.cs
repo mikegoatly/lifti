@@ -5,6 +5,6 @@ namespace Lifti
 {
     internal interface IItemTokenizationOptions
     {
-        IEnumerable<IFieldTokenizationOptions> GetConfiguredFields();
+        IEnumerable<IFieldTokenization> GetConfiguredFields();
     }
 }

@@ -24,7 +24,7 @@ namespace Lifti.ItemTokenization
         /// </summary>
         public IReadOnlyList<FieldTokenizationOptions<TItem>> FieldTokenization { get; }
 
-        IEnumerable<IFieldTokenizationOptions> IItemTokenizationOptions.GetConfiguredFields()
+        IEnumerable<IFieldTokenization> IItemTokenizationOptions.GetConfiguredFields()
         {
             return this.FieldTokenization;
         }

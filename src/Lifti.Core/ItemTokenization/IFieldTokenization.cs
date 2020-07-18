@@ -1,6 +1,6 @@
 ﻿namespace Lifti.ItemTokenization
 {
-    internal interface IFieldTokenizationOptions
+    internal interface IFieldTokenization
     {
         /// <summary>
         /// Gets the name of the field. This can be referred to when querying to restrict searches to text read for this field only.

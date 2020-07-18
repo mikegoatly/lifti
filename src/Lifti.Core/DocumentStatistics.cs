@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace Lifti
 {
+    /// <summary>
+    /// Statistics derived from an indexed document.
+    /// </summary>
     public class DocumentStatistics
     {
         internal DocumentStatistics(byte fieldId, int tokenCount)
@@ -24,7 +27,14 @@ namespace Lifti
             this.TotalTokenCount = totalTokenCount;
         }
 
+        /// <summary>
+        /// Gets a dictionary containing the token count for each field indexed in the document.
+        /// </summary>
         public IReadOnlyDictionary<byte, int> TokenCountByField { get; }
+
+        /// <summary>
+        /// Gets the total token count for the document in all indexed fields.
+        /// </summary>
         public int TotalTokenCount { get; }
     }
 }

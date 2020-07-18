@@ -117,6 +117,20 @@ namespace Lifti
         /// Specifies the default tokenization options that should be used when searching or indexing
         /// when no other options are provided.
         /// </summary>
+        /// <example>
+        /// <![CDATA[
+        /// var index = new FullTextIndexBuilder<int>()
+        ///.WithDefaultTokenizationOptions(o =>o
+        ///    .AccentInsensitive(true)
+        ///    .CaseInsensitive(true)
+        ///    .SplitOnPunctuation(true)
+        ///    .SplitOnCharacters('%', '#', '@')
+        ///    .WithStemming(true)
+        ///    .XmlContent()
+        ///)
+        ///.Build();
+        ///]]>
+        /// </example>
         public FullTextIndexBuilder<TKey> WithDefaultTokenizationOptions(Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder)
         {
             if (optionsBuilder is null)

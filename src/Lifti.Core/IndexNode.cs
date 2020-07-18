@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Lifti
 {
+    /// <summary>
+    /// A node that forms part of the structure of an index.
+    /// </summary>
     public class IndexNode
     {
         internal IndexNode(
@@ -17,13 +20,42 @@ namespace Lifti
             this.Matches = matches;
         }
 
+        /// <summary>
+        /// Gets the continuous sequence of characters that are matched at this node. When traversing the index,
+        /// any matches found at this node will not be considered an exact match until this 
+        /// text has been completely processed.
+        /// </summary>
         public ReadOnlyMemory<char> IntraNodeText { get; }
+        
+        /// <summary>
+        /// Gets any child nodes that can be navigated to from this instance, once the intra-node text has 
+        /// been processed.
+        /// </summary>
         public ImmutableDictionary<char, IndexNode> ChildNodes { get; }
+
+        /// <summary>
+        /// Gets the set of matches that are found at this location in the index (once all the <see cref="IntraNodeText"/>
+        /// has been processed.)
+        /// </summary>
         public ImmutableDictionary<int, ImmutableList<IndexedToken>> Matches { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this node is empty. A node is considered empty if it doesn't have 
+        /// any child nodes, and it doesn't have any matches.
+        /// </summary>
         public bool IsEmpty => !this.HasChildNodes && !this.HasMatches;
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has any child nodes.
+        /// </summary>
         public bool HasChildNodes => this.ChildNodes.Count > 0;
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has any items matched at it.
+        /// </summary>
         public bool HasMatches => this.Matches.Count > 0;
 
+        /// <inheritdoc />
         [Pure]
         public override string ToString()
         {

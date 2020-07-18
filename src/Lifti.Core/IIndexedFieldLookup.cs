@@ -6,7 +6,7 @@
     public interface IIndexedFieldLookup
     {
         /// <summary>
-        /// The id of the default field used when an <see cref="IFullTextIndex.AddAsync"/> overload has been used with strings, 
+        /// The id of the default field used when an <see cref="IFullTextIndex{T}.AddAsync(T, string, TokenizationOptions?)"/> overload has been used, 
         /// as opposed to indexing text read from properties of object.
         /// </summary>
         byte DefaultField { get; }

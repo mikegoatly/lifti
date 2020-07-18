@@ -6,6 +6,7 @@ using System.Threading;
 
 namespace Lifti
 {
+    /// <inheritdoc />
     public class IndexedFieldLookup : IIndexedFieldLookup
     {
         private readonly Dictionary<string, IndexedFieldDetails> fieldToDetailsLookup = new Dictionary<string, IndexedFieldDetails>(StringComparer.OrdinalIgnoreCase);
@@ -13,7 +14,7 @@ namespace Lifti
         private int nextId = 0;
 
         internal IndexedFieldLookup(
-            IEnumerable<IFieldTokenizationOptions> fieldTokenizationOptions, 
+            IEnumerable<IFieldTokenization> fieldTokenizationOptions, 
             ITokenizerFactory tokenizerFactory,
             TokenizationOptions defaultTokenizationOptions)
         {
@@ -67,7 +68,7 @@ namespace Lifti
             return details;
         }
 
-        private void RegisterField(IFieldTokenizationOptions fieldOptions, ITokenizerFactory tokenizerFactory, TokenizationOptions defaultTokenizationOptions)
+        private void RegisterField(IFieldTokenization fieldOptions, ITokenizerFactory tokenizerFactory, TokenizationOptions defaultTokenizationOptions)
         {
             var fieldName = fieldOptions.Name;
             if (this.fieldToDetailsLookup.ContainsKey(fieldOptions.Name))
