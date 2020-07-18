@@ -87,14 +87,14 @@ namespace Lifti.Tests
         public async Task WithScorer_ShouldPassImplementationToIndex()
         {
             var score = 999999999D;
-            var indexScorer = new Mock<IIndexScorer>();
+            var indexScorer = new Mock<IScorer>();
             indexScorer.Setup(s => s.Score(It.IsAny<IReadOnlyList<QueryTokenMatch>>()))
                 .Returns((IReadOnlyList<QueryTokenMatch> t) => t.Select(m => new ScoredToken(m.ItemId, m.FieldMatches.Select(fm => new ScoredFieldMatch(score, fm)).ToList())).ToList());
 
-            var scorer = new Mock<IScorer>();
+            var scorer = new Mock<IIndexScorerFactory>();
             scorer.Setup(s => s.CreateIndexScorer(It.IsAny<IIndexSnapshot>())).Returns(indexScorer.Object);
 
-            this.sut.WithScorer(scorer.Object);
+            this.sut.WithScorerFactory(scorer.Object);
 
             var index = this.sut.Build();
 

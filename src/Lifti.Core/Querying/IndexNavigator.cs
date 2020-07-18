@@ -11,11 +11,11 @@ namespace Lifti.Querying
     {
         private readonly StringBuilder navigatedWith = new StringBuilder(16);
         private IIndexNavigatorPool? pool;
-        private IIndexScorer? scorer;
+        private IScorer? scorer;
         private IndexNode? currentNode;
         private int intraNodeTextPosition;
 
-        internal void Initialize(IndexNode node, IIndexNavigatorPool pool, IIndexScorer scorer)
+        internal void Initialize(IndexNode node, IIndexNavigatorPool pool, IScorer scorer)
         {
             this.pool = pool;
             this.scorer = scorer;

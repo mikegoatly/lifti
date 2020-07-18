@@ -5,16 +5,29 @@ using System.Text;
 
 namespace Lifti.Querying
 {
+    /// <summary>
+    /// A partial search result that can subsequently be combined with other <see cref="IntermediateQueryResult"/> instances
+    /// materialized as part of a query.
+    /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Should not be compared")]
     public struct IntermediateQueryResult
     {
+        /// <summary>
+        /// Creates a new instance of <see cref="IntermediateQueryResult"/>.
+        /// </summary>
         public IntermediateQueryResult(IEnumerable<ScoredToken> matches)
         {
             this.Matches = matches as IReadOnlyList<ScoredToken> ?? matches.ToList();
         }
 
+        /// <summary>
+        /// Gets an <see cref="IntermediateQueryResult"/> with no matches.
+        /// </summary>
         public static IntermediateQueryResult Empty { get; } = new IntermediateQueryResult(Array.Empty<ScoredToken>());
 
+        /// <summary>
+        /// Gets the set of <see cref="ScoredToken"/> matches that this instance captured.
+        /// </summary>
         public IReadOnlyList<ScoredToken> Matches { get; }
 
         /// <summary>
@@ -50,6 +63,7 @@ namespace Lifti.Querying
             return new IntermediateQueryResult(UnionMerger.Instance.Apply(this, results));
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             var builder = new StringBuilder();

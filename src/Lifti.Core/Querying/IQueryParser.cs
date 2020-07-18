@@ -2,6 +2,9 @@
 
 namespace Lifti.Querying
 {
+    /// <summary>
+    /// Provides methods for parsing a query represented as text to an <see cref="IQuery"/>.
+    /// </summary>
     public interface IQueryParser
     {
         /// <summary>

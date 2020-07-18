@@ -34,7 +34,7 @@ namespace Lifti
             IIndexNodeFactory indexNodeFactory,
             ITokenizerFactory tokenizerFactory,
             IQueryParser queryParser,
-            IScorer scorer,
+            IIndexScorerFactory scorer,
             TokenizationOptions defaultTokenizationOptions,
             Func<IIndexSnapshot<TKey>, Task>[]? indexModifiedActions)
         {

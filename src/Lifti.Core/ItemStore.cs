@@ -30,8 +30,14 @@ namespace Lifti
         /// <inheritdoc />
         public IndexStatistics IndexStatistics { get; protected set; } = IndexStatistics.Empty;
 
+        /// <summary>
+        /// Gets or sets the lookup of item key to <see cref="ItemMetadata{T}"/> information.
+        /// </summary>
         protected ImmutableDictionary<T, ItemMetadata<T>> ItemLookup { get; set; }
 
+        /// <summary>
+        /// Gets or sets the lookup of internal item id to <see cref="ItemMetadata{T}"/> information.
+        /// </summary>
         protected ImmutableDictionary<int, ItemMetadata<T>> ItemIdLookup { get; set; }
 
         /// <inheritdoc />\

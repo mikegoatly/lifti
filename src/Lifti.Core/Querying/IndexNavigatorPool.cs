@@ -5,9 +5,9 @@ namespace Lifti.Querying
     internal sealed class IndexNavigatorPool : IIndexNavigatorPool
     {
         private readonly ConcurrentBag<IndexNavigator> pool = new ConcurrentBag<IndexNavigator>();
-        private readonly IScorer scorer;
+        private readonly IIndexScorerFactory scorer;
 
-        public IndexNavigatorPool(IScorer scorer)
+        public IndexNavigatorPool(IIndexScorerFactory scorer)
         {
             this.scorer = scorer;
         }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Lifti.ItemTokenization
 {
+    /// <inheritdoc />
     public abstract class FieldTokenizationOptions<TItem> : IFieldTokenization
     {
         internal FieldTokenizationOptions(string name, TokenizationOptions? tokenizationOptions)

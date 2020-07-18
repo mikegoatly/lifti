@@ -34,6 +34,7 @@ namespace Lifti
         /// </summary>
         public IReadOnlyList<TokenLocation> Locations { get; }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"{FoundIn}: {string.Join(",", this.Locations)}";

@@ -1,5 +1,8 @@
 ﻿namespace Lifti.ItemTokenization
 {
+    /// <summary>
+    /// Describes information about how an strongly typed object's field should be tokenized.
+    /// </summary>
     internal interface IFieldTokenization
     {
         /// <summary>

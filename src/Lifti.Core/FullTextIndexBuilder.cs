@@ -13,7 +13,7 @@ namespace Lifti
         private readonly IndexOptions advancedOptions = new IndexOptions();
         private IIndexNodeFactory? indexNodeFactory;
         private ITokenizerFactory? tokenizerFactory;
-        private IScorer? scorer;
+        private IIndexScorerFactory? scorerFactory;
         private IQueryParser? queryParser;
         private TokenizationOptions defaultTokenizationOptions = TokenizationOptions.Default;
         private List<Func<IIndexSnapshot<TKey>, Task>>? indexModifiedActions;
@@ -29,12 +29,12 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Registers the <see cref="IScorer"/> implementation to use when scoring search results. By default the scorer
-        /// will be <see cref="OkapiBm25Scorer"/> with the parameters k1 = 1.2 and b = 0.75.
+        /// Registers the <see cref="IIndexScorerFactory"/> implementation to use when scoring search results. By default the scorer
+        /// will be <see cref="OkapiBm25ScorerFactory"/> with the parameters k1 = 1.2 and b = 0.75.
         /// </summary>
-        public FullTextIndexBuilder<TKey> WithScorer(IScorer scorer)
+        public FullTextIndexBuilder<TKey> WithScorerFactory(IIndexScorerFactory scorerFactory)
         {
-            this.scorer = scorer;
+            this.scorerFactory = scorerFactory;
             return this;
         }
 
@@ -216,7 +216,7 @@ namespace Lifti
                 this.indexNodeFactory,
                 this.tokenizerFactory ?? new TokenizerFactory(),
                 this.queryParser ?? new QueryParser(),
-                this.scorer ?? new OkapiBm25Scorer(),
+                this.scorerFactory ?? new OkapiBm25ScorerFactory(),
                 this.defaultTokenizationOptions,
                 this.indexModifiedActions?.ToArray());
         }
