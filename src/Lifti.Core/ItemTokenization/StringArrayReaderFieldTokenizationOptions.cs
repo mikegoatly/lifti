@@ -17,12 +17,8 @@ namespace Lifti.ItemTokenization
 
         internal override ValueTask<IReadOnlyList<Token>> TokenizeAsync(ITokenizer tokenizer, TItem item)
         {
-            return new ValueTask<IReadOnlyList<Token>>(this.Tokenize(tokenizer, item));
-        }
-
-        internal override IReadOnlyList<Token> Tokenize(ITokenizer tokenizer, TItem item)
-        {
-            return tokenizer.Process(this.reader(item));
+            var tokens = tokenizer.Process(this.reader(item));
+            return new ValueTask<IReadOnlyList<Token>>(tokens);
         }
     }
 }

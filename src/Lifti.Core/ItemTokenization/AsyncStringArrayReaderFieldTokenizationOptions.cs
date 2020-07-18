@@ -19,10 +19,5 @@ namespace Lifti.ItemTokenization
         {
             return tokenizer.Process(await this.reader(item).ConfigureAwait(false));
         }
-
-        internal override IReadOnlyList<Token> Tokenize(ITokenizer tokenizer, TItem item)
-        {
-            throw new LiftiException(ExceptionMessages.AsyncAddMethodsMustBeUsed);
-        }
     }
 }
