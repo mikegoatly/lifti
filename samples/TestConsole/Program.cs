@@ -6,7 +6,7 @@ namespace TestConsole
     {
         public static async Task Main()
         {
-            await IndexSerialization.RunAsync();
+            await IndexSerializationWithCustomKeySerializer.RunAsync();
         }
     }
 }
