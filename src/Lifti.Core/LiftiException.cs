@@ -10,10 +10,17 @@ namespace Lifti
     [Serializable]
     public class LiftiException : Exception
     {
-        internal LiftiException() { }
-        internal LiftiException(string message) : base(message) { }
-        internal LiftiException(string message, params object[] args) : base(string.Format(CultureInfo.CurrentCulture, message, args)) { }
-        internal LiftiException(string message, System.Exception inner) : base(message, inner) { }
+        /// <inheritdoc />
+        public LiftiException() { }
+
+        /// <inheritdoc />
+        public LiftiException(string message) : base(message) { }
+
+        /// <inheritdoc />
+        public LiftiException(string message, params object[] args) : base(string.Format(CultureInfo.CurrentCulture, message, args)) { }
+
+        /// <inheritdoc />
+        public LiftiException(string message, System.Exception inner) : base(message, inner) { }
 
         /// <inheritdoc />
         protected LiftiException(

@@ -1,5 +1,8 @@
 ﻿namespace Lifti.Querying.QueryParts
 {
+    /// <summary>
+    /// Defines a <see cref="IQueryPart"/> that operates on a single string.
+    /// </summary>
     public interface IWordQueryPart : IQueryPart
     {
         /// <summary>

@@ -3,15 +3,19 @@
 namespace Lifti.Querying.QueryParts
 {
     /// <summary>
-    /// A query part that matches items that are indexed exactly against text.
+    /// An <see cref="IQueryPart"/> that only matches items that contain an exact match for the given text.
     /// </summary>
     public class ExactWordQueryPart : WordQueryPart
     {
+        /// <summary>
+        /// Constructs a new instance of <see cref="ExactWordQueryPart"/>.
+        /// </summary>
         public ExactWordQueryPart(string word)
             : base(word)
         {
         }
 
+        /// <inheritdoc/>
         public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
         {
             if (navigatorCreator == null)
@@ -26,6 +30,7 @@ namespace Lifti.Querying.QueryParts
             }
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             return this.Word;

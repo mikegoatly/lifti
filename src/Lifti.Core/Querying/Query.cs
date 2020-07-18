@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace Lifti.Querying
 {
+    /// <inheritdoc />
     public class Query : IQuery
     {
         /// <summary>
@@ -19,8 +20,10 @@ namespace Lifti.Querying
             this.Root = root;
         }
 
+        /// <inheritdoc />
         public IQueryPart Root { get; }
 
+        /// <inheritdoc />
         public IEnumerable<SearchResult<TKey>> Execute<TKey>(IIndexSnapshot<TKey> index)
         {
             if (index is null)

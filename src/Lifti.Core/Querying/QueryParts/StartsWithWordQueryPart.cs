@@ -3,15 +3,20 @@
 namespace Lifti.Querying.QueryParts
 {
     /// <summary>
-    /// A query part that matches items that are indexed starting with given text.
+    /// An <see cref="IQueryPart"/> that matches items that are indexed starting with given text.
     /// </summary>
     public class StartsWithWordQueryPart : WordQueryPart
     {
+        /// <summary>
+        /// Constructs a new instance of <see cref="StartsWithWordQueryPart"/>.
+        /// </summary>
+        /// <param name="word"></param>
         public StartsWithWordQueryPart(string word)
             : base(word)
         {
         }
 
+        /// <inheritdoc/>
         public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
         {
             if (navigatorCreator == null)
@@ -26,6 +31,7 @@ namespace Lifti.Querying.QueryParts
             }
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             return $"{this.Word}*";

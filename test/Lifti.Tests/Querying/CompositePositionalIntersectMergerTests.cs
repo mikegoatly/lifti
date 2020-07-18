@@ -30,7 +30,7 @@ namespace Lifti.Tests.Querying
         {
             var left = IntermediateQueryResult(ScoredToken(7, ScoredFieldMatch(1D, 1, 30, 41)));
             var right = IntermediateQueryResult(ScoredToken(7, ScoredFieldMatch(1D, 1, 35, 37, 42)));
-            var result = CompositePositionalIntersectMerger.Instance.Apply(left, right, 5, 5);
+            var result = CompositePositionalIntersectMerger.Apply(left, right, 5, 5);
 
             var matchedLocations = result.SelectMany(r => r.FieldMatches.SelectMany(m => m.Locations)).ToList();
             matchedLocations.Should().HaveCount(3);
@@ -43,7 +43,7 @@ namespace Lifti.Tests.Querying
         {
             var left = IntermediateQueryResult(ScoredToken(7, ScoredFieldMatch(1D, 1, 30)));
             var right = IntermediateQueryResult(ScoredToken(7, ScoredFieldMatch(1D, 1, 35)));
-            var result = CompositePositionalIntersectMerger.Instance.Apply(left, right, 0, 5);
+            var result = CompositePositionalIntersectMerger.Apply(left, right, 0, 5);
 
             result.Should().BeEquivalentTo(
                 ScoredToken(7,ScoredFieldMatch(2D, 1, (30, 35)))
@@ -53,7 +53,7 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void WhenExactRightToleranceMatchesOnlyForSomeFields_ShouldOnlyReturnCompositeMatchesForCorrectTokens()
         {
-            var result = CompositePositionalIntersectMerger.Instance.Apply(exactMatchLeft, exactMatchRight, 0, 5);
+            var result = CompositePositionalIntersectMerger.Apply(exactMatchLeft, exactMatchRight, 0, 5);
 
             result.Should().BeEquivalentTo(
                 ScoredToken(
@@ -65,7 +65,7 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void WhenExactLeftToleranceMatchesOnlyForSomeFields_ShouldOnlyReturnCompositeMatchesForCorrectTokens()
         {
-            var result = CompositePositionalIntersectMerger.Instance.Apply(exactMatchLeft, exactMatchRight, 5, 0);
+            var result = CompositePositionalIntersectMerger.Apply(exactMatchLeft, exactMatchRight, 5, 0);
 
             result.Should().BeEquivalentTo(new[]
             {
@@ -81,7 +81,7 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void WhenExactToleranceMatchesOnlyForSomeFields_ShouldOnlyReturnCompositeMatchesForCorrectTokens()
         {
-            var result = CompositePositionalIntersectMerger.Instance.Apply(exactMatchLeft, exactMatchRight, 5, 5);
+            var result = CompositePositionalIntersectMerger.Apply(exactMatchLeft, exactMatchRight, 5, 5);
 
             result.Should().BeEquivalentTo(new[]
             {
@@ -100,7 +100,7 @@ namespace Lifti.Tests.Querying
         {
             var left = IntermediateQueryResult(ScoredToken(7, ScoredFieldMatch(1D, 1, 30)));
             var right = IntermediateQueryResult(ScoredToken(7, ScoredFieldMatch(1D, 1, 36)));
-            var result = CompositePositionalIntersectMerger.Instance.Apply(left, right, 5, 5);
+            var result = CompositePositionalIntersectMerger.Apply(left, right, 5, 5);
 
             result.Should().BeEmpty();
         }
@@ -134,14 +134,54 @@ namespace Lifti.Tests.Querying
                     ScoredFieldMatch(1D, 1, 292)));
 
 
-            var results = CompositePositionalIntersectMerger.Instance.Apply(left, right, 0, 5).ToList();
+            var results = CompositePositionalIntersectMerger.Apply(left, right, 0, 5).ToList();
 
-            // TODO reverse composite results once fields ordered during querying
             var expected = new[]
             {
-                ScoredToken(2, ScoredFieldMatch(2D, 1, (323, 322))),
-                ScoredToken(3, ScoredFieldMatch(2D, 1, (436, 433))),
-                ScoredToken(5, ScoredFieldMatch(2D, 1, (292, 291)))
+                ScoredToken(2, ScoredFieldMatch(2D, 1, (322, 323))),
+                ScoredToken(3, ScoredFieldMatch(2D, 1, (433, 436))),
+                ScoredToken(5, ScoredFieldMatch(2D, 1, (291, 292)))
+            };
+
+            results.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void WhenMoreItemsAppearOnRight_ResultsShouldStillBeReturnedCorrectly()
+        {
+            var left = IntermediateQueryResult(
+                ScoredToken(
+                    2,
+                    ScoredFieldMatch(1D, 1, 322, 325, 960)),
+                ScoredToken(
+                    3,
+                    ScoredFieldMatch(1D, 1, 433, 556, 566, 1272)),
+                ScoredToken(
+                    5,
+                    ScoredFieldMatch(1D, 1, 291, 293)));
+
+            var right = IntermediateQueryResult(
+                ScoredToken(
+                    2,
+                    ScoredFieldMatch(1D, 1, 323)),
+                ScoredToken(
+                    3,
+                    ScoredFieldMatch(1D, 1, 436)),
+                ScoredToken(
+                    5,
+                    ScoredFieldMatch(1D, 1, 292)),
+                ScoredToken(
+                    8,
+                    ScoredFieldMatch(3D, 1, 497, 523, 529, 606)));
+
+
+            var results = CompositePositionalIntersectMerger.Apply(left, right, 0, 5).ToList();
+
+            var expected = new[]
+            {
+                ScoredToken(2, ScoredFieldMatch(2D, 1, (322, 323))),
+                ScoredToken(3, ScoredFieldMatch(2D, 1, (433, 436))),
+                ScoredToken(5, ScoredFieldMatch(2D, 1, (291, 292)))
             };
 
             results.Should().BeEquivalentTo(expected);

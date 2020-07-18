@@ -3,16 +3,21 @@ using System.Linq;
 
 namespace Lifti.Querying
 {
+    /// <summary>
+    /// Provides logic for intersecting the results in two <see cref="IntermediateQueryResult"/>s where the fields 
+    /// locations on the left must precede the matching field locations on the right.
+    /// </summary>
     public class PrecedingIntersectMerger : IntermediateQueryResultMerger
     {
-        public static readonly PrecedingIntersectMerger Instance = new PrecedingIntersectMerger();
-
-        public IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
+        /// <summary>
+        /// Applies the intersection logic.
+        /// </summary>
+        public static IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
-            // TODO Verify this assumption - forcing RIGHT to contain more will cause a bigger dictionary to be built
             // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
             // "left" and "right" have no special meaning when performing an intersection
-            SwapIf(left.Matches.Count > right.Matches.Count, ref left, ref right);
+            var swapLeftAndRight = left.Matches.Count > right.Matches.Count;
+            SwapIf(swapLeftAndRight, ref left, ref right);
 
             var rightItems = right.Matches.ToDictionary(m => m.ItemId);
 
@@ -21,8 +26,8 @@ namespace Lifti.Querying
                 if (rightItems.TryGetValue(leftMatch.ItemId, out var rightMatch))
                 {
                     var positionalMatches = EnumerateFieldMatches(
-                        leftMatch.FieldMatches,
-                        rightMatch.FieldMatches);
+                        (swapLeftAndRight ? rightMatch : leftMatch).FieldMatches,
+                        (swapLeftAndRight ? leftMatch : rightMatch).FieldMatches);
 
                     if (positionalMatches.Count > 0)
                     {

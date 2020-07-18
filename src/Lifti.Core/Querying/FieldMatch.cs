@@ -4,19 +4,31 @@ using System.Linq;
 
 namespace Lifti.Querying
 {
+    /// <summary>
+    /// Describes a match that occurred for a query within a field.
+    /// </summary>
     public struct FieldMatch : IEquatable<FieldMatch>
     {
+        /// <summary>
+        /// Constructs a new instance of <see cref="FieldMatch"/>.
+        /// </summary>
         public FieldMatch(IndexedToken token)
             : this(token.FieldId, token.Locations)
         {
         }
 
+        /// <summary>
+        /// Constructs a new instance of <see cref="FieldMatch"/>.
+        /// </summary>
         public FieldMatch(byte fieldId, IReadOnlyList<ITokenLocationMatch> locations)
         {
             this.FieldId = fieldId;
             this.Locations = locations;
         }
 
+        /// <summary>
+        /// Constructs a new instance of <see cref="FieldMatch"/>.
+        /// </summary>
         public FieldMatch(byte fieldId, params ITokenLocationMatch[] locations)
         {
             this.FieldId = fieldId;

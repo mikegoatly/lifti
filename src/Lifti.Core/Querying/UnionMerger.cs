@@ -3,13 +3,13 @@ using System.Linq;
 
 namespace Lifti.Querying
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class UnionMerger : IntermediateQueryResultMerger
     {
-        public static readonly UnionMerger Instance = new UnionMerger();
-
-        public IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
+        public static IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
-            // TODO Verify this assumption - forcing RIGHT to contain more will cause a bigger dictionary to be built
             // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
             // "left" and "right" have no special meaning when performing an intersection
             var rightDictionary = right.Matches.ToDictionary(i => i.ItemId);

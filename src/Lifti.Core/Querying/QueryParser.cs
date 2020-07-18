@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace Lifti.Querying
 {
+    /// <inheritdoc />
     public class QueryParser : IQueryParser
     {
         /// <inheritdoc />

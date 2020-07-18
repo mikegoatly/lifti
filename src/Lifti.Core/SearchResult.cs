@@ -4,9 +4,20 @@ using System.Linq;
 
 namespace Lifti
 {
-    public class SearchResult<T>
+    /// <summary>
+    /// Returned as results from an index query execution.
+    /// </summary>
+    /// <typeparam name="TKey">
+    /// The type of key in the index.
+    /// </typeparam>
+    public class SearchResult<TKey>
     {
-        public SearchResult(T item, IReadOnlyList<FieldSearchResult> locations)
+        /// <summary>
+        /// Constructs a new <see cref="SearchResult{TKey}"/> instance.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="locations"></param>
+        public SearchResult(TKey item, IReadOnlyList<FieldSearchResult> locations)
         {
             this.Key = item;
             this.FieldMatches = locations ?? throw new ArgumentNullException(nameof(locations));
@@ -23,7 +34,7 @@ namespace Lifti
         /// <summary>
         /// Gets the item that matched the search criteria.
         /// </summary>
-        public T Key { get; }
+        public TKey Key { get; }
 
         /// <summary>
         /// Gets the fields that were matched for the item. Each of these is scored independently and provides detailed information
@@ -36,6 +47,7 @@ namespace Lifti
         /// </summary>
         public double Score { get; }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"{this.Key}{Environment.NewLine}{string.Join(Environment.NewLine, this.FieldMatches.Select(l => "  " + l.ToString()))}";

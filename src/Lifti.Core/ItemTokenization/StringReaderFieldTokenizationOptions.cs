@@ -5,6 +5,12 @@ using System.Threading.Tasks;
 
 namespace Lifti.ItemTokenization
 {
+    /// <summary>
+    /// A field tokenization capable of asynchronously reading s string for a field.
+    /// </summary>
+    /// <typeparam name="TItem">
+    /// The type of item the field belongs to.
+    /// </typeparam>
     public class StringReaderFieldTokenizationOptions<TItem> : FieldTokenizationOptions<TItem>
     {
         private readonly Func<TItem, string> reader;

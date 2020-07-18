@@ -5,6 +5,10 @@
     /// </summary>
     public interface IQueryContext
     {
+        /// <summary>
+        /// Applies any additional filters present in the current query context, e.g. field filters, 
+        /// to the given <see cref="IntermediateQueryResult"/>, returning a new <see cref="IntermediateQueryResult"/> instance.
+        /// </summary>
         IntermediateQueryResult ApplyTo(IntermediateQueryResult intermediateQueryResult);
     }
 }

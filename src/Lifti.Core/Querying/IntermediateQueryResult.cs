@@ -35,7 +35,7 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult PrecedingIntersect(IntermediateQueryResult results)
         {
-            return new IntermediateQueryResult(PrecedingIntersectMerger.Instance.Apply(this, results));
+            return new IntermediateQueryResult(PrecedingIntersectMerger.Apply(this, results));
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult CompositePositionalIntersect(IntermediateQueryResult results, int leftTolerance, int rightTolerance)
         {
-            return new IntermediateQueryResult(CompositePositionalIntersectMerger.Instance.Apply(this, results, leftTolerance, rightTolerance));
+            return new IntermediateQueryResult(CompositePositionalIntersectMerger.Apply(this, results, leftTolerance, rightTolerance));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult Intersect(IntermediateQueryResult results)
         {
-            return new IntermediateQueryResult(IntersectMerger.Instance.Apply(this, results));
+            return new IntermediateQueryResult(IntersectMerger.Apply(this, results));
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult Union(IntermediateQueryResult results)
         {
-            return new IntermediateQueryResult(UnionMerger.Instance.Apply(this, results));
+            return new IntermediateQueryResult(UnionMerger.Apply(this, results));
         }
 
         /// <inheritdoc />

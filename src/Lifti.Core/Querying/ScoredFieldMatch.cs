@@ -3,18 +3,38 @@ using System.Collections.Generic;
 
 namespace Lifti.Querying
 {
+    /// <summary>
+    /// Information about an item's field that was matched and scored during the execution of a query.
+    /// </summary>
     public struct ScoredFieldMatch : IEquatable<ScoredFieldMatch>
     {
+        /// <summary>
+        /// Constructs a new instance of <see cref="ScoredFieldMatch"/>.
+        /// </summary>
         public ScoredFieldMatch(double score, FieldMatch fieldMatch)
         {
             this.Score = score;
             this.FieldMatch = fieldMatch;
         }
 
+        /// <summary>
+        /// Gets the score for the matched field.
+        /// </summary>
         public double Score { get; }
+
+        /// <summary>
+        /// Gets the id of the matched field.
+        /// </summary>
         public byte FieldId => this.FieldMatch.FieldId;
+
+        /// <summary>
+        /// Gets the locations in the field text at which the token was matched.
+        /// </summary>
         public IReadOnlyList<ITokenLocationMatch> Locations => this.FieldMatch.Locations;
 
+        /// <summary>
+        /// Gets the <see cref="FieldMatch"/> details for this instance.
+        /// </summary>
         public FieldMatch FieldMatch { get; }
 
         public override bool Equals(object? obj)

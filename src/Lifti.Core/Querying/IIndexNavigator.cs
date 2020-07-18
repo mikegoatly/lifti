@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Lifti.Querying
 {
+    /// <summary>
+    /// Defines methods for navigating an index character by character.
+    /// </summary>
     public interface IIndexNavigator : IDisposable
     {
         /// <summary>

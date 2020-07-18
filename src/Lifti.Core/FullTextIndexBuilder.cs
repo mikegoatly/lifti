@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace Lifti
 {
+    /// <summary>
+    /// The starting point for building an <see cref="IFullTextIndex{TKey}"/>.
+    /// </summary>
+    /// <typeparam name="TKey">The type of key to be stored in the index.</typeparam>
     public class FullTextIndexBuilder<TKey>
     {
         private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions = new ConfiguredItemTokenizationOptions<TKey>();
@@ -97,7 +101,7 @@ namespace Lifti
         /// Creates an <see cref="ItemTokenizationOptions{TItem, TKey}"/> configuration entry for an item of type <typeparamref name="TItem"/>
         /// in the index.
         /// </summary>
-        /// <param name="idReader">
+        /// <param name="optionsBuilder">
         /// A delegate capable of specifying all the required options for the item tokenization options.
         /// </param>
         public FullTextIndexBuilder<TKey> WithItemTokenization<TItem>(Func<ItemTokenizationOptionsBuilder<TItem, TKey>, ItemTokenizationOptionsBuilder<TItem, TKey>> optionsBuilder)

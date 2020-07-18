@@ -4,6 +4,17 @@ using System.Threading.Tasks;
 
 namespace Lifti.ItemTokenization
 {
+    /// <summary>
+    /// The builder class used to configure an object type for indexing. The object type <typeparamref name="TItem"/>
+    /// must expose an id property of type <typeparamref name="TKey"/> configured using the <see cref="WithKey(Func{TItem, TKey})"/>
+    /// method.
+    /// </summary>
+    /// <typeparam name="TItem">
+    /// The type of item to configure.
+    /// </typeparam>
+    /// <typeparam name="TKey">
+    /// The type of key in the index.
+    /// </typeparam>
     public class ItemTokenizationOptionsBuilder<TItem, TKey>
     {
         private List<FieldTokenizationOptions<TItem>> fieldTokenization { get; } = new List<FieldTokenizationOptions<TItem>>();

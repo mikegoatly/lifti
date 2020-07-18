@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Lifti.Querying
 {
+    /// <summary>
+    /// The default implementation of <see cref="IQueryParser"/>, capable of parsing standard LIFTI query syntax.
+    /// </summary>
     public class QueryTokenizer : IQueryTokenizer
     {
         private enum State
@@ -12,6 +15,7 @@ namespace Lifti.Querying
             ProcessingNearOperator = 2
         }
 
+        /// <inheritdoc />
         public IEnumerable<QueryToken> ParseQueryTokens(string queryText)
         {
             if (queryText is null)

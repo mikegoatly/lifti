@@ -2,6 +2,9 @@
 
 namespace Lifti.Querying
 {
+    /// <summary>
+    /// A token parsed from a query string.
+    /// </summary>
     public struct QueryToken : IEquatable<QueryToken>
     {
         private QueryToken(string tokenText, QueryTokenType tokenType, int tolerance)
@@ -79,16 +82,19 @@ namespace Lifti.Querying
             return HashCode.Combine(this.TokenText, this.TokenType, this.Tolerance);
         }
 
+        /// <inheritdoc />
         public static bool operator ==(QueryToken left, QueryToken right)
         {
             return left.Equals(right);
         }
 
+        /// <inheritdoc />
         public static bool operator !=(QueryToken left, QueryToken right)
         {
             return !(left == right);
         }
 
+        /// <inheritdoc />
         public bool Equals(QueryToken other)
         {
             return this.TokenText == other.TokenText &&

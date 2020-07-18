@@ -6,38 +6,56 @@ using System.Text;
 
 namespace Lifti.Querying
 {
+    /// <summary>
+    /// Provides information about an item that was matched and scored whilst executing a query.
+    /// </summary>
     public struct ScoredToken : IEquatable<ScoredToken>
     {
+        /// <summary>
+        /// Constructs a new instance of <see cref="ScoredToken"/>.
+        /// </summary>
         public ScoredToken(int itemId, IReadOnlyList<ScoredFieldMatch> fieldMatches)
         {
             this.ItemId = itemId;
             this.FieldMatches = fieldMatches;
         }
 
+        /// <summary>
+        /// Gets the id of the item that was matched.
+        /// </summary>
         public int ItemId { get; }
+
+        /// <summary>
+        /// Gets the fields in which the tokens were matched.
+        /// </summary>
         public IReadOnlyList<ScoredFieldMatch> FieldMatches { get; }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return obj is ScoredToken match &&
                    this.Equals(match);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return HashCode.Combine(this.ItemId, this.FieldMatches);
         }
 
+        /// <inheritdoc />
         public static bool operator ==(ScoredToken left, ScoredToken right)
         {
             return left.Equals(right);
         }
 
+        /// <inheritdoc />
         public static bool operator !=(ScoredToken left, ScoredToken right)
         {
             return !(left == right);
         }
 
+        /// <inheritdoc />
         public bool Equals(ScoredToken other)
         {
             return this.ItemId == other.ItemId &&

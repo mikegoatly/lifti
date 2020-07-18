@@ -2,16 +2,18 @@
 
 namespace Lifti.Querying.QueryParts
 {
-    /// <summary>
-    /// A query part that matches on a single word in some way.
-    /// </summary>
+    /// <inheritdoc />
     public abstract class WordQueryPart : IWordQueryPart
     {
+        /// <summary>
+        /// Constructs a new instance of <see cref="WordQueryPart"/>.
+        /// </summary>
         protected WordQueryPart(string word)
         {
             this.Word = word;
         }
 
+        /// <inheritdoc/>
         public string Word
         {
             get;

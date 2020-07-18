@@ -4,20 +4,36 @@ using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
+    /// <summary>
+    /// An <see cref="IIndexSerializer{TKey}"/> implementation capable of serializing and deserializing
+    /// an index to/from a binary representation.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
     public class BinarySerializer<TKey> : IIndexSerializer<TKey>
     {
         private readonly IKeySerializer<TKey> keySerializer;
 
+        /// <summary>
+        /// Constructs a new <see cref="BinarySerializer{TKey}"/> instance.
+        /// </summary>
         public BinarySerializer()
             : this(StandardKeySerializerFactory.Create<TKey>())
         {
         }
 
+        /// <summary>
+        /// Constructs a new <see cref="BinarySerializer{TKey}"/> instance.
+        /// </summary>
+        /// <param name="keySerializer">
+        /// The <see cref="IKeySerializer{TKey}"/> implementation to use when (de)serializing
+        /// keys for the index.
+        /// </param>
         public BinarySerializer(IKeySerializer<TKey> keySerializer)
         {
             this.keySerializer = keySerializer;
         }
 
+        /// <inheritdoc/>
         public async Task SerializeAsync(IIndexSnapshot<TKey> snapshot, Stream stream, bool disposeStream = true)
         {
             if (snapshot is null)
@@ -31,6 +47,7 @@ namespace Lifti.Serialization.Binary
             }
         }
 
+        /// <inheritdoc/>
         public async Task SerializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true)
         {
             if (index is null)
@@ -41,6 +58,7 @@ namespace Lifti.Serialization.Binary
             await this.SerializeAsync(index.Snapshot, stream, disposeStream).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public async Task DeserializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true)
         {
             if (index is null)

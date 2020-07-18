@@ -3,13 +3,19 @@ using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
+    /// <summary>
+    /// Provides methods to serialize and deserialize an index.
+    /// </summary>
+    /// <typeparam name="TKey">
+    /// The type of the key in the index.
+    /// </typeparam>
     public interface IIndexSerializer<TKey>
     {
         /// <summary>
-        /// Serializes the an index into a binary format.
+        /// Serializes an index into a binary format.
         /// </summary>
-        /// <param name="index">
-        /// The index to serialize.
+        /// <param name="snapshot">
+        /// A snapshot of the index to serialize.
         /// </param>
         /// <param name="stream">
         /// The stream to serialize into.
@@ -20,9 +26,9 @@ namespace Lifti.Serialization.Binary
         Task SerializeAsync(FullTextIndex<TKey> snapshot, Stream stream, bool disposeStream = true);
 
         /// <summary>
-        /// Serializes the an index into a binary format.
+        /// Serializes an index into a binary format.
         /// </summary>
-        /// <param name="index">
+        /// <param name="snapshot">
         /// A snapshot of the index to serialize.
         /// </param>
         /// <param name="stream">

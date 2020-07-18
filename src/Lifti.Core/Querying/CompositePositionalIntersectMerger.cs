@@ -3,11 +3,16 @@ using System.Linq;
 
 namespace Lifti.Querying
 {
+    /// <summary>
+    /// Provides logic for intersecting the results in two <see cref="IntermediateQueryResult"/>s where the fields 
+    /// locations on the left must be within a specified positional tolerance of the the matching field locations on the right.
+    /// </summary>
     public class CompositePositionalIntersectMerger : IntermediateQueryResultMerger
     {
-        public static readonly CompositePositionalIntersectMerger Instance = new CompositePositionalIntersectMerger();
-
-        public IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right, int leftTolerance, int rightTolerance)
+        /// <summary>
+        /// Applies the intersection to the <see cref="IntermediateQueryResult"/> instances.
+        /// </summary>
+        public static IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right, int leftTolerance, int rightTolerance)
         {
             // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
             // Also swap the tolerance values around, otherwise we reverse the tolerance directionality.
@@ -22,6 +27,7 @@ namespace Lifti.Querying
                 if (rightItems.TryGetValue(leftMatch.ItemId, out var rightMatch))
                 {
                     var positionalMatches = PositionallyMatchAndCombineTokens(
+                        swapLeftAndRight,
                         leftMatch.FieldMatches,
                         rightMatch.FieldMatches,
                         leftTolerance,
@@ -36,6 +42,7 @@ namespace Lifti.Querying
         }
 
         private static IReadOnlyList<ScoredFieldMatch> PositionallyMatchAndCombineTokens(
+            bool leftAndRightSwapped,
             IEnumerable<ScoredFieldMatch> leftFields,
             IEnumerable<ScoredFieldMatch> rightFields,
             int leftTolerance,
@@ -49,6 +56,16 @@ namespace Lifti.Querying
             {
                 fieldTokenMatches.Clear();
 
+                static CompositeTokenMatchLocation CreateCompositeTokenMatchLocation(bool swapTokens, ITokenLocationMatch currentToken, ITokenLocationMatch nextToken)
+                {
+                    if (swapTokens)
+                    {
+                        return new CompositeTokenMatchLocation(nextToken, currentToken);
+                    }
+
+                    return new CompositeTokenMatchLocation(currentToken, nextToken);
+                }
+
                 // TODO Unoptimised O(n^2) implementation for now - big optimisations be made when location order can be guaranteed
                 foreach (var currentToken in leftLocations)
                 {
@@ -58,7 +75,7 @@ namespace Lifti.Querying
                         {
                             if ((currentToken.MinTokenIndex - nextToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(leftTolerance))
                             {
-                                fieldTokenMatches.Add(new CompositeTokenMatchLocation(currentToken, nextToken));
+                                fieldTokenMatches.Add(CreateCompositeTokenMatchLocation(leftAndRightSwapped, currentToken, nextToken));
                             }
                         }
 
@@ -66,7 +83,7 @@ namespace Lifti.Querying
                         {
                             if ((nextToken.MinTokenIndex - currentToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(rightTolerance))
                             {
-                                fieldTokenMatches.Add(new CompositeTokenMatchLocation(currentToken, nextToken));
+                                fieldTokenMatches.Add(CreateCompositeTokenMatchLocation(leftAndRightSwapped, currentToken, nextToken));
                             }
                         }
                     }
@@ -77,7 +94,7 @@ namespace Lifti.Querying
                     fieldResults.Add(
                         new ScoredFieldMatch(
                             score,
-                            new FieldMatch(fieldId, fieldTokenMatches.ToList())));
+                            new FieldMatch(fieldId, fieldTokenMatches.OrderBy(m => m.MinTokenIndex).ToList())));
                 }
             }
 
