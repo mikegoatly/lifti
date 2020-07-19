@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
-using Lifti.ItemTokenization;
 using Lifti.Tokenization;
+using Lifti.Tokenization.Objects;
 using Moq;
 using Xunit;
 

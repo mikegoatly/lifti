@@ -1,4 +1,4 @@
-﻿namespace Lifti.ItemTokenization
+﻿namespace Lifti.Tokenization.Objects
 {
     /// <summary>
     /// Describes information about how an strongly typed object's field should be tokenized.

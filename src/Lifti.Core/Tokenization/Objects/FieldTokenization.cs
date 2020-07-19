@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Lifti.ItemTokenization
+namespace Lifti.Tokenization.Objects
 {
     /// <inheritdoc />
-    public abstract class FieldTokenizationOptions<TItem> : IFieldTokenization
+    public abstract class FieldTokenization<TItem> : IFieldTokenization
     {
-        internal FieldTokenizationOptions(string name, TokenizationOptions? tokenizationOptions)
+        internal FieldTokenization(string name, TokenizationOptions? tokenizationOptions)
         {
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
             this.TokenizationOptions = tokenizationOptions;

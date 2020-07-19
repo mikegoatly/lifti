@@ -1,6 +1,6 @@
-﻿using Lifti.ItemTokenization;
-using Lifti.Querying;
+﻿using Lifti.Querying;
 using Lifti.Tokenization;
+using Lifti.Tokenization.Objects;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -98,7 +98,7 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Creates an <see cref="ItemTokenizationOptions{TItem, TKey}"/> configuration entry for an item of type <typeparamref name="TItem"/>
+        /// Creates an <see cref="ItemTokenization{TItem, TKey}"/> configuration entry for an item of type <typeparamref name="TItem"/>
         /// in the index.
         /// </summary>
         /// <param name="optionsBuilder">
@@ -208,6 +208,9 @@ namespace Lifti
             return this;
         }
 
+        /// <summary>
+        /// Builds a <see cref="FullTextIndex{TKey}"/> using the configuration applied to this instance.
+        /// </summary>
         public FullTextIndex<TKey> Build()
         {
             this.indexNodeFactory ??= new IndexNodeFactory();

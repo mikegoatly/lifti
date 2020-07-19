@@ -2,22 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Lifti.ItemTokenization
+namespace Lifti.Tokenization.Objects
 {
     internal class ConfiguredItemTokenizationOptions<TKey>
     {
-        private readonly Dictionary<Type, IItemTokenizationOptions> options = new Dictionary<Type, IItemTokenizationOptions>();
+        private readonly Dictionary<Type, IItemTokenization> options = new Dictionary<Type, IItemTokenization>();
 
-        public void Add<TItem>(ItemTokenizationOptions<TItem, TKey> options)
+        public void Add<TItem>(ItemTokenization<TItem, TKey> options)
         {
             this.options[typeof(TItem)] = options;
         }
 
-        public ItemTokenizationOptions<TItem, TKey> Get<TItem>()
+        public ItemTokenization<TItem, TKey> Get<TItem>()
         {
             if (this.options.TryGetValue(typeof(TItem), out var itemTokenizationOptions))
             {
-                return (ItemTokenizationOptions<TItem, TKey>)itemTokenizationOptions;
+                return (ItemTokenization<TItem, TKey>)itemTokenizationOptions;
             }
 
             throw new LiftiException(ExceptionMessages.NoTokenizationOptionsProvidedForType, typeof(TItem));

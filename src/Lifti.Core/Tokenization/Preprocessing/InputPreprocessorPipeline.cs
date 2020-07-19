@@ -4,12 +4,14 @@ using System.Threading;
 
 namespace Lifti.Tokenization.Preprocessing
 {
+    /// <inheritdoc />
     public class InputPreprocessorPipeline : ConfiguredBy<TokenizationOptions>, IInputPreprocessorPipeline
     {
         private readonly List<IInputPreprocessor> inputPreprocessors = new List<IInputPreprocessor>();
         private Queue<PreprocessedInput> processQueue = new Queue<PreprocessedInput>();
         private Queue<PreprocessedInput> outputQueue = new Queue<PreprocessedInput>();
 
+        /// <inheritdoc />
         public IEnumerable<char> Process(char input)
         {
             if (this.inputPreprocessors.Count == 0)
@@ -59,6 +61,7 @@ namespace Lifti.Tokenization.Preprocessing
             }
         }
 
+        /// <inheritdoc />
         protected override void OnConfiguring(TokenizationOptions options)
         {
             if (options is null)

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Lifti.ItemTokenization
+namespace Lifti.Tokenization.Objects
 {
     /// <summary>
     /// The builder class used to configure an object type for indexing. The object type <typeparamref name="TItem"/>
@@ -17,7 +17,7 @@ namespace Lifti.ItemTokenization
     /// </typeparam>
     public class ItemTokenizationOptionsBuilder<TItem, TKey>
     {
-        private List<FieldTokenizationOptions<TItem>> fieldTokenization { get; } = new List<FieldTokenizationOptions<TItem>>();
+        private List<FieldTokenization<TItem>> fieldTokenization { get; } = new List<FieldTokenization<TItem>>();
         private Func<TItem, TKey>? keyReader;
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace Lifti.ItemTokenization
             return this;
         }
 
-        public ItemTokenizationOptions<TItem, TKey> Build()
+        public ItemTokenization<TItem, TKey> Build()
         {
             if (this.keyReader == null)
             {
@@ -150,7 +150,7 @@ namespace Lifti.ItemTokenization
                 throw new LiftiException(ExceptionMessages.AtLeastOneFieldMustBeIndexed);
             }
 
-            return new ItemTokenizationOptions<TItem, TKey>(
+            return new ItemTokenization<TItem, TKey>(
                 this.keyReader,
                 this.fieldTokenization);
         }

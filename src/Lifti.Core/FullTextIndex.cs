@@ -1,6 +1,6 @@
-﻿using Lifti.ItemTokenization;
-using Lifti.Querying;
+﻿using Lifti.Querying;
 using Lifti.Tokenization;
+using Lifti.Tokenization.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -325,7 +325,7 @@ namespace Lifti
             mutation.Remove(id);
         }
 
-        private async Task AddAsync<TItem>(TItem item, ItemTokenizationOptions<TItem, TKey> options, IndexMutation indexMutation)
+        private async Task AddAsync<TItem>(TItem item, ItemTokenization<TItem, TKey> options, IndexMutation indexMutation)
         {
             var itemKey = options.KeyReader(item);
 

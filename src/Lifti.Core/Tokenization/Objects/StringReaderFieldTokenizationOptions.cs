@@ -1,9 +1,8 @@
-﻿using Lifti.Tokenization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Lifti.ItemTokenization
+namespace Lifti.Tokenization.Objects
 {
     /// <summary>
     /// A field tokenization capable of asynchronously reading s string for a field.
@@ -11,7 +10,7 @@ namespace Lifti.ItemTokenization
     /// <typeparam name="TItem">
     /// The type of item the field belongs to.
     /// </typeparam>
-    public class StringReaderFieldTokenizationOptions<TItem> : FieldTokenizationOptions<TItem>
+    public class StringReaderFieldTokenizationOptions<TItem> : FieldTokenization<TItem>
     {
         private readonly Func<TItem, string> reader;
 

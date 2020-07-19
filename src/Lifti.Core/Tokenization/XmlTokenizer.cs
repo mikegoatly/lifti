@@ -1,5 +1,9 @@
 ﻿namespace Lifti.Tokenization
 {
+    /// <summary>
+    /// An implementation of <see cref="ITokenizer"/> that just extends the <see cref="BasicTokenizer"/> allowing for only
+    /// the text content of XML elements to be tokenized. Element names, attribute names and attribute values are ignored.
+    /// </summary>
     public class XmlTokenizer : BasicTokenizer
     {
         private enum State
@@ -12,6 +16,12 @@
         private State state;
         private char expectedCloseQuoteForAttributeValue;
 
+        /// <inheritdoc />
+        /// <remarks>
+        /// This is used to trick the tokenizer into thinking that while processing inside an XML element, *every* character 
+        /// is a split character. Because split characters appearing in sequence cause no tokens to be emitted, this allows 
+        /// us to skip over an XML element until we reach the element text.
+        /// </remarks>
         protected override bool IsSplitCharacter(char current)
         {
             switch (this.state)

@@ -1,5 +1,5 @@
-﻿using Lifti.ItemTokenization;
-using Lifti.Tokenization;
+﻿using Lifti.Tokenization;
+using Lifti.Tokenization.Objects;
 using System;
 using System.Collections.Generic;
 using System.Threading;

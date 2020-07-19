@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Lifti.ItemTokenization
+namespace Lifti.Tokenization.Objects
 {
     /// <summary>
     /// A field tokenization capable of reading an enumerable of strings for a field.
@@ -11,7 +11,7 @@ namespace Lifti.ItemTokenization
     /// <typeparam name="TItem">
     /// The type of item the field belongs to.
     /// </typeparam>
-    public class StringArrayReaderFieldTokenizationOptions<TItem> : FieldTokenizationOptions<TItem>
+    public class StringArrayReaderFieldTokenizationOptions<TItem> : FieldTokenization<TItem>
     {
         private readonly Func<TItem, IEnumerable<string>> reader;
 

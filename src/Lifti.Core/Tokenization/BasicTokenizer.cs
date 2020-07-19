@@ -8,6 +8,9 @@ using System.Text;
 
 namespace Lifti.Tokenization
 {
+    /// <summary>
+    /// A simple implementation of <see cref="ITokenizer"/> that just extracts tokens from plain text.
+    /// </summary>
     public class BasicTokenizer : ConfiguredBy<TokenizationOptions>, ITokenizer
     {
         private readonly IInputPreprocessorPipeline inputPreprocessorPipeline = new InputPreprocessorPipeline();
@@ -15,6 +18,7 @@ namespace Lifti.Tokenization
         private HashSet<char>? additionalSplitChars;
         private IStemmer? stemmer;
 
+        /// <inheritdoc />
         public IReadOnlyList<Token> Process(string input)
         {
             if (input == null)
@@ -25,6 +29,7 @@ namespace Lifti.Tokenization
             return this.Process(input.AsSpan());
         }
 
+        /// <inheritdoc />
         public IReadOnlyList<Token> Process(ReadOnlySpan<char> input)
         {
             var processedTokens = new TokenStore();
@@ -37,6 +42,7 @@ namespace Lifti.Tokenization
             return processedTokens.ToList();
         }
 
+        /// <inheritdoc />
         public IReadOnlyList<Token> Process(IEnumerable<string> inputs)
         {
             if (inputs is null)
@@ -101,6 +107,9 @@ namespace Lifti.Tokenization
             start = endOffset;
         }
 
+        /// <summary>
+        /// Determines whether the given character is considered to be a word splitting character.
+        /// </summary>
         protected virtual bool IsSplitCharacter(char current)
         {
             return char.IsSeparator(current) ||
@@ -127,6 +136,7 @@ namespace Lifti.Tokenization
             processedTokens.MergeOrAdd(new TokenHash(tokenBuilder), tokenBuilder, new TokenLocation(tokenIndex, start, (ushort)length));
         }
 
+        /// <inheritdoc />
         protected override void OnConfiguring(TokenizationOptions options)
         {
             this.tokenizationOptions = options ?? throw new ArgumentNullException(nameof(options));

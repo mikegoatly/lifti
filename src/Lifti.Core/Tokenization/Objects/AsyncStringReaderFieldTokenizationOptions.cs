@@ -3,19 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Lifti.ItemTokenization
+namespace Lifti.Tokenization.Objects
 {
     /// <summary>
-    /// A field tokenization capable of asynchronously reading an enumerable of strings for a field.
+    /// A field tokenization capable of asynchronously reading a string for a field.
     /// </summary>
     /// <typeparam name="TItem">
     /// The type of item the field belongs to.
     /// </typeparam>
-    public class AsyncStringArrayReaderFieldTokenizationOptions<TItem> : FieldTokenizationOptions<TItem>
+    public class AsyncStringReaderFieldTokenizationOptions<TItem> : FieldTokenization<TItem>
     {
-        private readonly Func<TItem, Task<IEnumerable<string>>> reader;
+        private readonly Func<TItem, Task<string>> reader;
 
-        internal AsyncStringArrayReaderFieldTokenizationOptions(string name, Func<TItem, Task<IEnumerable<string>>> reader, TokenizationOptions? tokenizationOptions = null)
+        internal AsyncStringReaderFieldTokenizationOptions(string name, Func<TItem, Task<string>> reader, TokenizationOptions? tokenizationOptions = null)
             : base(name, tokenizationOptions)
         {
             this.reader = reader ?? throw new ArgumentNullException(nameof(reader));
