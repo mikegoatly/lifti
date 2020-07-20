@@ -4,10 +4,14 @@ using System.Linq;
 namespace Lifti.Querying
 {
     /// <summary>
-    /// 
+    /// Provides logic for unioning the results in two <see cref="IntermediateQueryResult"/>s. The results from
+    /// both parts of the query will be combined into one and field match locations combined where items appear on both sides.
     /// </summary>
     public class UnionMerger : IntermediateQueryResultMerger
     {
+        /// <summary>
+        /// Applies the union operation to the <see cref="IntermediateQueryResult"/> instances.
+        /// </summary>
         public static IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
             // Swap over the variables to ensure we're performing as few iterations as possible in the intersection

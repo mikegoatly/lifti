@@ -4,11 +4,19 @@ using System.Collections.Generic;
 
 namespace Lifti
 {
+    /// <summary>
+    /// Options that can be provided to <see cref="ITokenizerFactory.Create(TokenizationOptions)"/> to createa configured
+    /// implementation of <see cref="ITokenizer"/>.
+    /// </summary>
     public class TokenizationOptions
     {
         private bool caseInsensitive = true;
         private bool accentInsensitive = true;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TokenizationOptions"/> class.
+        /// </summary>
+        /// <param name="tokenizerKind">Kind of the tokenizer.</param>
         public TokenizationOptions(TokenizerKind tokenizerKind)
         {
             this.TokenizerKind = tokenizerKind;

@@ -138,6 +138,15 @@ namespace Lifti.Tokenization.Objects
             return this;
         }
 
+        /// <summary>
+        /// Builds this instance.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="LiftiException">
+        /// Thrown if:
+        /// * <see cref="WithKey(Func{T, TKey})"/> has not been called.
+        /// * No fields have been configured.
+        /// </exception>
         public ObjectTokenization<T, TKey> Build()
         {
             if (this.keyReader == null)

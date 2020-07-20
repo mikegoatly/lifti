@@ -188,6 +188,7 @@
         /// <summary>
         /// Tests if any of the given substrings appear at the end of the string builder.
         /// </summary>
+        /// <param name="builder">The builder to test the contents of.</param>
         /// <param name="substringLookup">The substrings to test, keyed by the last letter in the search string.</param>
         /// <returns>
         /// The substring that was matched at the end of the string builder, or null if no matches were found.

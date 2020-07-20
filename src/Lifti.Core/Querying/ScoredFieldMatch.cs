@@ -37,28 +37,37 @@ namespace Lifti.Querying
         /// </summary>
         public FieldMatch FieldMatch { get; }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return obj is ScoredFieldMatch match &&
                    this.Equals(match);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return HashCode.Combine(this.Score, this.FieldMatch);
         }
 
+        /// <inheritdoc />
         public bool Equals(ScoredFieldMatch other)
         {
             return this.Score == other.Score &&
                    this.FieldMatch.Equals(other.FieldMatch);
         }
 
+        /// <summary>
+        /// Implements the operator ==.
+        /// </summary>
         public static bool operator ==(ScoredFieldMatch left, ScoredFieldMatch right)
         {
             return left.Equals(right);
         }
 
+        /// <summary>
+        /// Implements the operator !=.
+        /// </summary>
         public static bool operator !=(ScoredFieldMatch left, ScoredFieldMatch right)
         {
             return !(left == right);

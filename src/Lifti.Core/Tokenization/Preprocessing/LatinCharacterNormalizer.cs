@@ -1,7 +1,11 @@
 ﻿namespace Lifti.Tokenization.Preprocessing
 {
+    /// <summary>
+    /// An implementation of <see cref="IInputPreprocessor"/> capable of normalizing latin characters to a common form.
+    /// </summary>
     public class LatinCharacterNormalizer : IInputPreprocessor
     {
+        /// <inheritdoc />
         public PreprocessedInput Preprocess(char input)
         {
             if (input < '\u0080')

@@ -2,8 +2,10 @@
 
 namespace Lifti.Tokenization
 {
+    /// <inheritdoc />
     public class TokenizerFactory : ITokenizerFactory
     {
+        /// <inheritdoc />
         public virtual ITokenizer Create(TokenizationOptions options)
         {
             if (options is null)
