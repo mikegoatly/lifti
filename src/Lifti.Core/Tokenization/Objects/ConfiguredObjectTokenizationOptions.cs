@@ -4,20 +4,20 @@ using System.Linq;
 
 namespace Lifti.Tokenization.Objects
 {
-    internal class ConfiguredItemTokenizationOptions<TKey>
+    internal class ConfiguredObjectTokenizationOptions<TKey>
     {
-        private readonly Dictionary<Type, IItemTokenization> options = new Dictionary<Type, IItemTokenization>();
+        private readonly Dictionary<Type, IObjectTokenization> options = new Dictionary<Type, IObjectTokenization>();
 
-        public void Add<TItem>(ItemTokenization<TItem, TKey> options)
+        public void Add<TItem>(ObjectTokenization<TItem, TKey> options)
         {
             this.options[typeof(TItem)] = options;
         }
 
-        public ItemTokenization<TItem, TKey> Get<TItem>()
+        public ObjectTokenization<TItem, TKey> Get<TItem>()
         {
             if (this.options.TryGetValue(typeof(TItem), out var itemTokenizationOptions))
             {
-                return (ItemTokenization<TItem, TKey>)itemTokenizationOptions;
+                return (ObjectTokenization<TItem, TKey>)itemTokenizationOptions;
             }
 
             throw new LiftiException(ExceptionMessages.NoTokenizationOptionsProvidedForType, typeof(TItem));

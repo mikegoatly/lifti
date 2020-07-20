@@ -197,7 +197,7 @@ namespace Lifti.Tokenization.Stemming
             IEnumerable<WordReplacement> replacements)
         {
             var index = new FullTextIndexBuilder<WordReplacement>()
-                .WithItemTokenization<WordReplacement>(
+                .WithObjectTokenization<WordReplacement>(
                     i => i.WithKey(item => item)
                         .WithField(
                             "find",

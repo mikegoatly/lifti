@@ -17,7 +17,7 @@ namespace Lifti
         private readonly TokenizationOptions defaultTokenizationOptions;
         private readonly Func<IIndexSnapshot<TKey>, Task>[]? indexModifiedActions;
         private readonly IndexOptions indexOptions;
-        private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions;
+        private readonly ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions;
         private readonly IdPool<TKey> idPool;
         private readonly IIndexNavigatorPool indexNavigatorPool;
         private readonly SemaphoreSlim writeLock = new SemaphoreSlim(1);
@@ -30,7 +30,7 @@ namespace Lifti
 
         internal FullTextIndex(
             IndexOptions indexOptions,
-            ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions,
+            ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions,
             IIndexNodeFactory indexNodeFactory,
             ITokenizerFactory tokenizerFactory,
             IQueryParser queryParser,
@@ -325,7 +325,7 @@ namespace Lifti
             mutation.Remove(id);
         }
 
-        private async Task AddAsync<TItem>(TItem item, ItemTokenization<TItem, TKey> options, IndexMutation indexMutation)
+        private async Task AddAsync<TItem>(TItem item, ObjectTokenization<TItem, TKey> options, IndexMutation indexMutation)
         {
             var itemKey = options.KeyReader(item);
 

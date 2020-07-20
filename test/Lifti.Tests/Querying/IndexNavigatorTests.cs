@@ -14,7 +14,7 @@ namespace Lifti.Tests.Querying
         public async Task InitializeAsync()
         {
             this.index = new FullTextIndexBuilder<string>()
-                .WithItemTokenization<(string, string, string)>(
+                .WithObjectTokenization<(string, string, string)>(
                     o => o.WithKey(i => i.Item1)
                         .WithField("Field1", i => i.Item2)
                         .WithField("Field2", i => i.Item3))

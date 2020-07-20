@@ -107,7 +107,7 @@
         IList<SearchResult<string>> results = null;
         IFullTextIndex<string> index = new FullTextIndexBuilder<string>()
             .WithDefaultTokenizationOptions(o => o.WithStemming())
-            .WithItemTokenization<WikipediaPage>(
+            .WithObjectTokenization<WikipediaPage>(
                 page => page.WithKey(i => i.Title)
                     .WithField("Content", i => i.Text.Content, o => o.XmlContent().WithStemming()))
             .Build();

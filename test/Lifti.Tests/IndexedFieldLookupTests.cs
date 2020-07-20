@@ -15,7 +15,7 @@ namespace Lifti.Tests
 
         public IndexedFieldLookupTests()
         {
-            var itemConfig = new ItemTokenizationOptionsBuilder<string, string>()
+            var itemConfig = new ObjectTokenizationOptionsBuilder<string, string>()
                 .WithKey(i => i)
                 .WithField("Field1", r => r)
                 .WithField("Field2", r => r)
@@ -63,7 +63,7 @@ namespace Lifti.Tests
         [Fact]
         public void UsingMoreThan255IdsShouldThrowException()
         {
-            var itemConfigBuilder = new ItemTokenizationOptionsBuilder<string, string>()
+            var itemConfigBuilder = new ObjectTokenizationOptionsBuilder<string, string>()
                 .WithKey(i => i);
 
             for (var i = 0; i < 256; i++)
@@ -78,7 +78,7 @@ namespace Lifti.Tests
         [Fact]
         public void UsingDuplicateFieldNameShouldThrowException()
         {
-            var itemConfigBuilder = new ItemTokenizationOptionsBuilder<string, string>()
+            var itemConfigBuilder = new ObjectTokenizationOptionsBuilder<string, string>()
                 .WithField("Field1", o => o)
                 .WithField("Field2", o => o)
                 .WithField("Field1", o => o)

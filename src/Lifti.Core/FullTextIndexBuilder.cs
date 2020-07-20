@@ -13,7 +13,7 @@ namespace Lifti
     /// <typeparam name="TKey">The type of key to be stored in the index.</typeparam>
     public class FullTextIndexBuilder<TKey>
     {
-        private readonly ConfiguredItemTokenizationOptions<TKey> itemTokenizationOptions = new ConfiguredItemTokenizationOptions<TKey>();
+        private readonly ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions = new ConfiguredObjectTokenizationOptions<TKey>();
         private readonly IndexOptions advancedOptions = new IndexOptions();
         private IIndexNodeFactory? indexNodeFactory;
         private ITokenizerFactory? tokenizerFactory;
@@ -98,20 +98,20 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Creates an <see cref="ItemTokenization{TItem, TKey}"/> configuration entry for an item of type <typeparamref name="TItem"/>
+        /// Creates an <see cref="ObjectTokenization{TItem, TKey}"/> configuration entry for an item of type <typeparamref name="TItem"/>
         /// in the index.
         /// </summary>
         /// <param name="optionsBuilder">
         /// A delegate capable of specifying all the required options for the item tokenization options.
         /// </param>
-        public FullTextIndexBuilder<TKey> WithItemTokenization<TItem>(Func<ItemTokenizationOptionsBuilder<TItem, TKey>, ItemTokenizationOptionsBuilder<TItem, TKey>> optionsBuilder)
+        public FullTextIndexBuilder<TKey> WithObjectTokenization<TItem>(Func<ObjectTokenizationOptionsBuilder<TItem, TKey>, ObjectTokenizationOptionsBuilder<TItem, TKey>> optionsBuilder)
         {
             if (optionsBuilder is null)
             {
                 throw new ArgumentNullException(nameof(optionsBuilder));
             }
 
-            var builder = new ItemTokenizationOptionsBuilder<TItem, TKey>();
+            var builder = new ObjectTokenizationOptionsBuilder<TItem, TKey>();
             this.itemTokenizationOptions.Add(optionsBuilder(builder).Build());
 
             return this;

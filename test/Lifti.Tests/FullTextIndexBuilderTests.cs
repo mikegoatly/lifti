@@ -21,13 +21,13 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void WithItemConfiguration_ShouldConstructIndexWithSpecifiedConfig()
+        public void WithObjectConfiguration_ShouldConstructIndexWithSpecifiedConfig()
         {
-            this.sut.WithItemTokenization<TestObject1>(
+            this.sut.WithObjectTokenization<TestObject1>(
                 o => o
                     .WithKey(i => i.Id)
                     .WithField("TextField", i => i.Text))
-                .WithItemTokenization<TestObject2>(
+                .WithObjectTokenization<TestObject2>(
                 o => o
                     .WithKey(i => i.Id)
                     .WithField("Content", i => i.Content)
@@ -41,10 +41,10 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void WithItemConfiguration_ShouldUseDefaultTokenizationOptionsIfNotProvided()
+        public void WithObjectConfiguration_ShouldUseDefaultTokenizationOptionsIfNotProvided()
         {
             this.sut.WithDefaultTokenizationOptions(o => o.CaseInsensitive(false))
-                .WithItemTokenization<TestObject2>(
+                .WithObjectTokenization<TestObject2>(
                 o => o
                     .WithKey(i => i.Id)
                     .WithField("Content", i => i.Content)

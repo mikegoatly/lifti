@@ -15,15 +15,15 @@ namespace Lifti.Tests
         public FullTextIndexTests()
         {
             this.index = new FullTextIndexBuilder<string>()
-                .WithItemTokenization<TestObject>(
+                .WithObjectTokenization<TestObject>(
                     o => o.WithKey(i => i.Id)
                         .WithField("Text1", i => i.Text1, opts => opts.CaseInsensitive(false))
                         .WithField("Text2", i => i.Text2)
                         .WithField("Text3", i => i.Text3, opts => opts.WithStemming()))
-                .WithItemTokenization<TestObject2>(
+                .WithObjectTokenization<TestObject2>(
                     o => o.WithKey(i => i.Id)
                         .WithField("MultiText", i => i.Text))
-                .WithItemTokenization<TestObject3>(
+                .WithObjectTokenization<TestObject3>(
                     o => o.WithKey(i => i.Id)
                         .WithField("TextAsync", i => Task.Run(() => i.Text))
                         .WithField("MultiTextAsync", i => Task.Run(() => (IEnumerable<string>)i.MultiText)))

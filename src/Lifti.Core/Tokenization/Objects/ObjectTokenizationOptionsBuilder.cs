@@ -5,20 +5,20 @@ using System.Threading.Tasks;
 namespace Lifti.Tokenization.Objects
 {
     /// <summary>
-    /// The builder class used to configure an object type for indexing. The object type <typeparamref name="TItem"/>
-    /// must expose an id property of type <typeparamref name="TKey"/> configured using the <see cref="WithKey(Func{TItem, TKey})"/>
+    /// The builder class used to configure an object type for indexing. The object type <typeparamref name="T"/>
+    /// must expose an id property of type <typeparamref name="TKey"/> configured using the <see cref="WithKey(Func{T, TKey})"/>
     /// method.
     /// </summary>
-    /// <typeparam name="TItem">
-    /// The type of item to configure.
+    /// <typeparam name="T">
+    /// The type of object to configure.
     /// </typeparam>
     /// <typeparam name="TKey">
     /// The type of key in the index.
     /// </typeparam>
-    public class ItemTokenizationOptionsBuilder<TItem, TKey>
+    public class ObjectTokenizationOptionsBuilder<T, TKey>
     {
-        private List<FieldTokenization<TItem>> fieldTokenization { get; } = new List<FieldTokenization<TItem>>();
-        private Func<TItem, TKey>? keyReader;
+        private List<FieldTokenization<T>> fieldTokenization { get; } = new List<FieldTokenization<T>>();
+        private Func<T, TKey>? keyReader;
 
         /// <summary>
         /// Indicates how the unique key of the item can be read.
@@ -26,7 +26,7 @@ namespace Lifti.Tokenization.Objects
         /// <param name="keyReader">
         /// The delegate capable of reading the key from the item
         /// </param>
-        public ItemTokenizationOptionsBuilder<TItem, TKey> WithKey(Func<TItem, TKey> keyReader)
+        public ObjectTokenizationOptionsBuilder<T, TKey> WithKey(Func<T, TKey> keyReader)
         {
             if (keyReader is null)
             {
@@ -52,14 +52,14 @@ namespace Lifti.Tokenization.Objects
         /// null then <see cref="TokenizationOptions.Default"/> will be used when processing text - this provides a tokenizer that
         /// is accent and case insensitive that splits on punctuation and whitespace, but does <b>not</b> perform word stemming.
         /// </param>
-        public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(
+        public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
             string name,
-            Func<TItem, string> fieldTextReader,
+            Func<T, string> fieldTextReader,
             Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
         {
             ValidateFieldParameters(name, fieldTextReader);
             var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
-            this.fieldTokenization.Add(new StringReaderFieldTokenizationOptions<TItem>(name, fieldTextReader, tokenizationOptions));
+            this.fieldTokenization.Add(new StringReaderFieldTokenizationOptions<T>(name, fieldTextReader, tokenizationOptions));
             return this;
         }
 
@@ -77,14 +77,14 @@ namespace Lifti.Tokenization.Objects
         /// null then <see cref="TokenizationOptions.Default"/> will be used when processing text - this provides a tokenizer that
         /// is accent and case insensitive that splits on punctuation and whitespace, but does <b>not</b> perform word stemming.
         /// </param>
-        public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(
+        public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
             string name,
-            Func<TItem, IEnumerable<string>> reader,
+            Func<T, IEnumerable<string>> reader,
             Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
         {
             ValidateFieldParameters(name, reader);
             var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
-            this.fieldTokenization.Add(new StringArrayReaderFieldTokenizationOptions<TItem>(name, reader, tokenizationOptions));
+            this.fieldTokenization.Add(new StringArrayReaderFieldTokenizationOptions<T>(name, reader, tokenizationOptions));
             return this;
         }
 
@@ -102,14 +102,14 @@ namespace Lifti.Tokenization.Objects
         /// null then <see cref="TokenizationOptions.Default"/> will be used when processing text - this provides a tokenizer that
         /// is accent and case insensitive that splits on punctuation and whitespace, but does <b>not</b> perform word stemming.
         /// </param>
-        public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(
+        public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
             string name,
-            Func<TItem, Task<string>> fieldTextReader,
+            Func<T, Task<string>> fieldTextReader,
             Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
         {
             ValidateFieldParameters(name, fieldTextReader);
             var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
-            this.fieldTokenization.Add(new AsyncStringReaderFieldTokenizationOptions<TItem>(name, fieldTextReader, tokenizationOptions));
+            this.fieldTokenization.Add(new AsyncStringReaderFieldTokenizationOptions<T>(name, fieldTextReader, tokenizationOptions));
             return this;
         }
 
@@ -127,18 +127,18 @@ namespace Lifti.Tokenization.Objects
         /// null then <see cref="TokenizationOptions.Default"/> will be used when processing text - this provides a tokenizer that
         /// is accent and case insensitive that splits on punctuation and whitespace, but does <b>not</b> perform word stemming.
         /// </param>
-        public ItemTokenizationOptionsBuilder<TItem, TKey> WithField(
+        public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
             string name,
-            Func<TItem, Task<IEnumerable<string>>> reader,
+            Func<T, Task<IEnumerable<string>>> reader,
             Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
         {
             ValidateFieldParameters(name, reader);
             var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
-            this.fieldTokenization.Add(new AsyncStringArrayReaderFieldTokenizationOptions<TItem>(name, reader, tokenizationOptions));
+            this.fieldTokenization.Add(new AsyncStringArrayReaderFieldTokenizationOptions<T>(name, reader, tokenizationOptions));
             return this;
         }
 
-        public ItemTokenization<TItem, TKey> Build()
+        public ObjectTokenization<T, TKey> Build()
         {
             if (this.keyReader == null)
             {
@@ -150,7 +150,7 @@ namespace Lifti.Tokenization.Objects
                 throw new LiftiException(ExceptionMessages.AtLeastOneFieldMustBeIndexed);
             }
 
-            return new ItemTokenization<TItem, TKey>(
+            return new ObjectTokenization<T, TKey>(
                 this.keyReader,
                 this.fieldTokenization);
         }

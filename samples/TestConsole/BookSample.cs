@@ -29,7 +29,7 @@ namespace TestConsole
         public static async Task RunAsync()
         {
             var bookIndex = new FullTextIndexBuilder<int>() // Books are indexed by their BookId property, which is an int.
-                .WithItemTokenization<Book>(
+                .WithObjectTokenization<Book>(
                     options => options
                         .WithKey(b => b.BookId)
                         .WithField("Title", b => b.Title, tokenOptions => tokenOptions.WithStemming())

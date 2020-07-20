@@ -25,7 +25,7 @@ Where you want users to be able to search for text in all three Title, Abstract 
 ``` csharp
 // Books are indexed by their BookId property, which is an int.
 var bookIndex = new FullTextIndexBuilder<int>()
-    .WithItemTokenization<Book>(
+    .WithObjectTokenization<Book>(
         itemOptions => itemOptions
             .WithKey(b => b.BookId)
             .WithField("Title", b => b.Title,

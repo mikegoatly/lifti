@@ -23,7 +23,7 @@ namespace PerformanceProfiling
         {
             return new FullTextIndexBuilder<string>()
                 .WithIntraNodeTextSupportedAfterIndexDepth(supportSplitAtIndex)
-                .WithItemTokenization<(string name, string text)>(o => o.WithKey(p => p.name).WithField("Text", p => p.text, t => t.XmlContent().WithStemming()))
+                .WithObjectTokenization<(string name, string text)>(o => o.WithKey(p => p.name).WithField("Text", p => p.text, t => t.XmlContent().WithStemming()))
                 .Build();
         }
     }
