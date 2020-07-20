@@ -26,12 +26,12 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/getting-started/indexing-objects/" />
 <meta property="article:published_time" content="2020-07-14T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-07-14T21:32:01+01:00" /><meta property="og:site_name" content="LIFTI" />
+<meta property="article:modified_time" content="2020-07-20T07:36:58+01:00" /><meta property="og:site_name" content="LIFTI" />
 <meta itemprop="name" content="Indexing Objects">
 <meta itemprop="description" content="You&#39;re not restricted to indexing strings against ids - you can also configure an index to extract text out of one or more properties of an object. Each configured property is a *field*.
 ">
 <meta itemprop="datePublished" content="2020-07-14T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-07-14T21:32:01&#43;01:00" />
+<meta itemprop="dateModified" content="2020-07-20T07:36:58&#43;01:00" />
 <meta itemprop="wordCount" content="289">
 
 
@@ -158,6 +158,41 @@
       
       
       <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsgetting-startedindexing-objects" href="/lifti/docs/getting-started/indexing-objects/">Indexing Objects</a>
+      
+      
+    </li>
+  </ul>
+</ul>
+
+      
+      
+      
+      
+
+
+
+
+
+
+<ul class="td-sidebar-nav__section pr-md-3">
+  <li class="td-sidebar-nav__section-title">
+    <a  href="/lifti/docs/index-construction/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Index Construction</a>
+  </li>
+  <ul>
+    <li class="collapse " id="liftidocsindex-construction">
+      
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithdefaulttokenizationoptions" href="/lifti/docs/index-construction/withdefaulttokenizationoptions/">WithDefaultTokenizationOptions</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithduplicateitembehavior" href="/lifti/docs/index-construction/withduplicateitembehavior/">WithDuplicateItemBehavior</a>
       
       
     </li>
@@ -374,7 +409,7 @@
 </code></pre></div><p>Where you want users to be able to search for text in all three Title, Abstract and Content fields, you can build an index as:</p>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#8f5902;font-style:italic">// Books are indexed by their BookId property, which is an int.
 </span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">bookIndex</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;()</span>
-    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithItemTokenization</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Book</span><span style="color:#000;font-weight:bold">&gt;(</span>
+    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithObjectTokenization</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Book</span><span style="color:#000;font-weight:bold">&gt;(</span>
         <span style="color:#000">itemOptions</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">itemOptions</span>
             <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithKey</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">b</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">BookId</span><span style="color:#000;font-weight:bold">)</span>
             <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Title&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Title</span><span style="color:#000;font-weight:bold">,</span>
@@ -418,7 +453,7 @@
 </code></pre></div>
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified July 14, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/39bbc2a3fe13ca7459c0d71f765318c8ade8fcb6">Moving to hugo based documentation (39bbc2a)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified July 20, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/14ef0c57330adc5ed492dcd30eae7638cde2b0d1">ItemTokenization -&gt; ObjectTokenization WithItemTokenization -&gt; WithObjectTokenization More xml docs (14ef0c5)</a>
 </div>
 </div>
 

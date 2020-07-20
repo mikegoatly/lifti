@@ -9,11 +9,24 @@
   
   <url>
     <loc>https://mikegoatly.github.io/lifti/docs/serialization/key-serialization/</loc>
+    <lastmod>2020-07-18T09:10:51+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mikegoatly.github.io/lifti/docs/index-construction/</loc>
+  </url>
+  
+  <url>
+    <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withdefaulttokenizationoptions/</loc>
   </url>
   
   <url>
     <loc>https://mikegoatly.github.io/lifti/docs/searching/</loc>
     <lastmod>2020-07-14T21:32:01+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withduplicateitembehavior/</loc>
   </url>
   
   <url>
@@ -38,7 +51,7 @@
   
   <url>
     <loc>https://mikegoatly.github.io/lifti/docs/getting-started/indexing-objects/</loc>
-    <lastmod>2020-07-14T21:32:01+01:00</lastmod>
+    <lastmod>2020-07-20T07:36:58+01:00</lastmod>
   </url>
   
   <url>

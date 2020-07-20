@@ -7,7 +7,6 @@
 
 <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
 
-<link rel="alternate" type="application/rss&#43;xml" href="https://mikegoatly.github.io/lifti/docs/getting-started/index.xml">
 
 
 <link rel="shortcut icon" href="/favicons/favicon.ico" >
@@ -21,17 +20,23 @@
 <link rel="icon" type="image/png" href="/lifti/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
 
-<title>Getting Started | LIFTI</title><meta property="og:title" content="Getting Started" />
-<meta property="og:description" content="Indexing text against a key
+<title>WithDefaultTokenizationOptions | LIFTI</title><meta property="og:title" content="WithDefaultTokenizationOptions" />
+<meta property="og:description" content="Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
 " />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/getting-started/" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/index-construction/withdefaulttokenizationoptions/" />
 <meta property="og:site_name" content="LIFTI" />
-<meta itemprop="name" content="Getting Started">
-<meta itemprop="description" content="Indexing text against a key
-"><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Getting Started"/>
-<meta name="twitter:description" content="Indexing text against a key
+<meta itemprop="name" content="WithDefaultTokenizationOptions">
+<meta itemprop="description" content="Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
+">
+
+<meta itemprop="wordCount" content="23">
+
+
+
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WithDefaultTokenizationOptions"/>
+<meta name="twitter:description" content="Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
 "/>
 
 
@@ -50,7 +55,7 @@
 
 
   </head>
-  <body class="td-section">
+  <body class="td-page">
     <header>
       
 <nav class="js-navbar-scroll navbar navbar-expand navbar-dark flex-column flex-md-row td-navbar">
@@ -140,10 +145,10 @@
 
 <ul class="td-sidebar-nav__section pr-md-3">
   <li class="td-sidebar-nav__section-title">
-    <a  href="/lifti/docs/getting-started/" class="align-left pl-0 pr-2 active td-sidebar-link td-sidebar-link__section">Getting Started</a>
+    <a  href="/lifti/docs/getting-started/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Getting Started</a>
   </li>
   <ul>
-    <li class="collapse show" id="liftidocsgetting-started">
+    <li class="collapse " id="liftidocsgetting-started">
       
       
       
@@ -169,17 +174,17 @@
 
 <ul class="td-sidebar-nav__section pr-md-3">
   <li class="td-sidebar-nav__section-title">
-    <a  href="/lifti/docs/index-construction/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Index Construction</a>
+    <a  href="/lifti/docs/index-construction/" class="align-left pl-0 pr-2 active td-sidebar-link td-sidebar-link__section">Index Construction</a>
   </li>
   <ul>
-    <li class="collapse " id="liftidocsindex-construction">
+    <li class="collapse show" id="liftidocsindex-construction">
       
       
       
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithdefaulttokenizationoptions" href="/lifti/docs/index-construction/withdefaulttokenizationoptions/">WithDefaultTokenizationOptions</a>
+      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsindex-constructionwithdefaulttokenizationoptions" href="/lifti/docs/index-construction/withdefaulttokenizationoptions/">WithDefaultTokenizationOptions</a>
       
       
       
@@ -335,8 +340,8 @@
 
 
 
-<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Getting%20started/_index.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
-<a href="https://github.com/mikegoatly/lifti/issues/new?title=Getting%20Started" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
+<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Index%20construction/WithDefaultTokenizationOptions.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
+<a href="https://github.com/mikegoatly/lifti/issues/new?title=WithDefaultTokenizationOptions" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
 
 </div>
 
@@ -362,6 +367,9 @@
 
 
 
+
+
+
 <li class="breadcrumb-item" >
 	<a href="https://mikegoatly.github.io/lifti/docs/">Documentation</a>
 </li>
@@ -369,8 +377,15 @@
 
 
 
+<li class="breadcrumb-item" >
+	<a href="https://mikegoatly.github.io/lifti/docs/index-construction/">Index Construction</a>
+</li>
+
+
+
+
 <li class="breadcrumb-item active" aria-current="page">
-	<a href="https://mikegoatly.github.io/lifti/docs/getting-started/">Getting Started</a>
+	<a href="https://mikegoatly.github.io/lifti/docs/index-construction/withdefaulttokenizationoptions/">WithDefaultTokenizationOptions</a>
 </li>
 
 	</ol>
@@ -378,85 +393,29 @@
 
             
 <div class="td-content">
-	<h1>Getting Started</h1>
-        <div class="lead">Indexing text against a key</div>
-	
-	<p><em>TODO: Introduce concept of keys in an index</em></p>
-<p>Perhaps the simplest way to work with LIFTI is to index text against a key that means something in some other system.</p>
-<p>In this example, we&rsquo;re just indexing three pieces of text against 3 integer keys:</p>
-<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c#" data-lang="c#"><span style="color:#8f5902;font-style:italic">// Create a full text index with default settings and integer item keys
-</span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;().</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
-
-<span style="color:#8f5902;font-style:italic">// Index item keys with their associated text
-</span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;This is some text associated with A: fizz&#34;</span><span style="color:#000;font-weight:bold">);</span>
-<span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Some buzz text for B&#34;</span><span style="color:#000;font-weight:bold">);</span>
-<span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Text associated with C is both fizz and buzz&#34;</span><span style="color:#000;font-weight:bold">);</span>
-
-</code></pre></div><p>You can search in this index using:</p>
-<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c#" data-lang="c#"><span style="color:#8f5902;font-style:italic">// Search for text containing both Fizz *and* Buzz
-</span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">results</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Search</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Fizz Buzz&#34;</span><span style="color:#000;font-weight:bold">).</span><span style="color:#000">ToList</span><span style="color:#000;font-weight:bold">();</span>
-
-<span style="color:#8f5902;font-style:italic">// Output: Items with both Fizz and Buzz: 1
-</span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">$&#34;Items with both Fizz and Buzz: {results.Count}&#34;</span><span style="color:#000;font-weight:bold">);</span>
-
-<span style="color:#8f5902;font-style:italic">// Search for text containing both Fizz *or* Buzz
-</span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">results</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Search</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Fizz | Buzz&#34;</span><span style="color:#000;font-weight:bold">).</span><span style="color:#000">ToList</span><span style="color:#000;font-weight:bold">();</span>
-
-<span style="color:#8f5902;font-style:italic">// Outputs: Items with Fizz or Buzz: 3
-</span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">$&#34;Items with Fizz or Buzz: {results.Count}&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</code></pre></div><p>Each set of results returns the keys that the text was indexed against. For example, the first set of results will return a key of 3, 
-as that is the only key that was indexed with both &ldquo;fizz&rdquo; and &ldquo;buzz&rdquo;.</p>
-
-        <div class="section-index">
-    
-    
-    
-    
-    <hr class="panel-line">
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-                <div class="entry">
-                    <h5>
-                        <a href="/lifti/docs/getting-started/indexing-objects/">Indexing Objects</a>
-                    </h5>
-                    <p>You&rsquo;re not restricted to indexing strings against ids - you can also configure an index to extract text out of one or more properties of an object. Each configured property is a <em>field</em>.</p>
-                </div>
-            
-        
-            
-        
-            
-        
-            
-        
-    
-</div>
+	<h1>WithDefaultTokenizationOptions</h1>
+    <div class="lead">Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.</div>
+	       
+	<p><code>FullTextIndexBuilder&lt;TKey&gt; WithDefaultTokenizationOptions(Func&lt;TokenizationOptionsBuilder, TokenizationOptionsBuilder&gt; optionsBuilder)</code></p>
+<h2 id="example-usage">Example usage</h2>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;()</span>
+    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithDefaultTokenizationOptions</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span><span style="color:#000">o</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">AccentInsensitive</span><span style="color:#000;font-weight:bold">()</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">CaseInsensitive</span><span style="color:#000;font-weight:bold">()</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">SplitOnPunctuation</span><span style="color:#000;font-weight:bold">()</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">SplitOnCharacters</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;%&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#39;#&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#39;@&#39;</span><span style="color:#000;font-weight:bold">)</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithStemming</span><span style="color:#000;font-weight:bold">()</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">XmlContent</span><span style="color:#000;font-weight:bold">()</span>
+    <span style="color:#000;font-weight:bold">)</span>
+    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
+</code></pre></div><h3 id="heading"></h3>
 
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified July 14, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/39bbc2a3fe13ca7459c0d71f765318c8ade8fcb6">Moving to hugo based documentation (39bbc2a)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified January 1, 0001
 </div>
 </div>
+
 
           </main>
         </div>
