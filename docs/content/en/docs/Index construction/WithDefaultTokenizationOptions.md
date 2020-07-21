@@ -18,7 +18,7 @@ var index = new FullTextIndexBuilder<int>()
         .SplitOnPunctuation(true) // Default
         .SplitOnCharacters('%', '#', '@')
         .WithStemming()
-        .XmlContent()
+        .WithXmlTokenizer()
     )
     .Build();
 ```
@@ -65,7 +65,7 @@ be treated as `ABANDON`. Currently only English is supported.
 
 By default, all text passed to a tokenizer will be treated as text that should be indexed. This behavior can be modified if required.
 
-#### `XmlContent()`
+#### `WithXmlTokenizer()`
 
-Calling `XmlContent` on the builder causes the tokenizer to treat the source text as XML, skipping any characters and text contained
+Calling `WithXmlTokenizer` on the builder causes the tokenizer to treat the source text as XML, skipping any characters and text contained
 within tags. This will also skip any attributes and attribute text in the XML, i.e. the only text that will be indexed will text nodes.

@@ -109,7 +109,7 @@
             .WithDefaultTokenizationOptions(o => o.WithStemming())
             .WithObjectTokenization<WikipediaPage>(
                 page => page.WithKey(i => i.Title)
-                    .WithField("Content", i => i.Text.Content, o => o.XmlContent().WithStemming()))
+                    .WithField("Content", i => i.Text.Content, o => o.WithXmlTokenizer().WithStemming()))
             .Build();
 
     private bool errored;

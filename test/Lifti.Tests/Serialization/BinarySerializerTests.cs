@@ -20,7 +20,7 @@ namespace Lifti.Tests.Serialization
         {
             this.index = new FullTextIndexBuilder<string>().Build();
             var wikipediaTests = WikipediaDataLoader.Load(typeof(FullTextIndexTests));
-            var options = new TokenizationOptionsBuilder().XmlContent().WithStemming().Build();
+            var options = new TokenizationOptionsBuilder().WithXmlTokenizer().WithStemming().Build();
             foreach (var (name, text) in wikipediaTests)
             {
                 await this.index.AddAsync(name, text, options);

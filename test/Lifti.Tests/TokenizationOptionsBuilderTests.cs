@@ -24,7 +24,7 @@ namespace Lifti.Tests
         [Fact]
         public void ConfiguringContentAsXml_ShouldSetTheTokenizationKindToXml()
         {
-            var builder = new TokenizationOptionsBuilder().XmlContent();
+            var builder = new TokenizationOptionsBuilder().WithXmlTokenizer();
             builder.Build().TokenizerKind.Should().Be(TokenizerKind.XmlContent);
         }
 

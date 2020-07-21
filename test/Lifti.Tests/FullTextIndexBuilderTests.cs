@@ -134,7 +134,7 @@ namespace Lifti.Tests
             var parser = this.ConfigureQueryParserMock();
 
             this.sut.WithTokenizerFactory(factory.Object);
-            this.sut.WithDefaultTokenizationOptions(o => o.XmlContent());
+            this.sut.WithDefaultTokenizationOptions(o => o.WithXmlTokenizer());
 
             var index = this.sut.Build();
 

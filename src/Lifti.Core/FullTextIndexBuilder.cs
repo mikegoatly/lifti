@@ -130,7 +130,7 @@ namespace Lifti
         ///    .SplitOnPunctuation(true) // Default
         ///    .SplitOnCharacters('%', '#', '@')
         ///    .WithStemming(true)
-        ///    .XmlContent()
+        ///    .WithXmlTokenizer()
         ///)
         ///.Build();
         ///]]>

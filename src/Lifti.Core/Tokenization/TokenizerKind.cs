@@ -15,6 +15,11 @@
         /// of some form, and only element text will be tokenized. Element tags, attributes
         /// and attribute values will not be tokenized.
         /// </summary>
-        XmlContent = 1
+        XmlContent = 1,
+
+        /// <summary>
+        /// A custom <see cref="ITokenizer"/> type has been provided.
+        /// </summary>
+        Custom = 2
     }
 }

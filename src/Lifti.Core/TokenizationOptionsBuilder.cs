@@ -20,7 +20,7 @@ namespace Lifti
         /// within tags. This will also skip any attributes and attribute text in the XML, i.e. the only text that
         /// will be indexed will text nodes.
         /// </summary>
-        public TokenizationOptionsBuilder XmlContent()
+        public TokenizationOptionsBuilder WithXmlTokenizer()
         {
             this.tokenizerKind = TokenizerKind.XmlContent;
             return this;

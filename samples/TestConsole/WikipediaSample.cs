@@ -9,7 +9,7 @@ namespace TestConsole
         public static async Task RunAsync()
         {
             var index = new FullTextIndexBuilder<string>()
-                .WithDefaultTokenizationOptions(o => o.WithStemming().XmlContent())
+                .WithDefaultTokenizationOptions(o => o.WithStemming().WithXmlTokenizer())
                 .Build();
 
             var wikipediaTests = WikipediaDataLoader.Load(typeof(WikipediaSample));
