@@ -48,8 +48,17 @@ Remove-Item .\temp -Recurse -Force -ErrorAction Ignore
 
 "Fixing up relative path for blazor sample"
 (Get-Content .\public\blazor-sample\index.html) `
-	-replace '<base href="/" />', '<base href="/lifti/blazor-sample/" />' |
+	-replace '<base href="/" />', '<base href="/lifti/blazor-sample/" />' `
+	-replace '_framework', 'framework' |
 	Out-File .\public\blazor-sample\index.html
+
+"Fixing underscored paths"
+Rename-Item .\public\blazor-sample\_framework "framework"
+Rename-Item .\public\blazor-sample\framework\_bin "bin"
+(Get-Content .\public\blazor-sample\framework\blazor.webassembly.js) `
+	-replace '_framework', 'framework' `
+	-replace '_bin', 'bin' |
+	Out-File .\public\blazor-sample\framework\blazor.webassembly.js
 
 if ($commitMessage.Length -gt 0) {
 	"Committing master branch"
