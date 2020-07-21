@@ -17,7 +17,7 @@ namespace Lifti
 
         /// <summary>
         /// Configures the tokenizer to treat the source text as XML, skipping any characters and text contained
-        /// withing tags. This will also skip any attributes and attribute text in the XML, i.e. the only text that
+        /// within tags. This will also skip any attributes and attribute text in the XML, i.e. the only text that
         /// will be indexed will text nodes.
         /// </summary>
         public TokenizationOptionsBuilder XmlContent()
@@ -27,9 +27,10 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Configures the tokenizer to split on punctuation characters (e.g. those that match
+        /// Configures the tokenizer to split words on punctuation characters (e.g. those that match
         /// <see cref="Char.IsPunctuation(char)"/>). This is the default tokenizer behaviour that can
-        /// be suppressed by passing <c>false</c> to this method.
+        /// be suppressed by passing <c>false</c> to this method, in which case only characters explicitly specified
+        /// using <see cref="SplitOnCharacters(char[])" /> will be treated as word breaks.
         /// </summary>
         public TokenizationOptionsBuilder SplitOnPunctuation(bool splitOnPunctionation = true)
         {
@@ -49,8 +50,8 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Configures the tokenizer to be accent insensitive, normalizing all characters
-        /// to a latin-based equivalent. This is the default tokenizer behavior that can
+        /// Configures the tokenizer to normalize characters with diacritics common form. e.g. `aigües` and `aigues` will be equivalent, 
+        /// as will `laering` and `læring`. This is the default tokenizer behavior that can
         /// be suppressed by passing <c>false</c> to this method.
         /// </summary>
         public TokenizationOptionsBuilder AccentInsensitive(bool accentInsensitive = true)

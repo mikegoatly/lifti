@@ -125,9 +125,9 @@ namespace Lifti
         /// <![CDATA[
         /// var index = new FullTextIndexBuilder<int>()
         ///.WithDefaultTokenizationOptions(o =>o
-        ///    .AccentInsensitive(true)
-        ///    .CaseInsensitive(true)
-        ///    .SplitOnPunctuation(true)
+        ///    .AccentInsensitive(true) // Default
+        ///    .CaseInsensitive(true) // Default
+        ///    .SplitOnPunctuation(true) // Default
         ///    .SplitOnCharacters('%', '#', '@')
         ///    .WithStemming(true)
         ///    .XmlContent()

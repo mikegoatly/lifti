@@ -3,10 +3,8 @@ title: "Getting Started"
 linkTitle: "Getting Started"
 weight: 1
 description: >
-  Indexing text against a key
+  The simplest possible way to create a LIFTI index, index some text in it and retrieve search results.
 ---
-
-_TODO: Introduce concept of keys in an index_
 
 Perhaps the simplest way to work with LIFTI is to index text against a key that means something in some other system.
 

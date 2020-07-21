@@ -3,8 +3,7 @@ title: "Index Construction"
 linkTitle: "Index Construction"
 weight: 2
 description: >
-  Indexes are constructed using a `FullTextIndexBuilder<TKey>`. This exposes all the options
-  an index can be customized with.
+  Use a `FullTextIndexBuilder<TKey>` to configure the behavior of your index.
 ---
 
 ## Quick examples

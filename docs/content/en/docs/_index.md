@@ -23,5 +23,3 @@ Then LIFTI is for you. You could use it in:
 * ASP.NET applications where you need to perform a fast search against a long list of words. An in-memory index of exclusion words
 could easily be used to do this.
 * Lots of other scenarios!
-
-LIFTI probably won't be a great fit if you want a scalable, centralized *modifiable* index. At least, not without considerable effort!
