@@ -4,7 +4,7 @@
   
   <url>
     <loc>https://mikegoatly.github.io/lifti/docs/getting-started/</loc>
-    <lastmod>2020-07-14T21:32:01+01:00</lastmod>
+    <lastmod>2020-07-21T07:25:31+01:00</lastmod>
   </url>
   
   <url>
@@ -14,12 +14,12 @@
   
   <url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/</loc>
-    <lastmod>2020-07-20T20:44:46+01:00</lastmod>
+    <lastmod>2020-07-21T07:25:31+01:00</lastmod>
   </url>
   
   <url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withdefaulttokenizationoptions/</loc>
-    <lastmod>2020-07-20T20:44:46+01:00</lastmod>
+    <lastmod>2020-07-21T07:25:31+01:00</lastmod>
   </url>
   
   <url>
@@ -48,8 +48,16 @@
   </url>
   
   <url>
+    <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withindexmodificationaction/</loc>
+  </url>
+  
+  <url>
+    <loc>https://mikegoatly.github.io/lifti/docs/faq/</loc>
+  </url>
+  
+  <url>
     <loc>https://mikegoatly.github.io/lifti/docs/</loc>
-    <lastmod>2020-07-14T21:32:01+01:00</lastmod>
+    <lastmod>2020-07-21T07:25:31+01:00</lastmod>
   </url>
   
   <url>
@@ -70,6 +78,10 @@
   <url>
     <loc>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/</loc>
     <lastmod>2020-07-16T07:52:33+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withobjecttokenization/</loc>
   </url>
   
   <url>
