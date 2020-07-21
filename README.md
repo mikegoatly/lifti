@@ -10,7 +10,7 @@ Read the documentation [here](https://mikegoatly.github.io/lifti)
 
 ## Try it out!
 
-[Use LIFTI in a Blazor app](https://liftidemo.z22.web.core.windows.net/wikipedia-search) - try out various queries against Wikipedia content
+[Use LIFTI in a Blazor app](https://mikegoatly.github.io/lifti/blazor-sample) - try out various queries against Wikipedia content
 
 ## Simplest possible quick start
 
