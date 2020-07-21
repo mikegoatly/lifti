@@ -39,15 +39,3 @@ var index = new FullTextIndexBuilder<int>()
     )
     .Build();
 ```
-
-TODO
-
-`WithIndexModificationAction`
-`WithObjectTokenization`
-`WithQueryParser`
-
-TODO Advanced
-
-`WithIntraNodeTextSupportedAfterIndexDepth`
-`WithIndexNodeFactory`
-`WithTokenizerFactory`
