@@ -13,7 +13,7 @@ Create an index with defaults:
 * case insensitive
 * accent insensitive
 * no word stemming
-* splitting only on punctuation
+* splitting only on punctuation, whitespace and control characters
 
 ``` csharp
 var index = new FullTextIndexBuilder<int>()
