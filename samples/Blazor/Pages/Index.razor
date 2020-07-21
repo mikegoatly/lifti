@@ -1,5 +1,230 @@
 ﻿@page "/"
+@using Lifti
+@inject HttpClient Http
 
-<h1>Hello, LIFTI!</h1>
+<p>This example fetches random Wikipedia page content and indexes the text in it. You can try out various LIFTI searches to find content in them.</p>
 
-This is a Blazor app that acts as a self-contained example of some of the uses for LIFTI.
+<div class="position-relative">
+    <div class="alert alert-@(this.errored ? "danger" : "secondary") d-flex">
+        <span class="align-self-center">@Message</span>
+        <span class="align-self-center text-right flex-fill mr-2">@index.Count pages indexed.</span>
+        <button disabled=@indexing class="btn btn-secondary" @onclick="IndexRandomPagesAsync">Index more...</button>
+    </div>
+
+    <div class="d-flex flex-row mb-2">
+        <input type="text" @bind="SearchText" />
+        <button class="btn btn-primary ml-2" @onclick="Search">Search</button>
+        <button class="btn btn-secondary ml-2" @onclick="ShowAll">Show all</button>
+        <button class="btn btn-secondary ml-2" @onclick="Clear">Clear results</button>
+        <button class="btn btn-secondary ml-2" @onclick="ShowIndex">Show me the index</button>
+        <a href="https://mikegoatly.github.io/lifti/docs/searching/" class="align-self-center ml-2" target="_blank">Query language examples</a>
+    </div>
+
+    @if (this.IndexText != null)
+    {
+        <pre>
+            @this.IndexText
+        </pre>
+    }
+    else if (this.SyntaxError != null)
+    {
+        <div class="alert alert-danger d-flex">
+            <span class="align-self-center">@this.SyntaxError</span>
+        </div>
+    }
+    else if (results != null)
+    {
+        if (results.Count == 0)
+        {
+            <div class="alert alert-info d-flex">
+                <span class="align-self-center">No matches!</span>
+            </div>
+        }
+        else
+        {
+            <div class="container-fluid border-primary border-top">
+                <div class="row">
+                    <ul class="col-3 search-results pr-2 pt-2 border-primary border-right">
+                        @foreach (var result in results)
+                        {
+                            <li class="p-1" @onclick="() => this.ShowItem(result)">@result.Key <br/> Score @result.Score.ToString("0.####")</li>
+                        }
+                    </ul>
+                    @if (this.selectedContent != null)
+                    {
+                        <div class="col-9 pl-4 pt-2 d-flex flex-row">
+                            <div>
+                                @((MarkupString)this.selectedContent)
+                            </div>
+                            <div style="max-width:140px;width:140px;min-width:140px">
+                                <strong>Word matches:</strong>
+                                @foreach (var location in this.wordLocations)
+                                {
+                                    <div>@location</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="text-muted">
+            <div class="mb-4">Why not try these searches?:</div>
+            <dl>
+                <dt>"Buffy the vampire slayer"</dt>
+                <dd>All these words in this order</dd>
+                <dt>critical ~> acclaim</dt>
+                <dd>The word "critical" when it appears before and near to the word "acclaim"</dd>
+                <dt>st* & sp*</dt>
+                <dd>The document must contain words starting with "st" and "sp"</dd>
+                <dt>fight | thrones</dt>
+                <dd>Documents containing words deriving from "fight" or "thrones" (Word stemming is enabled)</dd>
+                <dt>"san ti"</dt>
+                <dd>Returns pages containing "Sān tǐ", demonstrating accent insensitivity searching.</dd>
+            </dl>
+        </div>
+    }
+</div>
+
+@code {
+        PageSummary[] defaultPages = new[]
+        {
+        new PageSummary { Slug = "The_Three-Body_Problem_(novel)" },
+        new PageSummary { Slug = "Aliens_(film)" },
+        new PageSummary { Slug = "Porcupine_Tree" },
+        new PageSummary { Slug = "Buffy_the_Vampire_Slayer" },
+        new PageSummary { Slug = "Monstress_(comics)" },
+        new PageSummary { Slug = "Donnie_Darko" },
+        new PageSummary { Slug = "Zune" },
+        new PageSummary { Slug = "The_Boys_(2019_TV_series)" },
+        new PageSummary { Slug = "Game_of_Thrones" },
+        new PageSummary { Slug = "Fantastic_Mr_Fox" }
+    };
+
+        IList<SearchResult<string>> results = null;
+        IFullTextIndex<string> index = new FullTextIndexBuilder<string>()
+            .WithDefaultTokenizationOptions(o => o.WithStemming())
+            .WithObjectTokenization<WikipediaPage>(
+                page => page.WithKey(i => i.Title)
+                    .WithField("Content", i => i.Text.Content, o => o.XmlContent().WithStemming()))
+            .Build();
+
+    private bool errored;
+    private bool indexing;
+    private string selectedContent;
+    private IReadOnlyList<TokenLocation> wordLocations;
+
+    private string IndexText { get; set; }
+    private string SyntaxError { get; set; }
+    private string Message { get; set; }
+    private string SearchText { get; set; }
+    private Dictionary<string, string> loadedPages = new Dictionary<string, string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchPagesAsync(defaultPages);
+    }
+
+    void ShowItem(SearchResult<string> searchResult)
+    {
+        var builder = new System.Text.StringBuilder(this.loadedPages[searchResult.Key]);
+        var locations = searchResult.FieldMatches.SelectMany(m => m.Locations).ToList();
+        foreach (var location in locations.OrderByDescending(l => l.Start))
+        {
+            builder.Insert(location.Start + location.Length, "</span>");
+            builder.Insert(location.Start, "<span class='bg-warning'>");
+        }
+
+        this.wordLocations = locations;
+        this.selectedContent = builder.ToString();
+    }
+
+    async Task IndexRandomPagesAsync()
+    {
+        this.errored = false;
+
+        this.Message = "Getting 10 random Wikipedia pages...";
+
+        try
+        {
+            var randomList = await Http.GetJsonAsync<RandomResult>("https://en.wikipedia.org/w/api.php?action=query&list=random&rnlimit=10&rnnamespace=0&format=json&&origin=*");
+
+            await this.FetchPagesAsync(randomList.Query.random);
+        }
+        catch (Exception ex)
+        {
+            this.Message = ex.Message;
+            this.errored = true;
+        }
+    }
+
+    async Task FetchPagesAsync(IEnumerable<PageSummary> pages)
+    {
+        this.indexing = true;
+        this.errored = false;
+
+        try
+        {
+            var i = 1;
+            foreach (var result in pages)
+            {
+                var counter = $"[{i++}/10]";
+                this.Message = $"{counter} Fetching page {result.Title ?? result.Slug}";
+                base.StateHasChanged();
+
+                var filter = result.Slug != null ? "page=" + result.Slug : "pageid=" + result.Id;
+                var results = await Http.GetJsonAsync<WikipediaResult>($"https://en.wikipedia.org/w/api.php?action=parse&section=0&prop=text&{filter}&format=json&&origin=*");
+
+                this.Message = $"{counter} Indexing...";
+                base.StateHasChanged();
+                loadedPages[results.Page.Title] = results.Page.Text.Content;
+                await this.index.AddAsync(results.Page);
+            }
+
+            this.Message = "Ready";
+        }
+        catch (Exception ex)
+        {
+            this.Message = ex.Message;
+            this.errored = true;
+        }
+        finally
+        {
+            this.indexing = false;
+        }
+    }
+
+    void ShowIndex()
+    {
+        this.IndexText = this.index.ToString();
+    }
+
+    void Clear()
+    {
+        this.IndexText = null;
+        this.results = null;
+    }
+
+    void Search()
+    {
+        try
+        {
+            this.IndexText = null;
+            this.SyntaxError = null;
+            results = this.index.Search(this.SearchText).ToList();
+        }
+        catch (Exception ex)
+        {
+            this.SyntaxError = ex.Message;
+        }
+    }
+
+    void ShowAll()
+    {
+        this.IndexText = null;  
+        results = this.loadedPages.Keys.Select(k => new SearchResult<string>(k, Array.Empty<FieldSearchResult>())).ToList();
+    }
+}
