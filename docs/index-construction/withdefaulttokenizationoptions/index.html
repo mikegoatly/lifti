@@ -30,7 +30,7 @@
 <meta itemprop="description" content="Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
 ">
 <meta itemprop="dateModified" content="2020-07-20T20:44:46&#43;01:00" />
-<meta itemprop="wordCount" content="23">
+<meta itemprop="wordCount" content="293">
 
 
 
@@ -350,6 +350,19 @@
 
 
 
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#example-usage">Example usage</a></li>
+    <li><a href="#tokenizationoptionsbuilder-methods">TokenizationOptionsBuilder methods</a>
+      <ul>
+        <li><a href="#word-break-modifiers">Word break modifiers</a></li>
+        <li><a href="#text-normalization">Text Normalization</a></li>
+        <li><a href="#content">Content</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
 
 
           </div>
@@ -400,15 +413,39 @@
 <h2 id="example-usage">Example usage</h2>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;()</span>
     <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithDefaultTokenizationOptions</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span><span style="color:#000">o</span>
-        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">AccentInsensitive</span><span style="color:#000;font-weight:bold">()</span>
-        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">CaseInsensitive</span><span style="color:#000;font-weight:bold">()</span>
-        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">SplitOnPunctuation</span><span style="color:#000;font-weight:bold">()</span>
-        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">SplitOnCharacters</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;%&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#39;#&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#39;@&#39;</span><span style="color:#000;font-weight:bold">)</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">AccentInsensitive</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// Default
+</span><span style="color:#8f5902;font-style:italic"></span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">CaseInsensitive</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// Default
+</span><span style="color:#8f5902;font-style:italic"></span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">SplitOnPunctuation</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// Default
+</span><span style="color:#8f5902;font-style:italic"></span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">SplitOnCharacters</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;%&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#39;#&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#39;@&#39;</span><span style="color:#000;font-weight:bold">)</span>
         <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithStemming</span><span style="color:#000;font-weight:bold">()</span>
         <span style="color:#000;font-weight:bold">.</span><span style="color:#000">XmlContent</span><span style="color:#000;font-weight:bold">()</span>
     <span style="color:#000;font-weight:bold">)</span>
     <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
-</code></pre></div><h3 id="heading"></h3>
+</code></pre></div><h2 id="tokenizationoptionsbuilder-methods">TokenizationOptionsBuilder methods</h2>
+<h3 id="word-break-modifiers">Word break modifiers</h3>
+<p>A tokenizer will always break words on separator (<code>Char.IsSeparator</code>) or control (<code>Char.IsControl</code>) characters.</p>
+<h4 id="splitonpunctuationbool"><code>SplitOnPunctuation(bool)</code></h4>
+<p><code>true</code>: <strong>Default</strong> The tokenizer will split words on punctuation characters (e.g. those that match <code>Char.IsPunctuation(char)</code>)</p>
+<p><code>false</code>: Only characters explicitly specified using <code>SplitOnCharacters</code> will be treated as word breaks.</p>
+<h4 id="splitoncharactersparams-char"><code>SplitOnCharacters(params char[])</code></h4>
+<p>Allows for additional characters to cause word breaks for a tokenizer. E.g. <code>SplitOnCharacters('$', '£')</code>.</p>
+<h3 id="text-normalization">Text Normalization</h3>
+<h4 id="accentinsensitivebool"><code>AccentInsensitive(bool)</code></h4>
+<p><code>true</code>: <strong>Default</strong> The tokenizer will normalize characters with diacritics to common form. e.g. <code>aigües</code> and <code>aigues</code> will be equivalent. 
+Additionally, characters that can be logically expressed as two characters are expanded, e.g. <code>laering</code> will be equivalent to <code>læring</code>.</p>
+<p><code>false</code>: The tokenizer will be accent sensitive. Searching for <code>aigües</code> will not match <code>aigues</code>.</p>
+<h4 id="caseinsensitivebool"><code>CaseInsensitive(bool)</code></h4>
+<p><code>true</code>: <strong>Default</strong> The tokenizer will normalize all characters to uppercase. e.g. <code>Cat</code> and <code>cat</code> will be equivalent.</p>
+<p><code>false</code>: The tokenizer will be case sensitive. Searching for <code>Cat</code> will match <code>Cat</code> but not <code>cat</code>.</p>
+<h4 id="withstemmingbool"><code>WithStemming(bool)</code></h4>
+<p><code>true</code>: Words will be stemmed using an implementation of the Porter Stemmer algorithm. For example, <code>ABANDON</code>, <code>ABANDONED</code> and <code>ABANDONING</code> will all
+be treated as <code>ABANDON</code>. Currently only English is supported.</p>
+<p><code>false</code>: <strong>Default</strong> No stemming will be performed on words.</p>
+<h3 id="content">Content</h3>
+<p>By default, all text passed to a tokenizer will be treated as text that should be indexed. This behavior can be modified if required.</p>
+<h4 id="xmlcontent"><code>XmlContent()</code></h4>
+<p>Calling <code>XmlContent</code> on the builder causes the tokenizer to treat the source text as XML, skipping any characters and text contained
+within tags. This will also skip any attributes and attribute text in the XML, i.e. the only text that will be indexed will text nodes.</p>
 
 	
 	
