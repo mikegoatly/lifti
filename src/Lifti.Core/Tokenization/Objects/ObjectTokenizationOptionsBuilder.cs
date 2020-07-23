@@ -18,7 +18,7 @@ namespace Lifti.Tokenization.Objects
     /// </typeparam>
     public class ObjectTokenizationOptionsBuilder<T, TKey>
     {
-        private List<FieldReader<T>> fieldReaders = new List<FieldReader<T>>();
+        private readonly List<FieldReader<T>> fieldReaders = new List<FieldReader<T>>();
         private Func<T, TKey>? keyReader;
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Lifti.Tokenization.Objects
             ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, fieldTextReader);
-            var tokenizer =  optionsBuilder.CreateTokenizer();
+            var tokenizer = optionsBuilder.CreateTokenizer();
             this.fieldReaders.Add(new StringFieldReader<T>(name, fieldTextReader, tokenizer, textExtractor));
             return this;
         }

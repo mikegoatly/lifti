@@ -15,8 +15,8 @@ namespace Lifti.Tokenization
     public class Tokenizer : ITokenizer
     {
         private readonly IInputPreprocessorPipeline inputPreprocessorPipeline;
-        private HashSet<char>? additionalSplitChars;
-        private IStemmer? stemmer;
+        private readonly HashSet<char>? additionalSplitChars;
+        private readonly IStemmer? stemmer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Tokenizer"/> class.
@@ -61,8 +61,8 @@ namespace Lifti.Tokenization
             foreach (var documentFragment in document)
             {
                 this.Process(
-                    processedTokens, 
-                    ref tokenIndex, 
+                    processedTokens,
+                    ref tokenIndex,
                     documentFragment.Offset,
                     tokenBuilder,
                     documentFragment.Text.Span);

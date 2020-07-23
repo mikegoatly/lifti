@@ -9,7 +9,7 @@ namespace Lifti
     /// </summary>
     public class IndexNodeFactory : IIndexNodeFactory
     {
-        private int supportIntraNodeTextAtDepth;
+        private readonly int supportIntraNodeTextAtDepth;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IndexNodeFactory"/> class.

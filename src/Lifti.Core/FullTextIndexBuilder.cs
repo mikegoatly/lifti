@@ -148,7 +148,7 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(optionsBuilder));
             }
 
-            this.defaultTokenizer = optionsBuilder.CreateTokenizer();
+            this.defaultTokenizer = optionsBuilder.CreateTokenizer()!;
 
             return this;
         }
