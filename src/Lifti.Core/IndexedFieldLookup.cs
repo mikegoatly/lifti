@@ -1,5 +1,6 @@
 ﻿using Lifti.Tokenization;
 using Lifti.Tokenization.Objects;
+using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -14,28 +15,28 @@ namespace Lifti
         private int nextId = 0;
 
         internal IndexedFieldLookup(
-            IEnumerable<IFieldTokenization> fieldTokenizationOptions, 
-            ITokenizerFactory tokenizerFactory,
-            TokenizationOptions defaultTokenizationOptions)
+            IEnumerable<IFieldReader> fieldReaders, 
+            ITextExtractor defaultTextExtractor,
+            ITokenizer defaultTokenizer)
         {
-            if (fieldTokenizationOptions is null)
+            if (fieldReaders is null)
             {
-                throw new ArgumentNullException(nameof(fieldTokenizationOptions));
+                throw new ArgumentNullException(nameof(fieldReaders));
             }
 
-            if (tokenizerFactory is null)
+            if (defaultTextExtractor is null)
             {
-                throw new ArgumentNullException(nameof(tokenizerFactory));
+                throw new ArgumentNullException(nameof(defaultTextExtractor));
             }
 
-            if (defaultTokenizationOptions is null)
+            if (defaultTokenizer is null)
             {
-                throw new ArgumentNullException(nameof(defaultTokenizationOptions));
+                throw new ArgumentNullException(nameof(defaultTokenizer));
             }
 
-            foreach (var field in fieldTokenizationOptions)
+            foreach (var field in fieldReaders)
             {
-                this.RegisterField(field, tokenizerFactory, defaultTokenizationOptions);
+                this.RegisterField(field, defaultTextExtractor, defaultTokenizer);
             }
         }
 
@@ -68,7 +69,7 @@ namespace Lifti
             return details;
         }
 
-        private void RegisterField(IFieldTokenization fieldOptions, ITokenizerFactory tokenizerFactory, TokenizationOptions defaultTokenizationOptions)
+        private void RegisterField(IFieldReader fieldOptions, ITextExtractor defaultTextExtractor, ITokenizer defaultTokenizer)
         {
             var fieldName = fieldOptions.Name;
             if (this.fieldToDetailsLookup.ContainsKey(fieldOptions.Name))
@@ -83,8 +84,9 @@ namespace Lifti
             }
 
             var id = (byte)newId;
-            var fieldTokenizationOptions = fieldOptions.TokenizationOptions ?? defaultTokenizationOptions;
-            this.fieldToDetailsLookup[fieldName] = new IndexedFieldDetails((byte)id, tokenizerFactory.Create(fieldTokenizationOptions));
+            var fieldTokenizer = fieldOptions.Tokenizer ?? defaultTokenizer;
+            var textExtractor = fieldOptions.TextExtractor ?? defaultTextExtractor;
+            this.fieldToDetailsLookup[fieldName] = new IndexedFieldDetails((byte)id, textExtractor, fieldTokenizer);
             this.idToFieldLookup[id] = fieldName;
         }
     }

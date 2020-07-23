@@ -1,66 +1,84 @@
-﻿using Lifti.Tokenization.Preprocessing;
+﻿
+using Lifti.Tokenization.Preprocessing;
 using Lifti.Tokenization.Stemming;
+using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Globalization;
 using System.Text;
 
 namespace Lifti.Tokenization
 {
     /// <summary>
-    /// A simple implementation of <see cref="ITokenizer"/> that just extracts tokens from plain text.
+    /// The default implementation of <see cref="ITokenizer"/> that just extracts tokens from plain text.
     /// </summary>
-    public class BasicTokenizer : ConfiguredBy<TokenizationOptions>, ITokenizer
+    public class Tokenizer : ITokenizer
     {
-        private readonly IInputPreprocessorPipeline inputPreprocessorPipeline = new InputPreprocessorPipeline();
-        private TokenizationOptions tokenizationOptions = TokenizationOptions.Default;
+        private readonly IInputPreprocessorPipeline inputPreprocessorPipeline;
         private HashSet<char>? additionalSplitChars;
         private IStemmer? stemmer;
 
-        /// <inheritdoc />
-        public IReadOnlyList<Token> Process(string input)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Tokenizer"/> class.
+        /// </summary>
+        /// <param name="tokenizationOptions">The tokenization options for this instance.</param>
+        public Tokenizer(TokenizationOptions tokenizationOptions)
         {
-            if (input == null)
+            this.Options = tokenizationOptions ?? throw new ArgumentNullException(nameof(tokenizationOptions));
+
+            if (tokenizationOptions.Stemming)
             {
-                return ImmutableList<Token>.Empty;
+                this.stemmer = new PorterStemmer();
             }
 
-            return this.Process(input.AsSpan());
+            this.additionalSplitChars = tokenizationOptions.AdditionalSplitCharacters.Count > 0
+                ? new HashSet<char>(tokenizationOptions.AdditionalSplitCharacters)
+                : null;
+
+            this.inputPreprocessorPipeline = new InputPreprocessorPipeline(tokenizationOptions);
         }
 
+        /// <summary>
+        /// Gets the default <see cref="ITokenizer"/> implementation, configured with <see cref="TokenizationOptions.Default"/>.
+        /// </summary>
+        public static Tokenizer Default { get; } = new Tokenizer(TokenizationOptions.Default);
+
         /// <inheritdoc />
-        public IReadOnlyList<Token> Process(ReadOnlySpan<char> input)
+        public TokenizationOptions Options { get; }
+
+        /// <inheritdoc />
+        public IReadOnlyList<Token> Process(IEnumerable<DocumentTextFragment> document)
         {
+            if (document is null)
+            {
+                return Array.Empty<Token>();
+            }
+
             var processedTokens = new TokenStore();
             var tokenIndex = 0;
-            var start = 0;
             var tokenBuilder = new StringBuilder();
 
-            this.Process(processedTokens, ref tokenIndex, ref start, 0, tokenBuilder, input);
+            foreach (var documentFragment in document)
+            {
+                this.Process(
+                    processedTokens, 
+                    ref tokenIndex, 
+                    documentFragment.Offset,
+                    tokenBuilder,
+                    documentFragment.Text.Span);
+            }
 
             return processedTokens.ToList();
         }
 
         /// <inheritdoc />
-        public IReadOnlyList<Token> Process(IEnumerable<string> inputs)
+        public IReadOnlyList<Token> Process(ReadOnlySpan<char> text)
         {
-            if (inputs is null)
-            {
-                return ImmutableList<Token>.Empty;
-            }
-
             var processedTokens = new TokenStore();
             var tokenIndex = 0;
-            var start = 0;
             var tokenBuilder = new StringBuilder();
-            var endOffset = 0;
 
-            foreach (var input in inputs)
-            {
-                this.Process(processedTokens, ref tokenIndex, ref start, endOffset, tokenBuilder, input.AsSpan());
-                endOffset += input.Length;
-            }
+            this.Process(processedTokens, ref tokenIndex, 0, tokenBuilder, text);
 
             return processedTokens.ToList();
         }
@@ -68,11 +86,11 @@ namespace Lifti.Tokenization
         private void Process(
             TokenStore processedTokens,
             ref int tokenIndex,
-            ref int start,
-            int endOffset,
+            int startOffset,
             StringBuilder tokenBuilder,
             ReadOnlySpan<char> input)
         {
+            var start = startOffset;
             for (var i = 0; i < input.Length; i++)
             {
                 var current = input[i];
@@ -80,12 +98,12 @@ namespace Lifti.Tokenization
                 {
                     if (tokenBuilder.Length > 0)
                     {
-                        this.CaptureToken(processedTokens, tokenIndex, start, i + endOffset, tokenBuilder);
+                        this.CaptureToken(processedTokens, tokenIndex, start, i + startOffset, tokenBuilder);
                         tokenIndex++;
                         tokenBuilder.Length = 0;
                     }
 
-                    start = i + endOffset + 1;
+                    start = i + startOffset + 1;
                 }
                 else
                 {
@@ -98,13 +116,10 @@ namespace Lifti.Tokenization
 
             if (tokenBuilder.Length > 0)
             {
-                this.CaptureToken(processedTokens, tokenIndex, start, input.Length + endOffset, tokenBuilder);
+                this.CaptureToken(processedTokens, tokenIndex, start, input.Length + startOffset, tokenBuilder);
                 tokenIndex++;
                 tokenBuilder.Length = 0;
             }
-
-            endOffset += input.Length;
-            start = endOffset;
         }
 
         /// <summary>
@@ -114,7 +129,7 @@ namespace Lifti.Tokenization
         {
             return char.IsSeparator(current) ||
                 char.IsControl(current) ||
-                (this.tokenizationOptions.SplitOnPunctuation == true && char.IsPunctuation(current)) ||
+                (this.Options.SplitOnPunctuation == true && char.IsPunctuation(current)) ||
                 (this.additionalSplitChars?.Contains(current) == true);
         }
 
@@ -134,23 +149,6 @@ namespace Lifti.Tokenization
             }
 
             processedTokens.MergeOrAdd(new TokenHash(tokenBuilder), tokenBuilder, new TokenLocation(tokenIndex, start, (ushort)length));
-        }
-
-        /// <inheritdoc />
-        protected override void OnConfiguring(TokenizationOptions options)
-        {
-            this.tokenizationOptions = options ?? throw new ArgumentNullException(nameof(options));
-
-            if (this.tokenizationOptions.Stemming)
-            {
-                this.stemmer = new PorterStemmer();
-            }
-
-            this.additionalSplitChars = this.tokenizationOptions.AdditionalSplitCharacters.Count > 0
-                ? new HashSet<char>(this.tokenizationOptions.AdditionalSplitCharacters)
-                : null;
-
-            this.inputPreprocessorPipeline.Configure(options);
         }
     }
 }

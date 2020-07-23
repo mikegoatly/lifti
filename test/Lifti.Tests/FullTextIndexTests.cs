@@ -1,5 +1,8 @@
 ﻿using FluentAssertions;
+using Lifti.Tokenization.TextExtraction;
+using Moq;
 using PerformanceProfiling;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -19,7 +22,8 @@ namespace Lifti.Tests
                     o => o.WithKey(i => i.Id)
                         .WithField("Text1", i => i.Text1, opts => opts.CaseInsensitive(false))
                         .WithField("Text2", i => i.Text2)
-                        .WithField("Text3", i => i.Text3, opts => opts.WithStemming()))
+                        .WithField("Text3", i => i.Text3, opts => opts.WithStemming())
+                        .WithField("Text4", i => i.Text3, textExtractor: new ReversingTextExtractor()))
                 .WithObjectTokenization<TestObject2>(
                     o => o.WithKey(i => i.Id)
                         .WithField("MultiText", i => i.Text))
@@ -47,13 +51,28 @@ namespace Lifti.Tests
         {
             await this.WithIndexedSingleStringPropertyObjectsAsync();
 
-            this.index.Items.IndexStatistics.TotalTokenCount.Should().Be(14);
+            this.index.Items.IndexStatistics.TotalTokenCount.Should().Be(22L);
             this.index.Items.IndexStatistics.TokenCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
             {
                 { 1, 4 },
                 { 2, 4 },
-                { 3, 6 }
+                { 3, 7 },
+                { 4, 7 }
             });
+        }
+
+        [Fact]
+        public async Task IndexingFieldWithCustomTextExtractor_ShouldOnlyApplyTextExtractorToExpectedField()
+        {
+            await this.WithIndexedSingleStringPropertyObjectsAsync();
+
+            var results = this.index.Search("TAE");
+            results.Should().HaveCount(1);
+            results.First().FieldMatches.Single().FoundIn.Should().Be("Text4");
+            
+            results = this.index.Search("EAT");
+            results.Should().HaveCount(1);
+            results.First().FieldMatches.Single().FoundIn.Should().Be("Text3");
         }
 
         [Fact]
@@ -124,8 +143,8 @@ namespace Lifti.Tests
             this.index.Search("Text1=one").Should().HaveCount(0);
             this.index.Search("Text1=One").Should().HaveCount(2);
 
-            this.index.Search("Text3=summer").Should().HaveCount(1);
-            this.index.Search("Text3=summers").Should().HaveCount(1);
+            this.index.Search("Text3=eat").Should().HaveCount(1);
+            this.index.Search("Text3=eats").Should().HaveCount(1);
             this.index.Search("Text3=drum").Should().HaveCount(1);
             this.index.Search("Text3=drumming").Should().HaveCount(1);
             this.index.Search("Text3=drums").Should().HaveCount(1);
@@ -326,10 +345,45 @@ namespace Lifti.Tests
             this.index.Root.Should().BeEquivalentTo(previousRoot);
         }
 
+        [Fact]
+        public async Task AddingItemsToIndex_ShouldUseProvidedTextExtractor()
+        {
+            var textExtractor = new Mock<ITextExtractor>();
+            textExtractor.SetReturnsDefault<IEnumerable<DocumentTextFragment>>(
+                new[]
+                {
+                    new DocumentTextFragment(0, "MOCKED".AsMemory())
+                });
+
+            var index = new FullTextIndexBuilder<int>()
+                .WithIntraNodeTextSupportedAfterIndexDepth(0)
+                .WithTextExtractor(textExtractor.Object)
+                .Build();
+
+            await index.AddAsync(1, "Hello");
+
+            index.Root.IntraNodeText.ToString().Should().BeEquivalentTo("MOCKED");
+        }
+
+        [Fact]
+        public async Task SearchingTheIndex_ShouldNotUseTextExtractor()
+        {
+            var index = new FullTextIndexBuilder<int>()
+                .WithIntraNodeTextSupportedAfterIndexDepth(0)
+                .WithTextExtractor<ReversingTextExtractor>()
+                .Build();
+
+            await index.AddAsync(1, "Hello");
+
+            // The text will have been reversed by the text extractor, but searching won't have that applied
+            index.Search("Hello").Should().HaveCount(0);
+            index.Search("olleh").Should().HaveCount(1);
+        }
+
         private async Task WithIndexedSingleStringPropertyObjectsAsync()
         {
             await this.index.AddAsync(new TestObject("A", "Text One", "Text Two", "Text Three Drumming"));
-            await this.index.AddAsync(new TestObject("B", "Not One", "Not Two", "Not Three Summers"));
+            await this.index.AddAsync(new TestObject("B", "Not One", "Not Two", "Not Three Eat Eating"));
         }
 
         private async Task WithIndexedMultiStringPropertyObjectsAsync()

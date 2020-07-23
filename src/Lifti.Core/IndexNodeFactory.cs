@@ -7,9 +7,22 @@ namespace Lifti
     /// A factory for <see cref="IndexNode"/> instances used by a <see cref="FullTextIndex{TKey}"/>
     /// when adding nodes to the index.
     /// </summary>
-    public class IndexNodeFactory : ConfiguredBy<IndexOptions>, IIndexNodeFactory
+    public class IndexNodeFactory : IIndexNodeFactory
     {
         private int supportIntraNodeTextAtDepth;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IndexNodeFactory"/> class.
+        /// </summary>
+        public IndexNodeFactory(IndexOptions options)
+        {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            this.supportIntraNodeTextAtDepth = options.SupportIntraNodeTextAfterIndexDepth;
+        }
 
         /// <summary>
         /// Creates a new instance of <see cref="IndexNodeFactory"/>.
@@ -37,17 +50,6 @@ namespace Lifti
             ImmutableDictionary<int, ImmutableList<IndexedToken>> matches)
         {
             return new IndexNode(intraNodeText, childNodes, matches);
-        }
-
-        /// <inheritdoc/>
-        protected override void OnConfiguring(IndexOptions options)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            this.supportIntraNodeTextAtDepth = options.SupportIntraNodeTextAfterIndexDepth;
         }
     }
 }

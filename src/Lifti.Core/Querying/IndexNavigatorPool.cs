@@ -16,7 +16,7 @@ namespace Lifti.Querying
         {
             var node = indexSnapshot.Root;
 
-            if (!pool.TryTake(out var navigator))
+            if (!this.pool.TryTake(out var navigator))
             {
                 navigator = new IndexNavigator();
             }

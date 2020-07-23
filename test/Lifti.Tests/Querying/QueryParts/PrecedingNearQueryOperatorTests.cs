@@ -57,7 +57,7 @@ namespace Lifti.Tests.Querying.QueryParts
         protected static async Task<IFullTextIndex<int>> CreateTestIndexAsync()
         {
             var index = new FullTextIndexBuilder<int>()
-                .WithDefaultTokenizationOptions(o => o.WithStemming())
+                .WithDefaultTokenization(o => o.WithStemming())
                 .Build();
 
             await index.AddAsync(1, "One two three four five");

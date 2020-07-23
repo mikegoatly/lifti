@@ -41,7 +41,7 @@ namespace Lifti.Querying
                     return ComposePart(currentQuery, CreateQueryPart(token, tokenizer));
 
                 case QueryTokenType.FieldFilter:
-                    var (fieldId, fieldTokenizer) = fieldLookup.GetFieldInfo(token.TokenText);
+                    var (fieldId, _, fieldTokenizer) = fieldLookup.GetFieldInfo(token.TokenText);
                     var filteredPart = CreateQueryPart(fieldLookup, state, state.GetNextToken(), fieldTokenizer, null);
                     return ComposePart(
                         currentQuery,
@@ -142,8 +142,7 @@ namespace Lifti.Querying
                 throw new QueryParserException(ExceptionMessages.UnexpectedOperator, operatorType);
             }
 
-            var existingBinaryOperator = existingPart as IBinaryQueryOperator;
-            if (existingBinaryOperator != null)
+            if (existingPart is IBinaryQueryOperator existingBinaryOperator)
             {
                 if (existingBinaryOperator.Precedence >= TokenPrecedence(operatorType))
                 {
@@ -207,7 +206,7 @@ namespace Lifti.Querying
                     return true;
                 }
 
-                token = default(QueryToken);
+                token = default;
                 return false;
             }
 

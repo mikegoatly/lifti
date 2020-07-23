@@ -13,6 +13,6 @@ namespace Lifti
         /// Gets the configuration for the fields associated to this instance.
         /// </summary>
         /// <returns></returns>
-        IEnumerable<IFieldTokenization> GetConfiguredFields();
+        IReadOnlyList<IFieldReader> GetConfiguredFields();
     }
 }

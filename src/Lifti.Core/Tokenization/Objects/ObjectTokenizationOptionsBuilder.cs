@@ -1,3 +1,4 @@
+using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace Lifti.Tokenization.Objects
     /// </typeparam>
     public class ObjectTokenizationOptionsBuilder<T, TKey>
     {
-        private List<FieldTokenization<T>> fieldTokenization { get; } = new List<FieldTokenization<T>>();
+        private List<FieldReader<T>> fieldReaders = new List<FieldReader<T>>();
         private Func<T, TKey>? keyReader;
 
         /// <summary>
@@ -49,17 +50,20 @@ namespace Lifti.Tokenization.Objects
         /// </param>
         /// <param name="optionsBuilder">
         /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
-        /// null then <see cref="TokenizationOptions.Default"/> will be used when processing text - this provides a tokenizer that
-        /// is accent and case insensitive that splits on punctuation and whitespace, but does <b>not</b> perform word stemming.
+        /// null then default tokenizer configured for the index will be used.
+        /// </param>
+        /// <param name="textExtractor">
+        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the 
         /// </param>
         public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
             string name,
             Func<T, string> fieldTextReader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null,
+            ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, fieldTextReader);
-            var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
-            this.fieldTokenization.Add(new StringReaderFieldTokenizationOptions<T>(name, fieldTextReader, tokenizationOptions));
+            var tokenizer =  optionsBuilder.CreateTokenizer();
+            this.fieldReaders.Add(new StringFieldReader<T>(name, fieldTextReader, tokenizer, textExtractor));
             return this;
         }
 
@@ -74,17 +78,20 @@ namespace Lifti.Tokenization.Objects
         /// </param>
         /// <param name="optionsBuilder">
         /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
-        /// null then <see cref="TokenizationOptions.Default"/> will be used when processing text - this provides a tokenizer that
-        /// is accent and case insensitive that splits on punctuation and whitespace, but does <b>not</b> perform word stemming.
+        /// null then default tokenizer configured for the index will be used.
+        /// </param>
+        /// <param name="textExtractor">
+        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the 
         /// </param>
         public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
             string name,
             Func<T, IEnumerable<string>> reader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null,
+            ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, reader);
-            var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
-            this.fieldTokenization.Add(new StringArrayReaderFieldTokenizationOptions<T>(name, reader, tokenizationOptions));
+            var tokenizer = optionsBuilder.CreateTokenizer();
+            this.fieldReaders.Add(new StringArrayFieldReader<T>(name, reader, tokenizer, textExtractor));
             return this;
         }
 
@@ -99,17 +106,20 @@ namespace Lifti.Tokenization.Objects
         /// </param>
         /// <param name="optionsBuilder">
         /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
-        /// null then <see cref="TokenizationOptions.Default"/> will be used when processing text - this provides a tokenizer that
-        /// is accent and case insensitive that splits on punctuation and whitespace, but does <b>not</b> perform word stemming.
+        /// null then default tokenizer configured for the index will be used.
+        /// </param>
+        /// <param name="textExtractor">
+        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the 
         /// </param>
         public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
             string name,
             Func<T, Task<string>> fieldTextReader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null,
+            ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, fieldTextReader);
-            var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
-            this.fieldTokenization.Add(new AsyncStringReaderFieldTokenizationOptions<T>(name, fieldTextReader, tokenizationOptions));
+            var tokenizer = optionsBuilder.CreateTokenizer();
+            this.fieldReaders.Add(new AsyncStringFieldReader<T>(name, fieldTextReader, tokenizer, textExtractor));
             return this;
         }
 
@@ -124,17 +134,20 @@ namespace Lifti.Tokenization.Objects
         /// </param>
         /// <param name="optionsBuilder">
         /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
-        /// null then <see cref="TokenizationOptions.Default"/> will be used when processing text - this provides a tokenizer that
-        /// is accent and case insensitive that splits on punctuation and whitespace, but does <b>not</b> perform word stemming.
+        /// null then default tokenizer configured for the index will be used.
+        /// </param>
+        /// <param name="textExtractor">
+        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the 
         /// </param>
         public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
             string name,
             Func<T, Task<IEnumerable<string>>> reader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null)
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null,
+            ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, reader);
-            var tokenizationOptions = optionsBuilder == null ? null : optionsBuilder.BuildOptionsOrDefault();
-            this.fieldTokenization.Add(new AsyncStringArrayReaderFieldTokenizationOptions<T>(name, reader, tokenizationOptions));
+            var tokenizer = optionsBuilder.CreateTokenizer();
+            this.fieldReaders.Add(new AsyncStringArrayFieldReader<T>(name, reader, tokenizer, textExtractor));
             return this;
         }
 
@@ -147,21 +160,21 @@ namespace Lifti.Tokenization.Objects
         /// * <see cref="WithKey(Func{T, TKey})"/> has not been called.
         /// * No fields have been configured.
         /// </exception>
-        public ObjectTokenization<T, TKey> Build()
+        internal ObjectTokenization<T, TKey> Build()
         {
             if (this.keyReader == null)
             {
                 throw new LiftiException(ExceptionMessages.KeyReaderMustBeProvided);
             }
 
-            if (this.fieldTokenization.Count == 0)
+            if (this.fieldReaders.Count == 0)
             {
                 throw new LiftiException(ExceptionMessages.AtLeastOneFieldMustBeIndexed);
             }
 
             return new ObjectTokenization<T, TKey>(
                 this.keyReader,
-                this.fieldTokenization);
+                this.fieldReaders);
         }
 
         private static void ValidateFieldParameters(string name, object fieldTextReader)

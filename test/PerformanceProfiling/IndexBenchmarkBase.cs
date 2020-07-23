@@ -1,4 +1,5 @@
 ﻿using Lifti;
+using Lifti.Tokenization.TextExtraction;
 using System.Threading.Tasks;
 
 namespace PerformanceProfiling
@@ -23,7 +24,10 @@ namespace PerformanceProfiling
         {
             return new FullTextIndexBuilder<string>()
                 .WithIntraNodeTextSupportedAfterIndexDepth(supportSplitAtIndex)
-                .WithObjectTokenization<(string name, string text)>(o => o.WithKey(p => p.name).WithField("Text", p => p.text, t => t.WithXmlTokenizer().WithStemming()))
+                .WithObjectTokenization<(string name, string text)>(
+                    o => o
+                    .WithKey(p => p.name)
+                    .WithField("Text", p => p.text, t => t.WithStemming(), new XmlTextExtractor()))
                 .Build();
         }
     }

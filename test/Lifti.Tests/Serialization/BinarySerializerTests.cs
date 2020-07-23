@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Serialization.Binary;
+using Lifti.Tokenization.TextExtraction;
 using PerformanceProfiling;
 using System;
 using System.Diagnostics;
@@ -18,12 +19,15 @@ namespace Lifti.Tests.Serialization
 
         public async Task InitializeAsync()
         {
-            this.index = new FullTextIndexBuilder<string>().Build();
+            this.index = new FullTextIndexBuilder<string>()
+                .WithTextExtractor<XmlTextExtractor>()
+                .WithDefaultTokenization(o => o.WithStemming())
+                .Build();
+
             var wikipediaTests = WikipediaDataLoader.Load(typeof(FullTextIndexTests));
-            var options = new TokenizationOptionsBuilder().WithXmlTokenizer().WithStemming().Build();
             foreach (var (name, text) in wikipediaTests)
             {
-                await this.index.AddAsync(name, text, options);
+                await this.index.AddAsync(name, text);
             }
         }
 

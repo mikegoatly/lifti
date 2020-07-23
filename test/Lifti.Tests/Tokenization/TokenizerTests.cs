@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
+using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,30 +8,24 @@ using Xunit;
 
 namespace Lifti.Tests.Tokenization
 {
-    public abstract class BasicTokenizerTests
+    public abstract class TokenizerTests
     {
-        protected BasicTokenizer sut = new BasicTokenizer();
-
         [Fact]
         public void ShouldReturnNoTokensForEmptyString()
         {
-            var output = this.sut.Process(string.Empty).ToList();
+            var sut = WithConfiguration();
+
+            var output = Execute(sut, string.Empty);
 
             output.Should().BeEmpty();
         }
 
         [Fact]
-        public void ShouldReturnNoTokensForNullString()
+        public void ShouldReturnNoTokensForDefaultMemoryFromNullString()
         {
-            var output = this.sut.Process((string)null).ToList();
+            var sut = WithConfiguration();
 
-            output.Should().BeEmpty();
-        }
-
-        [Fact]
-        public void ShouldReturnNoTokensForNullStringEnumerable()
-        {
-            var output = this.sut.Process((IEnumerable<string>)null).ToList();
+            var output = Execute(sut, new string[] { null });
 
             output.Should().BeEmpty();
         }
@@ -38,15 +33,17 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void ShouldReturnNoTokensForStringContainingJustWordBreakCharacters()
         {
-            var output = this.sut.Process(" \t\r\n\u2028\u2029\u000C").ToList();
+            var sut = WithConfiguration();
+
+            var output = Execute(sut, " \t\r\n\u2028\u2029\u000C");
 
             output.Should().BeEmpty();
         }
 
-        protected void WithConfiguration(bool splitOnPunctuation = true, char[] additionalSplitChars = null, bool caseInsensitive = false, bool accentInsensitive = false)
+        protected static Tokenizer WithConfiguration(bool splitOnPunctuation = true, char[] additionalSplitChars = null, bool caseInsensitive = false, bool accentInsensitive = false)
         {
-            ((IConfiguredBy<TokenizationOptions>)this.sut).Configure(
-                new TokenizationOptions(TokenizerKind.PlainText)
+            return new Tokenizer(
+                new TokenizationOptions()
                 {
                     SplitOnPunctuation = splitOnPunctuation,
                     AdditionalSplitCharacters = additionalSplitChars ?? Array.Empty<char>(),
@@ -55,12 +52,27 @@ namespace Lifti.Tests.Tokenization
                 });
         }
 
-        public class WithNoPreprocessors : BasicTokenizerTests
+        protected static IReadOnlyList<Token> Execute(Tokenizer tokenizer, params string[] textParts)
+        {
+            var fragments = new List<DocumentTextFragment>();
+            var offset = 0;
+            foreach (var text in textParts)
+            {
+                fragments.Add(new DocumentTextFragment(offset, text.AsMemory()));
+                offset += text?.Length ?? 0;
+            }
+
+            return tokenizer.Process(fragments);
+        }
+
+        public class WithNoPreprocessors : TokenizerTests
         {
             [Fact]
             public void ShouldReturnSingleTokenForStringContainingOnlyOneWord()
             {
-                var output = this.sut.Process("test").ToList();
+                var sut = WithConfiguration();
+
+                var output = Execute(sut, "test");
 
                 output.Should().BeEquivalentTo(new[]
                 {
@@ -71,7 +83,9 @@ namespace Lifti.Tests.Tokenization
             [Fact]
             public void ShouldReturnSeparateTokensForWordsSeparatedByNonBreakSpace()
             {
-                var output = this.sut.Process("test split").ToList();
+                var sut = WithConfiguration();
+
+                var output = Execute(sut, "test split");
 
                 output.Should().BeEquivalentTo(new[]
                 {
@@ -83,7 +97,9 @@ namespace Lifti.Tests.Tokenization
             [Fact]
             public void ShouldReturnSingleTokenForStringContainingOnlyOneWordEnclosedWithWordBreaks()
             {
-                var output = this.sut.Process(" test\r\n").ToList();
+                var sut = WithConfiguration();
+
+                var output = Execute(sut, " test\r\n");
 
                 output.Should().BeEquivalentTo(new[]
                 {
@@ -94,11 +110,11 @@ namespace Lifti.Tests.Tokenization
             [Fact]
             public void WhenSplittingAtPunctuation_ShouldTokenizeAtWordBreaksAndPunctuation()
             {
-                this.WithConfiguration();
+                var sut = WithConfiguration();
 
                 var input = "Test string (with punctuation) with test spaces";
 
-                var output = this.sut.Process(input).ToList();
+                var output = Execute(sut, input);
 
                 output.Should().BeEquivalentTo(new[]
                 {
@@ -114,11 +130,11 @@ namespace Lifti.Tests.Tokenization
             [Fact]
             public void WhenNotSplittingAtPunctuation_ShouldTokenizeAtWordBreaksOnly()
             {
-                this.WithConfiguration(splitOnPunctuation: false);
+                var sut = WithConfiguration(splitOnPunctuation: false);
 
                 var input = "Test string (with punctuation) with test spaces";
 
-                var output = this.sut.Process(input).ToList();
+                var output = Execute(sut, input);
 
                 output.Should().BeEquivalentTo(new[]
                 {
@@ -135,11 +151,11 @@ namespace Lifti.Tests.Tokenization
             [Fact]
             public void WhenSplittingOnAdditionalCharacters_ShouldTokenizeAtWordBreaksAndAdditionalCharacters()
             {
-                this.WithConfiguration(splitOnPunctuation: false, additionalSplitChars: new[] { '@', '¬' });
+                var sut = WithConfiguration(splitOnPunctuation: false, additionalSplitChars: new[] { '@', '¬' });
 
                 var input = "Test@string¬with custom\tsplits";
 
-                var output = this.sut.Process(input).ToList();
+                var output = Execute(sut, input);
 
                 output.Should().BeEquivalentTo(new[]
                 {
@@ -151,17 +167,19 @@ namespace Lifti.Tests.Tokenization
                 });
             }
 
-            public class WithAllInsensitivityProcessors : BasicTokenizerTests
+            public class WithAllInsensitivityProcessors : TokenizerTests
             {
+                private readonly Tokenizer sut;
+
                 public WithAllInsensitivityProcessors()
                 {
-                    this.WithConfiguration(caseInsensitive: true, accentInsensitive: true);
+                    this.sut = WithConfiguration(caseInsensitive: true, accentInsensitive: true);
                 }
 
                 [Fact]
                 public void ShouldReturnSingleTokenForStringContainingOnlyOneWord()
                 {
-                    var output = this.sut.Process("test").ToList();
+                    var output = Execute(this.sut, "test");
 
                     output.Should().BeEquivalentTo(new[]
                     {
@@ -170,22 +188,22 @@ namespace Lifti.Tests.Tokenization
                 }
 
                 [Fact]
-                public void ProcessingEnumerableSetOfOneWordStrings_ShouldReturnSingleTokenForEachWithContinuingIndexAndOffset()
+                public void ProcessingWithNonZeroOffset_ShouldReturnTokensWithExistingOffsetApplied()
                 {
-                    var output = this.sut.Process(new[] { "test", "test2", "test3" }).ToList();
+                    var output = Execute(this.sut, "test test2 test3");
 
                     output.Should().BeEquivalentTo(new[]
                     {
                         new Token("TEST", new TokenLocation(0, 0, 4)),
-                        new Token("TEST2", new TokenLocation(1, 4, 5)),
-                        new Token("TEST3", new TokenLocation(2, 9, 5))
+                        new Token("TEST2", new TokenLocation(1, 5, 5)),
+                        new Token("TEST3", new TokenLocation(2, 11, 5))
                     });
                 }
 
                 [Fact]
                 public void ProcessingEnumerableContainingMultipleWordStrings_ShouldReturnTokensWithContinuingIndexAndOffset()
                 {
-                    var output = this.sut.Process(new[] { "test", "test2 and test3", "test4" }).ToList();
+                    var output = Execute(this.sut, "test", "test2 and test3", "test4");
 
                     output.Should().BeEquivalentTo(new[]
                     {
@@ -200,7 +218,7 @@ namespace Lifti.Tests.Tokenization
                 [Fact]
                 public void ShouldReturnSingleTokenForStringContainingOnlyOneWordEnclosedWithWordBreaks()
                 {
-                    var output = this.sut.Process(" test\r\n").ToList();
+                    var output = Execute(this.sut, " test\r\n");
 
                     output.Should().BeEquivalentTo(new[]
                     {
@@ -213,7 +231,7 @@ namespace Lifti.Tests.Tokenization
                 {
                     var input = "Træ træ moo moǑ";
 
-                    var output = this.sut.Process(input).ToList();
+                    var output = Execute(this.sut, input);
 
                     output.OrderBy(o => o.Value[0]).Should().BeEquivalentTo(new[]
                     {

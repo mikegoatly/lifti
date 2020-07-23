@@ -1,14 +1,10 @@
-﻿using Lifti.Tokenization;
-using System;
-
-namespace Lifti
+﻿namespace Lifti
 {
     /// <summary>
     /// A builder capable of creating a <see cref="TokenizationOptions"/> instance for use in an index.
     /// </summary>
     public class TokenizationOptionsBuilder
     {
-        private TokenizerKind tokenizerKind = TokenizerKind.PlainText;
         private bool splitOnPunctuation = true;
         private bool accentInsensitive = true;
         private bool caseInsensitive = true;
@@ -16,19 +12,8 @@ namespace Lifti
         private char[]? additionalSplitCharacters = null;
 
         /// <summary>
-        /// Configures the tokenizer to treat the source text as XML, skipping any characters and text contained
-        /// within tags. This will also skip any attributes and attribute text in the XML, i.e. the only text that
-        /// will be indexed will text nodes.
-        /// </summary>
-        public TokenizationOptionsBuilder WithXmlTokenizer()
-        {
-            this.tokenizerKind = TokenizerKind.XmlContent;
-            return this;
-        }
-
-        /// <summary>
         /// Configures the tokenizer to split words on punctuation characters (e.g. those that match
-        /// <see cref="Char.IsPunctuation(char)"/>). This is the default tokenizer behaviour that can
+        /// <see cref="char.IsPunctuation(char)"/>). This is the default tokenizer behaviour that can
         /// be suppressed by passing <c>false</c> to this method, in which case only characters explicitly specified
         /// using <see cref="SplitOnCharacters(char[])" /> will be treated as word breaks.
         /// </summary>
@@ -87,7 +72,7 @@ namespace Lifti
         /// </summary>
         public TokenizationOptions Build()
         {
-            var options = new TokenizationOptions(this.tokenizerKind)
+            var options = new TokenizationOptions()
             {
                 SplitOnPunctuation = this.splitOnPunctuation,
                 AccentInsensitive = this.accentInsensitive,

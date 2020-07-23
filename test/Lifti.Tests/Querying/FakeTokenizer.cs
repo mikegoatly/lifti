@@ -1,29 +1,23 @@
-﻿using System;
+﻿using Lifti.Tokenization;
+using Lifti.Tokenization.TextExtraction;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lifti.Tokenization;
 
 namespace Lifti.Tests.Querying
 {
     public class FakeTokenizer : ITokenizer
     {
-        public void Configure(TokenizationOptions options)
+        public TokenizationOptions Options { get; }
+
+        public IReadOnlyList<Token> Process(ReadOnlySpan<char> text)
         {
+            return new[] { new Token(new string(text), new TokenLocation(0, 0, (ushort)text.Length)) };
         }
 
-        public IReadOnlyList<Token> Process(string input)
+        public IReadOnlyList<Token> Process(IEnumerable<DocumentTextFragment> input)
         {
-            return new[] { new Token(input, new TokenLocation(0, 0, (ushort)input.Length)) };
-        }
-
-        public IReadOnlyList<Token> Process(ReadOnlySpan<char> input)
-        {
-            return new[] { new Token(input.ToString(), new TokenLocation(0, 0, (ushort)input.Length)) };
-        }
-
-        public IReadOnlyList<Token> Process(IEnumerable<string> inputs)
-        {
-            return inputs.Select(s => new Token(s, new TokenLocation(1, 0, (ushort)s.Length))).ToList();
+            return new[] { new Token(string.Join("", input.Select(i => i.Text)), new TokenLocation(0, 0, (ushort)input.Sum(i => i.Text.Length))) };
         }
     }
 }

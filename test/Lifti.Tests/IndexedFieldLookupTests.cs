@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
 using Lifti.Tokenization.Objects;
+using Lifti.Tokenization.TextExtraction;
 using Moq;
 using Xunit;
 
@@ -8,14 +9,11 @@ namespace Lifti.Tests
 {
     public class IndexedFieldLookupTests
     {
-        private static readonly ITokenizer defaultTokenizer = new Mock<ITokenizer>().Object;
-        private static readonly ITokenizer stemmingTokenizer = new Mock<ITokenizer>().Object;
         private readonly IndexedFieldLookup sut;
-        private readonly Mock<ITokenizerFactory> tokenizerFactoryMock;
 
         public IndexedFieldLookupTests()
         {
-            var itemConfig = new ObjectTokenizationOptionsBuilder<string, string>()
+            IObjectTokenization itemConfig = new ObjectTokenizationOptionsBuilder<string, string>()
                 .WithKey(i => i)
                 .WithField("Field1", r => r)
                 .WithField("Field2", r => r)
@@ -24,11 +22,10 @@ namespace Lifti.Tests
                 .WithField("FieldY", r => r)
                 .Build();
 
-            this.tokenizerFactoryMock = new Mock<ITokenizerFactory>();
-            this.tokenizerFactoryMock.Setup(f => f.Create(TokenizationOptions.Default)).Returns(defaultTokenizer);
-            this.tokenizerFactoryMock.Setup(f => f.Create(It.Is<TokenizationOptions>(o => o.Stemming))).Returns(stemmingTokenizer);
-
-            this.sut = new IndexedFieldLookup(itemConfig.FieldTokenization, this.tokenizerFactoryMock.Object, TokenizationOptions.Default);
+            this.sut = new IndexedFieldLookup(
+                itemConfig.GetConfiguredFields(), 
+                new PlainTextExtractor(), 
+                Tokenizer.Default);
         }
 
         [Fact]
@@ -42,8 +39,8 @@ namespace Lifti.Tests
         [Fact]
         public void GettingTokenizationOptionsShouldReturnCorrectlyConstructedInstances()
         {
-            this.sut.GetFieldInfo("FieldX").Tokenizer.Should().Be(stemmingTokenizer);
-            this.sut.GetFieldInfo("FieldY").Tokenizer.Should().Be(defaultTokenizer);
+            this.sut.GetFieldInfo("FieldX").Tokenizer.Options.Stemming.Should().BeTrue();
+            this.sut.GetFieldInfo("FieldY").Tokenizer.Options.Stemming.Should().BeFalse();
         }
 
         [Fact]
@@ -71,20 +68,23 @@ namespace Lifti.Tests
                 itemConfigBuilder = itemConfigBuilder.WithField("Field" + i, r => r);
             }
 
-            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(itemConfigBuilder.Build().FieldTokenization, this.tokenizerFactoryMock.Object, TokenizationOptions.Default))
+            IObjectTokenization config = itemConfigBuilder.Build();
+
+            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(config.GetConfiguredFields(), new PlainTextExtractor(), Tokenizer.Default))
                 .Message.Should().Be("Only 255 distinct fields can currently be indexed");
         }
 
         [Fact]
         public void UsingDuplicateFieldNameShouldThrowException()
         {
-            var itemConfigBuilder = new ObjectTokenizationOptionsBuilder<string, string>()
+            IObjectTokenization config = new ObjectTokenizationOptionsBuilder<string, string>()
                 .WithField("Field1", o => o)
                 .WithField("Field2", o => o)
                 .WithField("Field1", o => o)
-                .WithKey(i => i);
+                .WithKey(i => i)
+                .Build();
 
-            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(itemConfigBuilder.Build().FieldTokenization, this.tokenizerFactoryMock.Object, TokenizationOptions.Default))
+            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(config.GetConfiguredFields(), new PlainTextExtractor(), Tokenizer.Default))
                 .Message.Should().Be("Duplicate field name used: Field1. Field names must be unique across all item types registered with an index.");
         }
     }

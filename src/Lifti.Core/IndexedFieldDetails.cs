@@ -1,4 +1,5 @@
 ﻿using Lifti.Tokenization;
+using Lifti.Tokenization.TextExtraction;
 using System;
 
 namespace Lifti
@@ -8,9 +9,10 @@ namespace Lifti
     /// </summary>
     public struct IndexedFieldDetails : IEquatable<IndexedFieldDetails>
     {
-        internal IndexedFieldDetails(byte id, ITokenizer tokenizer)
+        internal IndexedFieldDetails(byte id, ITextExtractor textExtractor, ITokenizer tokenizer)
         {
             this.Id = id;
+            this.TextExtractor = textExtractor;
             this.Tokenizer = tokenizer;
         }
 
@@ -18,6 +20,11 @@ namespace Lifti
         /// The id of the field.
         /// </summary>
         public byte Id { get; }
+
+        /// <summary>
+        /// Gets the <see cref="ITextExtractor"/> used to extract sections of text from this field.
+        /// </summary>
+        public ITextExtractor TextExtractor { get; }
 
         /// <summary>
         /// The <see cref="ITokenizer"/> that should be used when tokenizing text for the field.
@@ -34,19 +41,22 @@ namespace Lifti
         /// <inheritdoc />
         public bool Equals(IndexedFieldDetails other)
         {
-            return other.Id == this.Id && this.Tokenizer == other.Tokenizer;
+            return other.Id == this.Id && 
+                this.Tokenizer == other.Tokenizer &&
+                this.TextExtractor == other.TextExtractor;
         }
 
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.Id, this.Tokenizer);
+            return HashCode.Combine(this.Id, this.Tokenizer, this.TextExtractor);
         }
 
-        internal void Deconstruct(out byte fieldId, out ITokenizer tokenizer)
+        internal void Deconstruct(out byte fieldId, out ITextExtractor textExtractor, out ITokenizer tokenizer)
         {
             fieldId = this.Id;
             tokenizer = this.Tokenizer;
+            textExtractor = this.TextExtractor;
         }
 
         /// <inheritdoc />

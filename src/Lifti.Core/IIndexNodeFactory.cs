@@ -7,7 +7,7 @@ namespace Lifti
     /// Implemented by classes that can create new <see cref="IndexNode"/> instances for use in
     /// an index.
     /// </summary>
-    public interface IIndexNodeFactory : IConfiguredBy<IndexOptions>
+    public interface IIndexNodeFactory
     {
         /// <summary>
         /// Constructs the root node of the index.
