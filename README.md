@@ -4,18 +4,27 @@
 
 A lightweight full text indexer for .NET
 
-This is very much a work in progress, and a re-imagining of the [original LIFTI project](https://github.com/mikegoatly/lifti-codeplex) from many years ago.
+## Documentation
 
-Read the documentation [here](https://mikegoatly.github.io/lifti/docs)
+[Read the documentation](https://mikegoatly.github.io/lifti/docs) - there's lots of useful information and examples there.
 
 ## Try it out!
 
 [Use LIFTI in a Blazor app](https://mikegoatly.github.io/lifti/blazor-sample) - try out various queries against Wikipedia content
 
+## Contribute
+
+It would be great to have more people contributing to LIFTI - how can you help?
+
+* Create issues for bugs you find - **level 1**
+* Create feature suggestions - **level 2**
+* Create pull requests for documentation changes - **level 3**
+* Create pull requests for bug fixes or features - **boss level**
+
 ## Simplest possible quick start
 
 ``` powerhshell
-Install-Package Lifti.Core -Version 2.0.0-beta17 -AllowPrereleaseVersions
+Install-Package Lifti.Core -Version 2.0.0-rc1 -AllowPrereleaseVersions
 ```
 
 ``` c#
@@ -39,10 +48,6 @@ results = index.Search("Fizz | Buzz").ToList();
 // Outputs: Items with Fizz or Buzz: 3
 Console.WriteLine($"Items with Fizz or Buzz: {results.Count}");
 ```
-
-## CI nuget feed
-
-If you want to try out the early versions of this, you can download the Lifti.Core package from the CI package feed: https://goatly.pkgs.visualstudio.com/LIFTI/_packaging/lifti-ci/nuget/v3/index.json
 
 ## Goals
 1) Provide a very simple way to build an in-memory full text index.
