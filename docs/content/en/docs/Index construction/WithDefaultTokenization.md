@@ -1,24 +1,21 @@
 ---
-title: "WithDefaultTokenizationOptions"
-linkTitle: "WithDefaultTokenizationOptions"
+title: "WithDefaultTokenization"
+linkTitle: "WithDefaultTokenization"
 weight: 2
 description: >
   Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
 ---
 
-`FullTextIndexBuilder<TKey> WithDefaultTokenizationOptions(Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder)`
-
 ## Example usage
 
 ``` csharp
 var index = new FullTextIndexBuilder<int>()
-    .WithDefaultTokenizationOptions(o =>o
+    .WithDefaultTokenization(o =>o
         .AccentInsensitive(true) // Default
         .CaseInsensitive(true) // Default
         .SplitOnPunctuation(true) // Default
         .SplitOnCharacters('%', '#', '@')
         .WithStemming()
-        .WithXmlTokenizer()
     )
     .Build();
 ```
@@ -60,12 +57,3 @@ Additionally, characters that can be logically expressed as two characters are e
 be treated as `ABANDON`. Currently only English is supported.
 
 `false`: **Default** No stemming will be performed on words.
-
-### Content
-
-By default, all text passed to a tokenizer will be treated as text that should be indexed. This behavior can be modified if required.
-
-#### `WithXmlTokenizer()`
-
-Calling `WithXmlTokenizer` on the builder causes the tokenizer to treat the source text as XML, skipping any characters and text contained
-within tags. This will also skip any attributes and attribute text in the XML, i.e. the only text that will be indexed will text nodes.

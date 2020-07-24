@@ -32,7 +32,7 @@ With object indexing enabled for a `Customer` type and stemming only enabled for
 
 ``` csharp
 var index = new FullTextIndexBuilder<int>()
-    .WithObjectTokenization(o => o
+    .WithObjectTokenization<Customer>(o => o
       .WithId(c => c.CustomerId)
       .WithField("Name", c=>c.Name)
       .WithField("Notes", c=>c.Notes, fo => fo.WithStemming())

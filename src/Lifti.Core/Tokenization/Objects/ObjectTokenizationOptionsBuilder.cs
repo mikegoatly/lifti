@@ -48,21 +48,22 @@ namespace Lifti.Tokenization.Objects
         /// <param name="fieldTextReader">
         /// The delegate capable of reading the entire text for the field.
         /// </param>
-        /// <param name="optionsBuilder">
+        /// <param name="tokenizationOptions">
         /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
         /// null then default tokenizer configured for the index will be used.
         /// </param>
         /// <param name="textExtractor">
-        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the 
+        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
+        /// text extractor for the index will be used.
         /// </param>
         public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
             string name,
             Func<T, string> fieldTextReader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null,
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, fieldTextReader);
-            var tokenizer = optionsBuilder.CreateTokenizer();
+            var tokenizer = tokenizationOptions.CreateTokenizer();
             this.fieldReaders.Add(new StringFieldReader<T>(name, fieldTextReader, tokenizer, textExtractor));
             return this;
         }
@@ -76,21 +77,22 @@ namespace Lifti.Tokenization.Objects
         /// <param name="reader">
         /// The delegate capable of reading the entire text for the field, where the text is broken in to multiple fragments.
         /// </param>
-        /// <param name="optionsBuilder">
+        /// <param name="tokenizationOptions">
         /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
         /// null then default tokenizer configured for the index will be used.
         /// </param>
         /// <param name="textExtractor">
-        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the 
+        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
+        /// text extractor for the index will be used.
         /// </param>
         public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
             string name,
             Func<T, IEnumerable<string>> reader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null,
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, reader);
-            var tokenizer = optionsBuilder.CreateTokenizer();
+            var tokenizer = tokenizationOptions.CreateTokenizer();
             this.fieldReaders.Add(new StringArrayFieldReader<T>(name, reader, tokenizer, textExtractor));
             return this;
         }
@@ -104,21 +106,22 @@ namespace Lifti.Tokenization.Objects
         /// <param name="fieldTextReader">
         /// The delegate capable of reading the entire text for the field.
         /// </param>
-        /// <param name="optionsBuilder">
+        /// <param name="tokenizationOptions">
         /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
         /// null then default tokenizer configured for the index will be used.
         /// </param>
         /// <param name="textExtractor">
-        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the 
+        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
+        /// text extractor for the index will be used.
         /// </param>
         public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
             string name,
             Func<T, Task<string>> fieldTextReader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null,
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, fieldTextReader);
-            var tokenizer = optionsBuilder.CreateTokenizer();
+            var tokenizer = tokenizationOptions.CreateTokenizer();
             this.fieldReaders.Add(new AsyncStringFieldReader<T>(name, fieldTextReader, tokenizer, textExtractor));
             return this;
         }
@@ -132,21 +135,22 @@ namespace Lifti.Tokenization.Objects
         /// <param name="reader">
         /// The delegate capable of reading the entire text for the field, where the text is broken in to multiple fragments.
         /// </param>
-        /// <param name="optionsBuilder">
+        /// <param name="tokenizationOptions">
         /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
         /// null then default tokenizer configured for the index will be used.
         /// </param>
         /// <param name="textExtractor">
-        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the 
+        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
+        /// text extractor for the index will be used.
         /// </param>
         public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
             string name,
             Func<T, Task<IEnumerable<string>>> reader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder = null,
+            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, reader);
-            var tokenizer = optionsBuilder.CreateTokenizer();
+            var tokenizer = tokenizationOptions.CreateTokenizer();
             this.fieldReaders.Add(new AsyncStringArrayFieldReader<T>(name, reader, tokenizer, textExtractor));
             return this;
         }
