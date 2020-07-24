@@ -3,12 +3,13 @@
 param (
 	[Parameter(Mandatory = $false)][string]$commitMessage = "",
 	[Parameter(Mandatory = $false)][bool]$dryRun = $false,
-	[Parameter(Mandatory = $false)][bool]$nopublish = $false
+	[Parameter(Mandatory = $false)][bool]$nopublish = $false,
+	[Parameter(Mandatory = $false)][bool]$force = $false
 )
 
 # abort if no changes to commit
 if ($commitMessage.Length -gt 0) {
-	If (-Not (git status --porcelain)) {
+	If ($force -eq $false -and -Not (git status --porcelain)) {
 		Write-Host "No changes to commit. Aborting." -ForegroundColor Red
 		exit
 	}
