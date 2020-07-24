@@ -218,25 +218,20 @@ namespace Lifti
 
         private static IReadOnlyList<Token> ExtractDocumentTokens(IEnumerable<string> documentTextFragments, ITextExtractor textExtractor, ITokenizer tokenizer)
         {
-            var tokens = new List<Token>();
             var documentOffset = 0;
+            var fragments = Enumerable.Empty<DocumentTextFragment>();
             foreach (var documentText in documentTextFragments)
             {
-                tokens.AddRange(ExtractDocumentTokens(documentText, documentOffset, textExtractor, tokenizer));
+                fragments = fragments.Concat(textExtractor.Extract(documentText.AsMemory(), documentOffset));
                 documentOffset += documentText.Length;
             }
 
-            return tokens;
+            return tokenizer.Process(fragments);
         }
 
         private static IReadOnlyList<Token> ExtractDocumentTokens(string documentText, ITextExtractor textExtractor, ITokenizer tokenizer)
         {
-            return ExtractDocumentTokens(documentText, 0, textExtractor, tokenizer);
-        }
-
-        private static IReadOnlyList<Token> ExtractDocumentTokens(string documentText, int fragmentOffset, ITextExtractor textExtractor, ITokenizer tokenizer)
-        {
-            var fragments = textExtractor.Extract(documentText.AsMemory(), fragmentOffset);
+            var fragments = textExtractor.Extract(documentText.AsMemory(), 0);
             return tokenizer.Process(fragments);
         }
 

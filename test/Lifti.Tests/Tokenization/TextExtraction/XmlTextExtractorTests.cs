@@ -21,7 +21,7 @@ namespace Lifti.Tests.Tokenization.TextExtraction
         {
             var output = this.sut.Extract("test data".AsMemory(), 0).ToList();
 
-            output.Select(o => (o.Offset, new string(o.Text.Span)))
+            output.Select(o => (o.Offset, o.Text.ToString()))
                 .Should().BeEquivalentTo(new[]
             {
                 (0, "test data")
@@ -33,7 +33,7 @@ namespace Lifti.Tests.Tokenization.TextExtraction
         {
             var output = this.sut.Extract("test <data tag='foo'>inside</data>outside".AsMemory(), 0).ToList();
 
-            output.Select(o => (o.Offset, new string(o.Text.Span)))
+            output.Select(o => (o.Offset, o.Text.ToString()))
                 .Should().BeEquivalentTo(new[]
             {
                 (0, "test "),
@@ -43,11 +43,25 @@ namespace Lifti.Tests.Tokenization.TextExtraction
         }
 
         [Fact]
+        public void ShouldApplyOffsetToExtractedFragments()
+        {
+            var output = this.sut.Extract("test <data tag='foo'>inside</data>outside".AsMemory(), 10).ToList();
+
+            output.Select(o => (o.Offset, o.Text.ToString()))
+                .Should().BeEquivalentTo(new[]
+            {
+                (10, "test "),
+                (31, "inside"),
+                (44, "outside")
+            });
+        }
+
+        [Fact]
         public void ShouldIgnorePresenceOfCloseAngleBracketsInAttributeValues()
         {
             var output = this.sut.Extract("test <data tag='foo>'>inside</data>outside".AsMemory(), 0).ToList();
 
-            output.Select(o => (o.Offset, new string(o.Text.Span)))
+            output.Select(o => (o.Offset, o.Text.ToString()))
                 .Should().BeEquivalentTo(new[]
             {
                 (0, "test "),

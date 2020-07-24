@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 namespace Lifti
 {
     internal class SharedPool<T>
+        where T: notnull
     {
         private readonly ConcurrentBag<T> pool = new ConcurrentBag<T>();
         private readonly Func<T> createNew;

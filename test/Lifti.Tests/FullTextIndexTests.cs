@@ -35,6 +35,20 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task IndexingMultipleStringsAgainstOneItem_ShouldStoreLocationsOfWordsCorrectlyAcrossFragments()
+        {
+            await this.index.AddAsync("A", new[] { "test test", "  test" });
+
+            var results = this.index.Search("test");
+            results.Should().HaveCount(1);
+            results.Single().FieldMatches.Single().Locations.Should().BeEquivalentTo(
+                new TokenLocation(0, 0, 4),
+                new TokenLocation(1, 5, 4),
+                new TokenLocation(2, 11, 4)
+            );
+        }
+
+        [Fact]
         public async Task IndexingItemsAgainstDefaultField_ShouldUpdateTotalTokenCountStats()
         {
             await this.WithIndexedStringsAsync();
@@ -403,7 +417,7 @@ namespace Lifti.Tests
             await this.index.AddAsync("A", "This is a test");
             await this.index.AddAsync("B", "This is another test");
             await this.index.AddAsync("C", "Foo is testing this as well");
-            await this.index.AddAsync("D", new[] { "One last test just for testing sake", "with hypenated text: third-eye" });
+            await this.index.AddAsync("D", new[] { "One last test just for testing sake", "with hyphenated text: third-eye" });
         }
 
         public class TestObject
