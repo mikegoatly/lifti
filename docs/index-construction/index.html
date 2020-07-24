@@ -179,7 +179,13 @@
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithdefaulttokenizationoptions" href="/lifti/docs/index-construction/withdefaulttokenizationoptions/">WithDefaultTokenizationOptions</a>
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithdefaulttokenization" href="/lifti/docs/index-construction/withdefaulttokenization/">WithDefaultTokenization</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithobjecttokenization" href="/lifti/docs/index-construction/withobjecttokenization/">WithObjectTokenization</a>
       
       
       
@@ -191,13 +197,13 @@
       
       
       
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithtextextraction" href="/lifti/docs/index-construction/withtextextraction/">WithTextExtraction</a>
+      
+      
+      
+      
+      
       <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithindexmodificationaction" href="/lifti/docs/index-construction/withindexmodificationaction/">WithIndexModificationAction</a>
-      
-      
-      
-      
-      
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithobjecttokenization" href="/lifti/docs/index-construction/withobjecttokenization/"></a>
       
       
     </li>
@@ -432,7 +438,7 @@
     <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
 </code></pre></div><p>With object indexing enabled for a <code>Customer</code> type and stemming only enabled for the <code>Notes</code> property:</p>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;()</span>
-    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithObjectTokenization</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">o</span>
+    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithObjectTokenization</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Customer</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">o</span>
       <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithId</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">CustomerId</span><span style="color:#000;font-weight:bold">)</span>
       <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Name&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">=&gt;</span><span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Name</span><span style="color:#000;font-weight:bold">)</span>
       <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Notes&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">=&gt;</span><span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Notes</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">fo</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">fo</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithStemming</span><span style="color:#000;font-weight:bold">())</span>
@@ -455,9 +461,18 @@
             
                 <div class="entry">
                     <h5>
-                        <a href="/lifti/docs/index-construction/withdefaulttokenizationoptions/">WithDefaultTokenizationOptions</a>
+                        <a href="/lifti/docs/index-construction/withdefaulttokenization/">WithDefaultTokenization</a>
                     </h5>
                     <p>Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.</p>
+                </div>
+            
+        
+            
+                <div class="entry">
+                    <h5>
+                        <a href="/lifti/docs/index-construction/withobjecttokenization/">WithObjectTokenization</a>
+                    </h5>
+                    <p>Configure the index to accept a strongly typed object when indexing content.</p>
                 </div>
             
         
@@ -474,6 +489,15 @@
         
             
         
+            
+        
+            
+                <div class="entry">
+                    <h5>
+                        <a href="/lifti/docs/index-construction/withtextextraction/">WithTextExtraction</a>
+                    </h5>
+                    <p>Text extraction is the process by which fragments of text are lifted from a larger body of text prior to tokenization.</p>
+                </div>
             
         
             
@@ -499,21 +523,12 @@
         
             
         
-            
-                <div class="entry">
-                    <h5>
-                        <a href="/lifti/docs/index-construction/withobjecttokenization/"></a>
-                    </h5>
-                    <p></p>
-                </div>
-            
-        
     
 </div>
 
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified July 21, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/e79e68a65514805e15999466c61192093376cd28">More index construction docs and faq (e79e68a)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified July 24, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/4f7abd8e5b4bc76c1ed35387cb9e516b30f2f4df">Updating documentation (4f7abd8)</a>
 </div>
 </div>
 

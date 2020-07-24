@@ -20,23 +20,23 @@
 <link rel="icon" type="image/png" href="/lifti/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
 
-<title>WithDefaultTokenizationOptions | LIFTI</title><meta property="og:title" content="WithDefaultTokenizationOptions" />
-<meta property="og:description" content="Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
+<title>WithTextExtraction | LIFTI</title><meta property="og:title" content="WithTextExtraction" />
+<meta property="og:description" content="Text extraction is the process by which fragments of text are lifted from a larger body of text prior to tokenization. 
 " />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/index-construction/withdefaulttokenizationoptions/" />
-<meta property="article:modified_time" content="2020-07-21T07:25:31+01:00" /><meta property="og:site_name" content="LIFTI" />
-<meta itemprop="name" content="WithDefaultTokenizationOptions">
-<meta itemprop="description" content="Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
+<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/index-construction/withtextextraction/" />
+<meta property="article:modified_time" content="2020-07-24T08:02:07+01:00" /><meta property="og:site_name" content="LIFTI" />
+<meta itemprop="name" content="WithTextExtraction">
+<meta itemprop="description" content="Text extraction is the process by which fragments of text are lifted from a larger body of text prior to tokenization. 
 ">
-<meta itemprop="dateModified" content="2020-07-21T07:25:31&#43;01:00" />
-<meta itemprop="wordCount" content="293">
+<meta itemprop="dateModified" content="2020-07-24T08:02:07&#43;01:00" />
+<meta itemprop="wordCount" content="58">
 
 
 
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="WithDefaultTokenizationOptions"/>
-<meta name="twitter:description" content="Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
+<meta name="twitter:title" content="WithTextExtraction"/>
+<meta name="twitter:description" content="Text extraction is the process by which fragments of text are lifted from a larger body of text prior to tokenization. 
 "/>
 
 
@@ -184,7 +184,13 @@
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsindex-constructionwithdefaulttokenizationoptions" href="/lifti/docs/index-construction/withdefaulttokenizationoptions/">WithDefaultTokenizationOptions</a>
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithdefaulttokenization" href="/lifti/docs/index-construction/withdefaulttokenization/">WithDefaultTokenization</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithobjecttokenization" href="/lifti/docs/index-construction/withobjecttokenization/">WithObjectTokenization</a>
       
       
       
@@ -196,13 +202,13 @@
       
       
       
+      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsindex-constructionwithtextextraction" href="/lifti/docs/index-construction/withtextextraction/">WithTextExtraction</a>
+      
+      
+      
+      
+      
       <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithindexmodificationaction" href="/lifti/docs/index-construction/withindexmodificationaction/">WithIndexModificationAction</a>
-      
-      
-      
-      
-      
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithobjecttokenization" href="/lifti/docs/index-construction/withobjecttokenization/"></a>
       
       
     </li>
@@ -375,8 +381,8 @@
 
 
 
-<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Index%20construction/WithDefaultTokenizationOptions.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
-<a href="https://github.com/mikegoatly/lifti/issues/new?title=WithDefaultTokenizationOptions" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
+<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Index%20construction/WithTextExtraction.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
+<a href="https://github.com/mikegoatly/lifti/issues/new?title=WithTextExtraction" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
 
 </div>
 
@@ -384,19 +390,6 @@
 
 
 
-
-<nav id="TableOfContents">
-  <ul>
-    <li><a href="#example-usage">Example usage</a></li>
-    <li><a href="#tokenizationoptionsbuilder-methods">TokenizationOptionsBuilder methods</a>
-      <ul>
-        <li><a href="#word-break-modifiers">Word break modifiers</a></li>
-        <li><a href="#text-normalization">Text Normalization</a></li>
-        <li><a href="#content">Content</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
 
 
 
@@ -433,7 +426,7 @@
 
 
 <li class="breadcrumb-item active" aria-current="page">
-	<a href="https://mikegoatly.github.io/lifti/docs/index-construction/withdefaulttokenizationoptions/">WithDefaultTokenizationOptions</a>
+	<a href="https://mikegoatly.github.io/lifti/docs/index-construction/withtextextraction/">WithTextExtraction</a>
 </li>
 
 	</ol>
@@ -441,50 +434,18 @@
 
             
 <div class="td-content">
-	<h1>WithDefaultTokenizationOptions</h1>
-    <div class="lead">Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.</div>
+	<h1>WithTextExtraction</h1>
+    <div class="lead">Text extraction is the process by which fragments of text are lifted from a larger body of text prior to tokenization.</div>
 	       
-	<p><code>FullTextIndexBuilder&lt;TKey&gt; WithDefaultTokenizationOptions(Func&lt;TokenizationOptionsBuilder, TokenizationOptionsBuilder&gt; optionsBuilder)</code></p>
-<h2 id="example-usage">Example usage</h2>
+	<p>For example, the text being indexed may be an XML or HTML document and you may only want to index the text content of the elements:</p>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;()</span>
-    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithDefaultTokenizationOptions</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span><span style="color:#000">o</span>
-        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">AccentInsensitive</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// Default
-</span><span style="color:#8f5902;font-style:italic"></span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">CaseInsensitive</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// Default
-</span><span style="color:#8f5902;font-style:italic"></span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">SplitOnPunctuation</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// Default
-</span><span style="color:#8f5902;font-style:italic"></span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">SplitOnCharacters</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;%&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#39;#&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#39;@&#39;</span><span style="color:#000;font-weight:bold">)</span>
-        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithStemming</span><span style="color:#000;font-weight:bold">()</span>
-        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">XmlContent</span><span style="color:#000;font-weight:bold">()</span>
-    <span style="color:#000;font-weight:bold">)</span>
+    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithTextExtraction</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">XmlTextExtractor</span><span style="color:#000;font-weight:bold">&gt;()</span>
     <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
-</code></pre></div><h2 id="tokenizationoptionsbuilder-methods">TokenizationOptionsBuilder methods</h2>
-<h3 id="word-break-modifiers">Word break modifiers</h3>
-<p>A tokenizer will always break words on separator (<code>Char.IsSeparator</code>) or control (<code>Char.IsControl</code>) characters.</p>
-<h4 id="splitonpunctuationbool"><code>SplitOnPunctuation(bool)</code></h4>
-<p><code>true</code>: <strong>Default</strong> The tokenizer will split words on punctuation characters (e.g. those that match <code>Char.IsPunctuation(char)</code>)</p>
-<p><code>false</code>: Only characters explicitly specified using <code>SplitOnCharacters</code> will be treated as word breaks.</p>
-<h4 id="splitoncharactersparams-char"><code>SplitOnCharacters(params char[])</code></h4>
-<p>Allows for additional characters to cause word breaks for a tokenizer. E.g. <code>SplitOnCharacters('$', '£')</code>.</p>
-<h3 id="text-normalization">Text Normalization</h3>
-<h4 id="accentinsensitivebool"><code>AccentInsensitive(bool)</code></h4>
-<p><code>true</code>: <strong>Default</strong> The tokenizer will normalize characters with diacritics to common form. e.g. <code>aigües</code> and <code>aigues</code> will be equivalent. 
-Additionally, characters that can be logically expressed as two characters are expanded, e.g. <code>laering</code> will be equivalent to <code>læring</code>.</p>
-<p><code>false</code>: The tokenizer will be accent sensitive. Searching for <code>aigües</code> will not match <code>aigues</code>.</p>
-<h4 id="caseinsensitivebool"><code>CaseInsensitive(bool)</code></h4>
-<p><code>true</code>: <strong>Default</strong> The tokenizer will normalize all characters to uppercase. e.g. <code>Cat</code> and <code>cat</code> will be equivalent.</p>
-<p><code>false</code>: The tokenizer will be case sensitive. Searching for <code>Cat</code> will match <code>Cat</code> but not <code>cat</code>.</p>
-<h4 id="withstemmingbool"><code>WithStemming(bool)</code></h4>
-<p><code>true</code>: Words will be stemmed using an implementation of the Porter Stemmer algorithm. For example, <code>ABANDON</code>, <code>ABANDONED</code> and <code>ABANDONING</code> will all
-be treated as <code>ABANDON</code>. Currently only English is supported.</p>
-<p><code>false</code>: <strong>Default</strong> No stemming will be performed on words.</p>
-<h3 id="content">Content</h3>
-<p>By default, all text passed to a tokenizer will be treated as text that should be indexed. This behavior can be modified if required.</p>
-<h4 id="xmlcontent"><code>XmlContent()</code></h4>
-<p>Calling <code>XmlContent</code> on the builder causes the tokenizer to treat the source text as XML, skipping any characters and text contained
-within tags. This will also skip any attributes and attribute text in the XML, i.e. the only text that will be indexed will text nodes.</p>
+</code></pre></div><p>Text extraction is only applied when <em>indexing</em> text, i.e. calls to the <code>IFullTextIndex.AddAsync</code> overloads. When searching, text extraction is never applied to any query text.</p>
 
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified July 21, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/4c88a99b88b94efb01943db29e5a46f87ccc6949">Updated documentation (4c88a99)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified July 24, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/4f7abd8e5b4bc76c1ed35387cb9e516b30f2f4df">Updating documentation (4f7abd8)</a>
 </div>
 </div>
 

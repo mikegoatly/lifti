@@ -20,21 +20,24 @@
 <link rel="icon" type="image/png" href="/lifti/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
 
-<title>LIFTI</title><meta property="og:title" content="" />
-<meta property="og:description" content="" />
+<title>WithObjectTokenization | LIFTI</title><meta property="og:title" content="WithObjectTokenization" />
+<meta property="og:description" content="Configure the index to accept a strongly typed object when indexing content.
+" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/index-construction/withobjecttokenization/" />
-<meta property="article:modified_time" content="2020-07-21T08:35:45+01:00" /><meta property="og:site_name" content="LIFTI" />
-<meta itemprop="name" content="">
-<meta itemprop="description" content="">
-<meta itemprop="dateModified" content="2020-07-21T08:35:45&#43;01:00" />
-<meta itemprop="wordCount" content="0">
+<meta property="article:modified_time" content="2020-07-24T08:02:07+01:00" /><meta property="og:site_name" content="LIFTI" />
+<meta itemprop="name" content="WithObjectTokenization">
+<meta itemprop="description" content="Configure the index to accept a strongly typed object when indexing content.
+">
+<meta itemprop="dateModified" content="2020-07-24T08:02:07&#43;01:00" />
+<meta itemprop="wordCount" content="409">
 
 
 
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content=""/>
-<meta name="twitter:description" content=""/>
+<meta name="twitter:title" content="WithObjectTokenization"/>
+<meta name="twitter:description" content="Configure the index to accept a strongly typed object when indexing content.
+"/>
 
 
 
@@ -181,7 +184,13 @@
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithdefaulttokenizationoptions" href="/lifti/docs/index-construction/withdefaulttokenizationoptions/">WithDefaultTokenizationOptions</a>
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithdefaulttokenization" href="/lifti/docs/index-construction/withdefaulttokenization/">WithDefaultTokenization</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsindex-constructionwithobjecttokenization" href="/lifti/docs/index-construction/withobjecttokenization/">WithObjectTokenization</a>
       
       
       
@@ -193,13 +202,13 @@
       
       
       
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithtextextraction" href="/lifti/docs/index-construction/withtextextraction/">WithTextExtraction</a>
+      
+      
+      
+      
+      
       <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithindexmodificationaction" href="/lifti/docs/index-construction/withindexmodificationaction/">WithIndexModificationAction</a>
-      
-      
-      
-      
-      
-      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsindex-constructionwithobjecttokenization" href="/lifti/docs/index-construction/withobjecttokenization/"></a>
       
       
     </li>
@@ -373,7 +382,7 @@
 
 
 <a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Index%20construction/WithObjectTokenization.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
-<a href="https://github.com/mikegoatly/lifti/issues/new?title=" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
+<a href="https://github.com/mikegoatly/lifti/issues/new?title=WithObjectTokenization" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
 
 </div>
 
@@ -381,6 +390,27 @@
 
 
 
+
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#example-usage">Example usage</a></li>
+    <li><a href="#withkey">WithKey</a></li>
+    <li><a href="#withfield">WithField</a>
+      <ul>
+        <li><a href="#name"><code>name</code></a></li>
+        <li><a href="#fieldtextreader"><code>fieldTextReader</code></a></li>
+        <li><a href="#tokenizationoptions"><code>tokenizationOptions</code></a></li>
+        <li><a href="#textextractor"><code>textExtractor</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#indexing-multiple-object-types">Indexing multiple object types</a>
+      <ul>
+        <li><a href="#1-extracted-keys-need-to-be-unique-across-all-object-types">1. Extracted keys need to be unique across all object types.</a></li>
+        <li><a href="#2-field-names-must-be-unique-across-all-object-types">2. Field names must be unique across all object types</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
 
 
 
@@ -417,7 +447,7 @@
 
 
 <li class="breadcrumb-item active" aria-current="page">
-	<a href="https://mikegoatly.github.io/lifti/docs/index-construction/withobjecttokenization/"></a>
+	<a href="https://mikegoatly.github.io/lifti/docs/index-construction/withobjecttokenization/">WithObjectTokenization</a>
 </li>
 
 	</ol>
@@ -425,13 +455,80 @@
 
             
 <div class="td-content">
-	<h1></h1>
-    
+	<h1>WithObjectTokenization</h1>
+    <div class="lead">Configure the index to accept a strongly typed object when indexing content.</div>
 	       
+	<h2 id="example-usage">Example usage</h2>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">Customer</span>
+<span style="color:#000;font-weight:bold">{</span>
+    <span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">Id</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">get</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#204a87;font-weight:bold">set</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#000;font-weight:bold">}</span>
+    <span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">Name</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">get</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#204a87;font-weight:bold">set</span><span style="color:#000;font-weight:bold">;}</span>
+    <span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">ProfileHtml</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">get</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#204a87;font-weight:bold">set</span><span style="color:#000;font-weight:bold">;}</span>
+<span style="color:#000;font-weight:bold">}</span>
+
+<span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;()</span>
+    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithObjectTokenization</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Customer</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">o</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithKey</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Id</span><span style="color:#000;font-weight:bold">)</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Name&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Name</span><span style="color:#000;font-weight:bold">)</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Profile&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ProfileHtml</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">textExtractor</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">XmlTextExtractor</span><span style="color:#000;font-weight:bold">())</span>
+    <span style="color:#000;font-weight:bold">)</span>
+    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
+
+<span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">Customer</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#000;font-weight:bold">...</span> <span style="color:#000;font-weight:bold">});</span>
+</code></pre></div><h2 id="withkey">WithKey</h2>
+<p>Each object configured against the index must have a key of the same type as the index&rsquo;s key. <code>WithKey</code> defines how this key is read from the object.</p>
+<h2 id="withfield">WithField</h2>
+<p>An object needs one or more named fields configured from which to read text, each of which is configured using <code>WithField</code>.</p>
+<h3 id="name"><code>name</code></h3>
+<p>The unique name of the field in the index. This has two main uses subsequently:</p>
+<ol>
+<li>In search results you are provided with a breakdown of where matches were found - the name of the field is included in this information.</li>
+<li>When querying, you can restrict a part of the search to a specific field, e.g. <code>Profile=food</code> will only match the word food in the <code>Profile</code> field, and no others. See <a href="../Searching/">Searching</a> for more information.</li>
+</ol>
+<h3 id="fieldtextreader"><code>fieldTextReader</code></h3>
+<p>A function capable of extracting the raw text from the object. Supported function definitions:</p>
+<ul>
+<li><code>Func&lt;T, string&gt;</code></li>
+<li><code>Func&lt;T, IEnumerable&lt;string&gt;&gt;</code></li>
+</ul>
+<p>And their async equivalents:</p>
+<ul>
+<li><code>Func&lt;T, Task&lt;string&gt;&gt;</code></li>
+<li><code>Func&lt;T, Task&lt;IEnumerable&lt;string&gt;&gt;&gt;</code></li>
+</ul>
+<h3 id="tokenizationoptions"><code>tokenizationOptions</code></h3>
+<p>Equivalent to <a href="./WithDefaultTokenization">WithDefaultTokenization</a> but for use exclusively with this field. If this is null then default tokenizer configured for the index will be used.</p>
+<h3 id="textextractor"><code>textExtractor</code></h3>
+<p>Equivalent to <a href="./WithTextExtraction">WithTextExtraction</a> but for use exclusive use with this field. If this is null then the default text extractor configured for the index will be used.</p>
+<h2 id="indexing-multiple-object-types">Indexing multiple object types</h2>
+<p>It is possible to index multiple types against an index, however you need to consider a couple of constraints.</p>
+<h3 id="1-extracted-keys-need-to-be-unique-across-all-object-types">1. Extracted keys need to be unique across all object types.</h3>
+<p>If you are indexing disparate object types with overlapping ids, you could consider using a composite key type in the index, e.g.</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">enum</span> <span style="color:#000">EntryKind</span>
+<span style="color:#000;font-weight:bold">{</span>
+    <span style="color:#000">Customer</span><span style="color:#000;font-weight:bold">,</span>
+    <span style="color:#000">Product</span>
+<span style="color:#000;font-weight:bold">}</span>
+
+<span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;(</span> <span style="color:#000">EntryKind</span> <span style="color:#000">kind</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000">id</span> <span style="color:#000;font-weight:bold">)&gt;()</span>
+    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithObjectTokenization</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Customer</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">o</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithKey</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">EntryKind</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Customer</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Id</span><span style="color:#000;font-weight:bold">))</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;CustomerName&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Name</span><span style="color:#000;font-weight:bold">)</span>
+    <span style="color:#000;font-weight:bold">)</span>
+    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithObjectTokenization</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Product</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">o</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithKey</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">p</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">EntryKind</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Product</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">p</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Id</span><span style="color:#000;font-weight:bold">))</span>
+        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;ProductName&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">p</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">p</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Name</span><span style="color:#000;font-weight:bold">)</span>
+    <span style="color:#000;font-weight:bold">)</span>
+    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
+</code></pre></div><blockquote>
+<p>To serialize an index with a composite key, you will need to use a custom <code>IKeySerializer</code> - see <a href="../Serialization/key-serialization">Key Serialization</a>.</p>
+</blockquote>
+<h3 id="2-field-names-must-be-unique-across-all-object-types">2. Field names must be unique across all object types</h3>
+<p>You will get an error if you try to register the same name twice, even in separate <code>WithObjectTokenization</code> calls.</p>
+
 	
 	
-	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified July 21, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/e79e68a65514805e15999466c61192093376cd28">More index construction docs and faq (e79e68a)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified July 24, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/4f7abd8e5b4bc76c1ed35387cb9e516b30f2f4df">Updating documentation (4f7abd8)</a>
 </div>
 </div>
 
