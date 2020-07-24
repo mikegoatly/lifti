@@ -6,7 +6,7 @@ namespace Lifti.Tokenization.Preprocessing
     /// Defines methods for pre-processing a <see cref="char"/> through a series
     /// of <see cref="IInputPreprocessor"/> instances.
     /// </summary>
-    public interface IInputPreprocessorPipeline : IConfiguredBy<TokenizationOptions>
+    public interface IInputPreprocessorPipeline
     {
         /// <summary>
         /// Processes the specified input character, passing it through a configured

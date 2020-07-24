@@ -1,27 +1,27 @@
-﻿using System;
+﻿using Lifti.Tokenization.TextExtraction;
+using System;
 using System.Collections.Generic;
 
 namespace Lifti.Tokenization
 {
     /// <summary>
-    /// Defines methods for processing inputs strings to a set of <see cref="Token"/> instances
-    /// that can be stored in an index.
+    /// Defines methods for processing inputs strings to a set of <see cref="Token"/> instances.
     /// </summary>
-    public interface ITokenizer : IConfiguredBy<TokenizationOptions>
+    public interface ITokenizer
     {
         /// <summary>
-        /// Processes the given input to a set of <see cref="Token"/>. instances.
+        /// Gets the options applied to this instance.
         /// </summary>
-        IReadOnlyList<Token> Process(string input);
+        TokenizationOptions Options { get; }
 
         /// <summary>
-        /// Processes the given input to a set of <see cref="Token"/>. instances.
+        /// Tokenizes the given <see cref="DocumentTextFragment"/>s relating a single document.
         /// </summary>
-        IReadOnlyList<Token> Process(ReadOnlySpan<char> input);
+        IReadOnlyList<Token> Process(IEnumerable<DocumentTextFragment> input);
 
         /// <summary>
-        /// Processes the given input to a set of <see cref="Token"/>. instances.
+        /// Tokenizes a single string.
         /// </summary>
-        IReadOnlyList<Token> Process(IEnumerable<string> input);
+        IReadOnlyList<Token> Process(ReadOnlySpan<char> tokenText);
     }
 }

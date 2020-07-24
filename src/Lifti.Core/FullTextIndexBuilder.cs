@@ -1,6 +1,7 @@
 ﻿using Lifti.Querying;
 using Lifti.Tokenization;
 using Lifti.Tokenization.Objects;
+using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,12 +16,31 @@ namespace Lifti
     {
         private readonly ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions = new ConfiguredObjectTokenizationOptions<TKey>();
         private readonly IndexOptions advancedOptions = new IndexOptions();
-        private IIndexNodeFactory? indexNodeFactory;
-        private ITokenizerFactory? tokenizerFactory;
         private IIndexScorerFactory? scorerFactory;
         private IQueryParser? queryParser;
-        private TokenizationOptions defaultTokenizationOptions = TokenizationOptions.Default;
+        private ITokenizer defaultTokenizer = Tokenizer.Default;
         private List<Func<IIndexSnapshot<TKey>, Task>>? indexModifiedActions;
+        private ITextExtractor? defaultTextExtractor;
+
+        /// <summary>
+        /// Configures the index to use a text extraction process when indexing text. This is useful when
+        /// source text contains markup, e,g. for XML/HTML you can use the <see cref="XmlTextExtractor"/>.
+        /// </summary>
+        public FullTextIndexBuilder<TKey> WithTextExtractor<T>()
+            where T : ITextExtractor, new()
+        {
+            return this.WithTextExtractor(new T());
+        }
+
+        /// <summary>
+        /// Configures the index to use a text extraction process when indexing text. This is useful when
+        /// source text contains markup, e,g. for XML/HTML you can use the <see cref="XmlTextExtractor"/>.
+        /// </summary>
+        public FullTextIndexBuilder<TKey> WithTextExtractor(ITextExtractor textExtractor)
+        {
+            this.defaultTextExtractor = textExtractor;
+            return this;
+        }
 
         /// <summary>
         /// Configures the behavior the index should exhibit when an item that already exists in the index is indexed again.
@@ -121,28 +141,14 @@ namespace Lifti
         /// Specifies the default tokenization options that should be used when searching or indexing
         /// when no other options are provided.
         /// </summary>
-        /// <example>
-        /// <![CDATA[
-        /// var index = new FullTextIndexBuilder<int>()
-        ///.WithDefaultTokenizationOptions(o =>o
-        ///    .AccentInsensitive(true) // Default
-        ///    .CaseInsensitive(true) // Default
-        ///    .SplitOnPunctuation(true) // Default
-        ///    .SplitOnCharacters('%', '#', '@')
-        ///    .WithStemming(true)
-        ///    .XmlContent()
-        ///)
-        ///.Build();
-        ///]]>
-        /// </example>
-        public FullTextIndexBuilder<TKey> WithDefaultTokenizationOptions(Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder)
+        public FullTextIndexBuilder<TKey> WithDefaultTokenization(Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder)
         {
             if (optionsBuilder is null)
             {
                 throw new ArgumentNullException(nameof(optionsBuilder));
             }
 
-            this.defaultTokenizationOptions = optionsBuilder.BuildOptionsOrDefault();
+            this.defaultTokenizer = optionsBuilder.CreateTokenizer()!;
 
             return this;
         }
@@ -151,6 +157,7 @@ namespace Lifti
         /// Sets the depth of the index tree after which intra-node text is supported.
         /// A value of zero indicates that intra-node text is always supported. To disable
         /// intra-node text completely, set this to an arbitrarily large value, e.g. <see cref="int.MaxValue"/>.
+        /// The default value is <c>4</c>.
         /// </summary>
         public FullTextIndexBuilder<TKey> WithIntraNodeTextSupportedAfterIndexDepth(int depth)
         {
@@ -160,36 +167,6 @@ namespace Lifti
             }
 
             this.advancedOptions.SupportIntraNodeTextAfterIndexDepth = depth;
-            return this;
-        }
-
-        /// <summary>
-        /// Replaces the default <see cref="IIndexNodeFactory"/> implementation used creating index nodes.
-        /// </summary>
-        public FullTextIndexBuilder<TKey> WithIndexNodeFactory(IIndexNodeFactory indexNodeFactory)
-        {
-            if (indexNodeFactory is null)
-            {
-                throw new ArgumentNullException(nameof(indexNodeFactory));
-            }
-
-            this.indexNodeFactory = indexNodeFactory;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Replaces the default <see cref="ITokenizerFactory"/> implementation.
-        /// </summary>
-        public FullTextIndexBuilder<TKey> WithTokenizerFactory(ITokenizerFactory tokenizerFactory)
-        {
-            if (tokenizerFactory is null)
-            {
-                throw new ArgumentNullException(nameof(tokenizerFactory));
-            }
-
-            this.tokenizerFactory = tokenizerFactory;
-
             return this;
         }
 
@@ -213,18 +190,14 @@ namespace Lifti
         /// </summary>
         public FullTextIndex<TKey> Build()
         {
-            this.indexNodeFactory ??= new IndexNodeFactory();
-
-            this.indexNodeFactory.Configure(this.advancedOptions);
-
             return new FullTextIndex<TKey>(
                 this.advancedOptions,
                 this.itemTokenizationOptions,
-                this.indexNodeFactory,
-                this.tokenizerFactory ?? new TokenizerFactory(),
+                new IndexNodeFactory(this.advancedOptions),
                 this.queryParser ?? new QueryParser(),
                 this.scorerFactory ?? new OkapiBm25ScorerFactory(),
-                this.defaultTokenizationOptions,
+                this.defaultTextExtractor ?? new PlainTextExtractor(),
+                this.defaultTokenizer,
                 this.indexModifiedActions?.ToArray());
         }
     }

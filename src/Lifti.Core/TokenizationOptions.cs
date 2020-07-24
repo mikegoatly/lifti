@@ -5,8 +5,7 @@ using System.Collections.Generic;
 namespace Lifti
 {
     /// <summary>
-    /// Options that can be provided to <see cref="ITokenizerFactory.Create(TokenizationOptions)"/> to createa configured
-    /// implementation of <see cref="ITokenizer"/>.
+    /// Options that can be provided to an <see cref="ITokenizer"/> to configure its behavior.
     /// </summary>
     public class TokenizationOptions
     {
@@ -16,22 +15,15 @@ namespace Lifti
         /// <summary>
         /// Initializes a new instance of the <see cref="TokenizationOptions"/> class.
         /// </summary>
-        /// <param name="tokenizerKind">Kind of the tokenizer.</param>
-        public TokenizationOptions(TokenizerKind tokenizerKind)
+        internal TokenizationOptions()
         {
-            this.TokenizerKind = tokenizerKind;
         }
 
         /// <summary>
         /// Gets the default configuration of <see cref="TokenizationOptions"/>. This provides a tokenizer that
         /// is accent and case insensitive that splits on punctuation and whitespace, but does <b>not</b> perform word stemming.
         /// </summary>
-        public static TokenizationOptions Default { get; } = new TokenizationOptions(TokenizerKind.PlainText);
-
-        /// <summary>
-        /// Gets the kind of tokenizer that should be used to read from any provided text.
-        /// </summary>
-        public TokenizerKind TokenizerKind { get; internal set; }
+        public static TokenizationOptions Default { get; } = new TokenizationOptions();
 
         /// <summary>
         /// Gets or sets a value indicating whether tokens should be split on punctuation in addition to standard 

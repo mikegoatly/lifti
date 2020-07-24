@@ -48,14 +48,11 @@ namespace Lifti.Tests.Tokenization.Preprocessing
 
         private static IInputPreprocessorPipeline CreatePipeline(bool caseInsensitive = false, bool accentInsensitive = false)
         {
-            var pipeline = new InputPreprocessorPipeline();
-            ((IConfiguredBy<TokenizationOptions>)pipeline).Configure(
-                new TokenizationOptions(TokenizerKind.PlainText)
-                {
-                    CaseInsensitive = caseInsensitive,
-                    AccentInsensitive = accentInsensitive
-                });
-            return pipeline;
+            return new InputPreprocessorPipeline(new TokenizationOptions()
+            {
+                CaseInsensitive = caseInsensitive,
+                AccentInsensitive = accentInsensitive
+            });
         }
     }
 }

@@ -31,19 +31,19 @@ namespace PerformanceProfiling
         }
     }
 
-    [SimpleJob(RuntimeMoniker.NetCoreApp22)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
-    [RankColumn, MemoryDiagnoser]
-    public class WordSplittingBenchmarks : IndexBenchmarkBase
-    {
-        [Benchmark()]
-        public void XmlWorkSplittingNew()
-        {
-            var splitter = new XmlTokenizer();
+    //[SimpleJob(RuntimeMoniker.NetCoreApp22)]
+    //[SimpleJob(RuntimeMoniker.NetCoreApp31)]
+    //[RankColumn, MemoryDiagnoser]
+    //public class WordSplittingBenchmarks : IndexBenchmarkBase
+    //{
+    //    [Benchmark()]
+    //    public void XmlWorkSplittingNew()
+    //    {
+    //        var splitter = new XmlTokenizer();
 
-            splitter.Process(WikipediaData.SampleData[0].text).ToList();
-        }
-    }
+    //        splitter.Process(WikipediaData.SampleData[0].text).ToList();
+    //    }
+    //}
 
     [MediumRunJob(RuntimeMoniker.NetCoreApp22)]
     [MediumRunJob(RuntimeMoniker.NetCoreApp31)]

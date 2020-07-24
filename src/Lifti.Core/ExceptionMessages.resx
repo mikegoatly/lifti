@@ -225,9 +225,6 @@
   <data name="UnsupportedIndexSupportLevel" xml:space="preserve">
     <value>Unsupported index support level {0}</value>
   </data>
-  <data name="UnsupportedTokenizerKind" xml:space="preserve">
-    <value>Unsupported tokenizer kind {0}</value>
-  </data>
   <data name="ValueMustNotBeLessThanZero" xml:space="preserve">
     <value>Value must not be less than zero</value>
   </data>

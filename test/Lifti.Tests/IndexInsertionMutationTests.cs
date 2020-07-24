@@ -24,7 +24,7 @@ namespace Lifti.Tests
 
         public IndexInsertionMutationTests()
         {
-            this.nodeFactory = new IndexNodeFactory();
+            this.nodeFactory = new IndexNodeFactory(new IndexOptions { SupportIntraNodeTextAfterIndexDepth = 0 } );
             this.rootNode = this.nodeFactory.CreateRootNode();
             this.sut = new IndexMutation(this.rootNode, this.nodeFactory);
         }

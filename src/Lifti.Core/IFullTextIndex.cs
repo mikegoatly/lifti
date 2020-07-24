@@ -44,24 +44,14 @@ namespace Lifti
         /// </summary>
         /// <param name="itemKey">The key of the item being indexed.</param>
         /// <param name="text">The text to index against the item.</param>
-        /// <param name="tokenizationOptions">
-        /// An instance of <see cref="TokenizationOptions"/>
-        /// that describes how the text should be treated as it is tokenized.
-        /// When null, <see cref="TokenizationOptions.Default"/> will be used.
-        /// </param>
-        Task AddAsync(TKey itemKey, string text, TokenizationOptions? tokenizationOptions = null);
+        Task AddAsync(TKey itemKey, string text);
 
         /// <summary>
         /// Indexes some text against a given key.
         /// </summary>
         /// <param name="itemKey">The key of the item being indexed.</param>
         /// <param name="text">The text to index against the item.</param>
-        /// <param name="tokenizationOptions">
-        /// An instance of <see cref="TokenizationOptions"/>
-        /// that describes how the text should be treated as it is tokenized.
-        /// When null, <see cref="TokenizationOptions.Default"/> will be used.
-        /// </param>
-        Task AddAsync(TKey itemKey, IEnumerable<string> text, TokenizationOptions? tokenizationOptions = null);
+        Task AddAsync(TKey itemKey, IEnumerable<string> text);
 
         /// <summary>
         /// Indexes a single item of type <typeparamref name="TItem"/>. This type must have been
@@ -105,12 +95,9 @@ namespace Lifti
         /// <param name="searchText">
         /// The query to use when searching in the index.
         /// </param>
-        /// <param name="tokenizationOptions">
-        /// The <see cref="TokenizationOptions"/> to use when tokenizing tokens in the <paramref name="searchText"/>.
-        /// </param>
         /// <returns>
         /// The matching search results.
         /// </returns>
-        IEnumerable<SearchResult<TKey>> Search(string searchText, TokenizationOptions? tokenizationOptions = null);
+        IEnumerable<SearchResult<TKey>> Search(string searchText);
     }
 }

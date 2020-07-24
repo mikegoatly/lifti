@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Lifti.Tokenization;
+using System;
 
 namespace Lifti
 {
     internal static class TokenizationOptionsBuilderExtensions
-    { 
-        public static TokenizationOptions BuildOptionsOrDefault(this Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder)
+    {
+        public static ITokenizer? CreateTokenizer(this Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? optionsBuilder)
         {
             return optionsBuilder == null ?
-                TokenizationOptions.Default :
-                optionsBuilder(new TokenizationOptionsBuilder()).Build();
+                null :
+                new Tokenizer(optionsBuilder(new TokenizationOptionsBuilder()).Build());
         }
     }
 }

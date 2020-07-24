@@ -1,4 +1,5 @@
 ﻿using Lifti.Tokenization;
+using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,20 +12,24 @@ namespace Lifti.Tokenization.Objects
     /// <typeparam name="TItem">
     /// The type of item the field belongs to.
     /// </typeparam>
-    public class StringArrayReaderFieldTokenizationOptions<TItem> : FieldTokenization<TItem>
+    internal class StringArrayFieldReader<TItem> : FieldReader<TItem>
     {
         private readonly Func<TItem, IEnumerable<string>> reader;
 
-        internal StringArrayReaderFieldTokenizationOptions(string name, Func<TItem, IEnumerable<string>> reader, TokenizationOptions? tokenizationOptions = null)
-            : base(name, tokenizationOptions)
+        internal StringArrayFieldReader(
+            string name,
+            Func<TItem, IEnumerable<string>> reader,
+            ITokenizer? tokenizer,
+            ITextExtractor? textExtractor)
+            : base(name, tokenizer, textExtractor)
         {
             this.reader = reader ?? throw new ArgumentNullException(nameof(reader));
         }
 
-        internal override ValueTask<IReadOnlyList<Token>> TokenizeAsync(ITokenizer tokenizer, TItem item)
+        /// <inheritdoc />
+        public override ValueTask<IEnumerable<string>> ReadAsync(TItem item)
         {
-            var tokens = tokenizer.Process(this.reader(item));
-            return new ValueTask<IReadOnlyList<Token>>(tokens);
+            return new ValueTask<IEnumerable<string>>(this.reader(item));
         }
     }
 }

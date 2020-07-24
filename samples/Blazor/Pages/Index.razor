@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using Lifti
+@using Lifti.Tokenization.TextExtraction
 @inject HttpClient Http
 
 <p>This example fetches random Wikipedia page content and indexes the text in it. You can try out various LIFTI searches to find content in them.</p>
@@ -106,10 +107,14 @@
 
         IList<SearchResult<string>> results = null;
         IFullTextIndex<string> index = new FullTextIndexBuilder<string>()
-            .WithDefaultTokenizationOptions(o => o.WithStemming())
+            .WithDefaultTokenization(o => o.WithStemming())
             .WithObjectTokenization<WikipediaPage>(
                 page => page.WithKey(i => i.Title)
-                    .WithField("Content", i => i.Text.Content, o => o.XmlContent().WithStemming()))
+                    .WithField(
+                        "Content", 
+                        i => i.Text.Content, 
+                        o => o.WithStemming(), 
+                        new XmlTextExtractor()))
             .Build();
 
     private bool errored;

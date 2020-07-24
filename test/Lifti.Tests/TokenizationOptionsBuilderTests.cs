@@ -11,7 +11,7 @@ namespace Lifti.Tests
         public void WithoutApplyingAnyOptions_ShouldSetDefaultsCorrectly()
         {
             var builder = new TokenizationOptionsBuilder();
-            builder.Build().Should().BeEquivalentTo(new TokenizationOptions(TokenizerKind.PlainText)
+            builder.Build().Should().BeEquivalentTo(new TokenizationOptions()
             {
                 AccentInsensitive = true,
                 Stemming = false,
@@ -19,13 +19,6 @@ namespace Lifti.Tests
                 CaseInsensitive = true,
                 SplitOnPunctuation = true
             });
-        }
-
-        [Fact]
-        public void ConfiguringContentAsXml_ShouldSetTheTokenizationKindToXml()
-        {
-            var builder = new TokenizationOptionsBuilder().XmlContent();
-            builder.Build().TokenizerKind.Should().Be(TokenizerKind.XmlContent);
         }
 
         [Theory]

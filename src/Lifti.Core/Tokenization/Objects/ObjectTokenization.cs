@@ -7,14 +7,14 @@ namespace Lifti.Tokenization.Objects
     /// <inheritdoc />
     /// <typeparam name="T">The type of object this tokenization is capable of indexing.</typeparam>
     /// <typeparam name="TKey">The type of the key.</typeparam>
-    public class ObjectTokenization<T, TKey> : IObjectTokenization
+    internal class ObjectTokenization<T, TKey> : IObjectTokenization
     {
         internal ObjectTokenization(
             Func<T, TKey> keyReader,
-            IReadOnlyList<FieldTokenization<T>> fieldTokenizationOptions)
+            IReadOnlyList<FieldReader<T>> fieldReaders)
         {
             this.KeyReader = keyReader;
-            this.FieldTokenization = fieldTokenizationOptions;
+            this.FieldReaders = fieldReaders;
         }
 
         /// <summary>
@@ -26,12 +26,12 @@ namespace Lifti.Tokenization.Objects
         /// Gets the set of configurations that determine how fields should be read from an object of 
         /// type <typeparamref name="T"/>.
         /// </summary>
-        public IReadOnlyList<FieldTokenization<T>> FieldTokenization { get; }
+        public IReadOnlyList<FieldReader<T>> FieldReaders { get; }
 
         /// <inheritdoc />
-        IEnumerable<IFieldTokenization> IObjectTokenization.GetConfiguredFields()
+        IReadOnlyList<IFieldReader> IObjectTokenization.GetConfiguredFields()
         {
-            return this.FieldTokenization;
+            return this.FieldReaders;
         }
     }
 }

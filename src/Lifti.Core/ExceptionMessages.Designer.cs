@@ -385,15 +385,6 @@ namespace Lifti {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unsupported tokenizer kind {0}.
-        /// </summary>
-        internal static string UnsupportedTokenizerKind {
-            get {
-                return ResourceManager.GetString("UnsupportedTokenizerKind", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Value must not be less than zero.
         /// </summary>
         internal static string ValueMustNotBeLessThanZero {
