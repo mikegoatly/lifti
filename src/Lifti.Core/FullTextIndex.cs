@@ -14,8 +14,6 @@ namespace Lifti
     public class FullTextIndex<TKey> : IFullTextIndex<TKey>, IDisposable
     {
         private readonly IQueryParser queryParser;
-        private readonly ITextExtractor defaultTextExtractor;
-        private readonly ITokenizer defaultTokenizer;
         private readonly Func<IIndexSnapshot<TKey>, Task>[]? indexModifiedActions;
         private readonly IndexOptions indexOptions;
         private readonly ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions;
@@ -44,8 +42,8 @@ namespace Lifti
             this.itemTokenizationOptions = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
             this.IndexNodeFactory = indexNodeFactory ?? throw new ArgumentNullException(nameof(indexNodeFactory));
             this.queryParser = queryParser ?? throw new ArgumentNullException(nameof(queryParser));
-            this.defaultTextExtractor = defaultTextExtractor;
-            this.defaultTokenizer = defaultTokenizer ?? throw new ArgumentNullException(nameof(defaultTokenizer));
+            this.DefaultTextExtractor = defaultTextExtractor;
+            this.DefaultTokenizer = defaultTokenizer ?? throw new ArgumentNullException(nameof(defaultTokenizer));
             this.indexModifiedActions = indexModifiedActions;
             this.idPool = new IdPool<TKey>();
             this.FieldLookup = new IndexedFieldLookup(
@@ -82,6 +80,12 @@ namespace Lifti
 
         /// <inheritdoc />
         public IIndexSnapshot<TKey> Snapshot => this.currentSnapshot;
+
+        /// <inheritdoc />
+        public ITokenizer DefaultTokenizer { get; }
+
+        /// <inheritdoc />
+        public ITextExtractor DefaultTextExtractor { get; }
 
         /// <inheritdoc />
         public IIndexNavigator CreateNavigator()
@@ -126,7 +130,7 @@ namespace Lifti
             {
                 await this.MutateAsync(m =>
                 {
-                    var tokens = ExtractDocumentTokens(text, this.defaultTextExtractor, this.defaultTokenizer);
+                    var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer);
                     this.AddForDefaultField(m, itemKey, tokens);
                 }).ConfigureAwait(false);
             }).ConfigureAwait(false);
@@ -139,7 +143,7 @@ namespace Lifti
             {
                 await this.MutateAsync(m =>
                 {
-                    var tokens = ExtractDocumentTokens(text, this.defaultTextExtractor, this.defaultTokenizer);
+                    var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer);
                     this.AddForDefaultField(m, itemKey, tokens);
                 }).ConfigureAwait(false);
             }).ConfigureAwait(false);
@@ -201,7 +205,7 @@ namespace Lifti
         /// <inheritdoc />
         public IEnumerable<SearchResult<TKey>> Search(string searchText)
         {
-            var query = this.queryParser.Parse(this.FieldLookup, searchText, this.defaultTokenizer);
+            var query = this.queryParser.Parse(this.FieldLookup, searchText, this.DefaultTokenizer);
             return query.Execute(this.currentSnapshot);
         }
 

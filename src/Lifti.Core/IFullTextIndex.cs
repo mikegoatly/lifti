@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Lifti.Querying;
+using Lifti.Tokenization;
+using Lifti.Tokenization.TextExtraction;
 
 namespace Lifti
 {
@@ -31,6 +33,18 @@ namespace Lifti
         /// whilst it is being mutated.
         /// </summary>
         IIndexSnapshot<TKey> Snapshot { get; }
+
+        /// <summary>
+        /// Gets the default <see cref="ITokenizer"/> implementation that the index will use when one is
+        /// not explicitly configured for a field.
+        /// </summary>
+        ITokenizer DefaultTokenizer { get; }
+
+        /// <summary>
+        /// Gets the default <see cref="ITextExtractor"/> implementation that the index will use when one is
+        /// not explicitly configured for a field.
+        /// </summary>
+        ITextExtractor DefaultTextExtractor { get; }
 
         /// <summary>
         /// Uses the current snapshot of the index to create an implementation of <see cref="IIndexNavigator"/> that can be used to 
