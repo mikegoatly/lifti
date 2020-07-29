@@ -54,8 +54,8 @@ namespace Lifti.Tests
 
             var index = this.sut.Build();
 
-            index.FieldLookup.GetFieldInfo("Content").Tokenizer.Options.CaseInsensitive.Should().BeFalse();
-            index.FieldLookup.GetFieldInfo("Title").Tokenizer.Options.CaseInsensitive.Should().BeTrue();
+            ((Tokenizer)index.FieldLookup.GetFieldInfo("Content").Tokenizer).Options.CaseInsensitive.Should().BeFalse();
+            ((Tokenizer)index.FieldLookup.GetFieldInfo("Title").Tokenizer).Options.CaseInsensitive.Should().BeTrue();
         }
 
         [Fact]

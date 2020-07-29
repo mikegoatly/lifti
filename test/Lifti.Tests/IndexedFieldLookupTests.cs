@@ -39,8 +39,8 @@ namespace Lifti.Tests
         [Fact]
         public void GettingTokenizationOptionsShouldReturnCorrectlyConstructedInstances()
         {
-            this.sut.GetFieldInfo("FieldX").Tokenizer.Options.Stemming.Should().BeTrue();
-            this.sut.GetFieldInfo("FieldY").Tokenizer.Options.Stemming.Should().BeFalse();
+            ((Tokenizer)this.sut.GetFieldInfo("FieldX").Tokenizer).Options.Stemming.Should().BeTrue();
+            ((Tokenizer)this.sut.GetFieldInfo("FieldY").Tokenizer).Options.Stemming.Should().BeFalse();
         }
 
         [Fact]

@@ -10,11 +10,6 @@ namespace Lifti.Tokenization
     public interface ITokenizer
     {
         /// <summary>
-        /// Gets the options applied to this instance.
-        /// </summary>
-        TokenizationOptions Options { get; }
-
-        /// <summary>
         /// Tokenizes the given <see cref="DocumentTextFragment"/>s relating a single document.
         /// </summary>
         IReadOnlyList<Token> Process(IEnumerable<DocumentTextFragment> input);
