@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
 using System.Linq;
+using System.Text;
 using Xunit;
 
 namespace Lifti.Tests.Tokenization
@@ -23,7 +24,7 @@ namespace Lifti.Tests.Tokenization
                 "loo"
             };
 
-            tests.Select(t => new TokenHash(t).HashValue).ToHashSet()
+            tests.Select(t => CreateTokenHash(t).HashValue).ToHashSet()
                 .Should().HaveCount(tests.Length);
         }
 
@@ -32,7 +33,7 @@ namespace Lifti.Tests.Tokenization
         {
             var testString = "lifti";
 
-            var constructorHash = new TokenHash(testString);
+            var constructorHash = CreateTokenHash(testString);
 
             var combinedHash = new TokenHash();
             foreach (var character in testString)
@@ -46,8 +47,8 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void EqualsForHashesWithSameValueReturnsTrue()
         {
-            var first = new TokenHash("test");
-            var second = new TokenHash("test");
+            var first = CreateTokenHash("test");
+            var second = CreateTokenHash("test");
 
             first.Equals(second).Should().BeTrue();
         }
@@ -55,8 +56,8 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void EqualsForHashesWithDifferentValueReturnsFalse()
         {
-            var first = new TokenHash("test");
-            var second = new TokenHash("tesf");
+            var first = CreateTokenHash("test");
+            var second = CreateTokenHash("tesf");
 
             first.Equals(second).Should().BeFalse();
         }
@@ -64,9 +65,14 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void GetHashCodeShouldJustReturnHashValue()
         {
-            var sut = new TokenHash("test");
+            var sut = CreateTokenHash("test");
 
             sut.HashValue.Should().Be(sut.GetHashCode());
+        }
+
+        private TokenHash CreateTokenHash(string text)
+        {
+            return new TokenHash(new StringBuilder(text));
         }
     }
 }
