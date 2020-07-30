@@ -28,6 +28,7 @@ Install-Package Lifti.Core
 ```
 
 [Indexing loose text](https://mikegoatly.github.io/lifti/docs/getting-started/)
+
 [Indexing objects](https://mikegoatly.github.io/lifti/docs/getting-started/indexing-objects/)
 
 ## Goals
