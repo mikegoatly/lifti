@@ -21,33 +21,14 @@ It would be great to have more people contributing to LIFTI - how can you help?
 * Create pull requests for documentation changes - **level 3**
 * Create pull requests for bug fixes or features - **boss level**
 
-## Simplest possible quick start
+## Simplest possible quick starts
 
 ``` powershell
 Install-Package Lifti.Core
 ```
 
-``` c#
-// Create a full text index with default settings
-var index = new FullTextIndexBuilder<string>().Build();
-
-// Index
-await index.AddAsync("A", "This is some text associated with A: fizz");
-await index.AddAsync("B", "Some buzz text for B");
-await index.AddAsync("C", "Text associated with C is both fizz and buzz");
-
-// Search for text containing both Fizz *and* Buzz
-var results = index.Search("Fizz Buzz").ToList();
-
-// Output: Items with both Fizz and Buzz: 1
-Console.WriteLine($"Items with both Fizz and Buzz: {results.Count}");
-
-// Search for text containing both Fizz *or* Buzz
-results = index.Search("Fizz | Buzz").ToList();
-
-// Outputs: Items with Fizz or Buzz: 3
-Console.WriteLine($"Items with Fizz or Buzz: {results.Count}");
-```
+[Indexing loose text](https://mikegoatly.github.io/lifti/docs/getting-started/)
+[Indexing objects](https://mikegoatly.github.io/lifti/docs/getting-started/indexing-objects/)
 
 ## Goals
 1) Provide a very simple way to build an in-memory full text index.
