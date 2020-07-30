@@ -8,6 +8,15 @@ namespace Lifti.Tests.Querying
 {
     public class FakeTokenizer : ITokenizer
     {
+        public FakeTokenizer()
+        {
+        }
+
+        public FakeTokenizer(TokenizationOptions options)
+        {
+            this.Options = options;
+        }
+
         public TokenizationOptions Options { get; }
 
         public IReadOnlyList<Token> Process(ReadOnlySpan<char> text)

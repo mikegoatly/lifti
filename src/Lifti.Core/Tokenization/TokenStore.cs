@@ -1,15 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace Lifti.Tokenization
 {
+    /// <summary>
+    /// The <see cref="TokenStore"/> class is responsible for capturing tokens during the
+    /// tokenization process and merging location lists where a unique token is matched multiple times. 
+    /// </summary>
     internal class TokenStore
     {
-        private readonly Dictionary<int, List<Token>> materializedTokens = new Dictionary<int, List<Token>>(); // Pooling? Configuration for expected unique tokens per document?
+        private readonly Dictionary<int, List<Token>> materializedTokens = new Dictionary<int, List<Token>>();
 
-        public void MergeOrAdd(TokenHash hash, StringBuilder token, TokenLocation location)
+        /// <summary>
+        /// Captures a token at a location, merging the token with any locations
+        /// it previously matched at.
+        /// </summary>
+        public void MergeOrAdd(StringBuilder token, TokenLocation location)
         {
+            var hash = new TokenHash(token);
             if (this.materializedTokens.TryGetValue(hash.HashValue, out var existingEntries))
             {
                 foreach (var existingEntry in existingEntries)
@@ -34,6 +44,9 @@ namespace Lifti.Tokenization
             }
         }
 
+        /// <summary>
+        /// Converts the set of captured tokens to a list.
+        /// </summary>
         public IReadOnlyList<Token> ToList()
         {
             return this.materializedTokens.Values.SelectMany(v => v).ToList();

@@ -124,14 +124,14 @@ namespace Lifti
         /// <param name="optionsBuilder">
         /// A delegate capable of specifying all the required options for the item tokenization options.
         /// </param>
-        public FullTextIndexBuilder<TKey> WithObjectTokenization<TItem>(Func<ObjectTokenizationOptionsBuilder<TItem, TKey>, ObjectTokenizationOptionsBuilder<TItem, TKey>> optionsBuilder)
+        public FullTextIndexBuilder<TKey> WithObjectTokenization<TItem>(Func<ObjectTokenizationBuilder<TItem, TKey>, ObjectTokenizationBuilder<TItem, TKey>> optionsBuilder)
         {
             if (optionsBuilder is null)
             {
                 throw new ArgumentNullException(nameof(optionsBuilder));
             }
 
-            var builder = new ObjectTokenizationOptionsBuilder<TItem, TKey>();
+            var builder = new ObjectTokenizationBuilder<TItem, TKey>();
             this.itemTokenizationOptions.Add(optionsBuilder(builder).Build());
 
             return this;
@@ -141,7 +141,7 @@ namespace Lifti
         /// Specifies the default tokenization options that should be used when searching or indexing
         /// when no other options are provided.
         /// </summary>
-        public FullTextIndexBuilder<TKey> WithDefaultTokenization(Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder> optionsBuilder)
+        public FullTextIndexBuilder<TKey> WithDefaultTokenization(Func<TokenizerBuilder, TokenizerBuilder> optionsBuilder)
         {
             if (optionsBuilder is null)
             {

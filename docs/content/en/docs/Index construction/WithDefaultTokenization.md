@@ -20,7 +20,7 @@ var index = new FullTextIndexBuilder<int>()
     .Build();
 ```
 
-## TokenizationOptionsBuilder methods
+## TokenizerBuilder methods
 
 ### Word break modifiers
 

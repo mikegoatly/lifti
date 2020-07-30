@@ -19,7 +19,7 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void ShouldCreateEntryForFirstCall()
         {
-            this.sut.MergeOrAdd(new TokenHash(1234), new StringBuilder("test"), this.location1);
+            this.sut.MergeOrAdd(new StringBuilder("test"), this.location1);
 
             this.sut.ToList().Should().BeEquivalentTo(
                 new[]
@@ -29,24 +29,10 @@ namespace Lifti.Tests.Tokenization
         }
 
         [Fact]
-        public void ShouldCreateSeparateEntryForClashingHasWithDifferentText()
-        {
-            this.sut.MergeOrAdd(new TokenHash(1234), new StringBuilder("test"), this.location1);
-            this.sut.MergeOrAdd(new TokenHash(1234), new StringBuilder("test2"), this.location2);
-
-            this.sut.ToList().Should().BeEquivalentTo(
-                new[]
-                {
-                    new Token("test", this.location1),
-                    new Token("test2", this.location2)
-                });
-        }
-
-        [Fact]
         public void ShouldCreateSeparateEntryForNovelHash()
         {
-            this.sut.MergeOrAdd(new TokenHash(1234), new StringBuilder("test"), this.location1);
-            this.sut.MergeOrAdd(new TokenHash(12345), new StringBuilder("test7"), this.location2);
+            this.sut.MergeOrAdd(new StringBuilder("test"), this.location1);
+            this.sut.MergeOrAdd(new StringBuilder("test7"), this.location2);
 
             this.sut.ToList().Should().BeEquivalentTo(
                 new[]
@@ -59,8 +45,8 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void ShouldCombineEntriesForMatchingHashAndText()
         {
-            this.sut.MergeOrAdd(new TokenHash(1234), new StringBuilder("test"), this.location1);
-            this.sut.MergeOrAdd(new TokenHash(1234), new StringBuilder("test"), this.location2);
+            this.sut.MergeOrAdd(new StringBuilder("test"), this.location1);
+            this.sut.MergeOrAdd(new StringBuilder("test"), this.location2);
 
             this.sut.ToList().Should().BeEquivalentTo(
                 new[]

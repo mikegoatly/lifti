@@ -16,7 +16,7 @@ namespace Lifti.Tokenization.Objects
     /// <typeparam name="TKey">
     /// The type of key in the index.
     /// </typeparam>
-    public class ObjectTokenizationOptionsBuilder<T, TKey>
+    public class ObjectTokenizationBuilder<T, TKey>
     {
         private readonly List<FieldReader<T>> fieldReaders = new List<FieldReader<T>>();
         private Func<T, TKey>? keyReader;
@@ -27,7 +27,7 @@ namespace Lifti.Tokenization.Objects
         /// <param name="keyReader">
         /// The delegate capable of reading the key from the item
         /// </param>
-        public ObjectTokenizationOptionsBuilder<T, TKey> WithKey(Func<T, TKey> keyReader)
+        public ObjectTokenizationBuilder<T, TKey> WithKey(Func<T, TKey> keyReader)
         {
             if (keyReader is null)
             {
@@ -56,10 +56,10 @@ namespace Lifti.Tokenization.Objects
         /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
         /// text extractor for the index will be used.
         /// </param>
-        public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
+        public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
             Func<T, string> fieldTextReader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? tokenizationOptions = null,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, fieldTextReader);
@@ -85,10 +85,10 @@ namespace Lifti.Tokenization.Objects
         /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
         /// text extractor for the index will be used.
         /// </param>
-        public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
+        public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
             Func<T, IEnumerable<string>> reader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? tokenizationOptions = null,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, reader);
@@ -114,10 +114,10 @@ namespace Lifti.Tokenization.Objects
         /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
         /// text extractor for the index will be used.
         /// </param>
-        public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
+        public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
             Func<T, Task<string>> fieldTextReader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? tokenizationOptions = null,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, fieldTextReader);
@@ -143,10 +143,10 @@ namespace Lifti.Tokenization.Objects
         /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
         /// text extractor for the index will be used.
         /// </param>
-        public ObjectTokenizationOptionsBuilder<T, TKey> WithField(
+        public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
             Func<T, Task<IEnumerable<string>>> reader,
-            Func<TokenizationOptionsBuilder, TokenizationOptionsBuilder>? tokenizationOptions = null,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null)
         {
             ValidateFieldParameters(name, reader);

@@ -1,15 +1,34 @@
-﻿namespace Lifti
+﻿using Lifti.Tokenization;
+using System;
+
+namespace Lifti
 {
     /// <summary>
-    /// A builder capable of creating a <see cref="TokenizationOptions"/> instance for use in an index.
+    /// A builder capable of creating an <see cref="ITokenizer"/> instance for use in an index.
     /// </summary>
-    public class TokenizationOptionsBuilder
+    public class TokenizerBuilder
     {
+        private static Func<TokenizationOptions, ITokenizer> defaultTokenizerFactory = o => new Tokenizer(o);
+
         private bool splitOnPunctuation = true;
         private bool accentInsensitive = true;
         private bool caseInsensitive = true;
         private bool stemming = false;
-        private char[]? additionalSplitCharacters = null;
+        private char[]? additionalSplitCharacters;
+        private Func<TokenizationOptions, ITokenizer> factory = defaultTokenizerFactory;
+
+        /// <summary>
+        /// Configures a specific implementation of <see cref="ITokenizer"/> to be used. Use this
+        /// method if you need more control over the tokenization process.
+        /// </summary>
+        /// <param name="tokenizerFactory">
+        /// A delegate capable of creating the required <see cref="ITokenizer"/>.
+        /// </param>
+        public TokenizerBuilder WithFactory(Func<TokenizationOptions, ITokenizer> tokenizerFactory)
+        {
+            this.factory = tokenizerFactory;
+            return this;
+        }
 
         /// <summary>
         /// Configures the tokenizer to split words on punctuation characters (e.g. those that match
@@ -17,7 +36,7 @@
         /// be suppressed by passing <c>false</c> to this method, in which case only characters explicitly specified
         /// using <see cref="SplitOnCharacters(char[])" /> will be treated as word breaks.
         /// </summary>
-        public TokenizationOptionsBuilder SplitOnPunctuation(bool splitOnPunctionation = true)
+        public TokenizerBuilder SplitOnPunctuation(bool splitOnPunctionation = true)
         {
             this.splitOnPunctuation = splitOnPunctionation;
             return this;
@@ -28,7 +47,7 @@
         /// be indexed normalized to their uppercase form. This is the default tokenizer behavior that can
         /// be suppressed by passing <c>false</c> to this method.
         /// </summary>
-        public TokenizationOptionsBuilder CaseInsensitive(bool caseInsensitive = true)
+        public TokenizerBuilder CaseInsensitive(bool caseInsensitive = true)
         {
             this.caseInsensitive = caseInsensitive;
             return this;
@@ -39,7 +58,7 @@
         /// as will `laering` and `læring`. This is the default tokenizer behavior that can
         /// be suppressed by passing <c>false</c> to this method.
         /// </summary>
-        public TokenizationOptionsBuilder AccentInsensitive(bool accentInsensitive = true)
+        public TokenizerBuilder AccentInsensitive(bool accentInsensitive = true)
         {
             this.accentInsensitive = accentInsensitive;
             return this;
@@ -50,7 +69,7 @@
         /// endings such as ING from words. Enabling this will cause both case and accent 
         /// insensitivity to be applied.
         /// </summary>
-        public TokenizationOptionsBuilder WithStemming(bool stemming = true)
+        public TokenizerBuilder WithStemming(bool stemming = true)
         {
             this.stemming = stemming;
             return this;
@@ -61,16 +80,16 @@
         /// if the text you are indexing contains additional characters you need to split on
         /// that is not whitespace or punctuation, e.g. '|'.
         /// </summary>
-        public TokenizationOptionsBuilder SplitOnCharacters(params char[] additionalSplitCharacters)
+        public TokenizerBuilder SplitOnCharacters(params char[] additionalSplitCharacters)
         {
             this.additionalSplitCharacters = additionalSplitCharacters;
             return this;
         }
 
         /// <summary>
-        /// Builds a <see cref="TokenizationOptions"/> instance matching the current builder configuration.
+        /// Builds an <see cref="ITokenizer"/> instance matching the current configuration.
         /// </summary>
-        public TokenizationOptions Build()
+        public ITokenizer Build()
         {
             var options = new TokenizationOptions()
             {
@@ -85,7 +104,7 @@
                 options.AdditionalSplitCharacters = this.additionalSplitCharacters;
             }
 
-            return options;
+            return this.factory(options);
         }
     }
 }
