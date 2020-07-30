@@ -14,6 +14,11 @@
   
   <url>
     <loc>https://mikegoatly.github.io/lifti/docs/serialization/automatic-serialization/</loc>
+    <lastmod>2020-07-30T09:40:31+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mikegoatly.github.io/lifti/docs/indexing-mutations/batch-mutations/</loc>
   </url>
   
   <url>
@@ -29,6 +34,14 @@
   <url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withobjecttokenization/</loc>
     <lastmod>2020-07-24T08:02:07+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mikegoatly.github.io/lifti/docs/indexing-mutations/</loc>
+  </url>
+  
+  <url>
+    <loc>https://mikegoatly.github.io/lifti/docs/indexing-mutations/removing-data/</loc>
   </url>
   
   <url>
