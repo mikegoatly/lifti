@@ -20,25 +20,23 @@
 <link rel="icon" type="image/png" href="/lifti/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
 
-<title>Serialization File Format | LIFTI</title><meta property="og:title" content="Serialization File Format" />
-<meta property="og:description" content="The current serialization format is version 2. Previous versions were beta versions and are no longer supported.
+<title>Automatic Serialization | LIFTI</title><meta property="og:title" content="Automatic Serialization" />
+<meta property="og:description" content="With a bit of configuration you can configure the index to serialize to a backing file whenever changes are made to it.
 " />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/reference/serialization-format/" />
-<meta property="article:published_time" content="2020-07-14T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-07-16T07:52:33+01:00" /><meta property="og:site_name" content="LIFTI" />
-<meta itemprop="name" content="Serialization File Format">
-<meta itemprop="description" content="The current serialization format is version 2. Previous versions were beta versions and are no longer supported.
+<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/serialization/automatic-serialization/" />
+<meta property="og:site_name" content="LIFTI" />
+<meta itemprop="name" content="Automatic Serialization">
+<meta itemprop="description" content="With a bit of configuration you can configure the index to serialize to a backing file whenever changes are made to it.
 ">
-<meta itemprop="datePublished" content="2020-07-14T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-07-16T07:52:33&#43;01:00" />
-<meta itemprop="wordCount" content="0">
+
+<meta itemprop="wordCount" content="33">
 
 
 
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Serialization File Format"/>
-<meta name="twitter:description" content="The current serialization format is version 2. Previous versions were beta versions and are no longer supported.
+<meta name="twitter:title" content="Automatic Serialization"/>
+<meta name="twitter:description" content="With a bit of configuration you can configure the index to serialize to a backing file whenever changes are made to it.
 "/>
 
 
@@ -287,10 +285,10 @@
 
 <ul class="td-sidebar-nav__section pr-md-3">
   <li class="td-sidebar-nav__section-title">
-    <a  href="/lifti/docs/serialization/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Serialization</a>
+    <a  href="/lifti/docs/serialization/" class="align-left pl-0 pr-2 active td-sidebar-link td-sidebar-link__section">Serialization</a>
   </li>
   <ul>
-    <li class="collapse " id="liftidocsserialization">
+    <li class="collapse show" id="liftidocsserialization">
       
       
       
@@ -303,7 +301,7 @@
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsserializationautomatic-serialization" href="/lifti/docs/serialization/automatic-serialization/">Automatic Serialization</a>
+      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsserializationautomatic-serialization" href="/lifti/docs/serialization/automatic-serialization/">Automatic Serialization</a>
       
       
     </li>
@@ -322,17 +320,17 @@
 
 <ul class="td-sidebar-nav__section pr-md-3">
   <li class="td-sidebar-nav__section-title">
-    <a  href="/lifti/docs/reference/" class="align-left pl-0 pr-2 active td-sidebar-link td-sidebar-link__section">Reference</a>
+    <a  href="/lifti/docs/reference/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Reference</a>
   </li>
   <ul>
-    <li class="collapse show" id="liftidocsreference">
+    <li class="collapse " id="liftidocsreference">
       
       
       
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsreferenceserialization-format" href="/lifti/docs/reference/serialization-format/">Serialization File Format</a>
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsreferenceserialization-format" href="/lifti/docs/reference/serialization-format/">Serialization File Format</a>
       
       
     </li>
@@ -389,8 +387,8 @@
 
 
 
-<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Reference/serialization-format.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
-<a href="https://github.com/mikegoatly/lifti/issues/new?title=Serialization%20File%20Format" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
+<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Serialization/automatic-serialization.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
+<a href="https://github.com/mikegoatly/lifti/issues/new?title=Automatic%20Serialization" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
 
 </div>
 
@@ -427,14 +425,14 @@
 
 
 <li class="breadcrumb-item" >
-	<a href="https://mikegoatly.github.io/lifti/docs/reference/">Reference</a>
+	<a href="https://mikegoatly.github.io/lifti/docs/serialization/">Serialization</a>
 </li>
 
 
 
 
 <li class="breadcrumb-item active" aria-current="page">
-	<a href="https://mikegoatly.github.io/lifti/docs/reference/serialization-format/">Serialization File Format</a>
+	<a href="https://mikegoatly.github.io/lifti/docs/serialization/automatic-serialization/">Automatic Serialization</a>
 </li>
 
 	</ol>
@@ -442,14 +440,14 @@
 
             
 <div class="td-content">
-	<h1>Serialization File Format</h1>
-    <div class="lead">The current serialization format is version 2. Previous versions were beta versions and are no longer supported.</div>
+	<h1>Automatic Serialization</h1>
+    <div class="lead">With a bit of configuration you can configure the index to serialize to a backing file whenever changes are made to it.</div>
 	       
-	<p><img src="../../../images/v2-serialization.svg" alt="LIFTI Serialization Format"></p>
+	<p>First you will need to make sure that the index is deserialized before use, as demonstrated <a href="..">here</a>, and add an <a href="../Index%20construction/WithIndexModificationAction">index modification hook</a> to serialize the index whenever a new snapshot is created.</p>
 
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified July 16, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/0069735c90f33de0d8995b421068b1b9316afffb">Updated image location (0069735)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified January 1, 0001
 </div>
 </div>
 

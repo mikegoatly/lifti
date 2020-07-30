@@ -97,5 +97,19 @@ so that the serializer knows how to read and write the data in your custom key:&
       </description>
     </item>
     
+    <item>
+      <title>Docs: Automatic Serialization</title>
+      <link>https://mikegoatly.github.io/lifti/docs/serialization/automatic-serialization/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://mikegoatly.github.io/lifti/docs/serialization/automatic-serialization/</guid>
+      <description>
+        
+        
+        &lt;p&gt;First you will need to make sure that the index is deserialized before use, as demonstrated &lt;a href=&#34;..&#34;&gt;here&lt;/a&gt;, and add an &lt;a href=&#34;../Index%20construction/WithIndexModificationAction&#34;&gt;index modification hook&lt;/a&gt; to serialize the index whenever a new snapshot is created.&lt;/p&gt;
+
+      </description>
+    </item>
+    
   </channel>
 </rss>

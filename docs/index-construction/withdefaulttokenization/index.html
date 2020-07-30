@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.74.0" />
+<meta name="generator" content="Hugo 0.74.2" />
 
 <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
 
@@ -25,11 +25,11 @@
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/index-construction/withdefaulttokenization/" />
-<meta property="article:modified_time" content="2020-07-24T08:02:07+01:00" /><meta property="og:site_name" content="LIFTI" />
+<meta property="article:modified_time" content="2020-07-30T09:07:04+01:00" /><meta property="og:site_name" content="LIFTI" />
 <meta itemprop="name" content="WithDefaultTokenization">
 <meta itemprop="description" content="Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
 ">
-<meta itemprop="dateModified" content="2020-07-24T08:02:07&#43;01:00" />
+<meta itemprop="dateModified" content="2020-07-30T09:07:04&#43;01:00" />
 <meta itemprop="wordCount" content="216">
 
 
@@ -298,6 +298,12 @@
       <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsserializationkey-serialization" href="/lifti/docs/serialization/key-serialization/">Key Serialization</a>
       
       
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsserializationautomatic-serialization" href="/lifti/docs/serialization/automatic-serialization/">Automatic Serialization</a>
+      
+      
     </li>
   </ul>
 </ul>
@@ -394,7 +400,7 @@
 <nav id="TableOfContents">
   <ul>
     <li><a href="#example-usage">Example usage</a></li>
-    <li><a href="#tokenizationoptionsbuilder-methods">TokenizationOptionsBuilder methods</a>
+    <li><a href="#tokenizerbuilder-methods">TokenizerBuilder methods</a>
       <ul>
         <li><a href="#word-break-modifiers">Word break modifiers</a></li>
         <li><a href="#text-normalization">Text Normalization</a></li>
@@ -459,7 +465,7 @@
         <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithStemming</span><span style="color:#000;font-weight:bold">()</span>
     <span style="color:#000;font-weight:bold">)</span>
     <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
-</code></pre></div><h2 id="tokenizationoptionsbuilder-methods">TokenizationOptionsBuilder methods</h2>
+</code></pre></div><h2 id="tokenizerbuilder-methods">TokenizerBuilder methods</h2>
 <h3 id="word-break-modifiers">Word break modifiers</h3>
 <p>A tokenizer will always break words on separator (<code>Char.IsSeparator</code>) or control (<code>Char.IsControl</code>) characters.</p>
 <h4 id="splitonpunctuationbool"><code>SplitOnPunctuation(bool)</code></h4>
@@ -482,7 +488,7 @@ be treated as <code>ABANDON</code>. Currently only English is supported.</p>
 
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified July 24, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/4f7abd8e5b4bc76c1ed35387cb9e516b30f2f4df">Updating documentation (4f7abd8)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified July 30, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/69b2f15d2923aa72eba41bd99411a2527e7061ae">Allow for custom ITokenizer implementations (69b2f15)</a>
 </div>
 </div>
 

@@ -32,7 +32,7 @@
         &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithStemming&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
     &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
     &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Build&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;tokenizationoptionsbuilder-methods&#34;&gt;TokenizationOptionsBuilder methods&lt;/h2&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;tokenizerbuilder-methods&#34;&gt;TokenizerBuilder methods&lt;/h2&gt;
 &lt;h3 id=&#34;word-break-modifiers&#34;&gt;Word break modifiers&lt;/h3&gt;
 &lt;p&gt;A tokenizer will always break words on separator (&lt;code&gt;Char.IsSeparator&lt;/code&gt;) or control (&lt;code&gt;Char.IsControl&lt;/code&gt;) characters.&lt;/p&gt;
 &lt;h4 id=&#34;splitonpunctuationbool&#34;&gt;&lt;code&gt;SplitOnPunctuation(bool)&lt;/code&gt;&lt;/h4&gt;
