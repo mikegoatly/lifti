@@ -23,8 +23,8 @@ It would be great to have more people contributing to LIFTI - how can you help?
 
 ## Simplest possible quick start
 
-``` powerhshell
-Install-Package Lifti.Core -Version 2.0.0-rc1 -AllowPrereleaseVersions
+``` powershell
+Install-Package Lifti.Core
 ```
 
 ``` c#
