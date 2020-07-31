@@ -12,15 +12,6 @@ A lightweight full text indexer for .NET
 
 [Use LIFTI in a Blazor app](https://mikegoatly.github.io/lifti/blazor-sample) - try out various queries against Wikipedia content
 
-## Contribute
-
-It would be great to have more people contributing to LIFTI - how can you help?
-
-* Create issues for bugs you find - **level 1**
-* Create feature suggestions - **level 2**
-* Create pull requests for documentation changes - **level 3**
-* Create pull requests for bug fixes or features - **boss level**
-
 ## Simplest possible quick starts
 
 ``` powershell
@@ -30,6 +21,15 @@ Install-Package Lifti.Core
 [Indexing loose text](https://mikegoatly.github.io/lifti/docs/getting-started/)
 
 [Indexing objects](https://mikegoatly.github.io/lifti/docs/getting-started/indexing-objects/)
+
+## Contribute
+
+It would be great to have more people contributing to LIFTI - how can you help?
+
+* Create issues for bugs you find - **level 1**
+* Create feature suggestions - **level 2**
+* Create pull requests for documentation changes - **level 3**
+* Create pull requests for bug fixes or features - **boss level**
 
 ## Goals
 1) Provide a very simple way to build an in-memory full text index.
