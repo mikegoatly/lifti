@@ -35,6 +35,24 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task IndexedEmoji_ShouldBeSearchable()
+        {
+            await this.index.AddAsync("A", new[] { "🎶" });
+
+            var results = this.index.Search("🎶");
+
+            results.Should().HaveCount(1);
+        }
+
+        [Fact]
+        public async Task IndexedEmoji_ShouldBeRetrievableAsIndexedTokens()
+        {
+            await index.AddAsync("A", "🎶");
+
+            index.Snapshot.CreateNavigator().EnumerateIndexedTokens().Should().BeEquivalentTo("🎶");
+        }
+
+        [Fact]
         public async Task IndexingMultipleStringsAgainstOneItem_ShouldStoreLocationsOfWordsCorrectlyAcrossFragments()
         {
             await this.index.AddAsync("A", new[] { "test test", "  test" });

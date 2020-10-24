@@ -5,13 +5,29 @@ using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
+    internal class V3IndexReader<TKey> : V2IndexReader<TKey>
+    {
+        public V3IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer) 
+            : base(stream, disposeStream, keySerializer)
+        {
+        }
+
+        /// <summary>
+        /// Reads a character matched at a node.
+        /// </summary>
+        protected override char ReadMatchedCharacter()
+        {
+            return (char)this.reader.ReadInt16();
+        }
+    }
+
     internal class V2IndexReader<TKey> : IIndexReader<TKey>
     {
         private readonly Stream underlyingStream;
         private readonly bool disposeStream;
         private readonly IKeySerializer<TKey> keySerializer;
         private readonly MemoryStream buffer;
-        private readonly BinaryReader reader;
+        protected readonly BinaryReader reader;
 
         public V2IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer)
         {
@@ -45,7 +61,7 @@ namespace Lifti.Serialization.Binary
                 var key = this.keySerializer.Read(this.reader);
                 var fieldStatCount = this.reader.ReadInt32();
                 var fieldTokenCounts = ImmutableDictionary.CreateBuilder<byte, int>();
-                int totalTokenCount = 0;
+                var totalTokenCount = 0;
                 for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
                 {
                     var fieldId = this.reader.ReadByte();
@@ -79,7 +95,7 @@ namespace Lifti.Serialization.Binary
 
             for (var i = 0; i < childNodeCount; i++)
             {
-                var matchChar = this.reader.ReadChar();
+                var matchChar = this.ReadMatchedCharacter();
                 childNodes!.Add(matchChar, this.DeserializeNode(nodeFactory, depth + 1));
             }
 
@@ -116,6 +132,14 @@ namespace Lifti.Serialization.Binary
                 intraNodeText, 
                 childNodes?.ToImmutable() ?? ImmutableDictionary<char, IndexNode>.Empty, 
                 matches?.ToImmutable() ?? ImmutableDictionary<int, ImmutableList<IndexedToken>>.Empty);
+        }
+
+        /// <summary>
+        /// Reads a character matched at a node.
+        /// </summary>
+        protected virtual char ReadMatchedCharacter()
+        {
+            return this.reader.ReadChar();
         }
 
         private void ReadLocations(int locationCount, List<TokenLocation> locationMatches)

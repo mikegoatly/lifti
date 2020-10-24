@@ -87,6 +87,8 @@ namespace Lifti.Serialization.Binary
                     throw new DeserializationException(ExceptionMessages.EarlierVersionSerializedIndexNotSupported, version);
                 case 2:
                     return new V2IndexReader<TKey>(stream, disposeStream, this.keySerializer);
+                case 3:
+                    return new V3IndexReader<TKey>(stream, disposeStream, this.keySerializer);
                 default:
                     throw new DeserializationException(ExceptionMessages.NoDeserializerAvailableForIndexVersion, version);
             }

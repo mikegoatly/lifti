@@ -59,5 +59,15 @@ namespace Lifti.Tests {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] v2Index {
+            get {
+                object obj = ResourceManager.GetObject("v2Index", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@ namespace Lifti.Serialization.Binary
 {
     internal class IndexWriter<TKey> : IIndexWriter<TKey>
     {
-        private const ushort Version = 2;
+        private const ushort Version = 3;
         private readonly Stream underlyingStream;
         private readonly bool disposeStream;
         private readonly IKeySerializer<TKey> keySerializer;
@@ -61,7 +61,7 @@ namespace Lifti.Serialization.Binary
             {
                 foreach (var childNode in node.ChildNodes)
                 {
-                    this.writer.Write(childNode.Key);
+                    this.writer.Write((short)childNode.Key);
                     await this.WriteNodeAsync(childNode.Value).ConfigureAwait(false);
                 }
             }
