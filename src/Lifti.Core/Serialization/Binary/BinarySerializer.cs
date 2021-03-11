@@ -81,17 +81,14 @@ namespace Lifti.Serialization.Binary
         {
             var version = await ReadFileVersionAsync(stream).ConfigureAwait(false);
 
-            switch (version)
+            return version switch
             {
-                case 1:
-                    throw new DeserializationException(ExceptionMessages.EarlierVersionSerializedIndexNotSupported, version);
-                case 2:
-                    return new V2IndexReader<TKey>(stream, disposeStream, this.keySerializer);
-                case 3:
-                    return new V3IndexReader<TKey>(stream, disposeStream, this.keySerializer);
-                default:
-                    throw new DeserializationException(ExceptionMessages.NoDeserializerAvailableForIndexVersion, version);
-            }
+                1 => throw new DeserializationException(ExceptionMessages.EarlierVersionSerializedIndexNotSupported, version),
+                2 => new V2IndexReader<TKey>(stream, disposeStream, this.keySerializer),
+                3 => new V3IndexReader<TKey>(stream, disposeStream, this.keySerializer),
+                4 => new V4IndexReader<TKey>(stream, disposeStream, this.keySerializer),
+                _ => throw new DeserializationException(ExceptionMessages.NoDeserializerAvailableForIndexVersion, version),
+            };
         }
 
         private static async Task<ushort> ReadFileVersionAsync(Stream stream)

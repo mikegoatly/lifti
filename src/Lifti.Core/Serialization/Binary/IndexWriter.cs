@@ -8,7 +8,7 @@ namespace Lifti.Serialization.Binary
 {
     internal class IndexWriter<TKey> : IIndexWriter<TKey>
     {
-        private const ushort Version = 3;
+        private const ushort Version = 4;
         private readonly Stream underlyingStream;
         private readonly bool disposeStream;
         private readonly IKeySerializer<TKey> keySerializer;
@@ -48,9 +48,31 @@ namespace Lifti.Serialization.Binary
             {
                 static void WriteIntraNodeText(BinaryWriter writer, ReadOnlySpan<char> span)
                 {
-                    for (var i = 0; i < span.Length; i++)
+                    var noSurrogateCharacters = true;
+                    for (var i = 0; i < span.Length && noSurrogateCharacters; i++)
                     {
-                        writer.Write(span[i]);
+                        if (char.IsSurrogate(span[i]))
+                        {
+                            noSurrogateCharacters = false;
+                        }
+                    }
+
+                    writer.Write(noSurrogateCharacters);
+                    if (noSurrogateCharacters)
+                    {
+                        // Write out as chars; no surrogates to worry about
+                        for (var i = 0; i < span.Length; i++)
+                        {
+                            writer.Write(span[i]);
+                        }
+                    }
+                    else
+                    {
+                        // Write out as shorts avoiding serialization errors
+                        for (var i = 0; i < span.Length; i++)
+                        {
+                            writer.Write((short)span[i]);
+                        }
                     }
                 }
 

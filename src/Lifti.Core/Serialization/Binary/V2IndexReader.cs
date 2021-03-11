@@ -5,21 +5,6 @@ using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
-    internal class V3IndexReader<TKey> : V2IndexReader<TKey>
-    {
-        public V3IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer) 
-            : base(stream, disposeStream, keySerializer)
-        {
-        }
-
-        /// <summary>
-        /// Reads a character matched at a node.
-        /// </summary>
-        protected override char ReadMatchedCharacter()
-        {
-            return (char)this.reader.ReadInt16();
-        }
-    }
 
     internal class V2IndexReader<TKey> : IIndexReader<TKey>
     {
@@ -89,7 +74,7 @@ namespace Lifti.Serialization.Binary
             var textLength = this.reader.ReadInt32();
             var matchCount = this.reader.ReadInt32();
             var childNodeCount = this.reader.ReadInt32();
-            var intraNodeText = textLength == 0 ? null : this.reader.ReadChars(textLength);
+            var intraNodeText = textLength == 0 ? null : ReadIntraNodeText(textLength);
             var childNodes = childNodeCount > 0 ? ImmutableDictionary.CreateBuilder<char, IndexNode>() : null;
             var matches = matchCount > 0 ? ImmutableDictionary.CreateBuilder<int, ImmutableList<IndexedToken>>() : null;
 
@@ -129,9 +114,23 @@ namespace Lifti.Serialization.Binary
             }
 
             return nodeFactory.CreateNode(
-                intraNodeText, 
-                childNodes?.ToImmutable() ?? ImmutableDictionary<char, IndexNode>.Empty, 
+                intraNodeText,
+                childNodes?.ToImmutable() ?? ImmutableDictionary<char, IndexNode>.Empty,
                 matches?.ToImmutable() ?? ImmutableDictionary<int, ImmutableList<IndexedToken>>.Empty);
+        }
+
+        /// <summary>
+        /// Reads the intra-node text from the serialized index.
+        /// </summary>
+        /// <param name="textLength">
+        /// The length of the text to read.
+        /// </param>
+        /// <returns>
+        /// The deserialized intra node 
+        /// </returns>
+        protected virtual char[] ReadIntraNodeText(int textLength)
+        {
+            return this.reader.ReadChars(textLength);
         }
 
         /// <summary>

@@ -69,5 +69,15 @@ namespace Lifti.Tests {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] v3Index {
+            get {
+                object obj = ResourceManager.GetObject("v3Index", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

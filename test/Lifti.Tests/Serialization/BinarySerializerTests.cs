@@ -22,20 +22,38 @@ namespace Lifti.Tests.Serialization
         }
 
         [Fact]
+        public async Task ShouldSerializeEmojiWithSurrogatePairs()
+        {
+            var index = await SearializeAndDeserializeIndexWithText("🎶 🤷🏾‍♀️");
+            index.Search("🤷🏾‍♀️").Should().HaveCount(1);
+        }
+
+        [Fact]
         public async Task ShouldSerializeEmoji()
         {
-            var stream = new MemoryStream();
-            var serializer = new BinarySerializer<string>();
+            var index = await SearializeAndDeserializeIndexWithText("🎶");
+            index.Search("🎶").Should().HaveCount(1);
+        }
+
+        [Fact]
+        public async Task ShouldSerializeEmojiSequences()
+        {
+            var index = await SearializeAndDeserializeIndexWithText("🎶🤷🏾‍♀️");
+            index.Search("🎶🤷🏾‍♀️").Should().HaveCount(1);
+        }
+
+        [Fact]
+        public async Task ShouldDeserializeV3Index()
+        {
             var index = new FullTextIndexBuilder<string>().Build();
-            await index.AddAsync("A", "🎶");
+            var serializer = new BinarySerializer<string>();
+            using (var stream = new MemoryStream(TestResources.v3Index))
+            {
+                await serializer.DeserializeAsync(index, stream);
+            }
 
-            await serializer.SerializeAsync(index, stream, false);
-
-            stream.Position = 0;
-
-            var index2 = new FullTextIndexBuilder<string>().Build();
-            await serializer.DeserializeAsync(index2, stream);
-            index2.Search("🎶").Should().HaveCount(1);
+            index.Search("serialized").Should().HaveCount(1);
+            index.Search("亜").Should().HaveCount(1);
         }
 
         [Fact]
@@ -92,6 +110,22 @@ namespace Lifti.Tests.Serialization
             }
 
             File.Delete(fileName);
+        }
+
+        private static async Task<FullTextIndex<string>> SearializeAndDeserializeIndexWithText(string text)
+        {
+            var stream = new MemoryStream();
+            var serializer = new BinarySerializer<string>();
+            var index = new FullTextIndexBuilder<string>().Build();
+            await index.AddAsync("A", text);
+
+            await serializer.SerializeAsync(index, stream, false);
+
+            stream.Position = 0;
+
+            var index2 = new FullTextIndexBuilder<string>().Build();
+            await serializer.DeserializeAsync(index2, stream);
+            return index2;
         }
 
         private async Task<FullTextIndex<string>> CreateWikipediaIndexAsync()
