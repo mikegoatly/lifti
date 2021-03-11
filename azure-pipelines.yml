@@ -31,6 +31,7 @@ stages:
       inputs:
         command: restore
         projects: '**/*.csproj'
+        verbosityRestore: 'Normal'
     - task: DotNetCoreCLI@2
       displayName: Run unit tests
       inputs:
