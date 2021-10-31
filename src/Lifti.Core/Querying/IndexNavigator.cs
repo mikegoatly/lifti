@@ -169,6 +169,29 @@ namespace Lifti.Querying
             return results;
         }
 
+        public IEnumerable<char> EnumerateNextCharacters()
+        {
+            if (this.currentNode != null)
+            {
+                if (this.HasIntraNodeTextLeftToProcess)
+                {
+                    yield return this.currentNode.IntraNodeText.Span[this.intraNodeTextPosition];
+                }
+                else if (this.currentNode.HasChildNodes)
+                {
+                    foreach (var character in this.currentNode.ChildNodes.Keys)
+                    {
+                        yield return character;
+                    }
+                }
+            }
+        }
+
+        public IIndexNavigatorBookmark CreateBookmark()
+        {
+            return new IndexNavigatorBookmark(this);
+        }
+
         public void Dispose()
         {
             if (this.pool == null)
@@ -238,6 +261,35 @@ namespace Lifti.Querying
             return new QueryTokenMatch(
                 match.Key,
                 match.Value.Select(v => new FieldMatch(v)).ToList());
+        }
+
+        internal struct IndexNavigatorBookmark : IIndexNavigatorBookmark
+        {
+            private readonly IndexNavigator indexNavigator;
+            private readonly int navigatedWithLength;
+            private readonly IndexNode? currentNode;
+            private readonly int intraNodeTextPosition;
+
+            public IndexNavigatorBookmark(IndexNavigator indexNavigator)
+            {
+                this.navigatedWithLength = indexNavigator.navigatedWith.Length;
+                this.currentNode = indexNavigator.currentNode;
+                this.intraNodeTextPosition = indexNavigator.intraNodeTextPosition;
+                this.indexNavigator = indexNavigator;
+            }
+
+            /// <inheritdoc />
+            public void RewindNavigator()
+            {
+                if (indexNavigator.navigatedWith.Length < this.navigatedWithLength)
+                {
+                    throw new LiftiException(ExceptionMessages.IndexNavigatorBookmarksCanOnlyRewind);
+                }
+
+                this.indexNavigator.navigatedWith.Length = this.navigatedWithLength;
+                this.indexNavigator.currentNode = this.currentNode;
+                this.indexNavigator.intraNodeTextPosition = this.intraNodeTextPosition;
+            }
         }
     }
 }

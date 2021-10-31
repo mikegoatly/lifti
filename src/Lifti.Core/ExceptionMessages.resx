@@ -159,6 +159,9 @@
   <data name="IndexMustBeEmptyForDeserialization" xml:space="preserve">
     <value>An index must be empty when attempting to deserialize its contents.</value>
   </data>
+  <data name="IndexNavigatorBookmarksCanOnlyRewind" xml:space="preserve">
+    <value>Index navigator bookmarks can only rewind to an earlier navigation state</value>
+  </data>
   <data name="ItemAlreadyIndexed" xml:space="preserve">
     <value>Item already indexed</value>
   </data>

@@ -44,5 +44,15 @@ namespace Lifti.Querying
         /// <c>true</c> if the navigator could process all the characters in the string, otherwise <c>false</c>.
         /// </returns>
         bool Process(ReadOnlySpan<char> text);
+
+        /// <summary>
+        /// Creates an <see cref="IIndexNavigatorBookmark"/> for the current state of this instance.
+        /// </summary>
+        IIndexNavigatorBookmark CreateBookmark();
+        
+        /// <summary>
+        /// Enumerates all the characters that are available as options to process from the navigators current location.
+        /// </summary>
+        IEnumerable<char> EnumerateNextCharacters();
     }
 }
