@@ -12,12 +12,33 @@ namespace Lifti.Querying
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Should not be compared")]
     public struct IntermediateQueryResult
     {
+        private readonly IEnumerable<ScoredToken> matches;
+        private readonly Lazy<IReadOnlyList<ScoredToken>> matchList;
+
         /// <summary>
         /// Creates a new instance of <see cref="IntermediateQueryResult"/>.
         /// </summary>
         public IntermediateQueryResult(IEnumerable<ScoredToken> matches)
         {
-            this.Matches = matches as IReadOnlyList<ScoredToken> ?? matches.ToList();
+            this.matches = matches;
+            this.matchList = new Lazy<IReadOnlyList<ScoredToken>>(() => matches as IReadOnlyList<ScoredToken> ?? matches.ToList());
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="IntermediateQueryResult"/> from several other <see cref="IntermediateQueryResult"/>
+        /// where there is guaranteed to be no overlap in matches.
+        /// </summary>
+        internal IntermediateQueryResult(IEnumerable<IntermediateQueryResult> intermediateResults)
+        {
+            var combinedResults = new List<ScoredToken>();
+
+            foreach (var result in intermediateResults)
+            {
+                combinedResults.AddRange(result.matches);
+            }
+
+            this.matches = combinedResults;
+            this.matchList = new Lazy<IReadOnlyList<ScoredToken>>(() => combinedResults);
         }
 
         /// <summary>
@@ -28,7 +49,7 @@ namespace Lifti.Querying
         /// <summary>
         /// Gets the set of <see cref="ScoredToken"/> matches that this instance captured.
         /// </summary>
-        public IReadOnlyList<ScoredToken> Matches { get; }
+        public IReadOnlyList<ScoredToken> Matches => matchList.Value;
 
         /// <summary>
         /// Intersects this and the specified instance, but only when the positions of the matched tokens on the left are preceding the tokens on the right.

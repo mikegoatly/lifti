@@ -135,8 +135,14 @@
   <data name="EmptyBracketedExpressionsAreNotSupported" xml:space="preserve">
     <value>Bracketed query parts cannot be empty</value>
   </data>
+  <data name="EmptyOrMissingTextQueryFragmentValue" xml:space="preserve">
+    <value>Internal error - missing text value</value>
+  </data>
   <data name="ExpectedAtLeastOneQueryPartParsed" xml:space="preserve">
     <value>Expected at least one query part to be parsed</value>
+  </data>
+  <data name="ExpectedTextQueryFragmentAfterMultiCharacterWildcard" xml:space="preserve">
+    <value>A text fragment must follow a multi-character wildcard in a wildcard expression</value>
   </data>
   <data name="ExpectedTextToken" xml:space="preserve">
     <value>Expected a text token - got {0}</value>

@@ -115,11 +115,29 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internal error - missing text value.
+        /// </summary>
+        internal static string EmptyOrMissingTextQueryFragmentValue {
+            get {
+                return ResourceManager.GetString("EmptyOrMissingTextQueryFragmentValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected at least one query part to be parsed.
         /// </summary>
         internal static string ExpectedAtLeastOneQueryPartParsed {
             get {
                 return ResourceManager.GetString("ExpectedAtLeastOneQueryPartParsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A text fragment must follow a multi-character wildcard in a wildcard expression.
+        /// </summary>
+        internal static string ExpectedTextQueryFragmentAfterMultiCharacterWildcard {
+            get {
+                return ResourceManager.GetString("ExpectedTextQueryFragmentAfterMultiCharacterWildcard", resourceCulture);
             }
         }
         
