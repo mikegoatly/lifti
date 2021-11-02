@@ -165,9 +165,6 @@
   <data name="IndexMustBeEmptyForDeserialization" xml:space="preserve">
     <value>An index must be empty when attempting to deserialize its contents.</value>
   </data>
-  <data name="IndexNavigatorBookmarksCanOnlyRewind" xml:space="preserve">
-    <value>Index navigator bookmarks can only rewind to an earlier navigation state</value>
-  </data>
   <data name="ItemAlreadyIndexed" xml:space="preserve">
     <value>Item already indexed</value>
   </data>
@@ -209,6 +206,9 @@
   </data>
   <data name="TimeoutWaitingForWriteLock" xml:space="preserve">
     <value>A timeout occurred waiting for index write lock</value>
+  </data>
+  <data name="UnableToEnumerateIndexedTokensAfterApplyingBookmark" xml:space="preserve">
+    <value>EnumerateIndexedTokens cannot be called after applying a bookmark</value>
   </data>
   <data name="UnableToReadHeaderInformation" xml:space="preserve">
     <value>Unable to read header data from serialized index content.</value>

@@ -205,15 +205,6 @@ namespace Lifti {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Index navigator bookmarks can only rewind to an earlier navigation state.
-        /// </summary>
-        internal static string IndexNavigatorBookmarksCanOnlyRewind {
-            get {
-                return ResourceManager.GetString("IndexNavigatorBookmarksCanOnlyRewind", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Item already indexed.
         /// </summary>
         internal static string ItemAlreadyIndexed {
@@ -336,6 +327,15 @@ namespace Lifti {
         internal static string TimeoutWaitingForWriteLock {
             get {
                 return ResourceManager.GetString("TimeoutWaitingForWriteLock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EnumerateIndexedTokens cannot be called after applying a bookmark.
+        /// </summary>
+        internal static string UnableToEnumerateIndexedTokensAfterApplyingBookmark {
+            get {
+                return ResourceManager.GetString("UnableToEnumerateIndexedTokensAfterApplyingBookmark", resourceCulture);
             }
         }
         

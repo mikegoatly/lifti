@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Lifti.Querying.QueryParts
 {
@@ -38,6 +39,7 @@ namespace Lifti.Querying.QueryParts
             {
                 var resultFragments = new List<IntermediateQueryResult>();
                 var bookmarkStack = new Stack<IIndexNavigatorBookmark>();
+                var nextBookmarks = new List<IIndexNavigatorBookmark>();
                 bookmarkStack.Push(navigator.CreateBookmark());
 
                 for (var i = 0; i < fragments.Count; i++)
@@ -53,10 +55,15 @@ namespace Lifti.Querying.QueryParts
                             fragments[i],
                             nextFragment))
                         {
-                            bookmarkStack.Push(bookmark);
+                            nextBookmarks.Add(bookmark);
                         }
                     }
                     while (bookmarkStack.Count > 0);
+
+                    foreach (var bookmark in nextBookmarks)
+                    {
+                        bookmarkStack.Push(bookmark);
+                    }
                 }
 
                 if (resultFragments.Count == 0)
@@ -85,6 +92,13 @@ namespace Lifti.Querying.QueryParts
                         return Array.Empty<IIndexNavigatorBookmark>();
                     }
 
+                    if (nextFragment == null)
+                    {
+                        // This is the end of the query and we've ended up on some exact matches
+                        fragmentResults.Add(navigator.GetExactMatches());
+                        return Array.Empty<IIndexNavigatorBookmark>();
+                    }
+
                     // Return a bookmark at the current location - we will continue from this point on the next iteration
                     return new[] { navigator.CreateBookmark() };
 
@@ -109,7 +123,7 @@ namespace Lifti.Querying.QueryParts
                         if (nextFragmentValue.Text?.Length > 0)
                         {
                             var terminatingCharacter = nextFragmentValue.Text![0];
-                            // TODO Recurse down the child nodes, bookmarking at each level
+                            
                             return RecursivelyCreateBookmarksAtMatchingCharacter(navigator, terminatingCharacter);
                         }
                         else
@@ -124,6 +138,22 @@ namespace Lifti.Querying.QueryParts
                 default:
                     throw new ArgumentException("Unknown WildcardQueryFragmentKind: " + fragment.Kind);
             }
+        }
+
+        private static IEnumerable<IIndexNavigatorBookmark> CreateBookmarksForAllChildCharacters(IIndexNavigator navigator)
+        {
+            var bookmark = navigator.CreateBookmark();
+            foreach (var character in navigator.EnumerateNextCharacters())
+            {
+                navigator.Process(character);
+                yield return navigator.CreateBookmark();
+                bookmark.RewindNavigator();
+            }
+        }
+
+        private static IEnumerable<IIndexNavigatorBookmark> RecursivelyCreateBookmarksAtMatchingCharacter(IIndexNavigator navigator, char terminatingCharacter)
+        {
+            throw new NotImplementedException();
         }
 
         private static IEnumerable<WildcardQueryFragment> NormalizeFragmentSequence(IEnumerable<WildcardQueryFragment> fragments)
