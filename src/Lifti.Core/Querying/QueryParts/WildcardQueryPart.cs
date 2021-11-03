@@ -12,6 +12,8 @@ namespace Lifti.Querying.QueryParts
     /// </summary>
     public class WildcardQueryPart : IQueryPart
     {
+        private static readonly IIndexNavigatorBookmark[] QueryCompleted = Array.Empty<IIndexNavigatorBookmark>();
+
         private readonly IReadOnlyList<WildcardQueryFragment> fragments;
 
         /// <summary>
@@ -37,13 +39,14 @@ namespace Lifti.Querying.QueryParts
 
             using (var navigator = navigatorCreator())
             {
-                var resultFragments = new List<IntermediateQueryResult>();
                 var bookmarkStack = new Stack<IIndexNavigatorBookmark>();
                 var nextBookmarks = new List<IIndexNavigatorBookmark>();
+                var results = IntermediateQueryResult.Empty;
                 bookmarkStack.Push(navigator.CreateBookmark());
 
-                for (var i = 0; i < fragments.Count; i++)
+                for (var i = 0; i < fragments.Count && bookmarkStack.Count > 0; i++)
                 {
+                    nextBookmarks.Clear();
                     var nextFragment = i == fragments.Count - 1 ? (WildcardQueryFragment?)null : fragments[i + 1];
 
                     do
@@ -51,9 +54,9 @@ namespace Lifti.Querying.QueryParts
                         bookmarkStack.Pop().RewindNavigator();
                         foreach (var bookmark in ProcessFragment(
                             navigator,
-                            resultFragments,
                             fragments[i],
-                            nextFragment))
+                            nextFragment,
+                            ref results))
                         {
                             nextBookmarks.Add(bookmark);
                         }
@@ -66,22 +69,15 @@ namespace Lifti.Querying.QueryParts
                     }
                 }
 
-                if (resultFragments.Count == 0)
-                {
-                    return IntermediateQueryResult.Empty;
-                }
-                else
-                {
-                    return queryContext.ApplyTo(new IntermediateQueryResult(resultFragments));
-                }
+                return results;
             }
         }
 
         private static IEnumerable<IIndexNavigatorBookmark> ProcessFragment(
             IIndexNavigator navigator,
-            IList<IntermediateQueryResult> fragmentResults,
             WildcardQueryFragment fragment,
-            WildcardQueryFragment? nextFragment)
+            WildcardQueryFragment? nextFragment,
+            ref IntermediateQueryResult results)
         {
             switch (fragment.Kind)
             {
@@ -89,14 +85,14 @@ namespace Lifti.Querying.QueryParts
                     if (!navigator.Process(fragment.Text.AsSpan()))
                     {
                         // No matches - nothing can return and no subsequent fragments can change that
-                        return Array.Empty<IIndexNavigatorBookmark>();
+                        return QueryCompleted;
                     }
 
                     if (nextFragment == null)
                     {
                         // This is the end of the query and we've ended up on some exact matches
-                        fragmentResults.Add(navigator.GetExactMatches());
-                        return Array.Empty<IIndexNavigatorBookmark>();
+                        results = results.Union(navigator.GetExactMatches());
+                        return QueryCompleted;
                     }
 
                     // Return a bookmark at the current location - we will continue from this point on the next iteration
@@ -107,10 +103,10 @@ namespace Lifti.Querying.QueryParts
                     {
                         // This wildcard is the last in the pattern - just return any exact and child matches under the current position
                         // I.e. as per the classic "starts with" operator
-                        fragmentResults.Add(navigator.GetExactAndChildMatches());
+                        results = results.Union(navigator.GetExactAndChildMatches());
 
                         // No other work to process - no more bookmarks required.
-                        return Array.Empty<IIndexNavigatorBookmark>();
+                        return QueryCompleted;
                     }
                     else
                     {
@@ -133,7 +129,23 @@ namespace Lifti.Querying.QueryParts
                     }
 
                 case WildcardQueryFragmentKind.SingleCharacter:
-                    return CreateBookmarksForAllChildCharacters(navigator);
+                    if (nextFragment == null)
+                    {
+                        // Add all exact matches for every character under the current position
+                        var bookmark = navigator.CreateBookmark();
+                        foreach (var character in navigator.EnumerateNextCharacters())
+                        {
+                            navigator.Process(character);
+                            results = results.Union(navigator.GetExactMatches());
+                            bookmark.RewindNavigator();
+                        }
+
+                        return QueryCompleted;
+                    }
+                    else
+                    {
+                        return CreateBookmarksForAllChildCharacters(navigator);
+                    }
 
                 default:
                     throw new ArgumentException("Unknown WildcardQueryFragmentKind: " + fragment.Kind);
@@ -153,7 +165,23 @@ namespace Lifti.Querying.QueryParts
 
         private static IEnumerable<IIndexNavigatorBookmark> RecursivelyCreateBookmarksAtMatchingCharacter(IIndexNavigator navigator, char terminatingCharacter)
         {
-            throw new NotImplementedException();
+            var bookmark = navigator.CreateBookmark();
+            foreach (var character in navigator.EnumerateNextCharacters())
+            {
+                if (character == terminatingCharacter)
+                {
+                    yield return navigator.CreateBookmark();
+                }
+
+                navigator.Process(character);
+
+                foreach (var recursedBookmark in RecursivelyCreateBookmarksAtMatchingCharacter(navigator, terminatingCharacter))
+                {
+                    yield return recursedBookmark;
+                }
+
+                bookmark.RewindNavigator();
+            }
         }
 
         private static IEnumerable<WildcardQueryFragment> NormalizeFragmentSequence(IEnumerable<WildcardQueryFragment> fragments)
