@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 
 namespace Lifti.Querying.QueryParts
@@ -15,6 +16,15 @@ namespace Lifti.Querying.QueryParts
         private static readonly IIndexNavigatorBookmark[] QueryCompleted = Array.Empty<IIndexNavigatorBookmark>();
 
         private readonly IReadOnlyList<WildcardQueryFragment> fragments;
+
+        /// <summary>
+        /// Creates a new instance of <see cref="WildcardQueryPart"/>.
+        /// </summary>
+        public WildcardQueryPart(params WildcardQueryFragment[] fragments)
+            : this((IEnumerable<WildcardQueryFragment>)fragments)
+        {
+
+        }
 
         /// <summary>
         /// Creates a new instance of <see cref="WildcardQueryPart"/>.
@@ -73,6 +83,25 @@ namespace Lifti.Querying.QueryParts
             }
         }
 
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+            foreach (var fragment in this.fragments)
+            {
+
+                builder.Append(fragment.Kind switch
+                {
+                    WildcardQueryFragmentKind.Text => fragment.Text,
+                    WildcardQueryFragmentKind.MultiCharacter => "*",
+                    WildcardQueryFragmentKind.SingleCharacter => "%",
+                    _ => "?"
+                });
+            }
+
+            return builder.ToString();
+        }
+
         private static IEnumerable<IIndexNavigatorBookmark> ProcessFragment(
             IIndexNavigator navigator,
             WildcardQueryFragment fragment,
@@ -119,7 +148,7 @@ namespace Lifti.Querying.QueryParts
                         if (nextFragmentValue.Text?.Length > 0)
                         {
                             var terminatingCharacter = nextFragmentValue.Text![0];
-                            
+
                             return RecursivelyCreateBookmarksAtMatchingCharacter(navigator, terminatingCharacter);
                         }
                         else

@@ -1,4 +1,5 @@
 ﻿using Lifti.Querying.QueryParts;
+using Lifti.Tokenization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -7,7 +8,7 @@ namespace Lifti.Querying
 {
     internal static class WildcardQueryPartParser
     {
-        public static bool TryParse(ReadOnlySpan<char> token, [NotNullWhen(true)] out WildcardQueryPart? part)
+        public static bool TryParse(ReadOnlySpan<char> token, ITokenizer tokenizer, [NotNullWhen(true)] out WildcardQueryPart? part)
         {
             List<WildcardQueryFragment>? fragments = null;
             void AddFragment(WildcardQueryFragment fragment)
@@ -26,7 +27,9 @@ namespace Lifti.Querying
                     case '*':
                         if (leadingTextIndex != null)
                         {
-                            AddFragment(WildcardQueryFragment.CreateText(token.Slice(leadingTextIndex.GetValueOrDefault(), i).ToString()));
+                            AddFragment(
+                                WildcardQueryFragment.CreateText(
+                                    tokenizer.Normalize(token.Slice(leadingTextIndex.GetValueOrDefault(), i))));
                         }
 
                         AddFragment(WildcardQueryFragment.MultiCharacter);

@@ -19,6 +19,11 @@ namespace Lifti.Tests.Querying
 
         public TokenizationOptions Options { get; }
 
+        public string Normalize(ReadOnlySpan<char> text)
+        {
+            return new string(text);
+        }
+
         public IReadOnlyList<Token> Process(ReadOnlySpan<char> text)
         {
             return new[] { new Token(new string(text), new TokenLocation(0, 0, (ushort)text.Length)) };

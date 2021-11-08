@@ -18,5 +18,10 @@ namespace Lifti.Tokenization
         /// Tokenizes a single string.
         /// </summary>
         IReadOnlyList<Token> Process(ReadOnlySpan<char> tokenText);
+
+        /// <summary>
+        /// Normalizes a fragment of text according to the rules in the tokenizer.
+        /// </summary>
+        string Normalize(ReadOnlySpan<char> tokenText);
     }
 }

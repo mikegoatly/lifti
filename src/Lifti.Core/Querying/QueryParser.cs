@@ -38,7 +38,7 @@ namespace Lifti.Querying
             switch (token.TokenType)
             {
                 case QueryTokenType.Text:
-                    return ComposePart(currentQuery, CreateQueryPart(token, tokenizer));
+                    return ComposePart(currentQuery, CreateWordQueryPart(token, tokenizer));
 
                 case QueryTokenType.FieldFilter:
                     var (fieldId, _, fieldTokenizer) = fieldLookup.GetFieldInfo(token.TokenText);
@@ -70,7 +70,7 @@ namespace Lifti.Querying
 
                 case QueryTokenType.BeginAdjacentTextOperator:
                     var tokens = state.GetTokensUntil(QueryTokenType.EndAdjacentTextOperator)
-                        .SelectMany(t => CreateQueryParts(t, tokenizer))
+                        .Select(t => CreateWordQueryPart(t, tokenizer))
                         .ToList();
 
                     if (tokens.Count == 0)
@@ -85,25 +85,7 @@ namespace Lifti.Querying
             }
         }
 
-        private static IQueryPart CreateQueryPart(QueryToken queryToken, ITokenizer wordTokenizer)
-        {
-            var queryParts = CreateQueryParts(queryToken, wordTokenizer).ToList();
-
-            if (queryParts.Count == 0)
-            {
-                throw new QueryParserException(ExceptionMessages.ExpectedAtLeastOneQueryPartParsed);
-            }
-
-            IQueryPart part = queryParts[0];
-            for (var i = 1; i < queryParts.Count; i++)
-            {
-                part = ComposePart(part, queryParts[i]);
-            }
-
-            return part;
-        }
-
-        private static IEnumerable<IWordQueryPart> CreateQueryParts(QueryToken queryToken, ITokenizer tokenizer)
+        private static IQueryPart CreateWordQueryPart(QueryToken queryToken, ITokenizer tokenizer)
         {
             if (queryToken.TokenType != QueryTokenType.Text)
             {
@@ -112,17 +94,21 @@ namespace Lifti.Querying
 
             var tokenText = queryToken.TokenText.AsSpan();
 
-            var hasWildcard = tokenText.Length > 0 && tokenText[tokenText.Length - 1] == '*';
-            if (hasWildcard)
+            if (WildcardQueryPartParser.TryParse(tokenText, tokenizer, out var wildcardQueryPart))
             {
-                tokenText = tokenText.Slice(0, tokenText.Length - 1);
+                return wildcardQueryPart;
             }
 
+            var result = tokenizer.Process(tokenText)
+                 .Select(token => new ExactWordQueryPart(token.Value))
+                 .FirstOrDefault();
 
-            return tokenizer.Process(tokenText)
-                .Select(token => hasWildcard ?
-                    (IWordQueryPart)new StartsWithWordQueryPart(token.Value) :
-                    new ExactWordQueryPart(token.Value));
+            if (result == null)
+            {
+                throw new QueryParserException(ExceptionMessages.ExpectedAtLeastOneQueryPartParsed);
+            }
+
+            return result;
         }
 
         private static IQueryPart ComposePart(IQueryPart? existingPart, IQueryPart newPart)

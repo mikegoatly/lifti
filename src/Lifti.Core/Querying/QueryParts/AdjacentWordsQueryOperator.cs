@@ -12,9 +12,9 @@ namespace Lifti.Querying.QueryParts
         /// Constructs a new <see cref="AdjacentWordsQueryOperator"/> instance.
         /// </summary>
         /// <param name="words">
-        /// The <see cref="IWordQueryPart"/>s that must appear in sequence.
+        /// The <see cref="IQueryPart"/>s that must appear in sequence.
         /// </param>
-        public AdjacentWordsQueryOperator(IReadOnlyList<IWordQueryPart> words)
+        public AdjacentWordsQueryOperator(IReadOnlyList<IQueryPart> words)
         {
             this.Words = words;
         }
@@ -22,7 +22,7 @@ namespace Lifti.Querying.QueryParts
         /// <summary>
         /// Gets the <see cref="IWordQueryPart"/>s that must appear in sequence.
         /// </summary>
-        public IReadOnlyList<IWordQueryPart> Words { get; }
+        public IReadOnlyList<IQueryPart> Words { get; }
 
         /// <inheritdoc/>
         public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)

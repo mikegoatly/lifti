@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Lifti.Tests.Querying
 {
-    public class FakeQueryPart : QueryTestBase, IQueryPart, IWordQueryPart
+    public class FakeQueryPart : QueryTestBase, IQueryPart
     {
         private readonly IntermediateQueryResult results;
 
@@ -22,8 +22,6 @@ namespace Lifti.Tests.Querying
                         m,
                         new[] { ScoredFieldMatch(m, (byte)m, m) })));
         }
-
-        public string Word => throw new NotImplementedException();
 
         public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
         {

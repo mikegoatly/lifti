@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Numeric;
 using Lifti.Querying;
 using System.Linq;
 using System.Threading.Tasks;
@@ -227,16 +228,26 @@ namespace Lifti.Tests.Querying
             var bookmark = this.sut.CreateBookmark();
 
             this.sut.Process("VIDUAL");
-            this.sut.EnumerateIndexedTokens().Should().BeEquivalentTo(new[] { "INDIVIDUALS" });
+            VerifyMatchedWordIndexes(13);
 
             bookmark.RewindNavigator();
 
             this.sut.Process("F");
-            this.sut.EnumerateIndexedTokens().Should().BeEquivalentTo(new[] { "INDIFFERENCE" });
+            VerifyMatchedWordIndexes(5);
 
             bookmark.RewindNavigator();
+            VerifyMatchedWordIndexes(5, 13);
+        }
 
-            this.sut.EnumerateIndexedTokens().Should().BeEquivalentTo(new[] { "INDIVIDUALS", "INDIFFERENCE" });
+        private void VerifyMatchedWordIndexes(params int[] indexes)
+        {
+            var results = this.sut.GetExactAndChildMatches();
+            results.Matches.Should().HaveCount(1);
+            results.Matches[0].FieldMatches.Should().HaveCount(1);
+            var fieldMatch = results.Matches[0].FieldMatches[0];
+            fieldMatch.Locations.Should().HaveCount(indexes.Length);
+
+            fieldMatch.Locations.Select(l => l.MinTokenIndex).Should().BeEquivalentTo(indexes);
         }
 
         [Theory]

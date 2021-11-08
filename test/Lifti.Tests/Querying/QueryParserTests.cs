@@ -61,7 +61,10 @@ namespace Lifti.Tests.Querying
         public void ParsingBracketedSingleExpression_ShouldReturnBracketedQueryPartContainer()
         {
             var result = this.Parse("(wordone*)");
-            var expectedQuery = new BracketedQueryPart(new StartsWithWordQueryPart("wordone"));
+            var expectedQuery = new BracketedQueryPart(
+                new WildcardQueryPart(
+                    WildcardQueryFragment.CreateText("wordone"), 
+                    WildcardQueryFragment.MultiCharacter));
 
             VerifyResult(result, expectedQuery);
         }
@@ -118,11 +121,11 @@ namespace Lifti.Tests.Querying
         {
             var result = this.Parse("\"search words startswith* too\"");
             var expectedQuery = new AdjacentWordsQueryOperator(
-                new IWordQueryPart[]
+                new IQueryPart[]
                 {
                     new ExactWordQueryPart("search"),
                     new ExactWordQueryPart("words"),
-                    new StartsWithWordQueryPart("startswith"),
+                    new WildcardQueryPart(WildcardQueryFragment.CreateText("startswith"), WildcardQueryFragment.MultiCharacter),
                     new ExactWordQueryPart("too")
                 });
 
@@ -134,7 +137,7 @@ namespace Lifti.Tests.Querying
         {
             var result = this.Parse("\"test & hello\"");
             var expectedQuery = new AdjacentWordsQueryOperator(
-                new IWordQueryPart[]
+                new IQueryPart[]
                 {
                     new ExactWordQueryPart("test"),
                     new ExactWordQueryPart("&"),
@@ -162,7 +165,7 @@ namespace Lifti.Tests.Querying
         public void ParsingWordWithWildcard_ShouldReturnStartsWithWordQueryPart(string test)
         {
             var result = this.Parse(test);
-            var expectedQuery = new StartsWithWordQueryPart("word");
+            var expectedQuery = new WildcardQueryPart(WildcardQueryFragment.CreateText("word"), WildcardQueryFragment.MultiCharacter);
             VerifyResult(result, expectedQuery);
         }
 
