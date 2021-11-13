@@ -230,12 +230,12 @@ namespace Lifti.Tests.Querying
             this.sut.Process("VIDUAL");
             VerifyMatchedWordIndexes(13);
 
-            bookmark.RewindNavigator();
+            bookmark.Apply();
 
             this.sut.Process("F");
             VerifyMatchedWordIndexes(5);
 
-            bookmark.RewindNavigator();
+            bookmark.Apply();
             VerifyMatchedWordIndexes(5, 13);
         }
 

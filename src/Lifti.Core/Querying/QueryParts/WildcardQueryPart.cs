@@ -60,7 +60,7 @@ namespace Lifti.Querying.QueryParts
 
                     do
                     {
-                        bookmarkStack.Pop().RewindNavigator();
+                        bookmarkStack.Pop().Apply();
                         foreach (var bookmark in ProcessFragment(
                             navigator,
                             Fragments[i],
@@ -165,7 +165,7 @@ namespace Lifti.Querying.QueryParts
                         {
                             navigator.Process(character);
                             results = results.Union(navigator.GetExactMatches());
-                            bookmark.RewindNavigator();
+                            bookmark.Apply();
                         }
 
                         return QueryCompleted;
@@ -187,7 +187,7 @@ namespace Lifti.Querying.QueryParts
             {
                 navigator.Process(character);
                 yield return navigator.CreateBookmark();
-                bookmark.RewindNavigator();
+                bookmark.Apply();
             }
         }
 
@@ -208,7 +208,7 @@ namespace Lifti.Querying.QueryParts
                     yield return recursedBookmark;
                 }
 
-                bookmark.RewindNavigator();
+                bookmark.Apply();
             }
         }
 

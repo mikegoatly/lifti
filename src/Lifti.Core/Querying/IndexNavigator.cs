@@ -288,7 +288,7 @@ namespace Lifti.Querying
             }
 
             /// <inheritdoc />
-            public void RewindNavigator()
+            public void Apply()
             {
                 this.indexNavigator.bookmarkApplied = true;
                 this.indexNavigator.currentNode = this.currentNode;
