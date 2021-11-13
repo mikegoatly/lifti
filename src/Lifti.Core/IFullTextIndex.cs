@@ -113,5 +113,16 @@ namespace Lifti
         /// The matching search results.
         /// </returns>
         IEnumerable<SearchResult<TKey>> Search(string searchText);
+
+        /// <summary>
+        /// Performs a search against this index.
+        /// </summary>
+        /// <param name="query">
+        /// The query to use when searching in the index.
+        /// </param>
+        /// <returns>
+        /// The matching search results.
+        /// </returns>
+        IEnumerable<SearchResult<TKey>> Search(IQuery query);
     }
 }
