@@ -16,8 +16,21 @@ namespace Lifti.Querying
                 fragments ??= new List<WildcardQueryFragment>();
                 fragments.Add(fragment);
             }
-
+            
             int? leadingTextIndex = null;
+            void AddPrecedingTextFragment(ReadOnlySpan<char> token, int currentIndex)
+            {
+                if (leadingTextIndex != null)
+                {
+                    var startIndex = leadingTextIndex.GetValueOrDefault();
+                    AddFragment(
+                        WildcardQueryFragment.CreateText(
+                            tokenizer.Normalize(token.Slice(startIndex, currentIndex - startIndex))));
+
+                    leadingTextIndex = null;
+                }
+            }
+
             for (var i = 0; i < token.Length; i++)
             {
                 var character = token[i];
@@ -25,16 +38,11 @@ namespace Lifti.Querying
                 switch (character)
                 {
                     case '*':
-                        if (leadingTextIndex != null)
-                        {
-                            AddFragment(
-                                WildcardQueryFragment.CreateText(
-                                    tokenizer.Normalize(token.Slice(leadingTextIndex.GetValueOrDefault(), i))));
-                        }
-
+                        AddPrecedingTextFragment(token, i);
                         AddFragment(WildcardQueryFragment.MultiCharacter);
                         break;
                     case '%':
+                        AddPrecedingTextFragment(token, i);
                         AddFragment(WildcardQueryFragment.SingleCharacter);
                         break;
                     default:
@@ -49,6 +57,10 @@ namespace Lifti.Querying
 
             if (fragments != null)
             {
+                // Only add any remaining preceding text fragment if we have encountered at least one
+                // wildcard fragment
+                AddPrecedingTextFragment(token, token.Length);
+
                 part = new WildcardQueryPart(fragments);
                 return true;
             }

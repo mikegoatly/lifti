@@ -204,6 +204,9 @@
   <data name="NoTokenizationOptionsProvidedForType" xml:space="preserve">
     <value>No tokenization options have been provided for type {0}</value>
   </data>
+  <data name="SingleCharacterWildcardsFollowingMultiCharacterNotSupported" xml:space="preserve">
+    <value>Single character wildcards (%) following a multi-character wildcard (*) are not currently supported.</value>
+  </data>
   <data name="TimeoutWaitingForWriteLock" xml:space="preserve">
     <value>A timeout occurred waiting for index write lock</value>
   </data>

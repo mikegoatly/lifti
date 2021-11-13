@@ -322,6 +322,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Single character wildcards (%) following a multi-character wildcard (*) are not currently supported..
+        /// </summary>
+        internal static string SingleCharacterWildcardsFollowingMultiCharacterNotSupported {
+            get {
+                return ResourceManager.GetString("SingleCharacterWildcardsFollowingMultiCharacterNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A timeout occurred waiting for index write lock.
         /// </summary>
         internal static string TimeoutWaitingForWriteLock {

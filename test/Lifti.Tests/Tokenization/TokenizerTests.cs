@@ -108,6 +108,19 @@ namespace Lifti.Tests.Tokenization
             }
 
             [Fact]
+            public void ShouldReturnSingleTokenForStringContainingWildcardCharacters()
+            {
+                var sut = WithConfiguration();
+
+                var output = Execute(sut, "*te%%st*");
+
+                output.Should().BeEquivalentTo(new[]
+                {
+                    new Token("*te%%st*", new TokenLocation(0, 0, 8))
+                });
+            }
+
+            [Fact]
             public void WhenSplittingAtPunctuation_ShouldTokenizeAtWordBreaksAndPunctuation()
             {
                 var sut = WithConfiguration();

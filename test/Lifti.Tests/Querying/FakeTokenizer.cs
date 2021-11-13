@@ -8,8 +8,11 @@ namespace Lifti.Tests.Querying
 {
     public class FakeTokenizer : ITokenizer
     {
-        public FakeTokenizer()
+        private readonly bool normalizeToUppercase;
+
+        public FakeTokenizer(bool normalizeToUppercase = false)
         {
+            this.normalizeToUppercase = normalizeToUppercase;
         }
 
         public FakeTokenizer(TokenizationOptions options)
@@ -21,7 +24,13 @@ namespace Lifti.Tests.Querying
 
         public string Normalize(ReadOnlySpan<char> text)
         {
-            return new string(text);
+            var result = new string(text);
+            if (this.normalizeToUppercase)
+            {
+                result = result.ToUpper();
+            }
+
+            return result;
         }
 
         public IReadOnlyList<Token> Process(ReadOnlySpan<char> text)

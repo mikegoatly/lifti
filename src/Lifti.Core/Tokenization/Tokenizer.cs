@@ -141,10 +141,14 @@ namespace Lifti.Tokenization
         {
             return char.IsSeparator(current) ||
                 char.IsControl(current) ||
-                (this.Options.SplitOnPunctuation == true && char.IsPunctuation(current)) ||
+                (this.Options.SplitOnPunctuation == true && !IsWildcardCharacter(current) && char.IsPunctuation(current)) ||
                 (this.additionalSplitChars?.Contains(current) == true);
         }
 
+        private static bool IsWildcardCharacter(char current)
+        {
+            return current == '*' || current == '%';
+        }
 
         private void CaptureToken(TokenStore processedTokens, ref int tokenIndex, int start, int end, StringBuilder tokenBuilder)
         {

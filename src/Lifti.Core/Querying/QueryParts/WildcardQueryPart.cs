@@ -14,8 +14,7 @@ namespace Lifti.Querying.QueryParts
     public class WildcardQueryPart : IQueryPart
     {
         private static readonly IIndexNavigatorBookmark[] QueryCompleted = Array.Empty<IIndexNavigatorBookmark>();
-
-        private readonly IReadOnlyList<WildcardQueryFragment> fragments;
+        internal IReadOnlyList<WildcardQueryFragment> Fragments { get; }
 
         /// <summary>
         /// Creates a new instance of <see cref="WildcardQueryPart"/>.
@@ -36,7 +35,7 @@ namespace Lifti.Querying.QueryParts
                 throw new ArgumentNullException(nameof(fragments));
             }
 
-            this.fragments = NormalizeFragmentSequence(fragments).ToList();
+            this.Fragments = NormalizeFragmentSequence(fragments).ToList();
         }
 
         /// <inheritdoc />
@@ -54,17 +53,17 @@ namespace Lifti.Querying.QueryParts
                 var results = IntermediateQueryResult.Empty;
                 bookmarkStack.Push(navigator.CreateBookmark());
 
-                for (var i = 0; i < fragments.Count && bookmarkStack.Count > 0; i++)
+                for (var i = 0; i < Fragments.Count && bookmarkStack.Count > 0; i++)
                 {
                     nextBookmarks.Clear();
-                    var nextFragment = i == fragments.Count - 1 ? (WildcardQueryFragment?)null : fragments[i + 1];
+                    var nextFragment = i == Fragments.Count - 1 ? (WildcardQueryFragment?)null : Fragments[i + 1];
 
                     do
                     {
                         bookmarkStack.Pop().RewindNavigator();
                         foreach (var bookmark in ProcessFragment(
                             navigator,
-                            fragments[i],
+                            Fragments[i],
                             nextFragment,
                             ref results))
                         {
@@ -87,7 +86,7 @@ namespace Lifti.Querying.QueryParts
         public override string ToString()
         {
             var builder = new StringBuilder();
-            foreach (var fragment in this.fragments)
+            foreach (var fragment in this.Fragments)
             {
 
                 builder.Append(fragment.Kind switch
@@ -233,6 +232,10 @@ namespace Lifti.Querying.QueryParts
                         }
 
                         yield return fragment;
+                    }
+                    else if (fragment.Kind == WildcardQueryFragmentKind.SingleCharacter)
+                    {
+                        throw new QueryParserException(ExceptionMessages.SingleCharacterWildcardsFollowingMultiCharacterNotSupported);
                     }
                 }
             }
