@@ -3,7 +3,7 @@
 namespace Lifti.Querying.QueryParts
 {
     /// <inheritdoc />
-    public abstract class WordQueryPart : IWordQueryPart
+    public abstract class WordQueryPart : IQueryPart
     {
         /// <summary>
         /// Constructs a new instance of <see cref="WordQueryPart"/>.

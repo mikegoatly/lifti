@@ -210,6 +210,17 @@ namespace Lifti
         }
 
         /// <inheritdoc />
+        public IEnumerable<SearchResult<TKey>> Search(IQuery query)
+        {
+            if (query is null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+
+            return query.Execute(this.currentSnapshot);
+        }
+
+        /// <inheritdoc />
         public override string ToString()
         {
             return this.Root.ToString();

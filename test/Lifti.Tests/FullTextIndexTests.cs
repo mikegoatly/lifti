@@ -280,8 +280,17 @@ namespace Lifti.Tests
 
             var results = this.index.Search("data").ToList();
             results.Should().BeInDescendingOrder(r => r.Score);
-            results.First().Score.Should().BeApproximately(2.4349517D, 0.0001D);
-            results.Last().Score.Should().BeApproximately(1.2298017D, 0.0001D);
+            results.First().Score.Should().BeApproximately(2.4336127D, 0.0001D);
+            results.Last().Score.Should().BeApproximately(1.2258197D, 0.0001D);
+        }
+
+        [Fact]
+        public async Task QueringIndex_ShouldHandleWildcards()
+        {
+            await PopulateIndexWithWikipediaData();
+
+            var results = this.index.Search("*ta").ToList();
+            results.Should().BeInDescendingOrder(r => r.Score);
         }
 
         [Fact]
