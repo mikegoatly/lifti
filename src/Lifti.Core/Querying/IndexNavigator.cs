@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -14,6 +15,7 @@ namespace Lifti.Querying
         private IScorer? scorer;
         private IndexNode? currentNode;
         private int intraNodeTextPosition;
+        private bool bookmarkApplied;
 
         internal void Initialize(IndexNode node, IIndexNavigatorPool pool, IScorer scorer)
         {
@@ -22,6 +24,7 @@ namespace Lifti.Querying
             this.currentNode = node;
             this.intraNodeTextPosition = 0;
             this.navigatedWith.Length = 0;
+            this.bookmarkApplied = false;
         }
 
         private bool HasIntraNodeTextLeftToProcess => this.currentNode != null && this.intraNodeTextPosition < this.currentNode.IntraNodeText.Length;
@@ -118,7 +121,10 @@ namespace Lifti.Querying
                 return false;
             }
 
-            this.navigatedWith.Append(value);
+            if (this.bookmarkApplied == false)
+            {
+                this.navigatedWith.Append(value);
+            }
 
             if (this.HasIntraNodeTextLeftToProcess)
             {
@@ -145,6 +151,11 @@ namespace Lifti.Querying
 
         public IEnumerable<string> EnumerateIndexedTokens()
         {
+            if (this.bookmarkApplied)
+            {
+                throw new LiftiException(ExceptionMessages.UnableToEnumerateIndexedTokensAfterApplyingBookmark);
+            }
+
             if (this.currentNode == null)
             {
                 return Enumerable.Empty<string>();
@@ -167,6 +178,29 @@ namespace Lifti.Querying
             }
 
             return results;
+        }
+
+        public IEnumerable<char> EnumerateNextCharacters()
+        {
+            if (this.currentNode != null)
+            {
+                if (this.HasIntraNodeTextLeftToProcess)
+                {
+                    yield return this.currentNode.IntraNodeText.Span[this.intraNodeTextPosition];
+                }
+                else if (this.currentNode.HasChildNodes)
+                {
+                    foreach (var character in this.currentNode.ChildNodes.Keys)
+                    {
+                        yield return character;
+                    }
+                }
+            }
+        }
+
+        public IIndexNavigatorBookmark CreateBookmark()
+        {
+            return new IndexNavigatorBookmark(this);
         }
 
         public void Dispose()
@@ -238,6 +272,28 @@ namespace Lifti.Querying
             return new QueryTokenMatch(
                 match.Key,
                 match.Value.Select(v => new FieldMatch(v)).ToList());
+        }
+
+        internal struct IndexNavigatorBookmark : IIndexNavigatorBookmark
+        {
+            private readonly IndexNavigator indexNavigator;
+            private readonly IndexNode? currentNode;
+            private readonly int intraNodeTextPosition;
+
+            public IndexNavigatorBookmark(IndexNavigator indexNavigator)
+            {
+                this.currentNode = indexNavigator.currentNode;
+                this.intraNodeTextPosition = indexNavigator.intraNodeTextPosition;
+                this.indexNavigator = indexNavigator;
+            }
+
+            /// <inheritdoc />
+            public void Apply()
+            {
+                this.indexNavigator.bookmarkApplied = true;
+                this.indexNavigator.currentNode = this.currentNode;
+                this.indexNavigator.intraNodeTextPosition = this.intraNodeTextPosition;
+            }
         }
     }
 }

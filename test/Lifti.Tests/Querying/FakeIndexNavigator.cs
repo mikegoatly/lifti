@@ -86,5 +86,15 @@ namespace Lifti.Tests.Querying
         public void Dispose()
         {
         }
+
+        public IIndexNavigatorBookmark CreateBookmark()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<char> EnumerateNextCharacters()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
