@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Lifti.Querying.QueryParts
@@ -20,6 +21,11 @@ namespace Lifti.Querying.QueryParts
         public void Add(T item)
         {
             this.swap.Add(item);
+        }
+
+        public void AddRange(IEnumerable<T> items)
+        {
+            this.swap.AddRange(items);
         }
 
         public int Count => this.current.Count;

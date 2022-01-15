@@ -48,34 +48,27 @@ namespace Lifti.Querying.QueryParts
 
             using (var navigator = navigatorCreator())
             {
-                var bookmarkStack = new Stack<IIndexNavigatorBookmark>();
-                var nextBookmarks = new List<IIndexNavigatorBookmark>();
                 var results = IntermediateQueryResult.Empty;
-                bookmarkStack.Push(navigator.CreateBookmark());
+                var bookmarks = new DoubleBufferedList<IIndexNavigatorBookmark>(navigator.CreateBookmark());
 
-                for (var i = 0; i < Fragments.Count && bookmarkStack.Count > 0; i++)
+                for (var i = 0; i < Fragments.Count && bookmarks.Count > 0; i++)
                 {
-                    nextBookmarks.Clear();
                     var nextFragment = i == Fragments.Count - 1 ? (WildcardQueryFragment?)null : Fragments[i + 1];
 
-                    do
-                    {
-                        bookmarkStack.Pop().Apply();
-                        foreach (var bookmark in ProcessFragment(
+                    foreach (var bookmark in bookmarks)
+                    { 
+                        bookmark.Apply();
+
+                        var nextBookmarks = ProcessFragment(
                             navigator,
                             Fragments[i],
                             nextFragment,
-                            ref results))
-                        {
-                            nextBookmarks.Add(bookmark);
-                        }
-                    }
-                    while (bookmarkStack.Count > 0);
+                            ref results);
 
-                    foreach (var bookmark in nextBookmarks)
-                    {
-                        bookmarkStack.Push(bookmark);
+                        bookmarks.AddRange(nextBookmarks);
                     }
+
+                    bookmarks.Swap();
                 }
 
                 return results;
