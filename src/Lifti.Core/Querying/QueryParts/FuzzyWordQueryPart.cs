@@ -118,33 +118,30 @@ namespace Lifti.Querying.QueryParts
                     else
                     {
                         var currentCharacter = this.Word[wordIndex];
-                        if (navigator.Process(currentCharacter))
+                        void AddToStateStore(IIndexNavigatorBookmark bookmark, int editDistance)
                         {
-                            // The character matched successfully, so potentially no edits incurred, just move to the next character
                             stateStore.Add(
                                 new FuzzyMatchState(
-                                    navigator.CreateBookmark(),
-                                    state.EditDistance,
+                                    bookmark,
+                                    editDistance,
                                     wordIndex + 1
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                                 , state.MatchText + currentCharacter
 #endif
                                 ));
                         }
+
+                        if (navigator.Process(currentCharacter))
+                        {
+                            // The character matched successfully, so potentially no edits incurred, just move to the next character
+                            AddToStateStore(navigator.CreateBookmark(), state.EditDistance);
+                        }
                         else
                         {
                             // First skip this character (assume extra character inserted), but don't move the navigator on
                             if (state.EditDistance < this.maxEditDistance)
                             {
-                                stateStore.Add(
-                                    new FuzzyMatchState(
-                                        bookmark,
-                                        state.EditDistance + 1,
-                                        wordIndex + 1
-#if DEBUG && TRACK_MATCH_STATE_TEXT
-                                        , state.MatchText + $"(+{currentCharacter})"
-#endif
-                            ));
+                                AddToStateStore(bookmark, state.EditDistance + 1);
                             }
 
                             // Also try skipping this character (assume omission) by just moving on in the navigator
