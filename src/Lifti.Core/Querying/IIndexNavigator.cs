@@ -23,12 +23,18 @@ namespace Lifti.Querying
         /// <summary>
         /// Gets all the items that are indexed under from where the navigator is located.
         /// </summary>
-        IntermediateQueryResult GetExactAndChildMatches();
+        /// <param name="weighting">
+        /// The weighting to apply to the matched tokens. This can be used to adjust the resulting score for the match.
+        /// </param>
+        IntermediateQueryResult GetExactAndChildMatches(double weighting = 1D);
 
         /// <summary>
         /// Gets all the items that are indexed exactly at the point of the navigators current location.
         /// </summary>
-        IntermediateQueryResult GetExactMatches();
+        /// <param name="weighting">
+        /// The weighting to apply to the matched tokens. This can be used to adjust the resulting score for the match.
+        /// </param>
+        IntermediateQueryResult GetExactMatches(double weighting = 1D);
 
         /// <summary>
         /// Processes a single character, moving the navigator along the index.

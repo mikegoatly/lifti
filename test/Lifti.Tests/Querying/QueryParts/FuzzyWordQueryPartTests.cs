@@ -91,6 +91,28 @@ namespace Lifti.Tests.Querying.QueryParts
             RunTest("OT", 2, "on");
         }
 
+        [Fact]
+        public void WhenFuzzyMatchingWord_ScoreShouldBeLessThanExactMatch()
+        {
+            var exactMatchScore = GetScore("SAMPLE", 1);
+            var singleEditMatchScore = GetScore("SUMPLE", 1);
+            var twoEditsMatchScore = GetScore("SUMPUE", 2);
+            var threeEditsMatchScore = GetScore("SUMPEL", 3);
+
+            var expectedScoreOrders = new[] { exactMatchScore, singleEditMatchScore, twoEditsMatchScore, threeEditsMatchScore };
+
+            expectedScoreOrders.Should().BeInDescendingOrder();
+        }
+
+        private double GetScore(string search, int maxDistance)
+        {
+            var part = new FuzzyWordQueryPart(search, maxDistance);
+            var results = this.fixture.Index.Search(new Query(part)).ToList();
+            return results.Where(r => r.FieldMatches.Any(m => m.Locations.Any(l => l.TokenIndex == 1)) && r.Key == 0)
+                .Select(s => s.Score)
+                .Single();
+        }
+
         private void RunTest(string word, int maxEditDistance, params string[] expectedWords)
         {
             var expectedWordLookup = expectedWords.ToHashSet(StringComparer.OrdinalIgnoreCase);

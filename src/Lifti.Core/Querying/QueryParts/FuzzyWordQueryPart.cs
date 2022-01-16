@@ -3,6 +3,7 @@
 // as it is being processed using the MatchText property. This is not available in release builds for performance.
 
 using System;
+using System.Collections.Generic;
 
 namespace Lifti.Querying.QueryParts
 {
@@ -19,28 +20,78 @@ namespace Lifti.Querying.QueryParts
             Deletion
         }
 
+        private class FuzzyMatchStateStore
+        {
+            private readonly int maxEditDistance;
+            private readonly DoubleBufferedList<FuzzyMatchState> state;
+
+            // It's very likely that we'll encounter the same point in the index multiple times while processing a fuzzy match.
+            // There's no point in traversing the same part multiple times for a given point in the search term, so this hashset keeps track of each logical
+            // location that has been reached at each index within the search term.
+            private readonly HashSet<(int wordIndex, IIndexNavigatorBookmark bookmark)> processedBookmarks = new HashSet<(int, IIndexNavigatorBookmark)>();
+
+            public FuzzyMatchStateStore(IIndexNavigator navigator, int maxEditDistance)
+            {
+                this.state = new DoubleBufferedList<FuzzyMatchState>(new FuzzyMatchState(navigator.CreateBookmark()));
+                this.maxEditDistance = maxEditDistance;
+            }
+
+            public bool HasEntries => this.state.Count > 0;
+
+            public void Add(
+                IIndexNavigatorBookmark bookmark, 
+                int editDistance, 
+                int wordIndex
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                ,string matchText)
+#else
+                )
+#endif
+            {
+                if (editDistance <= maxEditDistance && processedBookmarks.Add((wordIndex, bookmark)))
+                {
+                    this.state.Add(
+                        new FuzzyMatchState(
+                            bookmark,
+                            editDistance,
+                            wordIndex
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                            , matchText
+#endif
+                            ));
+                }
+            }
+
+            public IEnumerable<FuzzyMatchState> GetNextStateEntries()
+            {
+                return this.state;
+            }
+
+            public void PrepareNextEntries()
+            {
+                this.state.Swap();
+            }
+        }
+
         private struct FuzzyMatchState
         {
-#if DEBUG && TRACK_MATCH_STATE_TEXT
             public FuzzyMatchState(
                 IIndexNavigatorBookmark bookmark,
                 int editCount,
-                int wordIndex,
-                string matchText) : this()
+                int wordIndex
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                , string matchText)
+#else
+                )
+#endif
             {
                 this.Bookmark = bookmark;
                 this.EditDistance = editCount;
                 this.WordIndex = wordIndex;
+#if DEBUG && TRACK_MATCH_STATE_TEXT
                 this.MatchText = matchText;
-            }
-#else
-            public FuzzyMatchState(IIndexNavigatorBookmark bookmark, int editDistance, int wordIndex) : this()
-            {
-                this.Bookmark = bookmark;
-                this.EditDistance = editDistance;
-                this.WordIndex = wordIndex;
-            }
 #endif
+            }
 
             public FuzzyMatchState(IIndexNavigatorBookmark bookmark)
                 : this(
@@ -87,12 +138,12 @@ namespace Lifti.Querying.QueryParts
 
             using var navigator = navigatorCreator();
             var results = IntermediateQueryResult.Empty;
-            var stateStore = new DoubleBufferedList<FuzzyMatchState>(new FuzzyMatchState(navigator.CreateBookmark()));
+            var stateStore = new FuzzyMatchStateStore(navigator, this.maxEditDistance);
 
             var characterCount = 0;
             do
             {
-                foreach (var state in stateStore)
+                foreach (var state in stateStore.GetNextStateEntries())
                 {
                     var wordIndex = state.WordIndex;
                     var bookmark = state.Bookmark;
@@ -106,7 +157,13 @@ namespace Lifti.Querying.QueryParts
                             // We're out of search characters for this state.
                             if (navigator.HasExactMatches)
                             {
-                                results = results.Union(navigator.GetExactMatches());
+                                // Calculate the weighting as (L-E)/L where
+                                // L = Word length
+                                // E = Number of edits
+                                // So for a word with no edits, we have a weighting of (L-0)/L = 1
+                                // All other weightings will be less than 1, with more edits drawing the weighting towards zero
+                                var weighting = (double)(characterCount - state.EditDistance) / characterCount;
+                                results = results.Union(navigator.GetExactMatches(weighting));
                             }
                             else
                             {
@@ -121,14 +178,13 @@ namespace Lifti.Querying.QueryParts
                         void AddToStateStore(IIndexNavigatorBookmark bookmark, int editDistance)
                         {
                             stateStore.Add(
-                                new FuzzyMatchState(
                                     bookmark,
                                     editDistance,
                                     wordIndex + 1
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                                 , state.MatchText + currentCharacter
 #endif
-                                ));
+                                );
                         }
 
                         if (navigator.Process(currentCharacter))
@@ -139,10 +195,7 @@ namespace Lifti.Querying.QueryParts
                         else
                         {
                             // First skip this character (assume extra character inserted), but don't move the navigator on
-                            if (state.EditDistance < this.maxEditDistance)
-                            {
-                                AddToStateStore(bookmark, state.EditDistance + 1);
-                            }
+                            AddToStateStore(bookmark, state.EditDistance + 1);
 
                             // Also try skipping this character (assume omission) by just moving on in the navigator
                             AddBookmarksForAllTraversableCharacters(navigator, stateStore, state, EditKind.Deletion);
@@ -153,11 +206,11 @@ namespace Lifti.Querying.QueryParts
                     }
                 }
 
-                stateStore.Swap();
+                stateStore.PrepareNextEntries();
 
                 characterCount++;
             }
-            while (stateStore.Count > 0);
+            while (stateStore.HasEntries);
 
             // TODO adjust score based on edit count
             return results;
@@ -165,7 +218,7 @@ namespace Lifti.Querying.QueryParts
 
         private void AddBookmarksForAllTraversableCharacters(
             IIndexNavigator navigator,
-            DoubleBufferedList<FuzzyMatchState> stateStore,
+            FuzzyMatchStateStore stateStore,
             FuzzyMatchState currentState,
             EditKind editKind,
             char? except = null)
@@ -195,7 +248,6 @@ namespace Lifti.Querying.QueryParts
                 bookmark.Apply();
                 navigator.Process(c);
                 stateStore.Add(
-                    new FuzzyMatchState(
                         navigator.CreateBookmark(),
                         nextEditDistance,
                         nextIndex
@@ -204,10 +256,10 @@ namespace Lifti.Querying.QueryParts
                         {
                             EditKind.Substitution => currentState.MatchText + $"(-{this.Word[currentState.WordIndex]}{c}?)",
                             EditKind.Deletion => currentState.MatchText + $"(-{c})",
-                            _ => throw new InvalidOperationException("Unsupported edit kind!")
+                            _ => throw new InvalidOperationException()
                         }
 #endif
-                        ));
+                        );
             }
         }
 

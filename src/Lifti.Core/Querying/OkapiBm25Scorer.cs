@@ -12,6 +12,7 @@ namespace Lifti.Querying
         private readonly Dictionary<byte, double> averageTokenCountByField;
         private readonly double documentCount;
         private readonly double k1;
+        private readonly double k1PlusOne;
         private readonly double b;
         private readonly IItemStore snapshot;
 
@@ -34,12 +35,13 @@ namespace Lifti.Querying
             this.averageTokenCountByField = snapshot.IndexStatistics.TokenCountByField.ToDictionary(k => k.Key, k => k.Value / documentCount);
             this.documentCount = documentCount;
             this.k1 = k1;
+            this.k1PlusOne = k1 + 1D;
             this.b = b;
             this.snapshot = snapshot;
         }
 
         /// <inheritdoc />
-        public IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryTokenMatch> tokenMatches)
+        public IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryTokenMatch> tokenMatches, double weighting)
         {
             if (tokenMatches is null)
             {
@@ -59,12 +61,14 @@ namespace Lifti.Querying
                     var tokensInDocument = itemTokenCounts[fieldId];
                     var tokensInDocumentWeighting = tokensInDocument / this.averageTokenCountByField[fieldId];
 
-                    var numerator = frequencyInDocument * (this.k1 + 1D);
+                    var numerator = frequencyInDocument * this.k1PlusOne;
                     var denominator = frequencyInDocument + this.k1 * (1 - this.b + this.b * tokensInDocumentWeighting);
 
                     var fieldScore = idf * (numerator / denominator);
 
-                    scoredFieldMatches.Add(new ScoredFieldMatch(fieldScore, fieldMatch));
+                    var weightedScore = fieldScore * weighting;
+
+                    scoredFieldMatches.Add(new ScoredFieldMatch(weightedScore, fieldMatch));
                 }
 
                 return new ScoredToken(t.ItemId, scoredFieldMatches);
@@ -73,8 +77,9 @@ namespace Lifti.Querying
 
         private double CalculateInverseDocumentFrequency(IReadOnlyList<QueryTokenMatch> tokens)
         {
-            var idf = (this.documentCount - tokens.Count + 0.5D)
-                    / (tokens.Count + 0.5D);
+            var tokenCount = tokens.Count;
+            var idf = (this.documentCount - tokenCount + 0.5D)
+                    / (tokenCount + 0.5D);
 
             idf = Math.Log(1D + idf);
 

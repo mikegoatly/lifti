@@ -56,12 +56,12 @@ namespace Lifti.Tests.Querying
             return new FakeIndexNavigator(true, matches);
         }
 
-        public IntermediateQueryResult GetExactAndChildMatches()
+        public IntermediateQueryResult GetExactAndChildMatches(double weighting = 1D)
         {
             return this.ExpectedExactAndChildMatches;
         }
 
-        public IntermediateQueryResult GetExactMatches()
+        public IntermediateQueryResult GetExactMatches(double weighting = 1D)
         {
             return this.ExpectedExactMatches;
         }
