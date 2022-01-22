@@ -7,6 +7,18 @@ using System.Collections.Generic;
 
 namespace Lifti.Querying.QueryParts
 {
+    internal struct SubstitutedCharacters
+    {
+        public SubstitutedCharacters(char expected, char replacedWith)
+        {
+            this.Expected = expected;
+            this.ReplacedWith = replacedWith;
+        }
+
+        public char Expected { get; }
+        public char ReplacedWith { get; }
+    }
+
     /// <summary>
     /// An <see cref="IQueryPart"/> that matches items that contain an fuzzy match for the given text.
     /// </summary>
@@ -38,27 +50,11 @@ namespace Lifti.Querying.QueryParts
 
             public bool HasEntries => this.state.Count > 0;
 
-            public void Add(
-                IIndexNavigatorBookmark bookmark, 
-                int editDistance, 
-                int wordIndex
-#if DEBUG && TRACK_MATCH_STATE_TEXT
-                ,string matchText)
-#else
-                )
-#endif
+            public void Add(FuzzyMatchState state)
             {
-                if (editDistance <= maxEditDistance && processedBookmarks.Add((wordIndex, bookmark)))
+                if (state.EditDistance <= maxEditDistance && processedBookmarks.Add((state.WordIndex, state.Bookmark)))
                 {
-                    this.state.Add(
-                        new FuzzyMatchState(
-                            bookmark,
-                            editDistance,
-                            wordIndex
-#if DEBUG && TRACK_MATCH_STATE_TEXT
-                            , matchText
-#endif
-                            ));
+                    this.state.Add(state);
                 }
             }
 
@@ -80,10 +76,9 @@ namespace Lifti.Querying.QueryParts
                 int editCount,
                 int wordIndex
 #if DEBUG && TRACK_MATCH_STATE_TEXT
-                , string matchText)
-#else
-                )
+                , string matchText
 #endif
+                )
             {
                 this.Bookmark = bookmark;
                 this.EditDistance = editCount;
@@ -117,6 +112,54 @@ namespace Lifti.Querying.QueryParts
 #if DEBUG && TRACK_MATCH_STATE_TEXT
             public string MatchText { get; }
 #endif
+
+            public FuzzyMatchState ApplySubstitution(IIndexNavigatorBookmark newBookmark, SubstitutedCharacters substituted)
+            {
+                return new FuzzyMatchState(
+                    newBookmark,
+                    this.EditDistance + 1,
+                    this.WordIndex + 1,
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                    this.MatchText + $"(-{substituted.Expected}+{substituted.ReplacedWith})"
+#endif
+                    );
+            }
+
+            public FuzzyMatchState ApplyDeletion(IIndexNavigatorBookmark newBookmark, char omittedCharacter)
+            {
+                return new FuzzyMatchState(
+                    newBookmark,
+                    this.EditDistance + 1,
+                    this.WordIndex,
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                    this.MatchText + $"(-{omittedCharacter})"
+#endif
+                    );
+            }
+
+            public FuzzyMatchState ApplyInsertion(char additionalCharacter)
+            {
+                return new FuzzyMatchState(
+                    this.Bookmark,
+                    this.EditDistance + 1,
+                    this.WordIndex + 1,
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                    this.MatchText + $"(+{additionalCharacter})"
+#endif
+                    );
+            }
+
+            public FuzzyMatchState ApplyExactMatch(IIndexNavigatorBookmark nextBookmark, char currentCharacter)
+            {
+                return new FuzzyMatchState(
+                    nextBookmark,
+                    this.EditDistance,
+                    this.WordIndex + 1,
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                    this.MatchText + currentCharacter
+#endif
+                    );
+            }
         }
 
         /// <summary>
@@ -168,41 +211,29 @@ namespace Lifti.Querying.QueryParts
                             else
                             {
                                 // Assume there could be missing characters at the end
-                                AddBookmarksForAllTraversableCharacters(navigator, stateStore, state, EditKind.Deletion);
+                                AddDeletionBookmarks(navigator, stateStore, state);
                             }
                         }
                     }
                     else
                     {
                         var currentCharacter = this.Word[wordIndex];
-                        void AddToStateStore(IIndexNavigatorBookmark bookmark, int editDistance)
-                        {
-                            stateStore.Add(
-                                    bookmark,
-                                    editDistance,
-                                    wordIndex + 1
-#if DEBUG && TRACK_MATCH_STATE_TEXT
-                                , state.MatchText + currentCharacter
-#endif
-                                );
-                        }
-
                         if (navigator.Process(currentCharacter))
                         {
                             // The character matched successfully, so potentially no edits incurred, just move to the next character
-                            AddToStateStore(navigator.CreateBookmark(), state.EditDistance);
+                            stateStore.Add(state.ApplyExactMatch(navigator.CreateBookmark(), currentCharacter));
                         }
                         else
                         {
                             // First skip this character (assume extra character inserted), but don't move the navigator on
-                            AddToStateStore(bookmark, state.EditDistance + 1);
+                            stateStore.Add(state.ApplyInsertion(currentCharacter));
 
                             // Also try skipping this character (assume omission) by just moving on in the navigator
-                            AddBookmarksForAllTraversableCharacters(navigator, stateStore, state, EditKind.Deletion);
+                            AddDeletionBookmarks(navigator, stateStore, state);
                         }
 
                         // Always assume this could be a substituted character
-                        AddBookmarksForAllTraversableCharacters(navigator, stateStore, state, EditKind.Substitution, except: currentCharacter);
+                        AddSubstitutionBookmarks(navigator, stateStore, currentCharacter, state);
                     }
                 }
 
@@ -212,56 +243,41 @@ namespace Lifti.Querying.QueryParts
             }
             while (stateStore.HasEntries);
 
-            // TODO adjust score based on edit count
             return results;
         }
 
-        private void AddBookmarksForAllTraversableCharacters(
-            IIndexNavigator navigator,
-            FuzzyMatchStateStore stateStore,
-            FuzzyMatchState currentState,
-            EditKind editKind,
-            char? except = null)
+        private static void AddSubstitutionBookmarks(IIndexNavigator navigator, FuzzyMatchStateStore stateStore, char currentCharacter, FuzzyMatchState currentState)
         {
             var bookmark = currentState.Bookmark;
-            var nextEditDistance = currentState.EditDistance + 1;
-            var nextIndex = editKind switch
-            {
-                EditKind.Deletion => currentState.WordIndex,
-                _ => currentState.WordIndex + 1
-            };
-
-            if (nextEditDistance > this.maxEditDistance)
-            {
-                // Stop processing - we've reached the maximum number of allowed edits
-                return;
-            }
 
             bookmark.Apply();
             foreach (char c in navigator.EnumerateNextCharacters())
             {
-                if (except == c)
+                if (currentCharacter == c)
                 {
+                    // Don't bother applying this substitution,we'll have already processed it as an exact match.
                     continue;
                 }
 
                 bookmark.Apply();
                 navigator.Process(c);
-                stateStore.Add(
-                        navigator.CreateBookmark(),
-                        nextEditDistance,
-                        nextIndex
-#if DEBUG && TRACK_MATCH_STATE_TEXT
-                        , editKind switch
-                        {
-                            EditKind.Substitution => currentState.MatchText + $"(-{this.Word[currentState.WordIndex]}{c}?)",
-                            EditKind.Deletion => currentState.MatchText + $"(-{c})",
-                            _ => throw new InvalidOperationException()
-                        }
-#endif
-                        );
+                stateStore.Add(currentState.ApplySubstitution(navigator.CreateBookmark(), new SubstitutedCharacters(currentCharacter, c)));
             }
         }
+
+        private static void AddDeletionBookmarks(IIndexNavigator navigator, FuzzyMatchStateStore stateStore, FuzzyMatchState currentState)
+        {
+            var bookmark = currentState.Bookmark;
+
+            bookmark.Apply();
+            foreach (char c in navigator.EnumerateNextCharacters())
+            {
+                bookmark.Apply();
+                navigator.Process(c);
+                stateStore.Add(currentState.ApplyDeletion(navigator.CreateBookmark(), c));
+            }
+        }
+
 
         /// <inheritdoc/>
         public override string ToString()
