@@ -10,7 +10,7 @@ namespace Lifti.Querying.QueryParts
     /// <summary>
     /// An <see cref="IQueryPart"/> that matches items that contain an fuzzy match for the given text.
     /// </summary>
-    public class FuzzyWordQueryPart : WordQueryPart
+    public class FuzzyMatchQueryPart : WordQueryPart
     {
         private readonly int maxEditDistance;
 
@@ -120,9 +120,9 @@ namespace Lifti.Querying.QueryParts
         }
 
         /// <summary>
-        /// Constructs a new instance of <see cref="ExactWordQueryPart"/>.
+        /// Constructs a new instance of <see cref="FuzzyMatchQueryPart"/>.
         /// </summary>
-        public FuzzyWordQueryPart(string word, int maxEditDistance)
+        public FuzzyMatchQueryPart(string word, int maxEditDistance)
             : base(word)
         {
             this.maxEditDistance = maxEditDistance;
