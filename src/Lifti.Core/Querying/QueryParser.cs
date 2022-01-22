@@ -40,6 +40,9 @@ namespace Lifti.Querying
                 case QueryTokenType.Text:
                     return ComposePart(currentQuery, CreateWordQueryPart(token, tokenizer));
 
+                case QueryTokenType.FuzzyMatch:
+                    return ComposePart(currentQuery, CreateFuzzyMatchQueryPart(token, tokenizer));
+
                 case QueryTokenType.FieldFilter:
                     var (fieldId, _, fieldTokenizer) = fieldLookup.GetFieldInfo(token.TokenText);
                     var filteredPart = CreateQueryPart(fieldLookup, state, state.GetNextToken(), fieldTokenizer, null);
@@ -110,6 +113,27 @@ namespace Lifti.Querying
 
             return result;
         }
+
+        private static IQueryPart CreateFuzzyMatchQueryPart(QueryToken queryToken, ITokenizer tokenizer)
+        {
+            if (queryToken.TokenType != QueryTokenType.FuzzyMatch)
+            {
+                throw new QueryParserException(ExceptionMessages.ExpectedFuzzyMatchToken, queryToken.TokenType);
+            }
+
+            var tokenText = queryToken.TokenText.AsSpan();
+            var result = tokenizer.Process(tokenText)
+                 .Select(token => new FuzzyMatchQueryPart(token.Value, queryToken.Tolerance))
+                 .FirstOrDefault();
+
+            if (result == null)
+            {
+                throw new QueryParserException(ExceptionMessages.ExpectedAtLeastOneQueryPartParsed);
+            }
+
+            return result;
+        }
+
 
         private static IQueryPart ComposePart(IQueryPart? existingPart, IQueryPart newPart)
         {

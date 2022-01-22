@@ -106,7 +106,7 @@ namespace Lifti.Tests.Querying.QueryParts
 
         private double GetScore(string search, int maxDistance)
         {
-            var part = new FuzzyWordQueryPart(search, maxDistance);
+            var part = new FuzzyMatchQueryPart(search, maxDistance);
             var results = this.fixture.Index.Search(new Query(part)).ToList();
             return results.Where(r => r.FieldMatches.Any(m => m.Locations.Any(l => l.TokenIndex == 1)) && r.Key == 0)
                 .Select(s => s.Score)
@@ -138,7 +138,7 @@ namespace Lifti.Tests.Querying.QueryParts
                     x => new TokenLocation(x.index, x.startLocation, (ushort)x.Value.Length)).ToList()))
                 .ToList();
 
-            var part = new FuzzyWordQueryPart(word, maxEditDistance);
+            var part = new FuzzyMatchQueryPart(word, maxEditDistance);
 
             var results = this.fixture.Index.Search(new Query(part)).ToList();
 

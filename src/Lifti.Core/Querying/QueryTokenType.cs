@@ -58,7 +58,12 @@
         /// <summary>
         /// The token is a field filter - the captured token is the field that results should be restricted to.
         /// </summary>
-        FieldFilter
+        FieldFilter,
+
+        /// <summary>
+        /// The token text is a fuzzy match.
+        /// </summary>
+        FuzzyMatch
     }
 
 }
