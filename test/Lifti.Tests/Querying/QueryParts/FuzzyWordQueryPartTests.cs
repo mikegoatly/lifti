@@ -58,62 +58,68 @@ namespace Lifti.Tests.Querying.QueryParts
         [Fact]
         public void ShouldReturnExactMatch()
         {
-            RunTest("SAMPLE", 2, "sample");
+            RunTest("SAMPLE", 2, 1, "sample");
         }
 
         [Fact]
         public void MaxDistanceOfOne_ShouldHandleSubstitutions()
         {
-            RunTest("SONE", 1, "some");
+            RunTest("SONE", 1, 1, "some");
         }
 
         [Fact]
         public void MaxDistanceOfOne_ShouldHandleDeletions()
         {
-            RunTest("SOE", 1, "some");
+            RunTest("SOE", 1, 1, "some");
         }
 
         [Fact]
         public void MaxDistanceOfOne_ShouldHandleInsertions()
         {
-            RunTest("SOMME", 1, "some");
+            RunTest("SOMME", 1, 1, "some");
+        }
+
+        [Fact]
+        public void MaxDistanceOfOne_ShouldTreatTranspositionsAsSingleEdit()
+        {
+            RunTest("SMOE", 1, 1, "some");
         }
 
         [Fact]
         public void MaxDistanceOfThree_ShouldReturnAllPotentialVariations()
         {
-            RunTest("OBAN", 3, "obey", "plan", "on");
+            RunTest("OBAN", 3, 3, "obey", "plan", "on");
         }
 
         [Fact]
         public void ShouldNotAllowVariationsConsistingEntirelyOfEdits()
         {
-            RunTest("OT", 2, "on");
+            RunTest("OF", 2, 1, "on");
         }
 
         [Fact]
         public void WhenFuzzyMatchingWord_ScoreShouldBeLessThanExactMatch()
         {
-            var exactMatchScore = GetScore("SAMPLE", 1);
-            var singleEditMatchScore = GetScore("SUMPLE", 1);
-            var twoEditsMatchScore = GetScore("SUMPUE", 2);
-            var threeEditsMatchScore = GetScore("SUMPEL", 3);
+            var exactMatchScore = GetScore("SAMPLE", 1, 1);
+            var singleEditMatchScore = GetScore("SXMPLE", 1, 1);
+            var twoEditsMatchScore = GetScore("SXMPXE", 2, 1);
+            var threeEditsMatchScore = GetScore("SXMXLX", 3, 1);
 
             var expectedScoreOrders = new[] { exactMatchScore, singleEditMatchScore, twoEditsMatchScore, threeEditsMatchScore };
 
             expectedScoreOrders.Should().BeInDescendingOrder();
         }
 
-        private double GetScore(string search, int maxDistance)
+        private double GetScore(string search, short maxDistance, short maxSequentialEdits)
         {
-            var part = new FuzzyMatchQueryPart(search, maxDistance);
+            var part = new FuzzyMatchQueryPart(search, maxDistance, maxSequentialEdits);
             var results = this.fixture.Index.Search(new Query(part)).ToList();
             return results.Where(r => r.FieldMatches.Any(m => m.Locations.Any(l => l.TokenIndex == 1)) && r.Key == 0)
                 .Select(s => s.Score)
                 .Single();
         }
 
-        private void RunTest(string word, int maxEditDistance, params string[] expectedWords)
+        private void RunTest(string word, short maxEditDistance, short maxSequentialEdits, params string[] expectedWords)
         {
             var expectedWordLookup = expectedWords.ToHashSet(StringComparer.OrdinalIgnoreCase);
             var expectedMatchRegex = new Regex(@"(^|\s)*((?<word>[^\s]*)($|\s))+");
@@ -138,7 +144,7 @@ namespace Lifti.Tests.Querying.QueryParts
                     x => new TokenLocation(x.index, x.startLocation, (ushort)x.Value.Length)).ToList()))
                 .ToList();
 
-            var part = new FuzzyMatchQueryPart(word, maxEditDistance);
+            var part = new FuzzyMatchQueryPart(word, maxEditDistance, maxSequentialEdits);
 
             var results = this.fixture.Index.Search(new Query(part)).ToList();
 

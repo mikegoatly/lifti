@@ -123,7 +123,7 @@ namespace Lifti.Querying
 
             var tokenText = queryToken.TokenText.AsSpan();
             var result = tokenizer.Process(tokenText)
-                 .Select(token => new FuzzyMatchQueryPart(token.Value, queryToken.Tolerance))
+                 .Select(token => new FuzzyMatchQueryPart(token.Value))
                  .FirstOrDefault();
 
             if (result == null)
