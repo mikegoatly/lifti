@@ -78,6 +78,9 @@ namespace Lifti.Querying.QueryParts
             /// <summary>
             /// Creates a new <see cref="FuzzyMatchState"/> instance.
             /// </summary>
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+            /// <param name="matchText">The debug text used to illustrate the alterations that were made to the original search term to reach this point.</param>
+#endif
             /// <param name="bookmark">The <see cref="IIndexNavigatorBookmark"/> for the state of the index that this instance is for.</param>
             /// <param name="totalEditCount">The current number number of edits this required to reach this point in the match.</param>
             /// <param name="levenshteinDistance">The Levelshtein distance accumulated so far. This will differ from <paramref name="totalEditCount"/> 
@@ -85,9 +88,6 @@ namespace Lifti.Querying.QueryParts
             /// <param name="sequentialEdits">The number of sequential edits that have accumulated so far to reach this point. When
             /// an exact match is processed, this will be reset to zero.</param>
             /// <param name="wordIndex">The current index in the search term.</param>
-#if DEBUG && TRACK_MATCH_STATE_TEXT
-            /// <param name="matchText">The debug text used to illustrate the alterations that were made to the original search term to reach this point.</param>
-#endif
             /// <param name="lastSubstitution">The character substitution that was made at the last character, or null if the last operation was 
             /// not a substitution. This is used to identify the case where letters have been transposed.</param>
             public FuzzyMatchState(
@@ -107,9 +107,9 @@ namespace Lifti.Querying.QueryParts
                 this.LevenshteinDistance = levenshteinDistance;
                 this.SequentialEdits = sequentialEdits;
                 this.WordIndex = wordIndex;
+                this.LastSubstitution = lastSubstitution;
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                 this.MatchText = matchText;
-                this.LastSubstitution = lastSubstitution;
 #endif
             }
 
