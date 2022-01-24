@@ -20,7 +20,7 @@ namespace Lifti.Querying.QueryParts
         }
 
         /// <summary>
-        /// Gets the <see cref="IWordQueryPart"/>s that must appear in sequence.
+        /// Gets the <see cref="IQueryPart"/>s that must appear in sequence.
         /// </summary>
         public IReadOnlyList<IQueryPart> Words { get; }
 

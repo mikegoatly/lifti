@@ -29,13 +29,13 @@ namespace Lifti.Querying.QueryParts
     /// </summary>
     public class FuzzyMatchQueryPart : WordQueryPart
     {
-        private readonly short maxEditDistance;
-        private readonly short maxSequentialEdits;
+        private readonly ushort maxEditDistance;
+        private readonly ushort maxSequentialEdits;
 
         private class FuzzyMatchStateStore
         {
-            private readonly short maxEditDistance;
-            private readonly short maxSequentialEdits;
+            private readonly ushort maxEditDistance;
+            private readonly ushort maxSequentialEdits;
             private readonly DoubleBufferedList<FuzzyMatchState> state;
 
             // It's very likely that we'll encounter the same point in the index multiple times while processing a fuzzy match.
@@ -43,7 +43,7 @@ namespace Lifti.Querying.QueryParts
             // location that has been reached at each index within the search term.
             private readonly HashSet<(int wordIndex, IIndexNavigatorBookmark bookmark)> processedBookmarks = new HashSet<(int, IIndexNavigatorBookmark)>();
 
-            public FuzzyMatchStateStore(IIndexNavigator navigator, short maxEditDistance, short maxSequentialEdits)
+            public FuzzyMatchStateStore(IIndexNavigator navigator, ushort maxEditDistance, ushort maxSequentialEdits)
             {
                 this.state = new DoubleBufferedList<FuzzyMatchState>(new FuzzyMatchState(navigator.CreateBookmark()));
                 this.maxEditDistance = maxEditDistance;
@@ -54,7 +54,7 @@ namespace Lifti.Querying.QueryParts
 
             public void Add(FuzzyMatchState state)
             {
-                if (state.EditDistance <= maxEditDistance && 
+                if (state.TotalEditCount <= maxEditDistance && 
                     state.SequentialEdits <= maxSequentialEdits &&
                     processedBookmarks.Add((state.WordIndex, state.Bookmark)))
                 {
@@ -75,11 +75,27 @@ namespace Lifti.Querying.QueryParts
 
         private struct FuzzyMatchState
         {
+            /// <summary>
+            /// Creates a new <see cref="FuzzyMatchState"/> instance.
+            /// </summary>
+            /// <param name="bookmark">The <see cref="IIndexNavigatorBookmark"/> for the state of the index that this instance is for.</param>
+            /// <param name="totalEditCount">The current number number of edits this required to reach this point in the match.</param>
+            /// <param name="levenshteinDistance">The Levelshtein distance accumulated so far. This will differ from <paramref name="totalEditCount"/> 
+            /// only when substitutions are encountered, in which case an extra 1 per substitution will be accumulated here.</param>
+            /// <param name="sequentialEdits">The number of sequential edits that have accumulated so far to reach this point. When
+            /// an exact match is processed, this will be reset to zero.</param>
+            /// <param name="wordIndex">The current index in the search term.</param>
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+            /// <param name="matchText">The debug text used to illustrate the alterations that were made to the original search term to reach this point.</param>
+#endif
+            /// <param name="lastSubstitution">The character substitution that was made at the last character, or null if the last operation was 
+            /// not a substitution. This is used to identify the case where letters have been transposed.</param>
             public FuzzyMatchState(
                 IIndexNavigatorBookmark bookmark,
-                short editDistance,
-                short sequentialEdits,
-                int wordIndex,
+                ushort totalEditCount,
+                ushort levenshteinDistance,
+                ushort sequentialEdits,
+                ushort wordIndex,
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                 string matchText,
 #endif
@@ -87,7 +103,8 @@ namespace Lifti.Querying.QueryParts
                 )
             {
                 this.Bookmark = bookmark;
-                this.EditDistance = editDistance;
+                this.TotalEditCount = totalEditCount;
+                this.LevenshteinDistance = levenshteinDistance;
                 this.SequentialEdits = sequentialEdits;
                 this.WordIndex = wordIndex;
 #if DEBUG && TRACK_MATCH_STATE_TEXT
@@ -101,6 +118,7 @@ namespace Lifti.Querying.QueryParts
                       bookmark,
                       0,
                       0,
+                      0,
                       0
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                       , string.Empty
@@ -111,15 +129,16 @@ namespace Lifti.Querying.QueryParts
 
             public IIndexNavigatorBookmark Bookmark { get; }
 
-            public short EditDistance { get; }
+            public ushort TotalEditCount { get; }
+            public ushort LevenshteinDistance { get; }
 
             /// <summary>
             /// The index that this state is currently matching in the target word.
             /// </summary>
-            public int WordIndex { get; }
+            public ushort WordIndex { get; }
 
             public SubstitutedCharacters? LastSubstitution { get; }
-            public short SequentialEdits { get; }
+            public ushort SequentialEdits { get; }
 
 #if DEBUG && TRACK_MATCH_STATE_TEXT
             public string MatchText { get; }
@@ -135,9 +154,10 @@ namespace Lifti.Querying.QueryParts
 
                 return new FuzzyMatchState(
                     newBookmark,
-                    isTransposition ? this.EditDistance : (short)(this.EditDistance + 1),
-                    isTransposition ? this.SequentialEdits : (short)(this.SequentialEdits + 1),
-                    this.WordIndex + 1,
+                    isTransposition ? this.TotalEditCount : (ushort)(this.TotalEditCount + 1),
+                    isTransposition ? this.LevenshteinDistance : (ushort)(this.LevenshteinDistance + 2),
+                    isTransposition ? this.SequentialEdits : (ushort)(this.SequentialEdits + 1),
+                    (ushort)(this.WordIndex + 1),
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                     this.MatchText + $"(-{substituted.Expected}+{substituted.ReplacedWith})",
 #endif
@@ -148,8 +168,9 @@ namespace Lifti.Querying.QueryParts
             {
                 return new FuzzyMatchState(
                     newBookmark,
-                    (short)(this.EditDistance + 1),
-                    (short)(this.SequentialEdits + 1),
+                    (ushort)(this.TotalEditCount + 1),
+                    (ushort)(this.LevenshteinDistance + 1),
+                    (ushort)(this.SequentialEdits + 1),
                     this.WordIndex
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                     , this.MatchText + $"(-{omittedCharacter})"
@@ -161,9 +182,10 @@ namespace Lifti.Querying.QueryParts
             {
                 return new FuzzyMatchState(
                     this.Bookmark,
-                    (short)(this.EditDistance + 1),
-                    (short)(this.SequentialEdits + 1),
-                    this.WordIndex + 1
+                    (ushort)(this.TotalEditCount + 1),
+                    (ushort)(this.LevenshteinDistance + 1),
+                    (ushort)(this.SequentialEdits + 1),
+                    (ushort)(this.WordIndex + 1)
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                     , this.MatchText + $"(+{additionalCharacter})"
 #endif
@@ -174,9 +196,10 @@ namespace Lifti.Querying.QueryParts
             {
                 return new FuzzyMatchState(
                     nextBookmark,
-                    this.EditDistance,
+                    this.TotalEditCount,
+                    this.LevenshteinDistance,
                     0, // Reset sequential edits when an exact match occurs
-                    this.WordIndex + 1
+                    (ushort)(this.WordIndex + 1)
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                     , this.MatchText + currentCharacter
 #endif
@@ -187,7 +210,15 @@ namespace Lifti.Querying.QueryParts
         /// <summary>
         /// Constructs a new instance of <see cref="FuzzyMatchQueryPart"/>.
         /// </summary>
-        public FuzzyMatchQueryPart(string word, short maxEditDistance = 3, short maxSequentialEdits = 1)
+        /// <param name="word">The word to search for in the index.</param>
+        /// <param name="maxEditDistance">The maximum of edits allowed for any given match. The higher this value, the more divergent 
+        /// matches will be.</param>
+        /// <param name="maxSequentialEdits">The maximum number of edits that are allowed to appear sequentially. By default this is 1,
+        /// which forces matches to be more similar to the search criteria.</param>
+        /// <remarks>
+        /// A transposition of neighboring characters is considered as single edit, not two distinct substitutions.
+        /// </remarks>
+        public FuzzyMatchQueryPart(string word, ushort maxEditDistance = 4, ushort maxSequentialEdits = 1)
             : base(word)
         {
             this.maxEditDistance = maxEditDistance;
@@ -219,17 +250,20 @@ namespace Lifti.Querying.QueryParts
                     if (state.WordIndex == searchTermLength)
                     {
                         // Don't allow matches that have consisted entirely of edits
-                        if (characterCount > state.EditDistance)
+                        if (characterCount > state.TotalEditCount)
                         {
                             // We're out of search characters for this state.
                             if (navigator.HasExactMatches)
                             {
-                                // Calculate the weighting as (L-E)/L where
-                                // L = Word length
+                                // Use Levenshtein Distance to calculate the weighting
+                                // Calculate the weighting as ((L1 + L2)-E)/(L1 + L2) where
+                                // L1 = Search term length
+                                // L2 = Matched term length
                                 // E = Number of edits
                                 // So for a word with no edits, we have a weighting of (L-0)/L = 1
                                 // All other weightings will be less than 1, with more edits drawing the weighting towards zero
-                                var weighting = (double)(characterCount - state.EditDistance) / characterCount;
+                                var lengthTotal = searchTermLength + characterCount;
+                                var weighting = (double)(lengthTotal - state.LevenshteinDistance) / lengthTotal;
                                 results = results.Union(navigator.GetExactMatches(weighting));
                             }
                             else

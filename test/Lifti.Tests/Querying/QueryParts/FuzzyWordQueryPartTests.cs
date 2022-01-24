@@ -110,7 +110,7 @@ namespace Lifti.Tests.Querying.QueryParts
             expectedScoreOrders.Should().BeInDescendingOrder();
         }
 
-        private double GetScore(string search, short maxDistance, short maxSequentialEdits)
+        private double GetScore(string search, ushort maxDistance, ushort maxSequentialEdits)
         {
             var part = new FuzzyMatchQueryPart(search, maxDistance, maxSequentialEdits);
             var results = this.fixture.Index.Search(new Query(part)).ToList();
@@ -119,7 +119,7 @@ namespace Lifti.Tests.Querying.QueryParts
                 .Single();
         }
 
-        private void RunTest(string word, short maxEditDistance, short maxSequentialEdits, params string[] expectedWords)
+        private void RunTest(string word, ushort maxEditDistance, ushort maxSequentialEdits, params string[] expectedWords)
         {
             var expectedWordLookup = expectedWords.ToHashSet(StringComparer.OrdinalIgnoreCase);
             var expectedMatchRegex = new Regex(@"(^|\s)*((?<word>[^\s]*)($|\s))+");
