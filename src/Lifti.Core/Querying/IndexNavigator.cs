@@ -42,7 +42,7 @@ namespace Lifti.Querying
             }
         }
 
-        public IntermediateQueryResult GetExactMatches()
+        public IntermediateQueryResult GetExactMatches(double weighting = 1D)
         {
             if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess || !this.currentNode.HasMatches)
             {
@@ -51,10 +51,10 @@ namespace Lifti.Querying
 
             var matches = this.currentNode.Matches.Select(CreateQueryTokenMatch);
 
-            return CreateIntermediateQueryResult(matches);
+            return CreateIntermediateQueryResult(matches, weighting);
         }
 
-        public IntermediateQueryResult GetExactAndChildMatches()
+        public IntermediateQueryResult GetExactAndChildMatches(double weighting = 1D)
         {
             if (this.currentNode == null)
             {
@@ -98,7 +98,7 @@ namespace Lifti.Querying
                     m.Key,
                     MergeItemMatches(m.Value).ToList()));
 
-            return CreateIntermediateQueryResult(queryTokenMatches);
+            return CreateIntermediateQueryResult(queryTokenMatches, weighting);
         }
 
         public bool Process(ReadOnlySpan<char> text)
@@ -214,7 +214,7 @@ namespace Lifti.Querying
             this.pool.Return(this);
         }
 
-        private IntermediateQueryResult CreateIntermediateQueryResult(IEnumerable<QueryTokenMatch> matches)
+        private IntermediateQueryResult CreateIntermediateQueryResult(IEnumerable<QueryTokenMatch> matches, double weighting)
         {
             if (this.scorer == null)
             {
@@ -222,7 +222,7 @@ namespace Lifti.Querying
             }
 
             var matchList = matches as IReadOnlyList<QueryTokenMatch> ?? matches.ToList();
-            var scoredMatches = this.scorer.Score(matchList);
+            var scoredMatches = this.scorer.Score(matchList, weighting);
             return new IntermediateQueryResult(scoredMatches);
         }
 
@@ -274,7 +274,7 @@ namespace Lifti.Querying
                 match.Value.Select(v => new FieldMatch(v)).ToList());
         }
 
-        internal struct IndexNavigatorBookmark : IIndexNavigatorBookmark
+        internal struct IndexNavigatorBookmark : IIndexNavigatorBookmark, IEquatable<IndexNavigatorBookmark>
         {
             private readonly IndexNavigator indexNavigator;
             private readonly IndexNode? currentNode;
@@ -293,6 +293,28 @@ namespace Lifti.Querying
                 this.indexNavigator.bookmarkApplied = true;
                 this.indexNavigator.currentNode = this.currentNode;
                 this.indexNavigator.intraNodeTextPosition = this.intraNodeTextPosition;
+            }
+
+            public override bool Equals(object? obj)
+            {
+                if (obj is IndexNavigatorBookmark other)
+                {
+                    return this.Equals(other);
+                }
+
+                return false;
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(this.indexNavigator, this.currentNode, this.intraNodeTextPosition);
+            }
+
+            public bool Equals(IndexNavigatorBookmark bookmark)
+            {
+                return this.indexNavigator == bookmark.indexNavigator &&
+                       this.currentNode == bookmark.currentNode &&
+                       this.intraNodeTextPosition == bookmark.intraNodeTextPosition;
             }
         }
     }

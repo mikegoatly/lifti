@@ -75,8 +75,8 @@ namespace Lifti.Tests
         {
             var score = 999999999D;
             var indexScorer = new Mock<IScorer>();
-            indexScorer.Setup(s => s.Score(It.IsAny<IReadOnlyList<QueryTokenMatch>>()))
-                .Returns((IReadOnlyList<QueryTokenMatch> t) => t.Select(m => new ScoredToken(m.ItemId, m.FieldMatches.Select(fm => new ScoredFieldMatch(score, fm)).ToList())).ToList());
+            indexScorer.Setup(s => s.Score(It.IsAny<IReadOnlyList<QueryTokenMatch>>(), It.IsAny<double>()))
+                .Returns((IReadOnlyList<QueryTokenMatch> t, double weight) => t.Select(m => new ScoredToken(m.ItemId, m.FieldMatches.Select(fm => new ScoredFieldMatch(score, fm)).ToList())).ToList());
 
             var scorer = new Mock<IIndexScorerFactory>();
             scorer.Setup(s => s.CreateIndexScorer(It.IsAny<IIndexSnapshot>())).Returns(indexScorer.Object);

@@ -34,6 +34,29 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
+        public void ParsingTwoFuzzyWordsWithNoOperator_ShouldComposeWithAndOperator()
+        {
+            var result = this.Parse("?wordone ?wordtwo");
+            var expectedQuery = new AndQueryOperator(new FuzzyMatchQueryPart("wordone", 3), new FuzzyMatchQueryPart("wordtwo", 3));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingMixOfWordMatchesWithNoOperator_ShouldComposeWithAndOperators()
+        {
+            var result = this.Parse("?wordone wordtwo wor* ?wordthree");
+            var expectedQuery =
+                new AndQueryOperator(
+                    new AndQueryOperator(
+                        new AndQueryOperator(
+                            new FuzzyMatchQueryPart("wordone", 3), 
+                            new ExactWordQueryPart("wordtwo")),
+                        new WildcardQueryPart(WildcardQueryFragment.CreateText("wor"), WildcardQueryFragment.MultiCharacter)),
+                    new FuzzyMatchQueryPart("wordthree",3));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
         public void ParsingTwoWordsWithAndOperator_ShouldComposeWithAndOperator()
         {
             var result = this.Parse("wordone & wordtwo");

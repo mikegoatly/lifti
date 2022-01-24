@@ -141,6 +141,9 @@
   <data name="ExpectedAtLeastOneQueryPartParsed" xml:space="preserve">
     <value>Expected at least one query part to be parsed</value>
   </data>
+  <data name="ExpectedFuzzyMatchToken" xml:space="preserve">
+    <value>Expected a fuzzy match token - got {0}</value>
+  </data>
   <data name="ExpectedTextQueryFragmentAfterMultiCharacterWildcard" xml:space="preserve">
     <value>A text fragment must follow a multi-character wildcard in a wildcard expression</value>
   </data>

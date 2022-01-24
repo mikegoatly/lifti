@@ -133,6 +133,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expected a fuzzy match token - got {0}.
+        /// </summary>
+        internal static string ExpectedFuzzyMatchToken {
+            get {
+                return ResourceManager.GetString("ExpectedFuzzyMatchToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A text fragment must follow a multi-character wildcard in a wildcard expression.
         /// </summary>
         internal static string ExpectedTextQueryFragmentAfterMultiCharacterWildcard {
