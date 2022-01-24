@@ -259,7 +259,7 @@ namespace Lifti.Querying.QueryParts
                                 // Calculate the weighting as ((L1 + L2)-E)/(L1 + L2) where
                                 // L1 = Search term length
                                 // L2 = Matched term length
-                                // E = Number of edits
+                                // E = The Levenshtein distance between the search term and match
                                 // So for a word with no edits, we have a weighting of (L-0)/L = 1
                                 // All other weightings will be less than 1, with more edits drawing the weighting towards zero
                                 var lengthTotal = searchTermLength + characterCount;
