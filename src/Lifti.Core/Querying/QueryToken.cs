@@ -42,14 +42,6 @@ namespace Lifti.Querying
         public static QueryToken ForText(string text) => new QueryToken(text, QueryTokenType.Text, 0);
 
         /// <summary>
-        /// Creates a new <see cref="QueryToken"/> instance representing a textual part of the query with fuzzy matching.
-        /// </summary>
-        /// <param name="text">
-        /// The text to be matched by the query.
-        /// </param>
-        public static QueryToken ForFuzzyText(string text) => new QueryToken(text, QueryTokenType.FuzzyMatch, 3);
-
-        /// <summary>
         /// Creates a new <see cref="QueryToken"/> instance representing a field filter.
         /// </summary>
         /// <param name="fieldName">

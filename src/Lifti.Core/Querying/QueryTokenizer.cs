@@ -4,16 +4,19 @@ using System.Collections.Generic;
 namespace Lifti.Querying
 {
     /// <summary>
-    /// The default implementation of <see cref="IQueryParser"/>, capable of parsing standard LIFTI query syntax.
+    /// The default implementation of <see cref="IQueryTokenizer"/>, capable of parsing standard LIFTI query syntax.
     /// </summary>
-    public class QueryTokenizer : IQueryTokenizer
+    internal class QueryTokenizer : IQueryTokenizer
     {
         private enum State
         {
             None = 0,
             ProcessingString = 1,
-            ProcessingNearOperator = 2,
-            ProcessingFuzzyText = 3
+            ProcessingNearOperator = 2
+        }
+
+        public QueryTokenizer()
+        {
         }
 
         /// <inheritdoc />
@@ -33,18 +36,7 @@ namespace Lifti.Querying
                 if (tokenStart != null)
                 {
                     var tokenText = queryText.Substring(tokenStart.Value, endIndex - tokenStart.Value);
-                    QueryToken token;
-                    switch (state)
-                    {
-                        case State.ProcessingFuzzyText:
-                            state = State.None;
-                            token = QueryToken.ForFuzzyText(tokenText);
-                            break;
-                        default:
-                            token = QueryToken.ForText(tokenText);
-                            break;
-                    }
-
+                    var token = QueryToken.ForText(tokenText);
                     tokenStart = null;
                     return token;
                 }
@@ -108,18 +100,11 @@ namespace Lifti.Querying
                                     state = State.ProcessingString;
                                     yield return QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator);
                                     break;
-                                case '?':
-                                    state = State.ProcessingFuzzyText;
-                                    break;
                                 default:
                                     tokenStart ??= i;
                                     break;
                             }
 
-                            break;
-
-                        case State.ProcessingFuzzyText:
-                            tokenStart ??= i;
                             break;
 
                         case State.ProcessingString:

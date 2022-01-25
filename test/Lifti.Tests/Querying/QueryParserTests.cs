@@ -34,10 +34,18 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
+        public void AssumingFuzzySearch_ShouldTreatWordsAsFuzzySearch()
+        {
+            var result = this.Parse("wordone", assumeFuzzy: true);
+            var expectedQuery = new FuzzyMatchQueryPart("wordone");
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
         public void ParsingTwoFuzzyWordsWithNoOperator_ShouldComposeWithAndOperator()
         {
             var result = this.Parse("?wordone ?wordtwo");
-            var expectedQuery = new AndQueryOperator(new FuzzyMatchQueryPart("wordone", 3), new FuzzyMatchQueryPart("wordtwo", 3));
+            var expectedQuery = new AndQueryOperator(new FuzzyMatchQueryPart("wordone"), new FuzzyMatchQueryPart("wordtwo"));
             VerifyResult(result, expectedQuery);
         }
 
@@ -238,9 +246,9 @@ namespace Lifti.Tests.Querying
             result.Root.ToString().Should().Be(expectedQuery.ToString());
         }
 
-        private IQuery Parse(string text)
+        private IQuery Parse(string text, bool assumeFuzzy = false)
         {
-            var parser = new QueryParser();
+            var parser = new QueryParser(new QueryParserOptions { AssumeFuzzySearchTerms = assumeFuzzy });
             return parser.Parse(this.fieldLookupMock.Object, text, new FakeTokenizer());
         }
     }

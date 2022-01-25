@@ -147,7 +147,7 @@ namespace Lifti.Tokenization
 
         private static bool IsWildcardCharacter(char current)
         {
-            return current == '*' || current == '%';
+            return current == '*' || current == '%' || current == '?';
         }
 
         private void CaptureToken(TokenStore processedTokens, ref int tokenIndex, int start, int end, StringBuilder tokenBuilder)

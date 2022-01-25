@@ -186,6 +186,22 @@ namespace Lifti
         }
 
         /// <summary>
+        /// Replaces the default <see cref="IQueryParser"/> implementation used when searching the index.
+        /// </summary>
+        public FullTextIndexBuilder<TKey> WithQueryParser(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)
+        {
+            if (optionsBuilder is null)
+            {
+                throw new ArgumentNullException(nameof(optionsBuilder));
+            }
+
+            var builder = new QueryParserBuilder();
+            this.queryParser = optionsBuilder(builder).Build();
+
+            return this;
+        }
+
+        /// <summary>
         /// Builds a <see cref="FullTextIndex{TKey}"/> using the configuration applied to this instance.
         /// </summary>
         public FullTextIndex<TKey> Build()
@@ -194,7 +210,7 @@ namespace Lifti
                 this.advancedOptions,
                 this.itemTokenizationOptions,
                 new IndexNodeFactory(this.advancedOptions),
-                this.queryParser ?? new QueryParser(),
+                this.queryParser ?? new QueryParser(new QueryParserOptions()),
                 this.scorerFactory ?? new OkapiBm25ScorerFactory(),
                 this.defaultTextExtractor ?? new PlainTextExtractor(),
                 this.defaultTokenizer,
