@@ -13,7 +13,7 @@ namespace TestConsole
             public string ProfileHtml { get; set; }
         }
 
-        public static async Task RunAsync()
+        public static Task RunAsync()
         {
             var index = new FullTextIndexBuilder<int>()
                 .WithObjectTokenization<Customer>(o => o
@@ -22,6 +22,8 @@ namespace TestConsole
                     .WithField("Profile", c => c.ProfileHtml, textExtractor: new XmlTextExtractor())
                 )
                 .Build();
+
+            return Task.CompletedTask;
         }
     }
 }
