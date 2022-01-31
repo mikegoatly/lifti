@@ -40,7 +40,7 @@ namespace Lifti.Tests.Tokenization
             output.Should().BeEmpty();
         }
 
-        protected static Tokenizer WithConfiguration(bool splitOnPunctuation = true, char[]? additionalSplitChars = null, bool caseInsensitive = false, bool accentInsensitive = false)
+        protected static Tokenizer WithConfiguration(bool splitOnPunctuation = true, char[] additionalSplitChars = null, bool caseInsensitive = false, bool accentInsensitive = false)
         {
             return new Tokenizer(
                 new TokenizationOptions()
@@ -52,7 +52,7 @@ namespace Lifti.Tests.Tokenization
                 });
         }
 
-        protected static IReadOnlyList<Token> Execute(Tokenizer tokenizer, params string?[] textParts)
+        protected static IReadOnlyList<Token> Execute(Tokenizer tokenizer, params string[] textParts)
         {
             var fragments = new List<DocumentTextFragment>();
             var offset = 0;

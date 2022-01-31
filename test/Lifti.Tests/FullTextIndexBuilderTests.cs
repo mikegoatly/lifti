@@ -73,7 +73,7 @@ namespace Lifti.Tests
         [Fact]
         public void WithQueryParserOptions_ShouldPassOptionsToQueryParser()
         {
-            QueryParserOptions? providedOptions = null;
+            QueryParserOptions providedOptions = null;
 
             this.sut.WithQueryParser(o => o
                 .AssumeFuzzySearchTerms()

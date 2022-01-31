@@ -160,12 +160,12 @@ namespace Lifti.Tests
 
         private static void VerifyResult(
             IndexNode node,
-            string? intraNodeText,
-            (int, IndexedToken)[]? expectedMatches = null,
-            char[]? expectedChildNodes = null)
+            string intraNodeText,
+            (int, IndexedToken)[] expectedMatches = null,
+            char[] expectedChildNodes = null)
         {
-            expectedChildNodes = expectedChildNodes ?? Array.Empty<char>();
-            expectedMatches = expectedMatches ?? Array.Empty<(int, IndexedToken)>();
+            expectedChildNodes ??= Array.Empty<char>();
+            expectedMatches ??= Array.Empty<(int, IndexedToken)>();
 
             node.IntraNodeText.ToArray().Should().BeEquivalentTo(intraNodeText?.ToCharArray() ?? Array.Empty<char>());
             node.ChildNodes.Keys.Should().BeEquivalentTo(expectedChildNodes, o => o.WithoutStrictOrdering());
@@ -175,9 +175,9 @@ namespace Lifti.Tests
         private static void VerifyResult(
             IndexNode node,
             char[] navigationChars,
-            string? intraNodeText,
-            (int, IndexedToken)[]? expectedMatches = null,
-            char[]? expectedChildNodes = null)
+            string intraNodeText,
+            (int, IndexedToken)[] expectedMatches = null,
+            char[] expectedChildNodes = null)
         {
             foreach (var navigationChar in navigationChars)
             {

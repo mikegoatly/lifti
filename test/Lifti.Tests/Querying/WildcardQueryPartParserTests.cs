@@ -54,7 +54,7 @@ namespace Lifti.Tests.Querying
             RunTest("%%foo*bar", new WildcardQueryPart(SingleCharacter, SingleCharacter, CreateText("FOO"), MultiCharacter, CreateText("BAR")));
         }
 
-        private static void RunTest(string text, WildcardQueryPart? expectedQueryPart, bool expectedResult = true)
+        private static void RunTest(string text, WildcardQueryPart expectedQueryPart, bool expectedResult = true)
         {
             var result = WildcardQueryPartParser.TryParse(text, new FakeTokenizer(normalizeToUppercase: true), out var part);
 

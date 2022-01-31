@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using FluentAssertions.Numeric;
 using Lifti.Querying;
 using System.Linq;
 using System.Threading.Tasks;
