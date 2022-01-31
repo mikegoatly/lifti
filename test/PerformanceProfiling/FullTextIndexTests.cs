@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 namespace PerformanceProfiling
 {
     [RankColumn, MemoryDiagnoser]
-    [ShortRunJob(RuntimeMoniker.NetCoreApp22)]
     [ShortRunJob(RuntimeMoniker.NetCoreApp31)]
+    [ShortRunJob(RuntimeMoniker.Net60)]
     public class IndexSearchingBenchmarks : IndexBenchmarkBase
     {
         private IFullTextIndex<string> index;
@@ -45,8 +45,8 @@ namespace PerformanceProfiling
     //    }
     //}
 
-    [MediumRunJob(RuntimeMoniker.NetCoreApp22)]
     [MediumRunJob(RuntimeMoniker.NetCoreApp31)]
+    [MediumRunJob(RuntimeMoniker.Net60)]
     [RankColumn, MemoryDiagnoser]
     public class FullTextIndexTests : IndexBenchmarkBase
     {
