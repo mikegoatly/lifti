@@ -46,33 +46,31 @@ namespace Lifti.Querying.QueryParts
                 throw new ArgumentNullException(nameof(navigatorCreator));
             }
 
-            using (var navigator = navigatorCreator())
+            using var navigator = navigatorCreator();
+            var results = IntermediateQueryResult.Empty;
+            var bookmarks = new DoubleBufferedList<IIndexNavigatorBookmark>(navigator.CreateBookmark());
+
+            for (var i = 0; i < Fragments.Count && bookmarks.Count > 0; i++)
             {
-                var results = IntermediateQueryResult.Empty;
-                var bookmarks = new DoubleBufferedList<IIndexNavigatorBookmark>(navigator.CreateBookmark());
+                var nextFragment = i == Fragments.Count - 1 ? (WildcardQueryFragment?)null : Fragments[i + 1];
 
-                for (var i = 0; i < Fragments.Count && bookmarks.Count > 0; i++)
+                foreach (var bookmark in bookmarks)
                 {
-                    var nextFragment = i == Fragments.Count - 1 ? (WildcardQueryFragment?)null : Fragments[i + 1];
+                    bookmark.Apply();
 
-                    foreach (var bookmark in bookmarks)
-                    { 
-                        bookmark.Apply();
+                    var nextBookmarks = ProcessFragment(
+                        navigator,
+                        Fragments[i],
+                        nextFragment,
+                        ref results);
 
-                        var nextBookmarks = ProcessFragment(
-                            navigator,
-                            Fragments[i],
-                            nextFragment,
-                            ref results);
-
-                        bookmarks.AddRange(nextBookmarks);
-                    }
-
-                    bookmarks.Swap();
+                    bookmarks.AddRange(nextBookmarks);
                 }
 
-                return results;
+                bookmarks.Swap();
             }
+
+            return results;
         }
 
         /// <inheritdoc />

@@ -8,7 +8,7 @@ namespace Lifti.Querying
     /// </summary>
     public class QueryParserBuilder
     {
-        private static Func<QueryParserOptions, IQueryParser> defaultQueryParserFactory = o => new QueryParser(o);
+        private static readonly Func<QueryParserOptions, IQueryParser> defaultQueryParserFactory = o => new QueryParser(o);
         private Func<QueryParserOptions, IQueryParser> factory = defaultQueryParserFactory;
 
         private bool assumeFuzzySearchTerms;

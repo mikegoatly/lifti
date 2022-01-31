@@ -54,7 +54,7 @@ namespace Lifti.Querying.QueryParts
 
             public void Add(FuzzyMatchState state)
             {
-                if (state.TotalEditCount <= maxEditDistance && 
+                if (state.TotalEditCount <= maxEditDistance &&
                     state.SequentialEdits <= maxSequentialEdits &&
                     processedBookmarks.Add((state.WordIndex, state.Bookmark)))
                 {
@@ -78,9 +78,6 @@ namespace Lifti.Querying.QueryParts
             /// <summary>
             /// Creates a new <see cref="FuzzyMatchState"/> instance.
             /// </summary>
-#if DEBUG && TRACK_MATCH_STATE_TEXT
-            /// <param name="matchText">The debug text used to illustrate the alterations that were made to the original search term to reach this point.</param>
-#endif
             /// <param name="bookmark">The <see cref="IIndexNavigatorBookmark"/> for the state of the index that this instance is for.</param>
             /// <param name="totalEditCount">The current number number of edits this required to reach this point in the match.</param>
             /// <param name="levenshteinDistance">The Levelshtein distance accumulated so far. This will differ from <paramref name="totalEditCount"/> 
@@ -97,7 +94,9 @@ namespace Lifti.Querying.QueryParts
                 ushort sequentialEdits,
                 ushort wordIndex,
 #if DEBUG && TRACK_MATCH_STATE_TEXT
+#pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
                 string matchText,
+#pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
 #endif
                 SubstitutedCharacters? lastSubstitution = null
                 )
@@ -164,7 +163,12 @@ namespace Lifti.Querying.QueryParts
                     isTransposition ? (SubstitutedCharacters?)null : substituted);
             }
 
-            public FuzzyMatchState ApplyDeletion(IIndexNavigatorBookmark newBookmark, char omittedCharacter)
+            public FuzzyMatchState ApplyDeletion(
+                IIndexNavigatorBookmark newBookmark
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                ,char omittedCharacter
+#endif
+                )
             {
                 return new FuzzyMatchState(
                     newBookmark,
@@ -178,7 +182,11 @@ namespace Lifti.Querying.QueryParts
                     );
             }
 
-            public FuzzyMatchState ApplyInsertion(char additionalCharacter)
+            public FuzzyMatchState ApplyInsertion(
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                char additionalCharacter
+#endif
+                )
             {
                 return new FuzzyMatchState(
                     this.Bookmark,
@@ -192,7 +200,12 @@ namespace Lifti.Querying.QueryParts
                     );
             }
 
-            public FuzzyMatchState ApplyExactMatch(IIndexNavigatorBookmark nextBookmark, char currentCharacter)
+            public FuzzyMatchState ApplyExactMatch(
+                IIndexNavigatorBookmark nextBookmark
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                , char currentCharacter
+#endif
+                )
             {
                 return new FuzzyMatchState(
                     nextBookmark,
@@ -279,12 +292,21 @@ namespace Lifti.Querying.QueryParts
                         if (navigator.Process(currentCharacter))
                         {
                             // The character matched successfully, so potentially no edits incurred, just move to the next character
-                            stateStore.Add(state.ApplyExactMatch(navigator.CreateBookmark(), currentCharacter));
+                            stateStore.Add(state.ApplyExactMatch(
+                                navigator.CreateBookmark()
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                                , currentCharacter
+#endif
+                                ));
                         }
                         else
                         {
                             // First skip this character (assume extra character inserted), but don't move the navigator on
-                            stateStore.Add(state.ApplyInsertion(currentCharacter));
+                            stateStore.Add(state.ApplyInsertion(
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                                currentCharacter
+#endif
+                                ));
 
                             // Also try skipping this character (assume omission) by just moving on in the navigator
                             AddDeletionBookmarks(navigator, stateStore, state);
@@ -332,7 +354,12 @@ namespace Lifti.Querying.QueryParts
             {
                 bookmark.Apply();
                 navigator.Process(c);
-                stateStore.Add(currentState.ApplyDeletion(navigator.CreateBookmark(), c));
+                stateStore.Add(currentState.ApplyDeletion(
+                    navigator.CreateBookmark()
+#if DEBUG && TRACK_MATCH_STATE_TEXT
+                    , c
+#endif
+                    ));
             }
         }
 

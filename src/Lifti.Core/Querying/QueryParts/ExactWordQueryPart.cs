@@ -23,11 +23,9 @@ namespace Lifti.Querying.QueryParts
                 throw new ArgumentNullException(nameof(navigatorCreator));
             }
 
-            using (var navigator = navigatorCreator())
-            {
-                navigator.Process(this.Word.AsSpan());
-                return queryContext.ApplyTo(navigator.GetExactMatches());
-            }
+            using var navigator = navigatorCreator();
+            navigator.Process(this.Word.AsSpan());
+            return queryContext.ApplyTo(navigator.GetExactMatches());
         }
 
         /// <inheritdoc/>
