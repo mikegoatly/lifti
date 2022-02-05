@@ -15,8 +15,8 @@ namespace Lifti.Tests.Querying.QueryParts
     public class FuzzyWordQueryPartTestsFixture : IAsyncLifetime
     {
         public string[] IndexedText { get; } = {
-            "Some sample text to match on",
-            "Sounds like a solid plan to me",
+            "Some sample comics text to match on",
+            "Samples sounds like a solid plan to me",
             "Odius ogres obey Mobius"
         };
 
@@ -58,7 +58,7 @@ namespace Lifti.Tests.Querying.QueryParts
         [Fact]
         public void ShouldReturnExactMatch()
         {
-            RunTest("SAMPLE", 2, 1, "sample");
+            RunTest("SAMPLES", 2, 1, "samples");
         }
 
         [Fact]
@@ -95,6 +95,12 @@ namespace Lifti.Tests.Querying.QueryParts
         public void ShouldNotAllowVariationsConsistingEntirelyOfEdits()
         {
             RunTest("OF", 2, 1, "on");
+        }
+
+        [Fact]
+        public void WhenMatchEndsOnExactMatch_PotentialDeletionsShouldStillBeReturned()
+        {
+            RunTest("SAMPE", 2, 1, "some", "sample", "samples");
         }
 
         [Fact]

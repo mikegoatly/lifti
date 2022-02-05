@@ -279,11 +279,9 @@ namespace Lifti.Querying.QueryParts
                                 var weighting = (double)(lengthTotal - state.LevenshteinDistance) / lengthTotal;
                                 results = results.Union(navigator.GetExactMatches(weighting));
                             }
-                            else
-                            {
-                                // Assume there could be missing characters at the end
-                                AddDeletionBookmarks(navigator, stateStore, state);
-                            }
+                            
+                            // Always assume there could be missing characters at the end
+                            AddDeletionBookmarks(navigator, stateStore, state);
                         }
                     }
                     else
