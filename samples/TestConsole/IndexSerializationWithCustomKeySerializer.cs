@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace TestConsole
 {
-    public class IndexSerializationWithCustomKeySerializer
+    public class IndexSerializationWithCustomKeySerializer : SampleBase
     {
-        public static async Task RunAsync()
+        public override async Task RunAsync()
         {
             // Create a full text index with a custom key type
             var index = new FullTextIndexBuilder<CompositeKey>().Build();
@@ -23,21 +23,28 @@ namespace TestConsole
             //    please provide a custom implementation of IKeySerializer<> when serializing/deserializing.
             // var serializer = new BinarySerializer<int>();
 
+            var match = index.Search("fizz & buzz").Single();
+            Console.WriteLine($"Only ({match.Key.UserId}, {match.Key.CompanyId}) contains 'Fizz & Buzz' in the original index");
+
             var serializer = new BinarySerializer<CompositeKey>(new CompositeKeySerializer());
             using var stream = new MemoryStream();
 
             // Serialize the index
+            Console.WriteLine("Serializing index using a custom key serializer");
             await serializer.SerializeAsync(index, stream, disposeStream: false);
 
             // Deserialize the index into a new instance
+            Console.WriteLine("Deserializing to a new index");
             stream.Position = 0;
             var newIndex = new FullTextIndexBuilder<CompositeKey>().Build();
             await serializer.DeserializeAsync(newIndex, stream, disposeStream: false);
 
             // Prove that the new index has the same contents and the keys have round-tripped
             // Emits: only (3, 11) contains Fizz & Buzz
-            var match = newIndex.Search("fizz & buzz").Single();
-            Console.WriteLine($"Only ({match.Key.UserId}, {match.Key.CompanyId}) contains Fizz & Buzz");
+            match = newIndex.Search("fizz & buzz").Single();
+            Console.WriteLine($"Only ({match.Key.UserId}, {match.Key.CompanyId}) contains 'Fizz & Buzz' in the deserialized index");
+
+            WaitForEnterToReturnToMenu();
         }
     }
 }

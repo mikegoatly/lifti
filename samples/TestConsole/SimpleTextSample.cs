@@ -1,14 +1,11 @@
 ﻿using Lifti;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace TestConsole
 {
-
-    public static class SimpleTextSample
+    public class SimpleTextSample : SampleBase
     {
-        public static async Task RunAsync()
+        public override async Task RunAsync()
         {
             // Create a full text index with default settings
             var index = new FullTextIndexBuilder<string>().Build();
@@ -18,17 +15,13 @@ namespace TestConsole
             await index.AddAsync("B", "Some buzz text for B");
             await index.AddAsync("C", "Text associated with C is both fizz and buzz");
 
-            // Search for text containing both Fizz *and* Buzz
-            var results = index.Search("Fizz Buzz").ToList();
+            // Number of items with both Fizz and Buzz: 1
+            RunSearch(index, "Fizz Buzz", "Items with both Fizz AND Buzz");
 
-            // Output: Items with both Fizz and Buzz: 1
-            Console.WriteLine($"Items with both Fizz and Buzz: {results.Count}");
+            // Number of items with Fizz or Buzz: 3
+            RunSearch(index, "Fizz | Buzz", "Items with Fizz OR Buzz");
 
-            // Search for text containing both Fizz *or* Buzz
-            results = index.Search("Fizz | Buzz").ToList();
-
-            // Outputs: Items with Fizz or Buzz: 3
-            Console.WriteLine($"Items with Fizz or Buzz: {results.Count}");
+            WaitForEnterToReturnToMenu();
         }
     }
 }
