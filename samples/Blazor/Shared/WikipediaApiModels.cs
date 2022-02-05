@@ -4,39 +4,74 @@ namespace BlazorApp.Shared
 {
     public class WikipediaResult
     {
+        public WikipediaResult(WikipediaPage page)
+        {
+            this.Page = page;
+        }
+
         [JsonPropertyName("parse")]
-        public WikipediaPage Page { get; set; }
+        public WikipediaPage Page { get; }
     }
 
     public class WikipediaPage
     {
-        public string Title { get; set; }
-        public int PageId { get; set; }
-        public Text Text { get; set; }
+        public WikipediaPage(string title, int pageId, Text text)
+        {
+            this.Title = title;
+            this.PageId = pageId;
+            this.Text = text;
+        }
+
+        public string Title { get; }
+        public int PageId { get; }
+        public Text Text { get; }
     }
 
     public class Text
     {
+        public Text(string content)
+        {
+            this.Content = content;
+        }
+
         [JsonPropertyName("*")]
-        public string Content { get; set; }
+        public string Content { get; }
     }
 
 
     public class RandomResult
     {
-        public Query Query { get; set; }
+        public RandomResult(Query query)
+        {
+            this.Query = query;
+        }
+
+        public Query Query { get; }
     }
 
     public class Query
     {
-        public PageSummary[] random { get; set; }
+        public Query(IReadOnlyList<PageSummary> random)
+        {
+            this.Random = random;
+        }
+
+        [JsonPropertyName("random")]
+        public IReadOnlyList<PageSummary> Random { get; }
     }
 
     public class PageSummary
     {
-        public int? Id { get; set; }
-        public string Slug { get; set; }
-        public string Title { get; set; }
+        public PageSummary(int? id, string slug, string title)
+        {
+            this.Id = id;
+            this.Slug = slug;
+            this.Title = title;
+        }
+
+        public int? Id { get; }
+        public string Slug { get; }
+        public string Title { get; }
     }
 
 }
