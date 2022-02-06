@@ -175,6 +175,9 @@ namespace Lifti.Tests
             this.index.Search("Text1=one").Should().HaveCount(0);
             this.index.Search("Text1=One").Should().HaveCount(2);
 
+            this.index.Search("Text2=*t").Should().HaveCount(2); //Text and not
+            this.index.Search("Text2=?toxt").Should().HaveCount(2); //Text and not
+
             this.index.Search("Text3=eat").Should().HaveCount(1);
             this.index.Search("Text3=eats").Should().HaveCount(1);
             this.index.Search("Text3=drum").Should().HaveCount(1);
