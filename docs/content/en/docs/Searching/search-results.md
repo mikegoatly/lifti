@@ -6,6 +6,10 @@ description:
     Results from `FullTextIndex<T>.Search` are an enumeration of `SearchResult<T>`
 ---
 
+## Search result order
+
+Search results are returned sorted according to the total document score, in descending order. See [scoring](../../scoring) for more information.
+
 ## SearchResult&lt;T&gt;
 
 ### T Item { get; }
