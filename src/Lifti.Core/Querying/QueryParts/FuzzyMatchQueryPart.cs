@@ -365,7 +365,7 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public override string ToString()
         {
-            return this.Word;
+            return "?" + this.Word;
         }
     }
 }
