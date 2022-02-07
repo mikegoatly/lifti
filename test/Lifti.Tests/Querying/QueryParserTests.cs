@@ -150,14 +150,14 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void ParsingWordsInQuotes_ShouldResultInAdjacentWordsQueryOperator()
         {
-            var result = this.Parse("\"search words startswith* too\"");
+            var result = this.Parse("\"search words startswith* ?too\"");
             var expectedQuery = new AdjacentWordsQueryOperator(
                 new IQueryPart[]
                 {
                     new ExactWordQueryPart("search"),
                     new ExactWordQueryPart("words"),
                     new WildcardQueryPart(WildcardQueryFragment.CreateText("startswith"), WildcardQueryFragment.MultiCharacter),
-                    new ExactWordQueryPart("too")
+                    new FuzzyMatchQueryPart("too")
                 });
 
             VerifyResult(result, expectedQuery);
@@ -173,6 +173,20 @@ namespace Lifti.Tests.Querying
                     new ExactWordQueryPart("test"),
                     new ExactWordQueryPart("&"),
                     new ExactWordQueryPart("hello")
+                });
+
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingQuotes_AssumingFuzzyText_ShouldTreatAsFuzzy()
+        {
+            var result = this.Parse("\"test hello\"", true);
+            var expectedQuery = new AdjacentWordsQueryOperator(
+                new IQueryPart[]
+                {
+                    new FuzzyMatchQueryPart("test"),
+                    new FuzzyMatchQueryPart("hello")
                 });
 
             VerifyResult(result, expectedQuery);
