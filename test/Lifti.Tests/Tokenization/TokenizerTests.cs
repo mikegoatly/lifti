@@ -108,24 +108,11 @@ namespace Lifti.Tests.Tokenization
             }
 
             [Fact]
-            public void ShouldReturnSingleTokenForStringContainingWildcardCharacters()
-            {
-                var sut = WithConfiguration();
-
-                var output = Execute(sut, "*te%%st*");
-
-                output.Should().BeEquivalentTo(new[]
-                {
-                    new Token("*te%%st*", new TokenLocation(0, 0, 8))
-                });
-            }
-
-            [Fact]
             public void WhenSplittingAtPunctuation_ShouldTokenizeAtWordBreaksAndPunctuation()
             {
                 var sut = WithConfiguration();
 
-                var input = "Test string (with punctuation) with test spaces";
+                var input = "Test string (with punctuation) with test spaces?";
 
                 var output = Execute(sut, input);
 
@@ -145,7 +132,7 @@ namespace Lifti.Tests.Tokenization
             {
                 var sut = WithConfiguration(splitOnPunctuation: false);
 
-                var input = "Test string (with punctuation) with test spaces";
+                var input = "Test string (with punctuation) with test spaces?";
 
                 var output = Execute(sut, input);
 
@@ -157,7 +144,7 @@ namespace Lifti.Tests.Tokenization
                     new Token("punctuation)", new TokenLocation(3, 18, 12)),
                     new Token("with", new TokenLocation(4, 31, 4)),
                     new Token("test", new TokenLocation(5, 36, 4)),
-                    new Token("spaces", new TokenLocation(6, 41, 6))
+                    new Token("spaces?", new TokenLocation(6, 41, 7))
                 });
             }
 

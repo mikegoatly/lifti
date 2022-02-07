@@ -8,6 +8,34 @@ namespace Lifti.Querying
     /// </summary>
     internal class QueryTokenizer : IQueryTokenizer
     {
+        private static readonly HashSet<char> wildcardPunctuation = new HashSet<char>
+        {
+            '*',
+            '?',
+            '%'
+        };
+
+        // Punctuation characters that shouldn't cause a token to be automatically split - these
+        // are part of the LIFTI query syntax and processed on a case by case basis.
+        private static readonly HashSet<char> generalNonSplitPunctuation = new HashSet<char>(wildcardPunctuation)
+        {
+            '&',
+            '|',
+            '>',
+            '=',
+            '(',
+            ')',
+            '~',
+            '"'
+        };
+
+        // Punctuation characters that shouldn't cause a token to be automatically split when processing
+        // inside a quoted section
+        private static readonly HashSet<char> quotedSectionNonSplitPunctuation = new HashSet<char>(wildcardPunctuation)
+        {
+            '"'
+        };
+
         private enum State
         {
             None = 0,
@@ -43,7 +71,7 @@ namespace Lifti.Querying
             for (var i = 0; i < queryText.Length; i++)
             {
                 var current = queryText[i];
-                if (char.IsWhiteSpace(current))
+                if (IsSplitChar(current, state))
                 {
                     var token = CreateTokenForYielding(i);
                     if (token != null)
@@ -164,6 +192,22 @@ namespace Lifti.Querying
                     yield return token.GetValueOrDefault();
                 }
             }
+        }
+
+        private static bool IsSplitChar(char current, State state)
+        {
+            var isWhitespace = char.IsWhiteSpace(current);
+            return state switch
+            {
+                State.None => isWhitespace ||
+                    (!generalNonSplitPunctuation.Contains(current) && char.IsPunctuation(current)),
+
+                State.ProcessingString => isWhitespace ||
+                    (!quotedSectionNonSplitPunctuation.Contains(current) && char.IsPunctuation(current)),
+
+                // When processing a near operator, no splitting is possible until the operator processing is complete
+                State.ProcessingNearOperator => false
+            };
         }
     }
 }

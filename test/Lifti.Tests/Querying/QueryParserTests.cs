@@ -101,6 +101,17 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
+        public void ParsingPunctuatedWords_ShouldResultInMultipleQueryParts()
+        {
+            var result = this.Parse("wordone-wordtwo,wordthree");
+            var expectedQuery = new AndQueryOperator(
+                new AndQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo")),
+                new ExactWordQueryPart("wordthree"));
+
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
         public void ParsingBracketedAndExpressions_ShouldReturnBracketedQueryPartContainer()
         {
             var result = this.Parse("(wordone wordtwo)");
@@ -164,14 +175,13 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
-        public void ParsingOperatorsInQuotes_ShouldTreatAsText()
+        public void OperatorsInQuotes_ShouldBeTreatedAsSplitChars()
         {
-            var result = this.Parse("\"test & hello\"");
+            var result = this.Parse("\"test&hello\"");
             var expectedQuery = new AdjacentWordsQueryOperator(
                 new IQueryPart[]
                 {
                     new ExactWordQueryPart("test"),
-                    new ExactWordQueryPart("&"),
                     new ExactWordQueryPart("hello")
                 });
 

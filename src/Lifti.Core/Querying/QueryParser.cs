@@ -56,8 +56,6 @@ namespace Lifti.Querying
                         currentQuery,
                         new FieldFilterQueryOperator(token.TokenText, fieldId, filteredPart));
 
-
-
                 case QueryTokenType.OrOperator:
                 case QueryTokenType.AndOperator:
                 case QueryTokenType.NearOperator:
@@ -110,17 +108,32 @@ namespace Lifti.Querying
                 return wildcardQueryPart;
             }
 
+            IEnumerable<IQueryPart> result;
             if (isExplicitFuzzyMatch || this.options.AssumeFuzzySearchTerms)
             {
-                return new FuzzyMatchQueryPart(
-                    tokenizer.Normalize(
-                        isExplicitFuzzyMatch ? tokenText.Slice(1) : tokenText)
-                    .ToString());
+                result = tokenizer.Process(isExplicitFuzzyMatch ? tokenText.Slice(1) : tokenText)
+                 .Select(token => new FuzzyMatchQueryPart(token.Value));
+            }
+            else
+            {
+                result = tokenizer.Process(tokenText)
+                     .Select(token => new ExactWordQueryPart(token.Value));
             }
 
-            var result = tokenizer.Process(tokenText)
-                 .Select(token => new ExactWordQueryPart(token.Value))
-                 .FirstOrDefault();
+            return ComposeParts(result);
+        }
+
+        private static IQueryPart ComposeParts(IEnumerable<IQueryPart> parts)
+        {
+            IQueryPart? result = null;
+            var enumerator = parts.GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                result = result == null
+                    ? enumerator.Current
+                    : ComposePart(result, enumerator.Current);
+            }
 
             if (result == null)
             {

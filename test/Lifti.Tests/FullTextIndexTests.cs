@@ -283,8 +283,8 @@ namespace Lifti.Tests
 
             var results = this.index.Search("data").ToList();
             results.Should().BeInDescendingOrder(r => r.Score);
-            results.First().Score.Should().BeApproximately(2.4336127D, 0.0001D);
-            results.Last().Score.Should().BeApproximately(1.2258197D, 0.0001D);
+            results.First().Score.Should().BeApproximately(2.434951738D, 0.0001D);
+            results.Last().Score.Should().BeApproximately(1.2298017649D, 0.0001D);
         }
 
         [Fact]
