@@ -15,10 +15,6 @@ namespace Lifti.Querying
             ProcessingNearOperator = 2
         }
 
-        public QueryTokenizer()
-        {
-        }
-
         /// <inheritdoc />
         public IEnumerable<QueryToken> ParseQueryTokens(string queryText)
         {
