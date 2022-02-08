@@ -108,6 +108,11 @@ namespace Lifti.Querying
                 return wildcardQueryPart;
             }
 
+            // We hand off any matched text in the query to the tokenizer (either the index default,
+            // or the one associated to the specific field being queryied) because we need to ensure
+            // that it is:
+            // a) Normalized in the same way as the tokens as they were added to the index
+            // b) Any additional processing, e.g. stemming is applied to them
             IEnumerable<IQueryPart> result;
             if (isExplicitFuzzyMatch || this.options.AssumeFuzzySearchTerms)
             {
