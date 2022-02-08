@@ -20,22 +20,22 @@
 <link rel="icon" type="image/png" href="/lifti/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
 
-<title>Automatic Serialization | LIFTI</title><meta property="og:title" content="Automatic Serialization" />
-<meta property="og:description" content="With a bit of configuration you can configure the index to serialize to a backing file whenever changes are made to it.
+<title>WithQueryParser | LIFTI</title><meta property="og:title" content="WithQueryParser" />
+<meta property="og:description" content="Prescribes how the QueryParser implementation should be configured for the index.
 " />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/serialization/automatic-serialization/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/index-construction/withqueryparser/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2022-02-06T08:05:54+00:00" /><meta property="og:site_name" content="LIFTI" />
+<meta property="article:modified_time" content="2022-02-06T09:34:50+00:00" /><meta property="og:site_name" content="LIFTI" />
 
-<meta itemprop="name" content="Automatic Serialization">
-<meta itemprop="description" content="With a bit of configuration you can configure the index to serialize to a backing file whenever changes are made to it.
+<meta itemprop="name" content="WithQueryParser">
+<meta itemprop="description" content="Prescribes how the QueryParser implementation should be configured for the index.
 ">
-<meta itemprop="dateModified" content="2022-02-06T08:05:54+00:00" />
-<meta itemprop="wordCount" content="33">
+<meta itemprop="dateModified" content="2022-02-06T09:34:50+00:00" />
+<meta itemprop="wordCount" content="113">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Automatic Serialization"/>
-<meta name="twitter:description" content="With a bit of configuration you can configure the index to serialize to a backing file whenever changes are made to it.
+<meta name="twitter:title" content="WithQueryParser"/>
+<meta name="twitter:description" content="Prescribes how the QueryParser implementation should be configured for the index.
 "/>
 
 
@@ -173,10 +173,10 @@
 
 <ul class="td-sidebar-nav__section pr-md-3">
   <li class="td-sidebar-nav__section-title">
-    <a  href="/lifti/docs/index-construction/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Index Construction</a>
+    <a  href="/lifti/docs/index-construction/" class="align-left pl-0 pr-2 active td-sidebar-link td-sidebar-link__section">Index Construction</a>
   </li>
   <ul>
-    <li class="collapse " id="liftidocsindex-construction">
+    <li class="collapse show" id="liftidocsindex-construction">
       
       
       
@@ -201,7 +201,7 @@
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithqueryparser" href="/lifti/docs/index-construction/withqueryparser/">WithQueryParser</a>
+      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsindex-constructionwithqueryparser" href="/lifti/docs/index-construction/withqueryparser/">WithQueryParser</a>
       
       
       
@@ -325,10 +325,10 @@
 
 <ul class="td-sidebar-nav__section pr-md-3">
   <li class="td-sidebar-nav__section-title">
-    <a  href="/lifti/docs/serialization/" class="align-left pl-0 pr-2 active td-sidebar-link td-sidebar-link__section">Serialization</a>
+    <a  href="/lifti/docs/serialization/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Serialization</a>
   </li>
   <ul>
-    <li class="collapse show" id="liftidocsserialization">
+    <li class="collapse " id="liftidocsserialization">
       
       
       
@@ -341,7 +341,7 @@
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsserializationautomatic-serialization" href="/lifti/docs/serialization/automatic-serialization/">Automatic Serialization</a>
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsserializationautomatic-serialization" href="/lifti/docs/serialization/automatic-serialization/">Automatic Serialization</a>
       
       
     </li>
@@ -427,8 +427,8 @@
 
 
 
-<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Serialization/automatic-serialization.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
-<a href="https://github.com/mikegoatly/lifti/issues/new?title=Automatic%20Serialization" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
+<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Index%20construction/WithQueryParser.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
+<a href="https://github.com/mikegoatly/lifti/issues/new?title=WithQueryParser" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
 
 </div>
 
@@ -436,6 +436,17 @@
 
 
 
+
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#providing-a-complete-iqueryparser-implementation">Providing a complete <code>IQueryParser</code> implementation</a></li>
+    <li><a href="#configuring-the-default-lifti-queryparser">Configuring the default LIFTI <code>QueryParser</code></a>
+      <ul>
+        <li><a href="#example-usage">Example usage</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
 
 
 
@@ -465,14 +476,14 @@
 
 
 <li class="breadcrumb-item" >
-	<a href="https://mikegoatly.github.io/lifti/docs/serialization/">Serialization</a>
+	<a href="https://mikegoatly.github.io/lifti/docs/index-construction/">Index Construction</a>
 </li>
 
 
 
 
 <li class="breadcrumb-item active" aria-current="page">
-	<a href="https://mikegoatly.github.io/lifti/docs/serialization/automatic-serialization/">Automatic Serialization</a>
+	<a href="https://mikegoatly.github.io/lifti/docs/index-construction/withqueryparser/">WithQueryParser</a>
 </li>
 
 	</ol>
@@ -480,14 +491,30 @@
 
             
 <div class="td-content">
-	<h1>Automatic Serialization</h1>
-    <div class="lead">With a bit of configuration you can configure the index to serialize to a backing file whenever changes are made to it.</div>
+	<h1>WithQueryParser</h1>
+    <div class="lead">Prescribes how the QueryParser implementation should be configured for the index.</div>
 	       
-	<p>First you will need to make sure that the index is deserialized before use, as demonstrated <a href="..">here</a>, and add an <a href="../../index-construction/withindexmodificationaction">index modification hook</a> to serialize the index whenever a new snapshot is created.</p>
-
+	<h2 id="providing-a-complete-iqueryparser-implementation">Providing a complete <code>IQueryParser</code> implementation</h2>
+<p><code>FullTextIndexBuilder&lt;TKey&gt; WithQueryParser(IQueryParser queryParser)</code></p>
+<p>Allows you to provide your own implementation of <code>IQueryParser</code> capable of parsing text into an <code>IQuery</code>.</p>
+<h2 id="configuring-the-default-lifti-queryparser">Configuring the default LIFTI <code>QueryParser</code></h2>
+<p><code>FullTextIndexBuilder&lt;TKey&gt; WithQueryParser(Func&lt;QueryParserBuilder, QueryParserBuilder&gt; optionsBuilder)</code></p>
+<p>By default LIFTI parses query text using the <a href="../searching">LIFTI query syntax</a>. The behavior of the parser can
+be tweaked using this overload.</p>
+<p><code>QueryParserBuilder.AssumeFuzzySearchTerms()</code>
+When used, uses fuzzy matching for any parsed search terms that don&rsquo;t contain
+wildcard operators, i.e. you don&rsquo;t need to prefix search terms with <code>?</code>.</p>
+<p><code>QueryParserBuilder.WithQueryParserFactory(Func&lt;QueryParserOptions, IQueryParser&gt;)</code>
+Given a <code>QueryParserOptions</code>, creates the implementation of <code>IQueryParser</code>. You can use this to provide a
+custom query parsing strategy.</p>
+<h3 id="example-usage">Example usage</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;()</span>
+    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithQueryParser</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">o</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AssumeFuzzySearch</span><span style="color:#000;font-weight:bold">())</span>
+    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
+</code></pre></div>
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified February 6, 2022: <a  href="https://github.com/mikegoatly/lifti/commit/d98d0b38b089e157095fc4a136b01131aec3689a">Fixed broken links (d98d0b3)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified February 6, 2022: <a  href="https://github.com/mikegoatly/lifti/commit/547b19f2fc42f2376800f10e7aa1d6c341b14f11">Updated docs (547b19f)</a>
 </div>
 </div>
 

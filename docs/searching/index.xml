@@ -31,7 +31,7 @@ navigation of the index.&lt;/p&gt;
 &lt;li&gt;&lt;code&gt;IIndexNavigator.GetExactAndChildMatches&lt;/code&gt; Gets the exact matches &lt;em&gt;and&lt;/em&gt; any matches in subsequent child nodes. This is the equivalent to a wildcard search.&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;IIndexNavigator.EnumerateIndexedTokens&lt;/code&gt; Enumerates the words (tokens) that were indexed under the current location. This essentaially allows for a reverse-engineering of words stored in the index, albeit in their index normalized form.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;async&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Task&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;RunAsync&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;async&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Task&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;RunAsync&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
     &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Create a full text index with default settings
 &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;index&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;FullTextIndexBuilder&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;string&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;().&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Build&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;
@@ -97,7 +97,9 @@ navigation of the index.&lt;/p&gt;
       <description>
         
         
-        &lt;h2 id=&#34;searchresultlttgt&#34;&gt;SearchResult&amp;lt;T&amp;gt;&lt;/h2&gt;
+        &lt;h2 id=&#34;search-result-order&#34;&gt;Search result order&lt;/h2&gt;
+&lt;p&gt;Search results are returned sorted according to the total document score, in descending order. See &lt;a href=&#34;../../scoring&#34;&gt;scoring&lt;/a&gt; for more information.&lt;/p&gt;
+&lt;h2 id=&#34;searchresultlttgt&#34;&gt;SearchResult&amp;lt;T&amp;gt;&lt;/h2&gt;
 &lt;h3 id=&#34;t-item--get-&#34;&gt;T Item { get; }&lt;/h3&gt;
 &lt;p&gt;The item that matched the search criteria.&lt;/p&gt;
 &lt;h3 id=&#34;ireadonlylistltfieldsearchresultgt-fieldmatches--get-&#34;&gt;IReadOnlyList&amp;lt;FieldSearchResult&amp;gt; FieldMatches { get; }&lt;/h3&gt;
