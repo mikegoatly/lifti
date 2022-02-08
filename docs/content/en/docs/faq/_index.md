@@ -21,4 +21,4 @@ Yes, this is managed by two mechanisms:
 
 ### Can I automatically serialize an index when it changes?
 
-Yes, you need to add a hook to `FullTextIndexBuilder<TKey>.WithIndexModificationAction`. There's an [example here](../Index%20construction/WithIndexModificationAction).
+Yes, you need to add a hook to `FullTextIndexBuilder<TKey>.WithIndexModificationAction`. There's an [example here](../index-construction/withindexmodificationaction).

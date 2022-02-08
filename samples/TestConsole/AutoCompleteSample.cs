@@ -35,6 +35,7 @@ namespace TestConsole
 
             var colorProperties = typeof(Color).GetProperties(BindingFlags.Static | BindingFlags.Public);
             var i = 0;
+
             foreach (var prop in colorProperties)
             {
                 await index.AddAsync(i++, prop.Name);
@@ -49,9 +50,9 @@ namespace TestConsole
     /// <summary>
     /// This example shows how you can use an index as an auto-complete solution.
     /// </summary>
-    public static class AutoCompleteSample
+    public class AutoCompleteSample : ISample
     {
-        public static async Task RunAsync()
+        public async Task RunAsync()
         {
             Console.Clear();
 
@@ -62,7 +63,7 @@ namespace TestConsole
             while (true)
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write("Type the name of a color (Ctrl-C to quit): ");
+                Console.Write("Type the name of a color (or enter to quit): ");
 
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine(input.ToString());
@@ -81,7 +82,11 @@ namespace TestConsole
                 }
 
                 var next = Console.ReadKey();
-                if (next.Key == ConsoleKey.Backspace && input.Length > 0)
+                if (next.Key == ConsoleKey.Enter)
+                {
+                    break;
+                }
+                else if (next.Key == ConsoleKey.Backspace && input.Length > 0)
                 {
                     input.Length -= 1;
                 }

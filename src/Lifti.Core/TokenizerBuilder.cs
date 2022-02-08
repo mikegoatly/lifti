@@ -8,7 +8,7 @@ namespace Lifti
     /// </summary>
     public class TokenizerBuilder
     {
-        private static Func<TokenizationOptions, ITokenizer> defaultTokenizerFactory = o => new Tokenizer(o);
+        private static readonly Func<TokenizationOptions, ITokenizer> defaultTokenizerFactory = o => new Tokenizer(o);
 
         private bool splitOnPunctuation = true;
         private bool accentInsensitive = true;

@@ -12,8 +12,10 @@ description: >
 Example|Meaning
 -|-
 West|**West** must appear in the text.
+?Wst|Words that [fuzzy match](#fuzzy-matching) with **wst** must appear in the text.
 title=West|**West** must appear in the ***title*** field of an indexed object.
-doc*|Words that starts with **doc**ument must appear in the text.
+doc*|Words that starts with **doc**ument must appear in the text. [See wildcard matching](#wildcard-matching)
+%%ing|Words that starts with any two letters and end with **ing**, e.g. *doing*. [See wildcard matching](#wildcard-matching)
 west&nbsp;&&nbsp;wing|The words **west** and **wing** must appear in the text.
 west&nbsp;wing|The words **west** and **wing** must appear in the text - the default operator is & if none is specified between search words.
 west&nbsp;\|&nbsp;wing|The words **west** or **wing** must appear in the text.
@@ -30,6 +32,37 @@ Search terms can be combined and placed in parenthesis:
 Example|Meaning
 -|-
 "west wing" ~ "oval office"|**West wing** must appear near **Oval Office**
+
+### Fuzzy matching
+
+LIFTI uses [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) to perform fuzzy matches between a search term and tokens in the index.
+The distance between two words is the number of edits that are required to match them, including:
+
+* insertions: fid would match fi**n**d 
+* deletions: foood would match food
+* substitutions: frnd would match f**i**nd
+* transpositions: fnid would match f**in**d - Transpositions are a special case, because although two characters are affected, it is considered a single edit.
+
+The resulting Levenshtein distance between any matched term and the search term is used to reduce the score of the match. This means that documents containing
+words that are closer matches will typically be surfaced higher up in the search results.
+
+To prevent a [combinatorial explosion](https://en.wikipedia.org/wiki/Combinatorial_explosion) of potential matches, LIFTI currently limits the maximum number
+of allowed edits to 3, and sequential edits to 1. This means that as of now:
+
+* **feed** will *not* match **food** because it requires two sequential edits
+* **redy** will *not* match **friendly** because it requires 4 insertions
+
+### Defaulting search terms to fuzzy matching
+
+By default LIFTI will treat a search term as an exact match, however [you can configure the index](../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser) so that any search term (apart from those containing wildcards)
+will be treated as a fuzzy match.
+
+### Wildcard matching
+
+Any search term containing `*` or `%` will be considered a wildcard match, where:
+
+* `*` matches zero or more characters
+* `%` matches any single character
 
 ## Query Operators
 

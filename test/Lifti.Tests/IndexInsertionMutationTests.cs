@@ -164,8 +164,8 @@ namespace Lifti.Tests
             (int, IndexedToken)[] expectedMatches = null,
             char[] expectedChildNodes = null)
         {
-            expectedChildNodes = expectedChildNodes ?? Array.Empty<char>();
-            expectedMatches = expectedMatches ?? Array.Empty<(int, IndexedToken)>();
+            expectedChildNodes ??= Array.Empty<char>();
+            expectedMatches ??= Array.Empty<(int, IndexedToken)>();
 
             node.IntraNodeText.ToArray().Should().BeEquivalentTo(intraNodeText?.ToCharArray() ?? Array.Empty<char>());
             node.ChildNodes.Keys.Should().BeEquivalentTo(expectedChildNodes, o => o.WithoutStrictOrdering());

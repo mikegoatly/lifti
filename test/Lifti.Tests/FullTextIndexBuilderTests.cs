@@ -71,12 +71,44 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public void WithQueryParserOptions_ShouldPassOptionsToQueryParser()
+        {
+            QueryParserOptions providedOptions = null;
+
+            this.sut.WithQueryParser(o => o
+                .AssumeFuzzySearchTerms()
+                .WithQueryParserFactory((QueryParserOptions f) =>
+                {
+                    providedOptions = f;
+                    return new QueryParser(f);
+                }));
+
+            var index = this.sut.Build();
+
+            providedOptions.Should().BeEquivalentTo(
+                new QueryParserOptions
+                {
+                    AssumeFuzzySearchTerms = true
+                });
+        }
+
+        [Fact]
+        public void WithQueryParserOptions_AndDefaultFactory_ShouldNotError()
+        {
+            this.sut.WithQueryParser(o => o.AssumeFuzzySearchTerms());
+
+            var index = this.sut.Build();
+
+            index.Should().NotBeNull();
+        }
+
+        [Fact]
         public async Task WithScorer_ShouldPassImplementationToIndex()
         {
             var score = 999999999D;
             var indexScorer = new Mock<IScorer>();
-            indexScorer.Setup(s => s.Score(It.IsAny<IReadOnlyList<QueryTokenMatch>>()))
-                .Returns((IReadOnlyList<QueryTokenMatch> t) => t.Select(m => new ScoredToken(m.ItemId, m.FieldMatches.Select(fm => new ScoredFieldMatch(score, fm)).ToList())).ToList());
+            indexScorer.Setup(s => s.Score(It.IsAny<IReadOnlyList<QueryTokenMatch>>(), It.IsAny<double>()))
+                .Returns((IReadOnlyList<QueryTokenMatch> t, double weight) => t.Select(m => new ScoredToken(m.ItemId, m.FieldMatches.Select(fm => new ScoredFieldMatch(score, fm)).ToList())).ToList());
 
             var scorer = new Mock<IIndexScorerFactory>();
             scorer.Setup(s => s.CreateIndexScorer(It.IsAny<IIndexSnapshot>())).Returns(indexScorer.Object);
@@ -162,15 +194,28 @@ namespace Lifti.Tests
 
         private class TestObject1
         {
-            public int Id { get; set; }
-            public string Text { get; set; }
+            public TestObject1(int id, string text)
+            {
+                this.Id = id;
+                this.Text = text;
+            }
+
+            public int Id { get; }
+            public string Text { get; }
         }
 
         private class TestObject2
         {
-            public int Id { get; set; }
-            public string[] Content { get; set; }
-            public string Title { get; set; }
+            public TestObject2(int id, string[] content, string title)
+            {
+                this.Id = id;
+                this.Content = content;
+                this.Title = title;
+            }
+
+            public int Id { get; }
+            public string[] Content { get; }
+            public string Title { get; }
         }
     }
 }

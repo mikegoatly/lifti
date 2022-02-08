@@ -19,7 +19,7 @@ namespace Lifti {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class ExceptionMessages {
@@ -115,11 +115,38 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internal error - missing text value.
+        /// </summary>
+        internal static string EmptyOrMissingTextQueryFragmentValue {
+            get {
+                return ResourceManager.GetString("EmptyOrMissingTextQueryFragmentValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected at least one query part to be parsed.
         /// </summary>
         internal static string ExpectedAtLeastOneQueryPartParsed {
             get {
                 return ResourceManager.GetString("ExpectedAtLeastOneQueryPartParsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected a fuzzy match token - got {0}.
+        /// </summary>
+        internal static string ExpectedFuzzyMatchToken {
+            get {
+                return ResourceManager.GetString("ExpectedFuzzyMatchToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A text fragment must follow a multi-character wildcard in a wildcard expression.
+        /// </summary>
+        internal static string ExpectedTextQueryFragmentAfterMultiCharacterWildcard {
+            get {
+                return ResourceManager.GetString("ExpectedTextQueryFragmentAfterMultiCharacterWildcard", resourceCulture);
             }
         }
         
@@ -304,11 +331,29 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Single character wildcards (%) following a multi-character wildcard (*) are not currently supported..
+        /// </summary>
+        internal static string SingleCharacterWildcardsFollowingMultiCharacterNotSupported {
+            get {
+                return ResourceManager.GetString("SingleCharacterWildcardsFollowingMultiCharacterNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A timeout occurred waiting for index write lock.
         /// </summary>
         internal static string TimeoutWaitingForWriteLock {
             get {
                 return ResourceManager.GetString("TimeoutWaitingForWriteLock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EnumerateIndexedTokens cannot be called after applying a bookmark.
+        /// </summary>
+        internal static string UnableToEnumerateIndexedTokensAfterApplyingBookmark {
+            get {
+                return ResourceManager.GetString("UnableToEnumerateIndexedTokensAfterApplyingBookmark", resourceCulture);
             }
         }
         

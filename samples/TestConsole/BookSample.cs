@@ -1,12 +1,11 @@
 ﻿using Lifti;
-using Lifti.Tokenization;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace TestConsole
 {
-    public static class BookSample
+    public class BookSample : SampleBase
     {
         private static readonly Book[] books = new[]
         {
@@ -26,7 +25,7 @@ namespace TestConsole
             },
         };
 
-        public static async Task RunAsync()
+        public override async Task RunAsync()
         {
             var bookIndex = new FullTextIndexBuilder<int>() // Books are indexed by their BookId property, which is an int.
                 .WithObjectTokenization<Book>(
@@ -37,19 +36,20 @@ namespace TestConsole
                         .WithField("Synopsis", b => b.Synopsis, tokenOptions => tokenOptions.WithStemming()))
                 .Build();
 
+            Console.WriteLine(@$"Indexing two sample books with 3 different fields, Title, Authors and Synposis:{Environment.NewLine}{string.Join(Environment.NewLine, books.Select(b => b.Title))}");
             await bookIndex.AddRangeAsync(books);
+            Console.WriteLine();
+            RunSearch(
+                bookIndex,
+                "first",
+                "Both books contain 'first' in at least one field");
 
-            // Both books contain "first" - prints "Matched items: 1, 2"
-            var results = bookIndex.Search("first");
-            Console.WriteLine(
-                "Matched items: " +
-                string.Join(", ", results.Select(i => i.Key)) +
-                " with respective scores: " +
-                string.Join(", ", results.Select(i => i.Score)));
-
-            // Only first book contains "the" in the title - prints "Matched items: 1"
-            results = bookIndex.Search("title=the");
-            Console.WriteLine("Matched items: " + string.Join(", ", results.Select(i => i.Key)));
+            RunSearch(
+                bookIndex,
+                "title=the",
+                "Only the first book contains 'the' in the title field");
+            
+            WaitForEnterToReturnToMenu();
         }
     }
 }

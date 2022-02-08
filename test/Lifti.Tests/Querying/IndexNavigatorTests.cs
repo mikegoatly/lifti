@@ -18,6 +18,7 @@ namespace Lifti.Tests.Querying
                     o => o.WithKey(i => i.Item1)
                         .WithField("Field1", i => i.Item2)
                         .WithField("Field2", i => i.Item3))
+                .WithIntraNodeTextSupportedAfterIndexDepth(2)
                 .Build();
 
             await this.index.AddAsync("A", "Triumphant elephant strode elegantly with indifference to shouting subjects, giving withering looks to individuals");
@@ -64,7 +65,7 @@ namespace Lifti.Tests.Querying
                 new[]
                 {
                     ScoredToken(
-                        0, 
+                        0,
                         ScoredFieldMatch(double.Epsilon, 0, new SingleTokenLocationMatch(new TokenLocation(5, 42, 12))))
                 },
                 o => o.ComparingByMembers<ScoredToken>()
@@ -113,7 +114,7 @@ namespace Lifti.Tests.Querying
         public void EnumeratingIndexedWords_WhenAtRoot_ShouldReturnAllWords()
         {
             this.sut.EnumerateIndexedTokens().Should().BeEquivalentTo(
-                new[] 
+                new[]
                 {
                     "TRIUMPHANT",
                     "ELEPHANT",
@@ -216,6 +217,47 @@ namespace Lifti.Tests.Querying
         public void NavigatingByString_ShouldReturnFalseIfEntireStringDoesntMatch(string test)
         {
             this.sut.Process(test).Should().BeFalse();
+        }
+
+        [Fact]
+        public void Bookmarking_WhenRewinding_ShouldResetToCapturedState()
+        {
+            this.sut.Process("INDI");
+
+            var bookmark = this.sut.CreateBookmark();
+
+            this.sut.Process("VIDUAL");
+            VerifyMatchedWordIndexes(13);
+
+            bookmark.Apply();
+
+            this.sut.Process("F");
+            VerifyMatchedWordIndexes(5);
+
+            bookmark.Apply();
+            VerifyMatchedWordIndexes(5, 13);
+        }
+
+        private void VerifyMatchedWordIndexes(params int[] indexes)
+        {
+            var results = this.sut.GetExactAndChildMatches();
+            results.Matches.Should().HaveCount(1);
+            results.Matches[0].FieldMatches.Should().HaveCount(1);
+            var fieldMatch = results.Matches[0].FieldMatches[0];
+            fieldMatch.Locations.Should().HaveCount(indexes.Length);
+
+            fieldMatch.Locations.Select(l => l.MinTokenIndex).Should().BeEquivalentTo(indexes);
+        }
+
+        [Theory]
+        [InlineData("INDI", 'V', 'F')]
+        [InlineData("IN", 'D')]
+        [InlineData("INDV")]
+        public void EnumeratingNextCharacters_ShouldReturnAllAvailableOptions(string test, params char[] expectedOptions)
+        {
+            this.sut.Process(test);
+
+            this.sut.EnumerateNextCharacters().Should().BeEquivalentTo(expectedOptions);
         }
     }
 }

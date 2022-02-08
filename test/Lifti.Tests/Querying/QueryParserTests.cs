@@ -34,6 +34,37 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
+        public void AssumingFuzzySearch_ShouldTreatWordsAsFuzzySearch()
+        {
+            var result = this.Parse("wordone", assumeFuzzy: true);
+            var expectedQuery = new FuzzyMatchQueryPart("wordone");
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingTwoFuzzyWordsWithNoOperator_ShouldComposeWithAndOperator()
+        {
+            var result = this.Parse("?wordone ?wordtwo");
+            var expectedQuery = new AndQueryOperator(new FuzzyMatchQueryPart("wordone"), new FuzzyMatchQueryPart("wordtwo"));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingMixOfWordMatchesWithNoOperator_ShouldComposeWithAndOperators()
+        {
+            var result = this.Parse("?wordone wordtwo wor* ?wordthree");
+            var expectedQuery =
+                new AndQueryOperator(
+                    new AndQueryOperator(
+                        new AndQueryOperator(
+                            new FuzzyMatchQueryPart("wordone", 3), 
+                            new ExactWordQueryPart("wordtwo")),
+                        new WildcardQueryPart(WildcardQueryFragment.CreateText("wor"), WildcardQueryFragment.MultiCharacter)),
+                    new FuzzyMatchQueryPart("wordthree",3));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
         public void ParsingTwoWordsWithAndOperator_ShouldComposeWithAndOperator()
         {
             var result = this.Parse("wordone & wordtwo");
@@ -61,7 +92,21 @@ namespace Lifti.Tests.Querying
         public void ParsingBracketedSingleExpression_ShouldReturnBracketedQueryPartContainer()
         {
             var result = this.Parse("(wordone*)");
-            var expectedQuery = new BracketedQueryPart(new StartsWithWordQueryPart("wordone"));
+            var expectedQuery = new BracketedQueryPart(
+                new WildcardQueryPart(
+                    WildcardQueryFragment.CreateText("wordone"), 
+                    WildcardQueryFragment.MultiCharacter));
+
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingPunctuatedWords_ShouldResultInMultipleQueryParts()
+        {
+            var result = this.Parse("wordone-wordtwo,wordthree");
+            var expectedQuery = new AndQueryOperator(
+                new AndQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo")),
+                new ExactWordQueryPart("wordthree"));
 
             VerifyResult(result, expectedQuery);
         }
@@ -116,29 +161,42 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void ParsingWordsInQuotes_ShouldResultInAdjacentWordsQueryOperator()
         {
-            var result = this.Parse("\"search words startswith* too\"");
+            var result = this.Parse("\"search words startswith* ?too\"");
             var expectedQuery = new AdjacentWordsQueryOperator(
-                new IWordQueryPart[]
+                new IQueryPart[]
                 {
                     new ExactWordQueryPart("search"),
                     new ExactWordQueryPart("words"),
-                    new StartsWithWordQueryPart("startswith"),
-                    new ExactWordQueryPart("too")
+                    new WildcardQueryPart(WildcardQueryFragment.CreateText("startswith"), WildcardQueryFragment.MultiCharacter),
+                    new FuzzyMatchQueryPart("too")
                 });
 
             VerifyResult(result, expectedQuery);
         }
 
         [Fact]
-        public void ParsingOperatorsInQuotes_ShouldTreatAsText()
+        public void OperatorsInQuotes_ShouldBeTreatedAsSplitChars()
         {
-            var result = this.Parse("\"test & hello\"");
+            var result = this.Parse("\"test&hello\"");
             var expectedQuery = new AdjacentWordsQueryOperator(
-                new IWordQueryPart[]
+                new IQueryPart[]
                 {
                     new ExactWordQueryPart("test"),
-                    new ExactWordQueryPart("&"),
                     new ExactWordQueryPart("hello")
+                });
+
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingQuotes_AssumingFuzzyText_ShouldTreatAsFuzzy()
+        {
+            var result = this.Parse("\"test hello\"", true);
+            var expectedQuery = new AdjacentWordsQueryOperator(
+                new IQueryPart[]
+                {
+                    new FuzzyMatchQueryPart("test"),
+                    new FuzzyMatchQueryPart("hello")
                 });
 
             VerifyResult(result, expectedQuery);
@@ -162,7 +220,7 @@ namespace Lifti.Tests.Querying
         public void ParsingWordWithWildcard_ShouldReturnStartsWithWordQueryPart(string test)
         {
             var result = this.Parse(test);
-            var expectedQuery = new StartsWithWordQueryPart("word");
+            var expectedQuery = new WildcardQueryPart(WildcardQueryFragment.CreateText("word"), WildcardQueryFragment.MultiCharacter);
             VerifyResult(result, expectedQuery);
         }
 
@@ -212,9 +270,9 @@ namespace Lifti.Tests.Querying
             result.Root.ToString().Should().Be(expectedQuery.ToString());
         }
 
-        private IQuery Parse(string text)
+        private IQuery Parse(string text, bool assumeFuzzy = false)
         {
-            var parser = new QueryParser();
+            var parser = new QueryParser(new QueryParserOptions { AssumeFuzzySearchTerms = assumeFuzzy });
             return parser.Parse(this.fieldLookupMock.Object, text, new FakeTokenizer());
         }
     }

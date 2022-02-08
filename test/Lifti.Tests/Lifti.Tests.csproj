@@ -1,13 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
-
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
-
+	
   <ItemGroup>
     <None Remove="Tokenization\Stemming\StemmerTestCases.txt" />
   </ItemGroup>

@@ -4,10 +4,38 @@ using System.Collections.Generic;
 namespace Lifti.Querying
 {
     /// <summary>
-    /// The default implementation of <see cref="IQueryParser"/>, capable of parsing standard LIFTI query syntax.
+    /// The default implementation of <see cref="IQueryTokenizer"/>, capable of parsing standard LIFTI query syntax.
     /// </summary>
-    public class QueryTokenizer : IQueryTokenizer
+    internal class QueryTokenizer : IQueryTokenizer
     {
+        private static readonly HashSet<char> wildcardPunctuation = new HashSet<char>
+        {
+            '*',
+            '?',
+            '%'
+        };
+
+        // Punctuation characters that shouldn't cause a token to be automatically split - these
+        // are part of the LIFTI query syntax and processed on a case by case basis.
+        private static readonly HashSet<char> generalNonSplitPunctuation = new HashSet<char>(wildcardPunctuation)
+        {
+            '&',
+            '|',
+            '>',
+            '=',
+            '(',
+            ')',
+            '~',
+            '"'
+        };
+
+        // Punctuation characters that shouldn't cause a token to be automatically split when processing
+        // inside a quoted section
+        private static readonly HashSet<char> quotedSectionNonSplitPunctuation = new HashSet<char>(wildcardPunctuation)
+        {
+            '"'
+        };
+
         private enum State
         {
             None = 0,
@@ -27,11 +55,12 @@ namespace Lifti.Querying
             var tokenStart = (int?)null;
             var tolerance = 0;
 
-            QueryToken? createTokenForYielding(int endIndex)
+            QueryToken? CreateTokenForYielding(int endIndex)
             {
                 if (tokenStart != null)
                 {
-                    var token = QueryToken.ForText(queryText.Substring(tokenStart.Value, endIndex - tokenStart.Value));
+                    var tokenText = queryText.Substring(tokenStart.Value, endIndex - tokenStart.Value);
+                    var token = QueryToken.ForText(tokenText);
                     tokenStart = null;
                     return token;
                 }
@@ -42,9 +71,9 @@ namespace Lifti.Querying
             for (var i = 0; i < queryText.Length; i++)
             {
                 var current = queryText[i];
-                if (char.IsWhiteSpace(current))
+                if (IsSplitChar(current, state))
                 {
-                    var token = createTokenForYielding(i);
+                    var token = CreateTokenForYielding(i);
                     if (token != null)
                     {
                         yield return token.Value;
@@ -76,7 +105,7 @@ namespace Lifti.Querying
                                     tokenStart = null;
                                     break;
                                 case ')':
-                                    var token = createTokenForYielding(i);
+                                    var token = CreateTokenForYielding(i);
                                     if (token != null)
                                     {
                                         yield return token.Value;
@@ -96,17 +125,18 @@ namespace Lifti.Querying
                                     yield return QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator);
                                     break;
                                 default:
-                                    tokenStart = tokenStart ?? i;
+                                    tokenStart ??= i;
                                     break;
                             }
 
                             break;
+
                         case State.ProcessingString:
                             switch (current)
                             {
                                 case '"':
                                     state = State.None;
-                                    var token = createTokenForYielding(i);
+                                    var token = CreateTokenForYielding(i);
                                     if (token != null)
                                     {
                                         yield return token.Value;
@@ -115,7 +145,7 @@ namespace Lifti.Querying
                                     yield return QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator);
                                     break;
                                 default:
-                                    tokenStart = tokenStart ?? i;
+                                    tokenStart ??= i;
                                     break;
                             }
 
@@ -156,8 +186,28 @@ namespace Lifti.Querying
 
             if (tokenStart != null)
             {
-                yield return QueryToken.ForText(queryText.Substring(tokenStart.Value, queryText.Length - tokenStart.Value));
+                var token = CreateTokenForYielding(queryText.Length);
+                if (token != null)
+                {
+                    yield return token.GetValueOrDefault();
+                }
             }
+        }
+
+        private static bool IsSplitChar(char current, State state)
+        {
+            var isWhitespace = char.IsWhiteSpace(current);
+            return state switch
+            {
+                State.None => isWhitespace ||
+                    (!generalNonSplitPunctuation.Contains(current) && char.IsPunctuation(current)),
+
+                State.ProcessingString => isWhitespace ||
+                    (!quotedSectionNonSplitPunctuation.Contains(current) && char.IsPunctuation(current)),
+
+                // When processing a near operator, no splitting is possible until the operator processing is complete
+                State.ProcessingNearOperator => false
+            };
         }
     }
 }

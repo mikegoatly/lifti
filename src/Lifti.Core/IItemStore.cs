@@ -50,7 +50,9 @@ namespace Lifti
         /// <exception cref="LiftiException">
         /// Thrown when the id is not known.
         /// </exception>
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
         IItemMetadata<TKey> GetMetadata(int id);
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
         /// <summary>
         /// Gets the item metadata for the given item.

@@ -37,6 +37,8 @@ namespace Lifti
         /// <summary>
         /// Gets the <see cref="IItemStore{T}"/> in the state it was in when the snapshot was taken.
         /// </summary>
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
         IItemStore<TKey> Items { get; }
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
     }
 }
