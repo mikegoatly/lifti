@@ -15,7 +15,6 @@
     <PackageId>Lifti.Core</PackageId>
     <Copyright>Mike Goatly</Copyright>
     <PackageLicenseFile></PackageLicenseFile>
-    <PackageReleaseNotes>First version of the new rewrite</PackageReleaseNotes>
     <AssemblyName>Lifti.Core</AssemblyName>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
