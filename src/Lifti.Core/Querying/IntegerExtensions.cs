@@ -4,7 +4,7 @@
     {
         internal static bool IsPositiveAndLessThanOrEqualTo(this int value, int target)
         {
-            return value >= 0 && value <= target;
+            return value > 0 && value <= target;
         }
     }
 }
