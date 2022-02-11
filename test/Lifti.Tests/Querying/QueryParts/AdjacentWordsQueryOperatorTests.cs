@@ -44,5 +44,22 @@ namespace Lifti.Tests.Querying.QueryParts
                 },
                 config => config.AllowingInfiniteRecursion());
         }
+
+        [Fact]
+        public void ShouldNotCombineSameTokensTogether()
+        {
+            var sut = new AdjacentWordsQueryOperator(
+                new[] {
+                    new FakeQueryPart(
+                        ScoredToken(7, ScoredFieldMatch(1D, 1, 8, 20, 100))),
+                    new FakeQueryPart(
+                        ScoredToken(7, ScoredFieldMatch(1D, 1, 8, 20, 100)))
+                    });
+
+            var results = sut.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
+
+            // The first and second query parts should not combine together
+            results.Matches.Should().BeEmpty();
+        }
     }
 }
