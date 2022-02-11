@@ -58,8 +58,6 @@ namespace Lifti.Tests.Querying.QueryParts
 
             var results = sut.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
 
-            // Item 7 matches only:
-            // Field 1: ((8, 9), 10)
             // The first and second query parts should not combine together
             results.Matches.Should().BeEmpty();
         }
