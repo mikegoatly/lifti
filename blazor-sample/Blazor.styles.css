@@ -1,0 +1,27 @@
+/* /Shared/MainLayout.razor.rz.scp.css */
+.page[b-r0yqwuvdyg] {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+main[b-r0yqwuvdyg] {
+    flex: 1;
+}
+
+.sidebar[b-r0yqwuvdyg] {
+    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+}
+
+@media (min-width: 641px) {
+    .page[b-r0yqwuvdyg] {
+        flex-direction: row;
+    }
+
+    .sidebar[b-r0yqwuvdyg] {
+        width: 250px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
+}
