@@ -7,6 +7,8 @@ param (
 	[Parameter(Mandatory = $false)][bool]$force = $false
 )
 
+$ErrorActionPreference = "Stop"
+
 # abort if no changes to commit
 if ($commitMessage.Length -gt 0) {
 	If ($force -eq $false -and -Not (git status --porcelain)) {
@@ -55,7 +57,7 @@ Remove-Item .\temp -Recurse -Force -ErrorAction Ignore
 
 "Fixing underscored paths"
 Rename-Item .\public\blazor-sample\_framework "framework"
-Rename-Item .\public\blazor-sample\framework\_bin "bin"
+# Rename-Item .\public\blazor-sample\framework\_bin "bin"
 (Get-Content .\public\blazor-sample\framework\blazor.webassembly.js) `
 	-replace '_framework', 'framework' `
 	-replace '_bin', 'bin' |
