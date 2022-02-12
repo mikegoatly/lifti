@@ -20,23 +20,20 @@
 <link rel="icon" type="image/png" href="/lifti/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
 
-<title>WithDefaultTokenization | LIFTI</title><meta property="og:title" content="WithDefaultTokenization" />
-<meta property="og:description" content="Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
-" />
+<title>Manually Constructing Query Objects | LIFTI</title><meta property="og:title" content="Manually Constructing Query Objects" />
+<meta property="og:description" content="Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/index-construction/withdefaulttokenization/" /><meta property="article:section" content="docs" />
+<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/searching/manually-constructing-queries/" /><meta property="article:section" content="docs" />
+<meta property="article:published_time" content="2022-02-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2022-02-12T13:20:53+00:00" /><meta property="og:site_name" content="LIFTI" />
 
-<meta property="article:modified_time" content="2020-07-30T09:07:04+01:00" /><meta property="og:site_name" content="LIFTI" />
-
-<meta itemprop="name" content="WithDefaultTokenization">
-<meta itemprop="description" content="Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
-">
-<meta itemprop="dateModified" content="2020-07-30T09:07:04+01:00" />
-<meta itemprop="wordCount" content="216">
+<meta itemprop="name" content="Manually Constructing Query Objects">
+<meta itemprop="description" content="Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index."><meta itemprop="datePublished" content="2022-02-12T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2022-02-12T13:20:53+00:00" />
+<meta itemprop="wordCount" content="582">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="WithDefaultTokenization"/>
-<meta name="twitter:description" content="Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
-"/>
+<meta name="twitter:title" content="Manually Constructing Query Objects"/>
+<meta name="twitter:description" content="Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index."/>
 
 
 
@@ -173,17 +170,17 @@
 
 <ul class="td-sidebar-nav__section pr-md-3">
   <li class="td-sidebar-nav__section-title">
-    <a  href="/lifti/docs/index-construction/" class="align-left pl-0 pr-2 active td-sidebar-link td-sidebar-link__section">Index Construction</a>
+    <a  href="/lifti/docs/index-construction/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Index Construction</a>
   </li>
   <ul>
-    <li class="collapse show" id="liftidocsindex-construction">
+    <li class="collapse " id="liftidocsindex-construction">
       
       
       
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsindex-constructionwithdefaulttokenization" href="/lifti/docs/index-construction/withdefaulttokenization/">WithDefaultTokenization</a>
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithdefaulttokenization" href="/lifti/docs/index-construction/withdefaulttokenization/">WithDefaultTokenization</a>
       
       
       
@@ -267,10 +264,10 @@
 
 <ul class="td-sidebar-nav__section pr-md-3">
   <li class="td-sidebar-nav__section-title">
-    <a  href="/lifti/docs/searching/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Searching</a>
+    <a  href="/lifti/docs/searching/" class="align-left pl-0 pr-2 active td-sidebar-link td-sidebar-link__section">Searching</a>
   </li>
   <ul>
-    <li class="collapse " id="liftidocssearching">
+    <li class="collapse show" id="liftidocssearching">
       
       
       
@@ -283,7 +280,7 @@
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocssearchingmanually-constructing-queries" href="/lifti/docs/searching/manually-constructing-queries/">Manually Constructing Query Objects</a>
+      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocssearchingmanually-constructing-queries" href="/lifti/docs/searching/manually-constructing-queries/">Manually Constructing Query Objects</a>
       
       
       
@@ -439,8 +436,8 @@
 
 
 
-<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Index%20construction/WithDefaultTokenization.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
-<a href="https://github.com/mikegoatly/lifti/issues/new?title=WithDefaultTokenization" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
+<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Searching/manually-constructing-queries.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
+<a href="https://github.com/mikegoatly/lifti/issues/new?title=Manually%20Constructing%20Query%20Objects" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
 
 </div>
 
@@ -451,11 +448,10 @@
 
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#example-usage">Example usage</a></li>
-    <li><a href="#tokenizerbuilder-methods">TokenizerBuilder methods</a>
+    <li><a href="#query-parts">Query Parts</a>
       <ul>
-        <li><a href="#word-break-modifiers">Word break modifiers</a></li>
-        <li><a href="#text-normalization">Text Normalization</a></li>
+        <li><a href="#textual-query-parts">Textual query parts</a></li>
+        <li><a href="#structural-query-parts">Structural query parts</a></li>
       </ul>
     </li>
   </ul>
@@ -489,14 +485,14 @@
 
 
 <li class="breadcrumb-item" >
-	<a href="https://mikegoatly.github.io/lifti/docs/index-construction/">Index Construction</a>
+	<a href="https://mikegoatly.github.io/lifti/docs/searching/">Searching</a>
 </li>
 
 
 
 
 <li class="breadcrumb-item active" aria-current="page">
-	<a href="https://mikegoatly.github.io/lifti/docs/index-construction/withdefaulttokenization/">WithDefaultTokenization</a>
+	<a href="https://mikegoatly.github.io/lifti/docs/searching/manually-constructing-queries/">Manually Constructing Query Objects</a>
 </li>
 
 	</ol>
@@ -504,43 +500,98 @@
 
             
 <div class="td-content">
-	<h1>WithDefaultTokenization</h1>
-    <div class="lead">Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.</div>
+	<h1>Manually Constructing Query Objects</h1>
+    <div class="lead">Instead of using a query parser to interpret your query, you can manually construct a <code>Query</code> object and execute it against the index.</div>
 	       
-	<h2 id="example-usage">Example usage</h2>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;()</span>
-    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithDefaultTokenization</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span><span style="color:#000">o</span>
-        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">AccentInsensitive</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// Default
-</span><span style="color:#8f5902;font-style:italic"></span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">CaseInsensitive</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// Default
-</span><span style="color:#8f5902;font-style:italic"></span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">SplitOnPunctuation</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// Default
-</span><span style="color:#8f5902;font-style:italic"></span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">SplitOnCharacters</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;%&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#39;#&#39;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#39;@&#39;</span><span style="color:#000;font-weight:bold">)</span>
-        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithStemming</span><span style="color:#000;font-weight:bold">()</span>
-    <span style="color:#000;font-weight:bold">)</span>
-    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
-</code></pre></div><h2 id="tokenizerbuilder-methods">TokenizerBuilder methods</h2>
-<h3 id="word-break-modifiers">Word break modifiers</h3>
-<p>A tokenizer will always break words on separator (<code>Char.IsSeparator</code>) or control (<code>Char.IsControl</code>) characters.</p>
-<h4 id="splitonpunctuationbool"><code>SplitOnPunctuation(bool)</code></h4>
-<p><code>true</code>: <strong>Default</strong> The tokenizer will split words on punctuation characters (e.g. those that match <code>Char.IsPunctuation(char)</code>)</p>
-<p><code>false</code>: Only characters explicitly specified using <code>SplitOnCharacters</code> will be treated as word breaks.</p>
-<h4 id="splitoncharactersparams-char"><code>SplitOnCharacters(params char[])</code></h4>
-<p>Allows for additional characters to cause word breaks for a tokenizer. E.g. <code>SplitOnCharacters('$', '£')</code>.</p>
-<h3 id="text-normalization">Text Normalization</h3>
-<h4 id="accentinsensitivebool"><code>AccentInsensitive(bool)</code></h4>
-<p><code>true</code>: <strong>Default</strong> The tokenizer will normalize characters with diacritics to common form. e.g. <code>aigües</code> and <code>aigues</code> will be equivalent. 
-Additionally, characters that can be logically expressed as two characters are expanded, e.g. <code>laering</code> will be equivalent to <code>læring</code>.</p>
-<p><code>false</code>: The tokenizer will be accent sensitive. Searching for <code>aigües</code> will not match <code>aigues</code>.</p>
-<h4 id="caseinsensitivebool"><code>CaseInsensitive(bool)</code></h4>
-<p><code>true</code>: <strong>Default</strong> The tokenizer will normalize all characters to uppercase. e.g. <code>Cat</code> and <code>cat</code> will be equivalent.</p>
-<p><code>false</code>: The tokenizer will be case sensitive. Searching for <code>Cat</code> will match <code>Cat</code> but not <code>cat</code>.</p>
-<h4 id="withstemmingbool"><code>WithStemming(bool)</code></h4>
-<p><code>true</code>: Words will be stemmed using an implementation of the Porter Stemmer algorithm. For example, <code>ABANDON</code>, <code>ABANDONED</code> and <code>ABANDONING</code> will all
-be treated as <code>ABANDON</code>. Currently only English is supported.</p>
-<p><code>false</code>: <strong>Default</strong> No stemming will be performed on words.</p>
+	<p>You can manually construct a <code>Query</code> using any combination of <code>IQueryPart</code>s, but take care to normalize any text to match in the same way that it has been indexed. You can do this using either the <code>ITokenizer</code> for the index, or if specific tokenization rules have been <a href="../index-construction/withobjecttokenization">configured for a field</a>, then the tokenizer for that field:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">tokenizer</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">DefaultTokenizer</span><span style="color:#000;font-weight:bold">;</span>
+<span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">query</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">Query</span><span style="color:#000;font-weight:bold">(</span>
+    <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">AndQueryOperator</span><span style="color:#000;font-weight:bold">(</span>
+        <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">ExactWordQueryPart</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">tokenizer</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Normalize</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;hello&#34;</span><span style="color:#000;font-weight:bold">)),</span> 
+        <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">ExactWordQueryPart</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">tokenizer</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Normalize</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;there&#34;</span><span style="color:#000;font-weight:bold">))));</span>
+</code></pre></div><h2 id="query-parts">Query Parts</h2>
+<p><code>IQueryPart</code>s come in two flavors:</p>
+<ol>
+<li>Operators - these contain other <code>IQueryParts</code>, combining the results that they return according to certain rules, e.g. <code>AndQueryPart</code> and <code>OrQueryPart</code></li>
+<li>Textual - these work the <a href="../using-the-index-navigator/"><code>IIndexNavigator</code></a> to query the index for matches appropriate to them, e.g. <code>ExactWordQueryPart</code>, <code>FuzzyMatchQueryPart</code>.</li>
+</ol>
+<h3 id="textual-query-parts">Textual query parts</h3>
+<h4 id="exactwordquerypartstring-word">ExactWordQueryPart(string word)</h4>
+<p>Searches the index for words that exactly match <code>word</code>.</p>
+<h4 id="fuzzymatchquerypartstring-word-ushort-maxeditdistance--4-ushort-maxsequentialedits--1">FuzzyMatchQueryPart(string word, ushort maxEditDistance = 4, ushort maxSequentialEdits = 1)</h4>
+<blockquote>
+<p><code>?</code> in LIFTI query syntax</p>
+</blockquote>
+<p>Performs a <a href="../lifti-query-syntax#fuzzy-match-">fuzzy match</a> against the index.</p>
+<ul>
+<li><code>maxEditDistance</code>: The maximum of edits allowed for any given match. The higher this value, the more divergent matches will be.</li>
+<li><code>maxSequentialEdits</code> The maximum number of edits that are allowed to appear sequentially. By default this is 1, which forces matches to be more similar to the search criteria</li>
+</ul>
+<h4 id="wildcardquerypartireadonlylistltwildcardqueryfragmentgt-fragments">WildcardQueryPart(IReadOnlyList&lt;WildcardQueryFragment&gt; fragments)</h4>
+<blockquote>
+<p><code>*</code> and <code>%</code> in LIFTI query syntax</p>
+</blockquote>
+<p>A <code>WildcardQueryPart</code> consists of multiple <code>WildcardQueryFragment</code>s that are processed sequentially to match tokens in the index. They can be constructed using the following methods:</p>
+<ul>
+<li><code>WildcardQueryFragment.MultiCharacter()</code> - matches zero or more characters in the index.</li>
+<li><code>WildcardQueryFragment.SingleCharacter()</code> - matches any single character in the index.</li>
+<li><code>WildcardQueryFragment.CreateText(string text)</code> - exact matches a fragment of text at whatever point has been reached in the index.</li>
+</ul>
+<p>For example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">wildcard</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">WildcardQueryPart</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">new</span><span style="color:#000;font-weight:bold">[]</span> <span style="color:#000;font-weight:bold">{</span> 
+    <span style="color:#000">WildcardQueryFragment</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SingleCharacter</span><span style="color:#000;font-weight:bold">(),</span>
+    <span style="color:#000">WildcardQueryFragment</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SingleCharacter</span><span style="color:#000;font-weight:bold">(),</span>
+    <span style="color:#000">WildcardQueryFragment</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">CreateText</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;d&#34;</span><span style="color:#000;font-weight:bold">)</span>
+<span style="color:#000;font-weight:bold">})</span>
+</code></pre></div><p>Would translate to the LIFTI query <code>%%d</code>, matching any words that start with any two letters followed by a <code>d</code>.</p>
+<h3 id="structural-query-parts">Structural query parts</h3>
+<h4 id="andqueryoperatoriquerypart-left-iquerypart-right"><code>AndQueryOperator(IQueryPart left, IQueryPart right)</code></h4>
+<blockquote>
+<p><code>&amp;</code> in LIFTI query syntax</p>
+</blockquote>
+<p>Intersects the results of two query parts. In other words, only matches that appear on <strong>both</strong> sides will be returned.</p>
+<h4 id="orqueryoperatoriquerypart-left-iquerypart-right"><code>OrQueryOperator(IQueryPart left, IQueryPart right)</code></h4>
+<blockquote>
+<p><code>|</code> in LIFTI query syntax</p>
+</blockquote>
+<p>Unions the results of two query parts. In other words, a deduplicated set of matches on <strong>both</strong> sides will be returned.</p>
+<h4 id="bracketedquerypartiquerypart-statement"><code>BracketedQueryPart(IQueryPart statement)</code></h4>
+<blockquote>
+<p><code>(</code> and <code>)</code> in LIFTI query syntax</p>
+</blockquote>
+<p>This can be used to group other query parts together, ensure they are executed in the right order.</p>
+<h4 id="adjacentwordsquerypartireadonlylistiquerypart-matches"><code>AdjacentWordsQueryPart(IReadOnlyList&lt;IQueryPart&gt; matches)</code></h4>
+<blockquote>
+<p><code>&quot;</code> in LIFTI query syntax</p>
+</blockquote>
+<p>A query part requiring that a series of matches must appear in a document in sequence.</p>
+<h4 id="fieldfilterqueryoperatorstring-fieldname-byte-fieldid-iquerypart-statement"><code>FieldFilterQueryOperator(string fieldName, byte fieldId, IQueryPart statement)</code></h4>
+<blockquote>
+<p><code>field=</code> in LIFTI query syntax</p>
+</blockquote>
+<p>Restricts the resulting item matches to only those that include matching tokens in a specific field.</p>
+<h4 id="nearqueryoperatoriquerypart-left-iquerypart-right-int-tolerance--5"><code>NearQueryOperator(IQueryPart left, IQueryPart right, int tolerance = 5)</code></h4>
+<blockquote>
+<p><code>~n</code> in LIFTI query syntax</p>
+</blockquote>
+<p>Produces an intersection of two <code>IQueryPart</code>s, restricting an item&rsquo;s field matches such that the locations are close to one another.</p>
+<p>Items that result in no field matches are filtered out.</p>
+<h4 id="precedingnearqueryoperatoriquerypart-left-iquerypart-right-int-tolerance--5"><code>PrecedingNearQueryOperator(IQueryPart left, IQueryPart right, int tolerance = 5)</code></h4>
+<blockquote>
+<p><code>~n&gt;</code> in LIFTI query syntax</p>
+</blockquote>
+<p>Produces an intersection of two <code>IQueryPart</code>s, restricting an item&rsquo;s field matches such that the locations of the first appear before the locations of the second and within a specified tolerance.</p>
+<p>Items that result in no field matches are filtered out.</p>
+<h4 id="precedingqueryoperatoriquerypart-left-iquerypart-right"><code>PrecedingQueryOperator(IQueryPart left, IQueryPart right)</code></h4>
+<blockquote>
+<p><code>&gt;</code> in LIFTI query syntax</p>
+</blockquote>
+<p>Produces an intersection of two <code>IQueryPart</code>s, restricting an item&rsquo;s field matches such that the locations of the first appear before the locations of the second.</p>
+<p>Items that result in no field matches are filtered out.</p>
 
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified July 30, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/69b2f15d2923aa72eba41bd99411a2527e7061ae">Allow for custom ITokenizer implementations (69b2f15)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified February 12, 2022: <a  href="https://github.com/mikegoatly/lifti/commit/b704135a469517915cc32a324c8f9508525baffb">Added more querying docs (b704135)</a>
 </div>
 </div>
 

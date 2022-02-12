@@ -22,16 +22,16 @@
 <link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
 
 <title>Searching | LIFTI</title><meta property="og:title" content="Searching" />
-<meta property="og:description" content="The LIFTI query syntax
+<meta property="og:description" content="How to search against a LIFTI index
 " />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/searching/" /><meta property="og:site_name" content="LIFTI" />
 
 <meta itemprop="name" content="Searching">
-<meta itemprop="description" content="The LIFTI query syntax
+<meta itemprop="description" content="How to search against a LIFTI index
 "><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Searching"/>
-<meta name="twitter:description" content="The LIFTI query syntax
+<meta name="twitter:description" content="How to search against a LIFTI index
 "/>
 
 
@@ -273,6 +273,18 @@
       
       
       
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocssearchinglifti-query-syntax" href="/lifti/docs/searching/lifti-query-syntax/">The LIFTI Query Syntax</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocssearchingmanually-constructing-queries" href="/lifti/docs/searching/manually-constructing-queries/">Manually Constructing Query Objects</a>
+      
+      
+      
+      
+      
       <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocssearchingusing-the-index-navigator" href="/lifti/docs/searching/using-the-index-navigator/">IndexNavigator</a>
       
       
@@ -435,27 +447,8 @@
 
 <nav id="TableOfContents">
   <ul>
-    <li><a href="#quick-examples">Quick examples</a>
-      <ul>
-        <li><a href="#fuzzy-matching">Fuzzy matching</a></li>
-        <li><a href="#defaulting-search-terms-to-fuzzy-matching">Defaulting search terms to fuzzy matching</a></li>
-        <li><a href="#wildcard-matching">Wildcard matching</a></li>
-      </ul>
-    </li>
-    <li><a href="#query-operators">Query Operators</a>
-      <ul>
-        <li><a href="#basic-word-matches">Basic word matches</a></li>
-        <li><a href="#starts-with-">Starts with (<code>*</code>)</a></li>
-        <li><a href="#and-">And (<code>&amp;</code>)</a></li>
-        <li><a href="#or-">Or (<code>|</code>)</a></li>
-        <li><a href="#bracketing-expressions">Bracketing expressions</a></li>
-        <li><a href="#field-restrictions-field">Field restrictions (<code>field=...</code>)</a></li>
-        <li><a href="#sequential-text-">Sequential text (<code>&quot;...&quot;</code>)</a></li>
-        <li><a href="#near--and-n">Near (<code>~</code> and <code>~n</code>)</a></li>
-        <li><a href="#near-following--and-n">Near following (<code>~&gt;</code> and <code>~n&gt;</code>)</a></li>
-        <li><a href="#following-">Following (<code>&gt;</code>)</a></li>
-      </ul>
-    </li>
+    <li><a href="#searching-with-text">Searching with text</a></li>
+    <li><a href="#searching-with-a-query">Searching with a <code>Query</code></a></li>
   </ul>
 </nav>
 
@@ -493,165 +486,21 @@
             
 <div class="td-content">
 	<h1>Searching</h1>
-        <div class="lead">The LIFTI query syntax</div>
+        <div class="lead">How to search against a LIFTI index</div>
 	
-	<h2 id="quick-examples">Quick examples</h2>
-<table>
-<thead>
-<tr>
-<th>Example</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>West</td>
-<td><strong>West</strong> must appear in the text.</td>
-</tr>
-<tr>
-<td>?Wst</td>
-<td>Words that <a href="#fuzzy-matching">fuzzy match</a> with <strong>wst</strong> must appear in the text.</td>
-</tr>
-<tr>
-<td>title=West</td>
-<td><strong>West</strong> must appear in the <em><strong>title</strong></em> field of an indexed object.</td>
-</tr>
-<tr>
-<td>doc*</td>
-<td>Words that starts with <strong>doc</strong>ument must appear in the text. <a href="#wildcard-matching">See wildcard matching</a></td>
-</tr>
-<tr>
-<td>%%ing</td>
-<td>Words that starts with any two letters and end with <strong>ing</strong>, e.g. <em>doing</em>. <a href="#wildcard-matching">See wildcard matching</a></td>
-</tr>
-<tr>
-<td>west &amp; wing</td>
-<td>The words <strong>west</strong> and <strong>wing</strong> must appear in the text.</td>
-</tr>
-<tr>
-<td>west wing</td>
-<td>The words <strong>west</strong> and <strong>wing</strong> must appear in the text - the default operator is &amp; if none is specified between search words.</td>
-</tr>
-<tr>
-<td>west | wing</td>
-<td>The words <strong>west</strong> or <strong>wing</strong> must appear in the text.</td>
-</tr>
-<tr>
-<td>west ~ wing</td>
-<td><strong>west</strong> and <strong>wing</strong> must appear near to each other (within 5 words - the default) in the text.</td>
-</tr>
-<tr>
-<td>west ~3 wing</td>
-<td><strong>west</strong> and <strong>wing</strong> must appear near to each other (within <strong>3</strong> words) in the text.</td>
-</tr>
-<tr>
-<td>west ~&gt; wing</td>
-<td><strong>west</strong> must be followed by <strong>wing</strong> closely (within 5 words - the default) in the text.</td>
-</tr>
-<tr>
-<td>west ~3&gt; wing</td>
-<td><strong>west</strong> must be followed by <strong>wing</strong> closely (within <strong>3</strong> words) in the text.</td>
-</tr>
-<tr>
-<td>west &gt; wing</td>
-<td><strong>west</strong> must precede <strong>wing</strong> anywhere in the text</td>
-</tr>
-<tr>
-<td>&ldquo;the west wing&rdquo;</td>
-<td>The words <strong>the west wing</strong> must appear in sequence in the indexed text.</td>
-</tr>
-<tr>
-<td>&ldquo;notr* dam*&rdquo;</td>
-<td>A word starting with notr must be immediately followed by a word starting with dam, e.g. <strong>Notre Dame</strong>.</td>
-</tr>
-</tbody>
-</table>
-<p>Search terms can be combined and placed in parenthesis:</p>
-<table>
-<thead>
-<tr>
-<th>Example</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>&ldquo;west wing&rdquo; ~ &ldquo;oval office&rdquo;</td>
-<td><strong>West wing</strong> must appear near <strong>Oval Office</strong></td>
-</tr>
-</tbody>
-</table>
-<h3 id="fuzzy-matching">Fuzzy matching</h3>
-<p>LIFTI uses <a href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein distance</a> to perform fuzzy matches between a search term and tokens in the index.
-The distance between two words is the number of edits that are required to match them, including:</p>
-<ul>
-<li>insertions: fid would match fi<strong>n</strong>d</li>
-<li>deletions: foood would match food</li>
-<li>substitutions: frnd would match f<strong>i</strong>nd</li>
-<li>transpositions: fnid would match f<strong>in</strong>d - Transpositions are a special case, because although two characters are affected, it is considered a single edit.</li>
-</ul>
-<p>The resulting Levenshtein distance between any matched term and the search term is used to reduce the score of the match. This means that documents containing
-words that are closer matches will typically be surfaced higher up in the search results.</p>
-<p>To prevent a <a href="https://en.wikipedia.org/wiki/Combinatorial_explosion">combinatorial explosion</a> of potential matches, LIFTI currently limits the maximum number
-of allowed edits to 3, and sequential edits to 1. This means that as of now:</p>
-<ul>
-<li><strong>feed</strong> will <em>not</em> match <strong>food</strong> because it requires two sequential edits</li>
-<li><strong>redy</strong> will <em>not</em> match <strong>friendly</strong> because it requires 4 insertions</li>
-</ul>
-<h3 id="defaulting-search-terms-to-fuzzy-matching">Defaulting search terms to fuzzy matching</h3>
-<p>By default LIFTI will treat a search term as an exact match, however <a href="../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser">you can configure the index</a> so that any search term (apart from those containing wildcards)
-will be treated as a fuzzy match.</p>
-<h3 id="wildcard-matching">Wildcard matching</h3>
-<p>Any search term containing <code>*</code> or <code>%</code> will be considered a wildcard match, where:</p>
-<ul>
-<li><code>*</code> matches zero or more characters</li>
-<li><code>%</code> matches any single character</li>
-</ul>
-<h2 id="query-operators">Query Operators</h2>
-<h3 id="basic-word-matches">Basic word matches</h3>
-<p>Any text in a query will be tokenized using to the provided tokenizer, 
-enforcing the same word stemming, case/accent sensitivity rules as used in the index.</p>
-<hr>
-<h3 id="starts-with-">Starts with (<code>*</code>)</h3>
-<p>Adding a <code>*</code> to the end of a word searches for words starting with the given text.</p>
-<p><code>foo*</code> would match occurrences of <code>food</code> and <code>football</code></p>
-<hr>
-<h3 id="and-">And (<code>&amp;</code>)</h3>
-<p>The and operator (<code>&amp;</code>) Performs an intersection of two intermediate query results, combining word positions for successful matches.</p>
-<p><code>Food &amp; Burger</code> searches for items containing both <code>&quot;food&quot;</code> and <code>&quot;burger&quot;</code> at any position, and in any field.</p>
-<p>(Alternatively <code>Food Burger</code> will have the same effect as the default operator between query parts is an <code>&amp;</code>.)</p>
-<hr>
-<h3 id="or-">Or (<code>|</code>)</h3>
-<p>Performs a union of two intermediate query results. Where an items appears in both sets, word positions are combined into one list.</p>
-<p>Restricts results to same field by default: <strong>false</strong></p>
-<hr>
-<h3 id="bracketing-expressions">Bracketing expressions</h3>
-<p>Brackets can be used to group expressions together.</p>
-<p>e.g. <code>(food &amp; cake) | (cheese &amp; biscuit)</code></p>
-<hr>
-<h3 id="field-restrictions-field">Field restrictions (<code>field=...</code>)</h3>
-<p>These allow for restricting searches within a given field.</p>
-<p><code>title=analysis | body=(chocolate &amp; cake)</code> Searches for items with <code>&quot;analysis&quot;</code> in the title field <em>or both</em> <code>&quot;chocolate&quot;</code> and <code>&quot;cake&quot;</code> in the body field.</p>
-<p><code>title=analysis food</code> Searches for items with <code>&quot;analysis&quot;</code> in the title field <em>and</em> <code>&quot;food&quot;</code> in <em>any</em> field.</p>
-<hr>
-<h3 id="sequential-text-">Sequential text (<code>&quot;...&quot;</code>)</h3>
-<p>Placing quotes around a search phrase will enforce that the words all appear
-immediately next to each other in the source text.</p>
-<p><code>&quot;cheese burger&quot;</code> will only match items that have text containing <code>&quot;cheese&quot;</code> followed immediately by <code>&quot;burger&quot;</code>.</p>
-<hr>
-<h3 id="near--and-n">Near (<code>~</code> and <code>~n</code>)</h3>
-<p>The near operator performs a positional intersection of two results based on the position of the word in a field.</p>
-<p>The <code>~</code> operator requires that words must be within 5 words of one another. This can value can be controlled by specifying a number, e.g. <code>~4</code> to restrict to only returning results within 4 words of one another.</p>
-<p><code>cheese ~ cake</code> will return items containing the words <code>&quot;cheese&quot;</code> and <code>&quot;cake&quot;</code> in either order, up to 5 words apart, e.g. <code>&quot;the cake was made with cheese&quot;</code> and <code>&quot;I like cheese and cake&quot;</code> would both match, but <code>&quot;cake is never to be considered a substitute for cheese&quot;</code> would not.</p>
-<hr>
-<h3 id="near-following--and-n">Near following (<code>~&gt;</code> and <code>~n&gt;</code>)</h3>
-<p>Same as Near (<code>~</code>) except that order is important in the positional intersection.</p>
-<p><code>cheese ~&gt; cake</code> will match <code>&quot;cheese and cake&quot;</code> but not <code>&quot;cake and cheese&quot;</code></p>
-<hr>
-<h3 id="following-">Following (<code>&gt;</code>)</h3>
-<p>Same as Near Following (<code>~&gt;</code>) except there are no constraints on how far apart the words can be.</p>
-<p><code>cheese &gt; cake</code> will match any text where <code>&quot;cheese&quot;</code> precedes <code>&quot;cake&quot;</code> in a given field.</p>
-
+	<p>There are two ways to query a <code>FullTextIndex</code>, searching with a query string and executing a manually constructed <code>Query</code>.</p>
+<h2 id="searching-with-text">Searching with text</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Search</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;find something&#34;</span><span style="color:#000;font-weight:bold">);</span>
+</code></pre></div><p>This approach uses the <code>IQueryParser</code> implementation configured for the index to parse the query text into a <code>Query</code> object, which is then executed.</p>
+<p>The default <code>IQueryParser</code> that is configured against an index parses the <a href="./lifti-query-syntax">LIFTI query syntax</a>, which is a fairly flexible way of expressing a query. If you want to swap out this parser with a custom implementation, you can do so when building the index using <a href="../index-construction/withqueryparser"><code>WithQueryParser</code></a> option.</p>
+<h2 id="searching-with-a-query">Searching with a <code>Query</code></h2>
+<p>You can manually construct a <code>Query</code> using any combination of <code>IQueryPart</code>s, but take care to normalize any text to match in the same way that it has been indexed. You can do this using either the <code>ITokenizer</code> for the index, or if specific tokenization rules have been <a href="../index-construction/withobjecttokenization">configured for a field</a>, then the tokenizer for that field:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-csharp" data-lang="csharp"><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">tokenizer</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">DefaultTokenizer</span><span style="color:#000;font-weight:bold">;</span>
+<span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">query</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">Query</span><span style="color:#000;font-weight:bold">(</span>
+    <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">AndQueryPart</span><span style="color:#000;font-weight:bold">(</span>
+        <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">ExactWordQueryPart</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">tokenizer</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Normalize</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;hello&#34;</span><span style="color:#000;font-weight:bold">)),</span> 
+        <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">ExactWordQueryPart</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">tokenizer</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Normalize</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;there&#34;</span><span style="color:#000;font-weight:bold">))));</span>
+</code></pre></div>
         <div class="section-index">
     
     
@@ -680,7 +529,12 @@ immediately next to each other in the source text.</p>
             
         
             
-        
+                <div class="entry">
+                    <h5>
+                        <a href="/lifti/docs/searching/lifti-query-syntax/">The LIFTI Query Syntax</a>
+                    </h5>
+                    <p>The LIFTI query syntax</p>
+                </div>
             
         
             
@@ -695,6 +549,19 @@ immediately next to each other in the source text.</p>
         
             
         
+            
+        
+            
+        
+            
+        
+            
+                <div class="entry">
+                    <h5>
+                        <a href="/lifti/docs/searching/manually-constructing-queries/">Manually Constructing Query Objects</a>
+                    </h5>
+                    <p>Instead of using a query parser to interpret your query, you can manually construct a <code>Query</code> object and execute it against the index.</p>
+                </div>
             
         
             
@@ -724,7 +591,7 @@ immediately next to each other in the source text.</p>
 
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified February 6, 2022: <a  href="https://github.com/mikegoatly/lifti/commit/547b19f2fc42f2376800f10e7aa1d6c341b14f11">Updated docs (547b19f)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified February 12, 2022: <a  href="https://github.com/mikegoatly/lifti/commit/b704135a469517915cc32a324c8f9508525baffb">Added more querying docs (b704135)</a>
 </div>
 </div>
 
