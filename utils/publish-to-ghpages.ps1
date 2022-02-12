@@ -44,7 +44,7 @@ hugo --quiet
 "Building sample blazor site"
 Remove-Item .\temp -Recurse -Force -ErrorAction Ignore
 dotnet publish ..\samples\Blazor\Blazor.csproj -o .\temp\ -c release
-Move-Item .\temp\BlazorApp\dist .\public\blazor-sample
+Move-Item .\temp\wwwroot .\public\blazor-sample
 Remove-Item .\temp -Recurse -Force -ErrorAction Ignore
 
 "Fixing up relative path for blazor sample"
