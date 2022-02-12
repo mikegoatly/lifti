@@ -1,14 +1,12 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Lifti;
-using Lifti.Tokenization;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
-    [RankColumn, MemoryDiagnoser]
-    [ShortRunJob(RuntimeMoniker.NetCoreApp31)]
+    [MemoryDiagnoser]
+    //[ShortRunJob(RuntimeMoniker.NetCoreApp31)]
     [ShortRunJob(RuntimeMoniker.Net60)]
     public class IndexSearchingBenchmarks : IndexBenchmarkBase
     {
@@ -21,7 +19,14 @@ namespace PerformanceProfiling
             await this.PopulateIndexAsync(this.index);
         }
 
-        [Params("(confiscation & th*) | \"and they\"")]
+        [Params(
+            "(confiscation & th*) | \"and they\"",
+            "?coniscatin",
+            "*ion",
+            "con*",
+            "%%ed",
+            "con*e*"
+            )]
         public string SearchCriteria { get; set; }
 
         [Benchmark]
