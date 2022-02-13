@@ -12,6 +12,8 @@ description: >
 
 Allows you to provide your own implementation of `IQueryParser` capable of parsing text into an `IQuery`.
 
+To see an example of a custom `IQueryParser` implementation, see this [blog post](https://www.goatly.net/post/custom-query-parsers-with-lifti/).
+
 ## Configuring the default LIFTI `QueryParser`
 
 `FullTextIndexBuilder<TKey> WithQueryParser(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)`
