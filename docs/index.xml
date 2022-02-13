@@ -483,6 +483,7 @@ immediately next to each other in the source text.&lt;/p&gt;
         &lt;h2 id=&#34;providing-a-complete-iqueryparser-implementation&#34;&gt;Providing a complete &lt;code&gt;IQueryParser&lt;/code&gt; implementation&lt;/h2&gt;
 &lt;p&gt;&lt;code&gt;FullTextIndexBuilder&amp;lt;TKey&amp;gt; WithQueryParser(IQueryParser queryParser)&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;Allows you to provide your own implementation of &lt;code&gt;IQueryParser&lt;/code&gt; capable of parsing text into an &lt;code&gt;IQuery&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;To see an example of a custom &lt;code&gt;IQueryParser&lt;/code&gt; implementation, see this &lt;a href=&#34;https://www.goatly.net/post/custom-query-parsers-with-lifti/&#34;&gt;blog post&lt;/a&gt;.&lt;/p&gt;
 &lt;h2 id=&#34;configuring-the-default-lifti-queryparser&#34;&gt;Configuring the default LIFTI &lt;code&gt;QueryParser&lt;/code&gt;&lt;/h2&gt;
 &lt;p&gt;&lt;code&gt;FullTextIndexBuilder&amp;lt;TKey&amp;gt; WithQueryParser(Func&amp;lt;QueryParserBuilder, QueryParserBuilder&amp;gt; optionsBuilder)&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;By default LIFTI parses query text using the &lt;a href=&#34;../searching&#34;&gt;LIFTI query syntax&lt;/a&gt;. The behavior of the parser can

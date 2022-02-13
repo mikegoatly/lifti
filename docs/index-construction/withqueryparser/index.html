@@ -32,7 +32,7 @@
 <meta itemprop="description" content="Prescribes how the QueryParser implementation should be configured for the index.
 ">
 <meta itemprop="dateModified" content="2022-02-06T09:34:50+00:00" />
-<meta itemprop="wordCount" content="113">
+<meta itemprop="wordCount" content="126">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="WithQueryParser"/>
 <meta name="twitter:description" content="Prescribes how the QueryParser implementation should be configured for the index.
@@ -509,6 +509,7 @@
 	<h2 id="providing-a-complete-iqueryparser-implementation">Providing a complete <code>IQueryParser</code> implementation</h2>
 <p><code>FullTextIndexBuilder&lt;TKey&gt; WithQueryParser(IQueryParser queryParser)</code></p>
 <p>Allows you to provide your own implementation of <code>IQueryParser</code> capable of parsing text into an <code>IQuery</code>.</p>
+<p>To see an example of a custom <code>IQueryParser</code> implementation, see this <a href="https://www.goatly.net/post/custom-query-parsers-with-lifti/">blog post</a>.</p>
 <h2 id="configuring-the-default-lifti-queryparser">Configuring the default LIFTI <code>QueryParser</code></h2>
 <p><code>FullTextIndexBuilder&lt;TKey&gt; WithQueryParser(Func&lt;QueryParserBuilder, QueryParserBuilder&gt; optionsBuilder)</code></p>
 <p>By default LIFTI parses query text using the <a href="../searching">LIFTI query syntax</a>. The behavior of the parser can
