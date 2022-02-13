@@ -45,7 +45,7 @@ hugo --quiet
 
 "Building sample blazor site"
 Remove-Item .\temp -Recurse -Force -ErrorAction Ignore
-dotnet publish ..\samples\Blazor\Blazor.csproj -o .\temp\ -c release
+dotnet publish ..\samples\Blazor\Blazor.csproj -o .\temp\ -c release -p:BlazorEnableCompression=false
 Move-Item .\temp\wwwroot .\public\blazor-sample
 Remove-Item .\temp -Recurse -Force -ErrorAction Ignore
 
@@ -59,8 +59,7 @@ Remove-Item .\temp -Recurse -Force -ErrorAction Ignore
 Rename-Item .\public\blazor-sample\_framework "framework"
 # Rename-Item .\public\blazor-sample\framework\_bin "bin"
 (Get-Content .\public\blazor-sample\framework\blazor.webassembly.js) `
-	-replace '_framework', 'framework' `
-	-replace '_bin', 'bin' |
+	-replace '_framework', 'framework' |
 	Out-File .\public\blazor-sample\framework\blazor.webassembly.js
 
 if ($commitMessage.Length -gt 0) {
