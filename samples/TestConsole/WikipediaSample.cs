@@ -2,6 +2,7 @@
 using Lifti.Tokenization.TextExtraction;
 using PerformanceProfiling;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace TestConsole
@@ -12,7 +13,7 @@ namespace TestConsole
         {
             var index = new FullTextIndexBuilder<string>()
                 .WithTextExtractor<XmlTextExtractor>()
-                .WithDefaultTokenization(o => o.WithStemming())
+                .WithQueryParser(o => o.AssumeFuzzySearchTerms())
                 .Build();
 
             Console.WriteLine("Indexing sample wikipedia pages using an XmlTextExtractor...");
@@ -24,8 +25,31 @@ namespace TestConsole
             }
 
             Console.WriteLine($"Indexed {index.Count} entries");
+            Console.WriteLine("Type a LIFTI query, or enter to quit:");
 
-            WaitForEnterToReturnToMenu();
+            do
+            {
+                var query = Console.ReadLine();
+                if (query.Length == 0)
+                {
+                    return;
+                }
+
+                var matches = index.Search(query).ToList();
+
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"{matches.Count} Match(es)");
+
+                //Console.ForegroundColor = ConsoleColor.DarkCyan;
+                //foreach (var match in matches)
+                //{
+                //    Console.WriteLine(match.Key);
+                //}
+
+                Console.WriteLine();
+                Console.ResetColor();
+            } while (true);
         }
     }
 }
