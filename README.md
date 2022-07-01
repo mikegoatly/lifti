@@ -10,6 +10,9 @@ A lightweight full text indexer for .NET
 
 [Check out some sample code](https://github.com/mikegoatly/lifti/tree/master/samples/TestConsole) - the repo contains examples that can be run as a console application.
 
+[![buymeacoffee](https://user-images.githubusercontent.com/4577868/176899270-00846262-8323-4f13-9c6a-d655a30cbca3.png)](https://www.buymeacoffee.com/mikegoatly)
+
+
 ## Try it out!
 
 [Use LIFTI in a Blazor app](https://mikegoatly.github.io/lifti/blazor-sample) - try out various queries against Wikipedia content
