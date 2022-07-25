@@ -24,22 +24,36 @@ namespace Lifti.Tests.Serialization
         [Fact]
         public async Task ShouldSerializeEmojiWithSurrogatePairs()
         {
-            var index = await SearializeAndDeserializeIndexWithText("🎶 🤷🏾‍♀️");
+            var index = await SearializeAndDeserializeIndexWithTextAsync("🎶 🤷🏾‍♀️");
             index.Search("🤷🏾‍♀️").Should().HaveCount(1);
         }
 
         [Fact]
         public async Task ShouldSerializeEmoji()
         {
-            var index = await SearializeAndDeserializeIndexWithText("🎶");
+            var index = await SearializeAndDeserializeIndexWithTextAsync("🎶");
             index.Search("🎶").Should().HaveCount(1);
         }
 
         [Fact]
         public async Task ShouldSerializeEmojiSequences()
         {
-            var index = await SearializeAndDeserializeIndexWithText("🎶🤷🏾‍♀️");
+            var index = await SearializeAndDeserializeIndexWithTextAsync("🎶🤷🏾‍♀️");
             index.Search("🎶🤷🏾‍♀️").Should().HaveCount(1);
+        }
+
+        [Fact]
+        public async Task ShouldDeserializeV4Index()
+        {
+            var index = new FullTextIndexBuilder<string>().Build();
+            var serializer = new BinarySerializer<string>();
+            using (var stream = new MemoryStream(TestResources.v4Index))
+            {
+                await serializer.DeserializeAsync(index, stream);
+            }
+
+            index.Search("serialized").Should().HaveCount(1);
+            index.Search("亜").Should().HaveCount(1);
         }
 
         [Fact]
@@ -74,8 +88,7 @@ namespace Lifti.Tests.Serialization
         public async Task ShouldRoundTripIndexStructure()
         {
             var serializer = new BinarySerializer<string>();
-
-            var fileName = Guid.NewGuid().ToString() + ".dat";
+            var fileName = CreateRandomIndexFileName();
 
             using (var stream = File.Open(fileName, FileMode.CreateNew))
             {
@@ -112,12 +125,57 @@ namespace Lifti.Tests.Serialization
             File.Delete(fileName);
         }
 
-        private static async Task<FullTextIndex<string>> SearializeAndDeserializeIndexWithText(string text)
+        [Fact]
+        public async Task ShouldBeAbleToSerializeAndDeserializeMultipleIndexesToTheSameStream()
+        {
+            var index1 = await CreateIndexAsync("Foo");
+            var index2 = await CreateIndexAsync("Bar");
+            var fileName = CreateRandomIndexFileName();
+            
+            var serializer = new BinarySerializer<string>();
+            using (var stream = File.Open(fileName, FileMode.CreateNew))
+            {
+                await serializer.SerializeAsync(index1, stream, false);
+                await serializer.SerializeAsync(index2, stream, true);
+            }
+
+            using (var stream = File.Open(fileName, FileMode.Open))
+            {
+                var deserializedIndex1 = new FullTextIndexBuilder<string>().Build();
+                var deserializedIndex2 = new FullTextIndexBuilder<string>().Build();
+                await serializer.DeserializeAsync(deserializedIndex1, stream, false);
+                await serializer.DeserializeAsync(deserializedIndex2, stream, true);
+
+                deserializedIndex1.Search("Foo").Should().HaveCount(1);
+                deserializedIndex2.Search("Bar").Should().HaveCount(1);
+            }
+        }
+
+        // Used to create test indexes when defining a new serialization version
+        //[Fact]
+        //public async Task CreateTestIndex()
+        //{
+        //    var index = new FullTextIndexBuilder<string>().Build();
+        //    await index.AddAsync("A", "Some serialized data");
+        //    await index.AddAsync("B", "亜");
+
+        //    var serializer = new BinarySerializer<string>();
+        //    using (var stream = File.Open("../../../V4.dat", FileMode.CreateNew))
+        //    {
+        //        await serializer.SerializeAsync(index, stream, true);
+        //    }
+        //}
+
+        private static string CreateRandomIndexFileName()
+        {
+            return Guid.NewGuid().ToString() + ".dat";
+        }
+
+        private static async Task<FullTextIndex<string>> SearializeAndDeserializeIndexWithTextAsync(string text)
         {
             var stream = new MemoryStream();
             var serializer = new BinarySerializer<string>();
-            var index = new FullTextIndexBuilder<string>().Build();
-            await index.AddAsync("A", text);
+            var index = await CreateIndexAsync(text);
 
             await serializer.SerializeAsync(index, stream, false);
 
@@ -126,6 +184,13 @@ namespace Lifti.Tests.Serialization
             var index2 = new FullTextIndexBuilder<string>().Build();
             await serializer.DeserializeAsync(index2, stream);
             return index2;
+        }
+
+        private static async Task<FullTextIndex<string>> CreateIndexAsync(string text)
+        {
+            var index = new FullTextIndexBuilder<string>().Build();
+            await index.AddAsync("A", text);
+            return index;
         }
 
         private async Task<FullTextIndex<string>> CreateWikipediaIndexAsync()
