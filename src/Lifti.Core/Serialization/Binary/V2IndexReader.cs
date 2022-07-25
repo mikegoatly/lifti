@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace Lifti.Serialization.Binary
         private readonly bool disposeStream;
         private readonly IKeySerializer<TKey> keySerializer;
         private readonly MemoryStream buffer;
+        private long initialUnderlyingStreamOffset = 0L;
         protected readonly BinaryReader reader;
 
         public V2IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer)
@@ -20,7 +22,7 @@ namespace Lifti.Serialization.Binary
             this.disposeStream = disposeStream;
             this.keySerializer = keySerializer;
 
-            this.buffer = new MemoryStream((int)this.underlyingStream.Length);
+            this.buffer = new MemoryStream((int)(this.underlyingStream.Length - this.underlyingStream.Position));
             this.reader = new BinaryReader(this.buffer);
         }
 
@@ -66,6 +68,11 @@ namespace Lifti.Serialization.Binary
             if (this.reader.ReadInt32() != -1)
             {
                 throw new DeserializationException(ExceptionMessages.MissingIndexTerminator);
+            }
+
+            if (this.underlyingStream.CanSeek)
+            {
+                this.underlyingStream.Position = this.buffer.Position + initialUnderlyingStreamOffset;
             }
         }
 
@@ -199,6 +206,7 @@ namespace Lifti.Serialization.Binary
 
         private async Task FillBufferAsync()
         {
+            this.initialUnderlyingStreamOffset = this.underlyingStream.Position;
             await this.underlyingStream.CopyToAsync(this.buffer).ConfigureAwait(false);
             this.buffer.Position = 0;
         }

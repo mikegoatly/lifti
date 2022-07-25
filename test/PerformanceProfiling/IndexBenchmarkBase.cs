@@ -20,7 +20,7 @@ namespace PerformanceProfiling
             }
         }
 
-        protected static IFullTextIndex<string> CreateNewIndex(int supportSplitAtIndex)
+        protected static FullTextIndex<string> CreateNewIndex(int supportSplitAtIndex)
         {
             return new FullTextIndexBuilder<string>()
                 .WithIntraNodeTextSupportedAfterIndexDepth(supportSplitAtIndex)
