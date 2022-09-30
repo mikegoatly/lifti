@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Lifti.Querying.QueryParts
 {
@@ -29,6 +31,34 @@ namespace Lifti.Querying.QueryParts
         public override string ToString()
         {
             return $"{this.Left} | {this.Right}";
+        }
+
+        /// <summary>
+        /// Combines all the given query parts with <see cref="OrQueryOperator"/>s. If <paramref name="queryParts"/> contains a single element, then
+        /// that query part is returned unaltered, making this effectively a no-op.
+        /// </summary>
+        /// <exception cref="QueryParserException">Thrown when <paramref name="queryParts"/> is empty.</exception>
+        public static IQueryPart CombineAll(IEnumerable<IQueryPart> queryParts)
+        {
+            IQueryPart? current = null;
+            foreach (var queryPart in queryParts)
+            {
+                if (current == null)
+                {
+                    current = queryPart;
+                }
+                else
+                {
+                    current = new OrQueryOperator(current, queryPart);
+                }
+            }
+
+            if (current == null)
+            {
+                throw new QueryParserException(ExceptionMessages.CannotCombineAnEmptySetOfQueryParts);
+            }
+
+            return current;
         }
     }
 }

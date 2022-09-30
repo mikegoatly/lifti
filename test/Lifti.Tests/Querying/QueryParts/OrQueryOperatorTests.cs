@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
 using Lifti.Querying.QueryParts;
+using System;
 using System.Linq;
 using Xunit;
 
@@ -40,6 +41,28 @@ namespace Lifti.Tests.Querying.QueryParts
                     ScoredToken(5, ScoredFieldMatch(5D, 1, 1, 9, 11, 103), ScoredFieldMatch(9D, 2, 2, 18)),
                     ScoredToken(7, ScoredFieldMatch(4D, 1, 18))
                 });
+        }
+
+        [Fact]
+        public void CombineAll_WithEmptyElementSet_ShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => OrQueryOperator.CombineAll(Array.Empty<IQueryPart>()));
+        }
+
+        [Fact]
+        public void CombineAll_WithSingleElement_ShouldReturnElement()
+        {
+            var op = OrQueryOperator.CombineAll(new[] { new ExactWordQueryPart("test") });
+
+            op.ToString().Should().Be("test");
+        }
+
+        [Fact]
+        public void CombineAll_WithMultipleElements_ShouldReturnElementCombinedWithOrStatement()
+        {
+            var op = OrQueryOperator.CombineAll(new[] { new ExactWordQueryPart("test"), new ExactWordQueryPart("test2"), new ExactWordQueryPart("test3") });
+
+            op.ToString().Should().Be("test | test2 | test3");
         }
     }
 }

@@ -88,6 +88,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot combine an empty set of query parts.
+        /// </summary>
+        internal static string CannotCombineAnEmptySetOfQueryParts {
+            get {
+                return ResourceManager.GetString("CannotCombineAnEmptySetOfQueryParts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI..
         /// </summary>
         internal static string EarlierVersionSerializedIndexNotSupported {

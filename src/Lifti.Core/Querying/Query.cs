@@ -23,6 +23,11 @@ namespace Lifti.Querying
         /// <inheritdoc />
         public IQueryPart Root { get; }
 
+        /// <summary>
+        /// Gets an empty query.
+        /// </summary>
+        public static IQuery Empty { get; } = new Query(EmptyQueryPart.Instance);
+
         /// <inheritdoc />
         public IEnumerable<SearchResult<TKey>> Execute<TKey>(IIndexSnapshot<TKey> index)
         {

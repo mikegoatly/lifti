@@ -126,6 +126,9 @@
   <data name="BatchChangeAlreadyStarted" xml:space="preserve">
     <value>Cannot start a new batch change while another is already in progress.</value>
   </data>
+  <data name="CannotCombineAnEmptySetOfQueryParts" xml:space="preserve">
+    <value>Cannot combine an empty set of query parts</value>
+  </data>
   <data name="EarlierVersionSerializedIndexNotSupported" xml:space="preserve">
     <value>The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI.</value>
   </data>
