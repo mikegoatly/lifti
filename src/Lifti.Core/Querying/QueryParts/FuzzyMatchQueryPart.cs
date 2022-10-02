@@ -29,6 +29,9 @@ namespace Lifti.Querying.QueryParts
     /// </summary>
     public class FuzzyMatchQueryPart : WordQueryPart
     {
+        internal const ushort DefaultMaxEditDistance = 4;
+        internal const ushort DefaultMaxSequentialEdits = 1;
+
         private readonly ushort maxEditDistance;
         private readonly ushort maxSequentialEdits;
 
@@ -231,7 +234,7 @@ namespace Lifti.Querying.QueryParts
         /// <remarks>
         /// A transposition of neighboring characters is considered as single edit, not two distinct substitutions.
         /// </remarks>
-        public FuzzyMatchQueryPart(string word, ushort maxEditDistance = 4, ushort maxSequentialEdits = 1)
+        public FuzzyMatchQueryPart(string word, ushort maxEditDistance = DefaultMaxEditDistance, ushort maxSequentialEdits = DefaultMaxSequentialEdits)
             : base(word)
         {
             this.maxEditDistance = maxEditDistance;
@@ -365,6 +368,11 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public override string ToString()
         {
+            if (this.maxEditDistance != DefaultMaxEditDistance || this.maxSequentialEdits != DefaultMaxSequentialEdits)
+            {
+                return $"?{(this.maxEditDistance != DefaultMaxEditDistance ? this.maxEditDistance : "")},{(this.maxSequentialEdits != DefaultMaxSequentialEdits ? this.maxSequentialEdits : "")}?{this.Word}";
+            }
+
             return "?" + this.Word;
         }
     }

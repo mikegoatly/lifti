@@ -3,6 +3,7 @@ using Lifti.Querying;
 using Lifti.Querying.QueryParts;
 using Lifti.Tokenization.TextExtraction;
 using Moq;
+using System;
 using Xunit;
 
 namespace Lifti.Tests.Querying
@@ -42,6 +43,22 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
+        public void ParsingFuzzyWordWithNoParameters_ShouldProvideParametersFromProvidedFunctions()
+        {
+            var result = this.Parse("wordone", assumeFuzzy: true, i => (ushort)(i * 10), i => (ushort)(i * 20));
+            var expectedQuery = new FuzzyMatchQueryPart("wordone", 70, 140);
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingFuzzyWordWithExplicitParameters_ShouldProvideOverrideDefaults()
+        {
+            var result = this.Parse("?9,5?wordone", assumeFuzzy: true, i => (ushort)(i * 10), i => (ushort)(i * 20));
+            var expectedQuery = new FuzzyMatchQueryPart("wordone", 9, 5);
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
         public void ParsingTwoFuzzyWordsWithNoOperator_ShouldComposeWithAndOperator()
         {
             var result = this.Parse("?wordone ?wordtwo");
@@ -52,12 +69,12 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void ParsingMixOfWordMatchesWithNoOperator_ShouldComposeWithAndOperators()
         {
-            var result = this.Parse("?wordone wordtwo wor* ?wordthree");
+            var result = this.Parse("?wordone wordtwo wor* ?3,?wordthree");
             var expectedQuery =
                 new AndQueryOperator(
                     new AndQueryOperator(
                         new AndQueryOperator(
-                            new FuzzyMatchQueryPart("wordone", 3), 
+                            new FuzzyMatchQueryPart("wordone"), 
                             new ExactWordQueryPart("wordtwo")),
                         new WildcardQueryPart(WildcardQueryFragment.CreateText("wor"), WildcardQueryFragment.MultiCharacter)),
                     new FuzzyMatchQueryPart("wordthree",3));
@@ -270,9 +287,20 @@ namespace Lifti.Tests.Querying
             result.Root.ToString().Should().Be(expectedQuery.ToString());
         }
 
-        private IQuery Parse(string text, bool assumeFuzzy = false)
+        private IQuery Parse(string text, bool assumeFuzzy = false, Func<int, ushort>? fuzzySearchMaxEditDistance = null, Func<int, ushort>? fuzzySearchMaxSequentialEdits = null)
         {
-            var parser = new QueryParser(new QueryParserOptions { AssumeFuzzySearchTerms = assumeFuzzy });
+            var options = new QueryParserOptions { AssumeFuzzySearchTerms = assumeFuzzy };
+            if (fuzzySearchMaxEditDistance != null)
+            {
+                options.FuzzySearchMaxEditDistance = fuzzySearchMaxEditDistance;
+            }
+
+            if (fuzzySearchMaxSequentialEdits != null)
+            {
+                options.FuzzySearchMaxSequentialEdits = fuzzySearchMaxSequentialEdits;
+            }
+
+            var parser = new QueryParser(options);
             return parser.Parse(this.fieldLookupMock.Object, text, new FakeTokenizer());
         }
     }

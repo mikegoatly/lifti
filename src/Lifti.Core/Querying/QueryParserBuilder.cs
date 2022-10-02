@@ -1,4 +1,5 @@
-﻿using Lifti.Tokenization;
+﻿using Lifti.Querying.QueryParts;
+using Lifti.Tokenization;
 using System;
 
 namespace Lifti.Querying
@@ -12,6 +13,8 @@ namespace Lifti.Querying
         private Func<QueryParserOptions, IQueryParser> factory = defaultQueryParserFactory;
 
         private bool assumeFuzzySearchTerms;
+        private Func<int, ushort>? fuzzySearchMaxEditDistance;
+        private Func<int, ushort>? fuzzySearchMaxSequentialEdits;
 
         /// <summary>
         /// Configures the tokenizer so that it will always treat search terms as fuzzy search expressions.
@@ -20,6 +23,33 @@ namespace Lifti.Querying
         public QueryParserBuilder AssumeFuzzySearchTerms(bool fuzzySearchByDefault = true)
         {
             this.assumeFuzzySearchTerms = fuzzySearchByDefault;
+            return this;
+        }
+
+        /// <summary>
+        /// Configures the default parameters for a fuzzy search when not provided explicitly as part of the query.
+        /// </summary>
+        /// <param name="maxEditDistance">The maximum of edits allowed for any given match. The higher this value, the more divergent 
+        /// matches will be.</param>
+        /// <param name="maxSequentialEdits">The maximum number of edits that are allowed to appear sequentially. By default this is 1,
+        /// which forces matches to be more similar to the search criteria.</param>
+        public QueryParserBuilder WithFuzzySearchDefaults(ushort maxEditDistance = FuzzyMatchQueryPart.DefaultMaxEditDistance, ushort maxSequentialEdits = FuzzyMatchQueryPart.DefaultMaxSequentialEdits)
+        {
+            this.fuzzySearchMaxEditDistance = termLength => maxEditDistance;
+            this.fuzzySearchMaxSequentialEdits = termLength => maxSequentialEdits;
+            return this;
+        }
+
+        /// <summary>
+        /// Configures the default parameters for a fuzzy search when not provided explicitly as part of the query.
+        /// </summary>
+        /// <param name="maxEditDistance">A function that can derive the maximum of edits allowed for a query term of a given length. The higher this value, the more divergent 
+        /// matches will be.</param>
+        /// <param name="maxSequentialEdits">A function that can derive the maximum number of edits that are allowed to appear sequentially for a query term of a given length.</param>
+        public QueryParserBuilder WithFuzzySearchDefaults(Func<int, ushort> maxEditDistance, Func<int, ushort> maxSequentialEdits)
+        {
+            this.fuzzySearchMaxEditDistance = maxEditDistance;
+            this.fuzzySearchMaxSequentialEdits = maxSequentialEdits;
             return this;
         }
 
@@ -42,6 +72,16 @@ namespace Lifti.Querying
             {
                 AssumeFuzzySearchTerms = this.assumeFuzzySearchTerms
             };
+
+            if (this.fuzzySearchMaxEditDistance != null)
+            {
+                options.FuzzySearchMaxEditDistance = this.fuzzySearchMaxEditDistance;
+            }
+
+            if (this.fuzzySearchMaxSequentialEdits != null)
+            {
+                options.FuzzySearchMaxSequentialEdits = this.fuzzySearchMaxSequentialEdits;
+            }
 
             return this.factory(options);
         }

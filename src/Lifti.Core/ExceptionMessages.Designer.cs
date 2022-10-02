@@ -205,6 +205,24 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Max edit distance values must be in the range 0-65535.
+        /// </summary>
+        internal static string FuzzyMatchMaxEditDistanceOutOfRange {
+            get {
+                return ResourceManager.GetString("FuzzyMatchMaxEditDistanceOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max sequential edit values must be in the range 0-65535.
+        /// </summary>
+        internal static string FuzzyMatchMaxSequentialEditsOutOfRange {
+            get {
+                return ResourceManager.GetString("FuzzyMatchMaxSequentialEditsOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Id {0} is already registered in the index..
         /// </summary>
         internal static string IdAlreadyUsed {
@@ -255,6 +273,15 @@ namespace Lifti {
         internal static string MalformedDataExpectedFullLocationEntry {
             get {
                 return ResourceManager.GetString("MalformedDataExpectedFullLocationEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Malformed parameters for a fuzzy match operator encountered: {0}.
+        /// </summary>
+        internal static string MalformedFuzzyMatchParameters {
+            get {
+                return ResourceManager.GetString("MalformedFuzzyMatchParameters", resourceCulture);
             }
         }
         

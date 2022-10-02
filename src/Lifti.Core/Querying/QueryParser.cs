@@ -101,9 +101,9 @@ namespace Lifti.Querying
 
             var tokenText = queryToken.TokenText.AsSpan();
 
-            var isExplicitFuzzyMatch = tokenText.Length > 1 && tokenText[0] == '?';
+            var fuzzyMatchInfo = ExplicitFuzzySearchTerm.Parse(tokenText);
 
-            if (!isExplicitFuzzyMatch && WildcardQueryPartParser.TryParse(tokenText, tokenizer, out var wildcardQueryPart))
+            if (!fuzzyMatchInfo.IsFuzzyMatch && WildcardQueryPartParser.TryParse(tokenText, tokenizer, out var wildcardQueryPart))
             {
                 return wildcardQueryPart;
             }
@@ -114,10 +114,14 @@ namespace Lifti.Querying
             // a) Normalized in the same way as the tokens as they were added to the index
             // b) Any additional processing, e.g. stemming is applied to them
             IEnumerable<IQueryPart> result;
-            if (isExplicitFuzzyMatch || this.options.AssumeFuzzySearchTerms)
+            if (fuzzyMatchInfo.IsFuzzyMatch || this.options.AssumeFuzzySearchTerms)
             {
-                result = tokenizer.Process(isExplicitFuzzyMatch ? tokenText.Slice(1) : tokenText)
-                 .Select(token => new FuzzyMatchQueryPart(token.Value));
+                result = tokenizer.Process(fuzzyMatchInfo.IsFuzzyMatch ? tokenText.Slice(fuzzyMatchInfo.SearchTermStartIndex) : tokenText)
+                 .Select(
+                    token => new FuzzyMatchQueryPart(
+                        token.Value,
+                        fuzzyMatchInfo.MaxEditDistance ?? this.options.FuzzySearchMaxEditDistance(token.Value.Length),
+                        fuzzyMatchInfo.MaxSequentialEdits ?? this.options.FuzzySearchMaxSequentialEdits(token.Value.Length)));
             }
             else
             {
@@ -271,5 +275,4 @@ namespace Lifti.Querying
             }
         }
     }
-
 }

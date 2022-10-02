@@ -59,6 +59,44 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public void WithConfiguredExplicitFuzzyMatchParameters_ShouldPassParametersToConstructedQueryParsers()
+        {
+            QueryParserOptions? passedOptions = null;
+            this.sut.WithQueryParser(o => o.WithFuzzySearchDefaults(10, 4).WithQueryParserFactory(x =>
+            {
+                passedOptions = x;
+                return new QueryParser(x);
+            }));
+
+            var index = this.sut.Build();
+
+            index.Search("test");
+
+            passedOptions.Should().NotBeNull();
+            passedOptions.FuzzySearchMaxEditDistance(1000).Should().Be(10);
+            passedOptions.FuzzySearchMaxSequentialEdits(1000).Should().Be(4);
+        }
+
+        [Fact]
+        public void WithConfigureDynamicFuzzyMatchParameters_ShouldPassParametersToConstructedQueryParsers()
+        {
+            QueryParserOptions? passedOptions = null;
+            this.sut.WithQueryParser(o => o.WithFuzzySearchDefaults(x => (ushort)(x / 10), x => (ushort)(x / 100)).WithQueryParserFactory(x =>
+            {
+                passedOptions = x;
+                return new QueryParser(x);
+            }));
+
+            var index = this.sut.Build();
+
+            index.Search("test");
+
+            passedOptions.Should().NotBeNull();
+            passedOptions.FuzzySearchMaxEditDistance(1000).Should().Be(100);
+            passedOptions.FuzzySearchMaxSequentialEdits(1000).Should().Be(10);
+        }
+
+        [Fact]
         public void WithCustomQueryParser_ShouldPassCustomImplementationToIndex()
         {
             var parser = this.ConfigureQueryParserMock();
