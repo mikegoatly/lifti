@@ -11,10 +11,20 @@ namespace Lifti.Querying
     {
         private static readonly Func<QueryParserOptions, IQueryParser> defaultQueryParserFactory = o => new QueryParser(o);
         private Func<QueryParserOptions, IQueryParser> factory = defaultQueryParserFactory;
-
-        private bool assumeFuzzySearchTerms;
+        private QueryTermJoinOperatorKind defaultJoiningOperator = QueryTermJoinOperatorKind.And;
+        private bool fuzzySearchByDefault;
         private Func<int, ushort>? fuzzySearchMaxEditDistance;
         private Func<int, ushort>? fuzzySearchMaxSequentialEdits;
+
+        internal QueryParserBuilder()
+        {
+        }
+
+        internal QueryParserBuilder(Func<QueryParserOptions, IQueryParser> queryParserFactory)
+        {
+            this.factory = queryParserFactory;
+        }
+
 
         /// <summary>
         /// Configures the tokenizer so that it will always treat search terms as fuzzy search expressions.
@@ -22,7 +32,7 @@ namespace Lifti.Querying
         /// </summary>
         public QueryParserBuilder AssumeFuzzySearchTerms(bool fuzzySearchByDefault = true)
         {
-            this.assumeFuzzySearchTerms = fuzzySearchByDefault;
+            this.fuzzySearchByDefault = fuzzySearchByDefault;
             return this;
         }
 
@@ -54,6 +64,17 @@ namespace Lifti.Querying
         }
 
         /// <summary>
+        /// The joining operator that should be used 
+        /// </summary>
+        /// <param name="joiningOperator"></param>
+        /// <returns></returns>
+        public QueryParserBuilder WithDefaultJoiningOperator(QueryTermJoinOperatorKind joiningOperator = QueryTermJoinOperatorKind.And)
+        {
+            this.defaultJoiningOperator = joiningOperator;
+            return this;
+        }
+
+        /// <summary>
         /// Configures a factory method capable of creating an implementation of <see cref="IQueryParser"/>
         /// with the provided options.
         /// </summary>
@@ -68,9 +89,10 @@ namespace Lifti.Querying
         /// </summary>
         public IQueryParser Build()
         {
-            var options = new QueryParserOptions()
+            var options = new QueryParserOptions
             {
-                AssumeFuzzySearchTerms = this.assumeFuzzySearchTerms
+                AssumeFuzzySearchTerms = this.fuzzySearchByDefault,
+                DefaultJoiningOperator = this.defaultJoiningOperator
             };
 
             if (this.fuzzySearchMaxEditDistance != null)

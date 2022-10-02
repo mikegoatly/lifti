@@ -466,6 +466,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unsupported query joining operator: {0}.
+        /// </summary>
+        internal static string UnsupportedQueryJoiningOperator {
+            get {
+                return ResourceManager.GetString("UnsupportedQueryJoiningOperator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value must not be less than zero.
         /// </summary>
         internal static string ValueMustNotBeLessThanZero {

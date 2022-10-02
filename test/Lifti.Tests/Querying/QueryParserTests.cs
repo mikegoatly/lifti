@@ -27,6 +27,22 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
+        public void ParsingTwoWordsWithNoOperator_WithAndOperatorAsDefault_ShouldComposeWithAndOperator()
+        {
+            var result = this.Parse("wordone wordtwo");
+            var expectedQuery = new AndQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingTwoWordsWithNoOperator_WithOrOperatorAsDefault_ShouldComposeWithOrOperator()
+        {
+            var result = this.Parse("wordone wordtwo", defaultJoinOperator: QueryTermJoinOperatorKind.Or);
+            var expectedQuery = new OrQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
         public void ParsingTwoWordsWithNoOperator_ShouldComposeWithAndOperator()
         {
             var result = this.Parse("wordone wordtwo");
@@ -287,7 +303,12 @@ namespace Lifti.Tests.Querying
             result.Root.ToString().Should().Be(expectedQuery.ToString());
         }
 
-        private IQuery Parse(string text, bool assumeFuzzy = false, Func<int, ushort>? fuzzySearchMaxEditDistance = null, Func<int, ushort>? fuzzySearchMaxSequentialEdits = null)
+        private IQuery Parse(
+            string text,
+            bool assumeFuzzy = false,
+            Func<int, ushort>? fuzzySearchMaxEditDistance = null,
+            Func<int, ushort>? fuzzySearchMaxSequentialEdits = null,
+            QueryTermJoinOperatorKind defaultJoinOperator = QueryTermJoinOperatorKind.And)
         {
             var options = new QueryParserOptions { AssumeFuzzySearchTerms = assumeFuzzy };
             if (fuzzySearchMaxEditDistance != null)
@@ -299,6 +320,8 @@ namespace Lifti.Tests.Querying
             {
                 options.FuzzySearchMaxSequentialEdits = fuzzySearchMaxSequentialEdits;
             }
+
+            options.DefaultJoiningOperator = defaultJoinOperator;
 
             var parser = new QueryParser(options);
             return parser.Parse(this.fieldLookupMock.Object, text, new FakeTokenizer());

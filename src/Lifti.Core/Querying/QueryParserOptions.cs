@@ -18,6 +18,11 @@ namespace Lifti.Querying
         public bool AssumeFuzzySearchTerms { get; internal set; }
 
         /// <summary>
+        /// Gets the default joining operator (And/Or) that should be used to combine terms that don't have an explicit operator between them.
+        /// </summary>
+        public QueryTermJoinOperatorKind DefaultJoiningOperator { get; internal set; } = QueryTermJoinOperatorKind.And;
+
+        /// <summary>
         /// Gets a function capable of deriving the maximum of edits allowed for a fuzzy search term of a given length.
         /// </summary>
         public Func<int, ushort> FuzzySearchMaxEditDistance { get; internal set; } = static termLength => 4;
