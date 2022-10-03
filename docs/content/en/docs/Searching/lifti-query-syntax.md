@@ -1,9 +1,9 @@
 ---
 title: "The LIFTI Query Syntax"
 linkTitle: "The LIFTI Query Syntax"
-weight: 5
+weight: 1
 description: >
-  The LIFTI query syntax
+  The default query parser for an index makes use of a powerful query syntax.
 ---
 
 ## Quick examples
@@ -12,6 +12,7 @@ Example|Meaning
 -|-
 West|**West** must appear in the text [exactly](#exact-word-matches).
 ?Wst|Words that [fuzzy match](#fuzzy-match-) with **wst** must appear in the text.
+?3,2?Wst|Words that [fuzzy match](#fuzzy-match-) with **wst** must appear in the text, with a specified max edit distance and max sequential edits.
 title=West|A [field restricted](#field-restrictions-field) search. **West** must appear in the ***title*** field of an indexed object.
 doc*|Words that starts with **doc**ument must appear in the text. [See wildcard matching](#wildcard-matching)
 %%ing|Words that starts with any two letters and end with **ing**, e.g. *doing*. [See wildcard matching](#wildcard-matching)
@@ -44,31 +45,21 @@ enforcing the same word stemming, case/accent sensitivity rules as used in the i
 
 ### Fuzzy match (`?`)
 
-By prefixing a search term with `?` a fuzzy matching algorithm will be used to match the search term against the index.
+By prefixing a search term with `?` a fuzzy matching algorithm will be used to match the search term against the index. You can optionally specify the maximum edit distance and maximum number of sequential edits
+for a specific search term using the format:
+
+`?{max edits},{max sequential edits}?term`
+
+For example `?2,1?food` will search for "food" with a maximum number of edits of 2, and maximum sequential edits of 1.
+
+You can omit one or the other parameter if required, so `?2,?food` will only set the maximum number of edits to 2, leaving the maximum sequential edits at the default value.
+
+See [Fuzzy Matching](../fuzzy-matching) for more details.
 
 #### Defaulting search terms to fuzzy matching
 
 By default LIFTI will treat a search term as an [exact word match](#exact-word-matches), however [you can configure the index](../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser) so that any search term (apart from those containing wildcards)
 will be treated as a fuzzy match.
-
-#### Fuzzy matching
-
-LIFTI uses [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) to perform fuzzy matches between a search term and tokens in the index.
-The distance between two words is the number of edits that are required to match them, including:
-
-* insertions: fid would match fi**n**d 
-* deletions: foood would match food
-* substitutions: frnd would match f**i**nd
-* transpositions: fnid would match f**in**d - Transpositions are a special case, because although two characters are affected, it is considered a single edit.
-
-The resulting Levenshtein distance between any matched term and the search term is used to reduce the score of the match. This means that documents containing
-words that are closer matches will typically be surfaced higher up in the search results.
-
-To prevent a [combinatorial explosion](https://en.wikipedia.org/wiki/Combinatorial_explosion) of potential matches, LIFTI currently limits the maximum number
-of allowed edits to 3, and sequential edits to 1. This means that as of now:
-
-* **feed** will *not* match **food** because it requires two sequential edits
-* **redy** will *not* match **friendly** because it requires 4 insertions
 
 ---
 
