@@ -12,6 +12,7 @@ Create an index with defaults:
 
 * case insensitive
 * accent insensitive
+* full [LIFTI query syntax](../searching) for queries (Don't want this? See [WithSimpleQueryParser](withsimplequeryparser))
 * no word stemming
 * splitting only on punctuation, whitespace and control characters
 

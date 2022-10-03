@@ -165,6 +165,12 @@
   <data name="FieldNameMustNotBeEmpty" xml:space="preserve">
     <value>Name must not be empty</value>
   </data>
+  <data name="FuzzyMatchMaxEditDistanceOutOfRange" xml:space="preserve">
+    <value>Max edit distance values must be in the range 0-65535</value>
+  </data>
+  <data name="FuzzyMatchMaxSequentialEditsOutOfRange" xml:space="preserve">
+    <value>Max sequential edit values must be in the range 0-65535</value>
+  </data>
   <data name="IdAlreadyUsed" xml:space="preserve">
     <value>Id {0} is already registered in the index.</value>
   </data>
@@ -182,6 +188,9 @@
   </data>
   <data name="MalformedDataExpectedFullLocationEntry" xml:space="preserve">
     <value>Malformed index data encountered - expected a full location entry</value>
+  </data>
+  <data name="MalformedFuzzyMatchParameters" xml:space="preserve">
+    <value>Malformed parameters for a fuzzy match operator encountered: {0}</value>
   </data>
   <data name="MaximumDistinctFieldsIndexReached" xml:space="preserve">
     <value>Only 255 distinct fields can currently be indexed</value>
@@ -231,6 +240,9 @@
   <data name="UnexpectedOperatorInternal" xml:space="preserve">
     <value>Internal error - An unexpected operator was encountered: {0}</value>
   </data>
+  <data name="UnexpectedOperatorParseStateEncountered" xml:space="preserve">
+    <value>Unexpected OperatorParseState {0} encountered while tokenizing a query</value>
+  </data>
   <data name="UnexpectedTokenEncountered" xml:space="preserve">
     <value>Unexpected token encountered: {0}</value>
   </data>
@@ -242,6 +254,9 @@
   </data>
   <data name="UnsupportedIndexSupportLevel" xml:space="preserve">
     <value>Unsupported index support level {0}</value>
+  </data>
+  <data name="UnsupportedQueryJoiningOperator" xml:space="preserve">
+    <value>Unsupported query joining operator: {0}</value>
   </data>
   <data name="ValueMustNotBeLessThanZero" xml:space="preserve">
     <value>Value must not be less than zero</value>

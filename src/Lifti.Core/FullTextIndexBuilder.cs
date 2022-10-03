@@ -185,6 +185,30 @@ namespace Lifti
             return this;
         }
 
+        /// <inheritdoc cref="WithSimpleQueryParser(Func{QueryParserBuilder, QueryParserBuilder})" />
+        public FullTextIndexBuilder<TKey> WithSimpleQueryParser()
+        {
+            return this.WithSimpleQueryParser(static o => o);
+        }
+        
+        /// <summary>
+        /// Configures the index to use a <see cref="SimpleQueryParser"/> instead of the full LIFTI query parser. Use this for situations where
+        /// you don't need the full complexity of the query language and just want user input to be run directly against the index.
+        /// This is a convenience method equivalent to <code>WithQueryParser(o => o.WithQueryParserFactory(options => new SimpleQueryParser(options)))</code>.
+        /// </summary>
+        public FullTextIndexBuilder<TKey> WithSimpleQueryParser(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)
+        {
+            if (optionsBuilder is null)
+            {
+                throw new ArgumentNullException(nameof(optionsBuilder));
+            }
+
+            var builder = new QueryParserBuilder(options => new SimpleQueryParser(options));
+            this.queryParser = optionsBuilder(builder).Build();
+
+            return this;
+        }
+
         /// <summary>
         /// Replaces the default <see cref="IQueryParser"/> implementation used when searching the index.
         /// </summary>

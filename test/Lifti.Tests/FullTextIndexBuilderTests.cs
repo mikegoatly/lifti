@@ -59,6 +59,59 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public void WithConfiguredExplicitFuzzyMatchParameters_ShouldPassParametersToConstructedQueryParsers()
+        {
+            var passedOptions = BuildSutAndGetPassedOptions(o => o.WithFuzzySearchDefaults(10, 4));
+
+            passedOptions.Should().NotBeNull();
+            passedOptions.FuzzySearchMaxEditDistance(1000).Should().Be(10);
+            passedOptions.FuzzySearchMaxSequentialEdits(1000).Should().Be(4);
+        }
+
+        [Fact]
+        public void WithNoDefaultJoiningOperatorConfigured_ShouldPassAndOperatorToIndex()
+        {
+            var passedOptions = BuildSutAndGetPassedOptions(o => o);
+            passedOptions.Should().NotBeNull();
+            passedOptions.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.And);
+        }
+
+        [Fact]
+        public void WithDefaultJoiningOperatorConfigured_ShouldPassDefaultOperatorToIndex()
+        {
+            var passedOptions = BuildSutAndGetPassedOptions(o => o.WithDefaultJoiningOperator(QueryTermJoinOperatorKind.Or));
+            passedOptions.Should().NotBeNull();
+            passedOptions.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.Or);
+        }
+
+        [Fact]
+        public void WithSimpleQueryParserConfigured_ShouldUseSimpleQueryParserInIndex()
+        {
+            var index = this.sut.WithSimpleQueryParser(o => o.WithDefaultJoiningOperator(QueryTermJoinOperatorKind.Or)).Build();
+
+            index.QueryParser.Should().BeOfType<SimpleQueryParser>();
+        }
+
+        [Fact]
+        public void WithConfigureDynamicFuzzyMatchParameters_ShouldPassParametersToConstructedQueryParsers()
+        {
+            QueryParserOptions? passedOptions = null;
+            this.sut.WithQueryParser(o => o.WithFuzzySearchDefaults(x => (ushort)(x / 10), x => (ushort)(x / 100)).WithQueryParserFactory(x =>
+            {
+                passedOptions = x;
+                return new QueryParser(x);
+            }));
+
+            var index = this.sut.Build();
+
+            index.Search("test");
+
+            passedOptions.Should().NotBeNull();
+            passedOptions.FuzzySearchMaxEditDistance(1000).Should().Be(100);
+            passedOptions.FuzzySearchMaxSequentialEdits(1000).Should().Be(10);
+        }
+
+        [Fact]
         public void WithCustomQueryParser_ShouldPassCustomImplementationToIndex()
         {
             var parser = this.ConfigureQueryParserMock();
@@ -179,6 +232,21 @@ namespace Lifti.Tests
             await index.AddAsync(1, "Testing");
 
             index.Search("Testing").Should().HaveCount(1);
+        }
+
+        private QueryParserOptions BuildSutAndGetPassedOptions(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)
+        {
+            QueryParserOptions? passedOptions = null;
+
+            this.sut.WithQueryParser(o => optionsBuilder(o).WithQueryParserFactory(x =>
+            {
+                passedOptions = x;
+                return new QueryParser(x);
+            }));
+
+            var index = this.sut.Build();
+
+            return passedOptions;
         }
 
         private Mock<IQueryParser> ConfigureQueryParserMock()

@@ -1,6 +1,6 @@
 
 ---
-title: "Documentation"
+title: "LIFTI"
 linkTitle: "Documentation"
 weight: 20
 menu:

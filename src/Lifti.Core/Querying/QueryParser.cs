@@ -11,10 +11,18 @@ namespace Lifti.Querying
     {
         private readonly IQueryTokenizer queryTokenizer;
         private readonly QueryParserOptions options;
+        private readonly QueryTokenType defaultJoiningOperator;
+
         public QueryParser(QueryParserOptions options)
         {
             this.queryTokenizer = new QueryTokenizer();
             this.options = options;
+            this.defaultJoiningOperator = options.DefaultJoiningOperator switch
+            {
+                QueryTermJoinOperatorKind.And => QueryTokenType.AndOperator,
+                QueryTermJoinOperatorKind.Or => QueryTokenType.OrOperator,
+                _ => throw new QueryParserException(ExceptionMessages.UnsupportedQueryJoiningOperator, options.DefaultJoiningOperator)
+            };
         }
 
 
@@ -47,12 +55,12 @@ namespace Lifti.Querying
             switch (token.TokenType)
             {
                 case QueryTokenType.Text:
-                    return ComposePart(currentQuery, this.CreateWordQueryPart(token, tokenizer));
+                    return this.ComposePart(currentQuery, this.CreateWordQueryPart(token, tokenizer));
 
                 case QueryTokenType.FieldFilter:
                     var (fieldId, _, fieldTokenizer) = fieldLookup.GetFieldInfo(token.TokenText);
                     var filteredPart = this.CreateQueryPart(fieldLookup, state, state.GetNextToken(), fieldTokenizer, null);
-                    return ComposePart(
+                    return this.ComposePart(
                         currentQuery,
                         new FieldFilterQueryOperator(token.TokenText, fieldId, filteredPart));
 
@@ -73,7 +81,7 @@ namespace Lifti.Querying
                         throw new QueryParserException(ExceptionMessages.EmptyBracketedExpressionsAreNotSupported);
                     }
 
-                    return ComposePart(currentQuery, new BracketedQueryPart(bracketedPart));
+                    return this.ComposePart(currentQuery, new BracketedQueryPart(bracketedPart));
 
                 case QueryTokenType.BeginAdjacentTextOperator:
                     var tokens = state.GetTokensUntil(QueryTokenType.EndAdjacentTextOperator)
@@ -85,7 +93,7 @@ namespace Lifti.Querying
                         throw new QueryParserException(ExceptionMessages.EmptyAdjacentTextPartsAreNotSupported);
                     }
 
-                    return ComposePart(currentQuery, new AdjacentWordsQueryOperator(tokens));
+                    return this.ComposePart(currentQuery, new AdjacentWordsQueryOperator(tokens));
 
                 default:
                     throw new QueryParserException(ExceptionMessages.UnexpectedTokenEncountered, token.TokenType);
@@ -101,9 +109,9 @@ namespace Lifti.Querying
 
             var tokenText = queryToken.TokenText.AsSpan();
 
-            var isExplicitFuzzyMatch = tokenText.Length > 1 && tokenText[0] == '?';
+            var fuzzyMatchInfo = ExplicitFuzzySearchTerm.Parse(tokenText);
 
-            if (!isExplicitFuzzyMatch && WildcardQueryPartParser.TryParse(tokenText, tokenizer, out var wildcardQueryPart))
+            if (!fuzzyMatchInfo.IsFuzzyMatch && WildcardQueryPartParser.TryParse(tokenText, tokenizer, out var wildcardQueryPart))
             {
                 return wildcardQueryPart;
             }
@@ -114,10 +122,14 @@ namespace Lifti.Querying
             // a) Normalized in the same way as the tokens as they were added to the index
             // b) Any additional processing, e.g. stemming is applied to them
             IEnumerable<IQueryPart> result;
-            if (isExplicitFuzzyMatch || this.options.AssumeFuzzySearchTerms)
+            if (fuzzyMatchInfo.IsFuzzyMatch || this.options.AssumeFuzzySearchTerms)
             {
-                result = tokenizer.Process(isExplicitFuzzyMatch ? tokenText.Slice(1) : tokenText)
-                 .Select(token => new FuzzyMatchQueryPart(token.Value));
+                result = tokenizer.Process(fuzzyMatchInfo.IsFuzzyMatch ? tokenText.Slice(fuzzyMatchInfo.SearchTermStartIndex) : tokenText)
+                 .Select(
+                    token => new FuzzyMatchQueryPart(
+                        token.Value,
+                        fuzzyMatchInfo.MaxEditDistance ?? this.options.FuzzySearchMaxEditDistance(token.Value.Length),
+                        fuzzyMatchInfo.MaxSequentialEdits ?? this.options.FuzzySearchMaxSequentialEdits(token.Value.Length)));
             }
             else
             {
@@ -128,7 +140,7 @@ namespace Lifti.Querying
             return ComposeParts(result);
         }
 
-        private static IQueryPart ComposeParts(IEnumerable<IQueryPart> parts)
+        private IQueryPart ComposeParts(IEnumerable<IQueryPart> parts)
         {
             IQueryPart? result = null;
             var enumerator = parts.GetEnumerator();
@@ -137,25 +149,17 @@ namespace Lifti.Querying
             {
                 result = result == null
                     ? enumerator.Current
-                    : ComposePart(result, enumerator.Current);
+                    : this.ComposePart(result, enumerator.Current);
             }
 
-            if (result == null)
-            {
-                throw new QueryParserException(ExceptionMessages.ExpectedAtLeastOneQueryPartParsed);
-            }
-
-            return result;
+            return result ?? throw new QueryParserException(ExceptionMessages.ExpectedAtLeastOneQueryPartParsed);
         }
 
-        private static IQueryPart ComposePart(IQueryPart? existingPart, IQueryPart newPart)
+        private IQueryPart ComposePart(IQueryPart? existingPart, IQueryPart newPart)
         {
-            if (existingPart == null)
-            {
-                return newPart;
-            }
-
-            return CombineParts(existingPart, newPart, QueryTokenType.AndOperator, 0);
+            return existingPart == null 
+                ? newPart 
+                : CombineParts(existingPart, newPart, this.defaultJoiningOperator, 0);
         }
 
         private static IBinaryQueryOperator CombineParts(IQueryPart? existingPart, IQueryPart newPart, QueryTokenType operatorType, int tolerance)
@@ -194,22 +198,15 @@ namespace Lifti.Querying
 
         private static OperatorPrecedence TokenPrecedence(QueryTokenType tokenType)
         {
-            switch (tokenType)
+            return tokenType switch
             {
-                case QueryTokenType.AndOperator:
-                    return OperatorPrecedence.And;
-
-                case QueryTokenType.OrOperator:
-                    return OperatorPrecedence.Or;
-
-                case QueryTokenType.PrecedingNearOperator:
-                case QueryTokenType.NearOperator:
-                case QueryTokenType.PrecedingOperator:
-                    return OperatorPrecedence.Positional;
-
-                default:
-                    throw new QueryParserException(ExceptionMessages.UnexpectedOperatorInternal, tokenType);
-            }
+                QueryTokenType.AndOperator => OperatorPrecedence.And,
+                QueryTokenType.OrOperator => OperatorPrecedence.Or,
+                QueryTokenType.PrecedingNearOperator 
+                    or QueryTokenType.NearOperator 
+                    or QueryTokenType.PrecedingOperator => OperatorPrecedence.Positional,
+                _ => throw new QueryParserException(ExceptionMessages.UnexpectedOperatorInternal, tokenType),
+            };
         }
 
         private class QueryParserState
@@ -235,12 +232,9 @@ namespace Lifti.Querying
 
             public QueryToken GetNextToken()
             {
-                if (this.enumerator.MoveNext())
-                {
-                    return this.enumerator.Current;
-                }
-
-                throw new QueryParserException(ExceptionMessages.UnexpectedEndOfQuery);
+                return this.enumerator.MoveNext() 
+                    ? this.enumerator.Current 
+                    : throw new QueryParserException(ExceptionMessages.UnexpectedEndOfQuery);
             }
 
             /// <summary>
@@ -271,5 +265,4 @@ namespace Lifti.Querying
             }
         }
     }
-
 }

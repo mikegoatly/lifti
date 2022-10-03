@@ -205,6 +205,24 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Max edit distance values must be in the range 0-65535.
+        /// </summary>
+        internal static string FuzzyMatchMaxEditDistanceOutOfRange {
+            get {
+                return ResourceManager.GetString("FuzzyMatchMaxEditDistanceOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max sequential edit values must be in the range 0-65535.
+        /// </summary>
+        internal static string FuzzyMatchMaxSequentialEditsOutOfRange {
+            get {
+                return ResourceManager.GetString("FuzzyMatchMaxSequentialEditsOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Id {0} is already registered in the index..
         /// </summary>
         internal static string IdAlreadyUsed {
@@ -255,6 +273,15 @@ namespace Lifti {
         internal static string MalformedDataExpectedFullLocationEntry {
             get {
                 return ResourceManager.GetString("MalformedDataExpectedFullLocationEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Malformed parameters for a fuzzy match operator encountered: {0}.
+        /// </summary>
+        internal static string MalformedFuzzyMatchParameters {
+            get {
+                return ResourceManager.GetString("MalformedFuzzyMatchParameters", resourceCulture);
             }
         }
         
@@ -403,6 +430,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unexpected OperatorParseState {0} encountered while tokenizing a query.
+        /// </summary>
+        internal static string UnexpectedOperatorParseStateEncountered {
+            get {
+                return ResourceManager.GetString("UnexpectedOperatorParseStateEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unexpected token encountered: {0}.
         /// </summary>
         internal static string UnexpectedTokenEncountered {
@@ -435,6 +471,15 @@ namespace Lifti {
         internal static string UnsupportedIndexSupportLevel {
             get {
                 return ResourceManager.GetString("UnsupportedIndexSupportLevel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported query joining operator: {0}.
+        /// </summary>
+        internal static string UnsupportedQueryJoiningOperator {
+            get {
+                return ResourceManager.GetString("UnsupportedQueryJoiningOperator", resourceCulture);
             }
         }
         
