@@ -78,7 +78,8 @@ namespace Lifti
 
         internal IIndexNodeFactory IndexNodeFactory { get; }
 
-        internal IQueryParser QueryParser => this.queryParser;
+        /// <inheritdoc />
+        public IQueryParser QueryParser => this.queryParser;
 
         /// <inheritdoc />
         public IIndexSnapshot<TKey> Snapshot => this.currentSnapshot;

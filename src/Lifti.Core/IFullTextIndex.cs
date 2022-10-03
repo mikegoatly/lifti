@@ -41,6 +41,12 @@ namespace Lifti
         ITokenizer DefaultTokenizer { get; }
 
         /// <summary>
+        /// Gets the configured <see cref="IQueryParser"/> for the index. If you need to execute the same query against the index multiple
+        /// times, you can use this to parse a query as an <see cref="IQuery"/>, and then execute that against the index's <see cref="Search(IQuery)"/> method.
+        /// </summary>
+        IQueryParser QueryParser { get; }
+
+        /// <summary>
         /// Gets the default <see cref="ITextExtractor"/> implementation that the index will use when one is
         /// not explicitly configured for a field.
         /// </summary>
