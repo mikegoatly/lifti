@@ -20,22 +20,22 @@
 <link rel="icon" type="image/png" href="/lifti/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
 
-<title>IndexNavigator | LIFTI</title><meta property="og:title" content="IndexNavigator" />
-<meta property="og:description" content="You can use an IndexNavigator to navigate the index character by character.
+<title>WithSimpleQueryParser | LIFTI</title><meta property="og:title" content="WithSimpleQueryParser" />
+<meta property="og:description" content="Prescribes the use of a simple query parser that you can use when you don&#39;t want queries to make use of the full LIFTI query syntax.
 " />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/searching/using-the-index-navigator/" /><meta property="article:section" content="docs" />
-<meta property="article:published_time" content="2020-07-14T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-07-14T21:32:01+01:00" /><meta property="og:site_name" content="LIFTI" />
+<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/index-construction/withsimplequeryparser/" /><meta property="article:section" content="docs" />
 
-<meta itemprop="name" content="IndexNavigator">
-<meta itemprop="description" content="You can use an IndexNavigator to navigate the index character by character.
-"><meta itemprop="datePublished" content="2020-07-14T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2020-07-14T21:32:01+01:00" />
-<meta itemprop="wordCount" content="322">
+<meta property="article:modified_time" content="2022-10-03T22:41:18+01:00" /><meta property="og:site_name" content="LIFTI" />
+
+<meta itemprop="name" content="WithSimpleQueryParser">
+<meta itemprop="description" content="Prescribes the use of a simple query parser that you can use when you don&#39;t want queries to make use of the full LIFTI query syntax.
+">
+<meta itemprop="dateModified" content="2022-10-03T22:41:18+01:00" />
+<meta itemprop="wordCount" content="71">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="IndexNavigator"/>
-<meta name="twitter:description" content="You can use an IndexNavigator to navigate the index character by character.
+<meta name="twitter:title" content="WithSimpleQueryParser"/>
+<meta name="twitter:description" content="Prescribes the use of a simple query parser that you can use when you don&#39;t want queries to make use of the full LIFTI query syntax.
 "/>
 
 
@@ -202,10 +202,10 @@
 
 <ul class="td-sidebar-nav__section pr-md-3">
   <li class="td-sidebar-nav__section-title">
-    <a  href="/lifti/docs/index-construction/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Index Construction</a>
+    <a  href="/lifti/docs/index-construction/" class="align-left pl-0 pr-2 active td-sidebar-link td-sidebar-link__section">Index Construction</a>
   </li>
   <ul>
-    <li class="collapse " id="liftidocsindex-construction">
+    <li class="collapse show" id="liftidocsindex-construction">
       
       
       
@@ -236,7 +236,7 @@
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocsindex-constructionwithsimplequeryparser" href="/lifti/docs/index-construction/withsimplequeryparser/">WithSimpleQueryParser</a>
+      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocsindex-constructionwithsimplequeryparser" href="/lifti/docs/index-construction/withsimplequeryparser/">WithSimpleQueryParser</a>
       
       
       
@@ -302,10 +302,10 @@
 
 <ul class="td-sidebar-nav__section pr-md-3">
   <li class="td-sidebar-nav__section-title">
-    <a  href="/lifti/docs/searching/" class="align-left pl-0 pr-2 active td-sidebar-link td-sidebar-link__section">Searching</a>
+    <a  href="/lifti/docs/searching/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Searching</a>
   </li>
   <ul>
-    <li class="collapse show" id="liftidocssearching">
+    <li class="collapse " id="liftidocssearching">
       
       
       
@@ -336,7 +336,7 @@
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocssearchingusing-the-index-navigator" href="/lifti/docs/searching/using-the-index-navigator/">IndexNavigator</a>
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocssearchingusing-the-index-navigator" href="/lifti/docs/searching/using-the-index-navigator/">IndexNavigator</a>
       
       
       
@@ -486,8 +486,8 @@
 
 
 
-<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Searching/using-the-index-navigator.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
-<a href="https://github.com/mikegoatly/lifti/issues/new?title=IndexNavigator" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
+<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Index%20construction/WithSimpleQueryParser.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
+<a href="https://github.com/mikegoatly/lifti/issues/new?title=WithSimpleQueryParser" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
 
 </div>
 
@@ -495,6 +495,16 @@
 
 
 
+
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#configuring-the-simplequeryparser">Configuring the <code>SimpleQueryParser</code></a>
+      <ul>
+        <li><a href="#example-usage">Example usage</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
 
 
 
@@ -524,14 +534,14 @@
 
 
 <li class="breadcrumb-item" >
-	<a href="https://mikegoatly.github.io/lifti/docs/searching/">Searching</a>
+	<a href="https://mikegoatly.github.io/lifti/docs/index-construction/">Index Construction</a>
 </li>
 
 
 
 
 <li class="breadcrumb-item active" aria-current="page">
-	<a href="https://mikegoatly.github.io/lifti/docs/searching/using-the-index-navigator/">IndexNavigator</a>
+	<a href="https://mikegoatly.github.io/lifti/docs/index-construction/withsimplequeryparser/">WithSimpleQueryParser</a>
 </li>
 
 	</ol>
@@ -539,75 +549,26 @@
 
             
 <div class="td-content">
-	<h1>IndexNavigator</h1>
-    <div class="lead">You can use an IndexNavigator to navigate the index character by character.</div>
+	<h1>WithSimpleQueryParser</h1>
+    <div class="lead">Prescribes the use of a simple query parser that you can use when you don&rsquo;t want queries to make use of the full LIFTI query syntax.</div>
 	       
-	<p>When processing a search query, LIFTI leverages a class called <code>IndexNavigator</code> which allows for a character-by-character
-navigation of the index.</p>
-<p>You can use an <code>IndexNavigator</code> to do the same thing yourself. The example below demonstrates the following methods:</p>
-<ul>
-<li><code>IIndexNavigator.Process</code> Navigates (forward only) the nodes in the index.</li>
-<li><code>IIndexNavigator.GetExactMatches</code> Gets all the matches at the current location in the index.</li>
-<li><code>IIndexNavigator.GetExactAndChildMatches</code> Gets the exact matches <em>and</em> any matches in subsequent child nodes. This is the equivalent to a wildcard search.</li>
-<li><code>IIndexNavigator.EnumerateIndexedTokens</code> Enumerates the words (tokens) that were indexed under the current location. This essentaially allows for a reverse-engineering of words stored in the index, albeit in their index normalized form.</li>
-</ul>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">static</span> <span style="color:#204a87;font-weight:bold">async</span> <span style="color:#000">Task</span> <span style="color:#000">RunAsync</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Create a full text index with default settings</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">&gt;().</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
+	<h2 id="configuring-the-simplequeryparser">Configuring the <code>SimpleQueryParser</code></h2>
+<p><code>FullTextIndexBuilder&lt;TKey&gt; WithSimpleQueryParser()</code></p>
+<p><code>FullTextIndexBuilder&lt;TKey&gt; WithSimpleQueryParser(Func&lt;QueryParserBuilder, QueryParserBuilder&gt; optionsBuilder)</code></p>
+<p>If you don&rsquo;t want to be querying against the index using the full <a href="../../searching/lifti-query-syntax">LIFTI query syntax</a> then you can use this method to query using simplified queries.</p>
+<p>You can optionally configure the query parser using the <code>QueryParserBuilder</code>, as you can with <code>WithQueryParser</code>: <a href="../withqueryparser/#queryparserbuilder-options">QueryParserBuilder options</a>.</p>
+<h3 id="example-usage">Example usage</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithSimpleQueryParser</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Index some sample data</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Item1&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Catastrophe&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Item2&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Casualty&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Item3&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Cat&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// To programatically search the index, create an index navigator instance </span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// from the index snapshot.</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">using</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">navigator</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">CreateNavigator</span><span style="color:#000;font-weight:bold">())</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Navigate through the letters &#39;C&#39; and &#39;A&#39; (these will be the characters in their </span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// *index normalized* form)</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Process</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;CA&#34;</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AsSpan</span><span style="color:#000;font-weight:bold">());</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// There will be no exact matches at the current position in the index, but 3 matches </span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// when considering child matches, i.e. words starting with &#34;ca&#34;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Writes: Exact matches: 0 Exact and child matches: 3</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">WriteMatchState</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Navigating through the &#39;T&#39; of Catastrophe and Cat, but not Casualty</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Process</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;T&#39;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Writes: Exact matches: 1 Exact and child matches: 2</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">WriteMatchState</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Use EnumerateIndexedTokens to reverse-engineer the words that have been indexed</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// under the current location in the index, in their normalized form.</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Writes:</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// CAT</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// CATASTROPHE</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">foreach</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">token</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">EnumerateIndexedTokens</span><span style="color:#000;font-weight:bold">())</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">token</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// The Process method returns true if navigation was successful, and false otherwise:</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Writes: True</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Process</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;A&#39;</span><span style="color:#000;font-weight:bold">));</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Writes: False</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Process</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;ZOOOOM&#34;</span><span style="color:#000;font-weight:bold">));</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">static</span> <span style="color:#204a87;font-weight:bold">void</span> <span style="color:#000">WriteMatchState</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">IIndexNavigator</span> <span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">$@&#34;Exact matches: {navigator.GetExactMatches().Matches.Count} 
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">Exact and child matches: {navigator.GetExactAndChildMatches().Matches.Count}&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithSimpleQueryParser</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">o</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AssumeFuzzySearch</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
 </span></span></code></pre></div>
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified July 14, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/39bbc2a3fe13ca7459c0d71f765318c8ade8fcb6">Moving to hugo based documentation (39bbc2a)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified October 3, 2022: <a  href="https://github.com/mikegoatly/lifti/commit/4372bd21da1202b2d639bbfef484db3b6708d087">Updated docs (4372bd2)</a>
 </div>
 </div>
 

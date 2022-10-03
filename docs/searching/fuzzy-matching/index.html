@@ -20,22 +20,22 @@
 <link rel="icon" type="image/png" href="/lifti/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
 
-<title>IndexNavigator | LIFTI</title><meta property="og:title" content="IndexNavigator" />
-<meta property="og:description" content="You can use an IndexNavigator to navigate the index character by character.
+<title>Fuzzy Matching | LIFTI</title><meta property="og:title" content="Fuzzy Matching" />
+<meta property="og:description" content="Fuzzy matching provides a mechanism by which you can search for words that are close to a search term, in terms of the number of differences between them.
 " />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/searching/using-the-index-navigator/" /><meta property="article:section" content="docs" />
-<meta property="article:published_time" content="2020-07-14T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-07-14T21:32:01+01:00" /><meta property="og:site_name" content="LIFTI" />
+<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/searching/fuzzy-matching/" /><meta property="article:section" content="docs" />
 
-<meta itemprop="name" content="IndexNavigator">
-<meta itemprop="description" content="You can use an IndexNavigator to navigate the index character by character.
-"><meta itemprop="datePublished" content="2020-07-14T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2020-07-14T21:32:01+01:00" />
-<meta itemprop="wordCount" content="322">
+<meta property="article:modified_time" content="2022-10-03T22:41:18+01:00" /><meta property="og:site_name" content="LIFTI" />
+
+<meta itemprop="name" content="Fuzzy Matching">
+<meta itemprop="description" content="Fuzzy matching provides a mechanism by which you can search for words that are close to a search term, in terms of the number of differences between them.
+">
+<meta itemprop="dateModified" content="2022-10-03T22:41:18+01:00" />
+<meta itemprop="wordCount" content="277">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="IndexNavigator"/>
-<meta name="twitter:description" content="You can use an IndexNavigator to navigate the index character by character.
+<meta name="twitter:title" content="Fuzzy Matching"/>
+<meta name="twitter:description" content="Fuzzy matching provides a mechanism by which you can search for words that are close to a search term, in terms of the number of differences between them.
 "/>
 
 
@@ -312,7 +312,7 @@
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocssearchingfuzzy-matching" href="/lifti/docs/searching/fuzzy-matching/">Fuzzy Matching</a>
+      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocssearchingfuzzy-matching" href="/lifti/docs/searching/fuzzy-matching/">Fuzzy Matching</a>
       
       
       
@@ -336,7 +336,7 @@
       
       
       
-      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocssearchingusing-the-index-navigator" href="/lifti/docs/searching/using-the-index-navigator/">IndexNavigator</a>
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocssearchingusing-the-index-navigator" href="/lifti/docs/searching/using-the-index-navigator/">IndexNavigator</a>
       
       
       
@@ -486,8 +486,8 @@
 
 
 
-<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Searching/using-the-index-navigator.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
-<a href="https://github.com/mikegoatly/lifti/issues/new?title=IndexNavigator" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
+<a href="https://github.com/mikegoatly/lifti/edit/master/docs/content/en/docs/Searching/fuzzy-matching.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
+<a href="https://github.com/mikegoatly/lifti/issues/new?title=Fuzzy%20Matching" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
 
 </div>
 
@@ -531,7 +531,7 @@
 
 
 <li class="breadcrumb-item active" aria-current="page">
-	<a href="https://mikegoatly.github.io/lifti/docs/searching/using-the-index-navigator/">IndexNavigator</a>
+	<a href="https://mikegoatly.github.io/lifti/docs/searching/fuzzy-matching/">Fuzzy Matching</a>
 </li>
 
 	</ol>
@@ -539,75 +539,38 @@
 
             
 <div class="td-content">
-	<h1>IndexNavigator</h1>
-    <div class="lead">You can use an IndexNavigator to navigate the index character by character.</div>
+	<h1>Fuzzy Matching</h1>
+    <div class="lead">Fuzzy matching provides a mechanism by which you can search for words that are close to a search term, in terms of the number of differences between them.</div>
 	       
-	<p>When processing a search query, LIFTI leverages a class called <code>IndexNavigator</code> which allows for a character-by-character
-navigation of the index.</p>
-<p>You can use an <code>IndexNavigator</code> to do the same thing yourself. The example below demonstrates the following methods:</p>
+	<p>Fuzzy matches can be explicitly searched for using the <a href="lifti-query-syntax/#fuzzy-match-">LIFTI query syntax</a>, or implied as the default for searches by 
+<a href="./index-construction/withqueryparser/#configuring-the-default-lifti-queryparser">configuring the index</a>.</p>
+<p>LIFTI uses <a href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein distance</a> to perform fuzzy matches between a search term and tokens in the index.
+The distance between two words is the number of edits that are required to match them, including:</p>
 <ul>
-<li><code>IIndexNavigator.Process</code> Navigates (forward only) the nodes in the index.</li>
-<li><code>IIndexNavigator.GetExactMatches</code> Gets all the matches at the current location in the index.</li>
-<li><code>IIndexNavigator.GetExactAndChildMatches</code> Gets the exact matches <em>and</em> any matches in subsequent child nodes. This is the equivalent to a wildcard search.</li>
-<li><code>IIndexNavigator.EnumerateIndexedTokens</code> Enumerates the words (tokens) that were indexed under the current location. This essentaially allows for a reverse-engineering of words stored in the index, albeit in their index normalized form.</li>
+<li>insertions: fid would match fi<strong>n</strong>d</li>
+<li>deletions: foood would match food</li>
+<li>substitutions: frnd would match f<strong>i</strong>nd</li>
+<li>transpositions: fnid would match f<strong>in</strong>d - Transpositions are a special case, because although two characters are affected, it is considered a single edit.</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">static</span> <span style="color:#204a87;font-weight:bold">async</span> <span style="color:#000">Task</span> <span style="color:#000">RunAsync</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Create a full text index with default settings</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">&gt;().</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// Index some sample data</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Item1&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Catastrophe&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Item2&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Casualty&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">await</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AddAsync</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Item3&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Cat&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// To programatically search the index, create an index navigator instance </span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// from the index snapshot.</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">using</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">navigator</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">CreateNavigator</span><span style="color:#000;font-weight:bold">())</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Navigate through the letters &#39;C&#39; and &#39;A&#39; (these will be the characters in their </span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// *index normalized* form)</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Process</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;CA&#34;</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">AsSpan</span><span style="color:#000;font-weight:bold">());</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// There will be no exact matches at the current position in the index, but 3 matches </span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// when considering child matches, i.e. words starting with &#34;ca&#34;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Writes: Exact matches: 0 Exact and child matches: 3</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">WriteMatchState</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Navigating through the &#39;T&#39; of Catastrophe and Cat, but not Casualty</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Process</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;T&#39;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Writes: Exact matches: 1 Exact and child matches: 2</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">WriteMatchState</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Use EnumerateIndexedTokens to reverse-engineer the words that have been indexed</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// under the current location in the index, in their normalized form.</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Writes:</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// CAT</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// CATASTROPHE</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">foreach</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">token</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">EnumerateIndexedTokens</span><span style="color:#000;font-weight:bold">())</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">token</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// The Process method returns true if navigation was successful, and false otherwise:</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Writes: True</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Process</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#39;A&#39;</span><span style="color:#000;font-weight:bold">));</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// Writes: False</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Process</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;ZOOOOM&#34;</span><span style="color:#000;font-weight:bold">));</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">static</span> <span style="color:#204a87;font-weight:bold">void</span> <span style="color:#000">WriteMatchState</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">IIndexNavigator</span> <span style="color:#000">navigator</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">$@&#34;Exact matches: {navigator.GetExactMatches().Matches.Count} 
-</span></span></span><span style="display:flex;"><span><span style="color:#4e9a06">Exact and child matches: {navigator.GetExactAndChildMatches().Matches.Count}&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div>
+<p>The resulting Levenshtein distance between any matched term and the search term is used to reduce the score of the match. This means that documents containing
+words that are closer matches will typically be surfaced higher up in the search results.</p>
+<h3 id="configuration">Configuration</h3>
+<p>To prevent a <a href="https://en.wikipedia.org/wiki/Combinatorial_explosion">combinatorial explosion</a> of potential matches, LIFTI provides two control mechanisms for fuzzy matching:</p>
+<ul>
+<li><strong>Maximum number of edits</strong> - the total number of edits that can be used in any potential match. The default for this value is calculated as <code>search term length/2</code>.</li>
+<li><strong>Maximum number of sequential edits</strong> - the maximum number of edits that can be found sequentially in any potential match. The default for this value is calculated as <code>search term length/4</code>.</li>
+</ul>
+<p>For example, with a max edits of <strong>3</strong> and max sequential edits of <strong>1</strong>:</p>
+<ul>
+<li><strong>feed</strong> will <em>not</em> match <strong>food</strong> because it requires two sequential edits</li>
+<li><strong>redy</strong> will <em>not</em> match <strong>friendly</strong> because it requires 4 insertions</li>
+</ul>
+<p>Default values can be <a href="../index-construction/withqueryparser/#queryparserbuilder-options">configured at the index level</a>, and can either be expressed as a static value,
+or a value calculated from the length of the search term.</p>
+
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified July 14, 2020: <a  href="https://github.com/mikegoatly/lifti/commit/39bbc2a3fe13ca7459c0d71f765318c8ade8fcb6">Moving to hugo based documentation (39bbc2a)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified October 3, 2022: <a  href="https://github.com/mikegoatly/lifti/commit/4372bd21da1202b2d639bbfef484db3b6708d087">Updated docs (4372bd2)</a>
 </div>
 </div>
 
