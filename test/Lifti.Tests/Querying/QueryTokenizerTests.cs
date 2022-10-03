@@ -35,6 +35,29 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
+        public void FuzzySearchTermsYieldedCorrectly()
+        {
+            this.sut.ParseQueryTokens("?Testing ?1,2?Test ?,?Test").Should().BeEquivalentTo(
+                QueryToken.ForText("?Testing"),
+                QueryToken.ForText("?1,2?Test"),
+                QueryToken.ForText("?,?Test"));
+        }
+
+        [Fact]
+        public void FuzzySearchTermsSeparatedByCommasYieldedCorrectly()
+        {
+            this.sut.ParseQueryTokens("?Testing,?Test2").Should().BeEquivalentTo(
+                QueryToken.ForText("?Testing"),
+                QueryToken.ForText("?Test2"));
+        }
+
+        [Fact]
+        public void EmptyFuzzySearchTermsShouldYieldNoTokens()
+        {
+            this.sut.ParseQueryTokens("? ?1,2? ?,? ?? ???").Should().BeEmpty();
+        }
+
+        [Fact]
         public void SingleWordWithSpacePaddingYieldsOneResult()
         {
             this.sut.ParseQueryTokens("  \t  Testing   \t ").Should().BeEquivalentTo(

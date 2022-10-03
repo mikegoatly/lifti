@@ -430,6 +430,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unexpected OperatorParseState {0} encountered while tokenizing a query.
+        /// </summary>
+        internal static string UnexpectedOperatorParseStateEncountered {
+            get {
+                return ResourceManager.GetString("UnexpectedOperatorParseStateEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unexpected token encountered: {0}.
         /// </summary>
         internal static string UnexpectedTokenEncountered {

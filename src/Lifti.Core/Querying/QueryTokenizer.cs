@@ -12,8 +12,7 @@ namespace Lifti.Querying
         {
             '*',
             '?',
-            '%',
-            ',' // A comma is used in the definition of a fuzzy match operator. It will be treated as a separator if encountered anywhere else.
+            '%'
         };
 
         // Punctuation characters that shouldn't cause a token to be automatically split - these
@@ -79,6 +78,14 @@ namespace Lifti.Querying
                         state = state with { TokenState = TokenParseState.None };
                     }
 
+                    if (tokenText.Length == 0 || (tokenText[0] == '?' && tokenText[tokenText.Length - 1] == '?'))
+                    {
+                        // This is an edge case where we have a fuzzy search without any search term. It could be either
+                        // just a "?" or a fuzzy search with parameters but no search term, e.g. "?4,1?"
+                        // This should be considered the same as an empty search term, so don't return a token
+                        return null;
+                    }
+
                     return token;
                 }
 
@@ -89,6 +96,16 @@ namespace Lifti.Querying
             for (var i = 0; i < queryText.Length; i++)
             {
                 var current = queryText[i];
+                if (state.TokenState == TokenParseState.ProcessingFuzzyMatch
+                                        && current != ',' 
+                                        && char.IsDigit(current) == false)
+                {
+                    // As soon as we encounter a non digit or comma when processing a fuzzy match,
+                    // assume that we're not processing the fuzzy match parameters - this way a comma can
+                    // subsequently be treated as a split character.
+                    state = state with { TokenState = TokenParseState.ProcessingFuzzyMatchTerm };
+                }
+
                 if (IsSplitChar(current, state))
                 {
                     token = CreateTokenForYielding(i);
@@ -128,19 +145,6 @@ namespace Lifti.Querying
                                     }
 
                                     tokenStart ??= i;
-
-                                    break;
-
-                                case ',':
-                                    // Commas should only appear in the parameters of a fuzzy search token
-                                    if (state.TokenState != TokenParseState.ProcessingFuzzyMatch)
-                                    {
-                                        token = CreateTokenForYielding(i);
-                                        if (token != null)
-                                        {
-                                            yield return token.Value;
-                                        }
-                                    }
 
                                     break;
 
@@ -248,14 +252,18 @@ namespace Lifti.Querying
             var isWhitespace = char.IsWhiteSpace(current);
             return state.OperatorState switch
             {
-                OperatorParseState.None => isWhitespace ||
-                    (!generalNonSplitPunctuation.Contains(current) && char.IsPunctuation(current)),
+                OperatorParseState.None => 
+                    isWhitespace || // Whitespace is always a split character
+                    (!generalNonSplitPunctuation.Contains(current) 
+                        && char.IsPunctuation(current) // Punctuation other than explicitly non-splitting characters is a split character,
+                        && !(state.TokenState == TokenParseState.ProcessingFuzzyMatch && current == ',')), // ..unless it's a comma appearing in the first part of a fuzzy match
 
                 OperatorParseState.ProcessingString => isWhitespace ||
                     (!quotedSectionNonSplitPunctuation.Contains(current) && char.IsPunctuation(current)),
 
                 // When processing a near operator, no splitting is possible until the operator processing is complete
-                OperatorParseState.ProcessingNearOperator => false
+                OperatorParseState.ProcessingNearOperator => false,
+                _ => throw new QueryParserException(ExceptionMessages.UnexpectedOperatorParseStateEncountered, state.OperatorState)
             };
         }
     }

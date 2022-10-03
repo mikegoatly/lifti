@@ -315,10 +315,18 @@ namespace Lifti.Tests.Querying
             {
                 options.FuzzySearchMaxEditDistance = fuzzySearchMaxEditDistance;
             }
+            else
+            {
+                options.FuzzySearchMaxEditDistance = x => 4;
+            }
 
             if (fuzzySearchMaxSequentialEdits != null)
             {
                 options.FuzzySearchMaxSequentialEdits = fuzzySearchMaxSequentialEdits;
+            }
+            else
+            {
+                options.FuzzySearchMaxSequentialEdits = x => 1;
             }
 
             options.DefaultJoiningOperator = defaultJoinOperator;

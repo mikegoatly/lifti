@@ -240,6 +240,9 @@
   <data name="UnexpectedOperatorInternal" xml:space="preserve">
     <value>Internal error - An unexpected operator was encountered: {0}</value>
   </data>
+  <data name="UnexpectedOperatorParseStateEncountered" xml:space="preserve">
+    <value>Unexpected OperatorParseState {0} encountered while tokenizing a query</value>
+  </data>
   <data name="UnexpectedTokenEncountered" xml:space="preserve">
     <value>Unexpected token encountered: {0}</value>
   </data>
