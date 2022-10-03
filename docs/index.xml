@@ -98,6 +98,178 @@ so that the serializer knows how to read and write the data in your custom key:&
     </item>
     
     <item>
+      <title>Docs: The LIFTI Query Syntax</title>
+      <link>https://mikegoatly.github.io/lifti/docs/searching/lifti-query-syntax/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://mikegoatly.github.io/lifti/docs/searching/lifti-query-syntax/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;quick-examples&#34;&gt;Quick examples&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Example&lt;/th&gt;
+&lt;th&gt;Meaning&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;West&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;West&lt;/strong&gt; must appear in the text &lt;a href=&#34;#exact-word-matches&#34;&gt;exactly&lt;/a&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;?Wst&lt;/td&gt;
+&lt;td&gt;Words that &lt;a href=&#34;#fuzzy-match-&#34;&gt;fuzzy match&lt;/a&gt; with &lt;strong&gt;wst&lt;/strong&gt; must appear in the text.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;?3,2?Wst&lt;/td&gt;
+&lt;td&gt;Words that &lt;a href=&#34;#fuzzy-match-&#34;&gt;fuzzy match&lt;/a&gt; with &lt;strong&gt;wst&lt;/strong&gt; must appear in the text, with a specified max edit distance and max sequential edits.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;title=West&lt;/td&gt;
+&lt;td&gt;A &lt;a href=&#34;#field-restrictions-field&#34;&gt;field restricted&lt;/a&gt; search. &lt;strong&gt;West&lt;/strong&gt; must appear in the &lt;em&gt;&lt;strong&gt;title&lt;/strong&gt;&lt;/em&gt; field of an indexed object.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;doc*&lt;/td&gt;
+&lt;td&gt;Words that starts with &lt;strong&gt;doc&lt;/strong&gt;ument must appear in the text. &lt;a href=&#34;#wildcard-matching&#34;&gt;See wildcard matching&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;%%ing&lt;/td&gt;
+&lt;td&gt;Words that starts with any two letters and end with &lt;strong&gt;ing&lt;/strong&gt;, e.g. &lt;em&gt;doing&lt;/em&gt;. &lt;a href=&#34;#wildcard-matching&#34;&gt;See wildcard matching&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;west &amp;amp; wing&lt;/td&gt;
+&lt;td&gt;The words &lt;strong&gt;west&lt;/strong&gt; &lt;a href=&#34;#and-&#34;&gt;and&lt;/a&gt; &lt;strong&gt;wing&lt;/strong&gt; must appear in the text.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;west wing&lt;/td&gt;
+&lt;td&gt;The words &lt;strong&gt;west&lt;/strong&gt; &lt;a href=&#34;#and-&#34;&gt;and&lt;/a&gt; &lt;strong&gt;wing&lt;/strong&gt; must appear in the text - the default operator is &amp;amp; if none is specified between search words.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;west | wing&lt;/td&gt;
+&lt;td&gt;The words &lt;strong&gt;west&lt;/strong&gt; &lt;a href=&#34;#or-&#34;&gt;or&lt;/a&gt; &lt;strong&gt;wing&lt;/strong&gt; must appear in the text.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;west ~ wing&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;west&lt;/strong&gt; and &lt;strong&gt;wing&lt;/strong&gt; must appear &lt;a href=&#34;#near--and-n&#34;&gt;near to each other&lt;/a&gt; (within 5 words - the default) in the text.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;west ~3 wing&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;west&lt;/strong&gt; and &lt;strong&gt;wing&lt;/strong&gt; must appear &lt;a href=&#34;#near--and-n&#34;&gt;near to each other&lt;/a&gt; (within &lt;strong&gt;3&lt;/strong&gt; words) in the text.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;west ~&amp;gt; wing&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;west&lt;/strong&gt; must be &lt;a href=&#34;#near-following--and-n&#34;&gt;followed by&lt;/a&gt; &lt;strong&gt;wing&lt;/strong&gt; closely (within 5 words - the default) in the text.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;west ~3&amp;gt; wing&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;west&lt;/strong&gt; must be &lt;a href=&#34;#near-following--and-n&#34;&gt;followed by&lt;/a&gt; &lt;strong&gt;wing&lt;/strong&gt; closely (within &lt;strong&gt;3&lt;/strong&gt; words) in the text.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;west &amp;gt; wing&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;west&lt;/strong&gt; must &lt;a href=&#34;#following-&#34;&gt;precede&lt;/a&gt; &lt;strong&gt;wing&lt;/strong&gt; anywhere in the text&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&amp;ldquo;the west wing&amp;rdquo;&lt;/td&gt;
+&lt;td&gt;The words &lt;strong&gt;the west wing&lt;/strong&gt; must appear &lt;a href=&#34;#sequential-text-&#34;&gt;in sequence&lt;/a&gt; in the indexed text.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&amp;ldquo;notr* dam*&amp;rdquo;&lt;/td&gt;
+&lt;td&gt;You can use &lt;a href=&#34;#wildcard-matching&#34;&gt;wildcards&lt;/a&gt; and &lt;a href=&#34;#fuzzy-match-&#34;&gt;fuzzy matching&lt;/a&gt; in a &lt;a href=&#34;#sequential-text-&#34;&gt;sequential text&lt;/a&gt; query. In this case, a word starting with &lt;strong&gt;notr&lt;/strong&gt; must be immediately followed by a word starting with &lt;strong&gt;dam&lt;/strong&gt;, e.g. &lt;strong&gt;Notre Dame&lt;/strong&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Search terms can be combined and placed in parenthesis:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Example&lt;/th&gt;
+&lt;th&gt;Meaning&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&amp;ldquo;west wing&amp;rdquo; ~ &amp;ldquo;oval office&amp;rdquo;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;West wing&lt;/strong&gt; must appear near &lt;strong&gt;Oval Office&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;(west | east) &amp;amp; wing&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;west wing&lt;/strong&gt; or &lt;strong&gt;east wing&lt;/strong&gt; must appear in the document.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;query-operators&#34;&gt;Query Operators&lt;/h2&gt;
+&lt;h3 id=&#34;exact-word-matches&#34;&gt;Exact word matches&lt;/h3&gt;
+&lt;p&gt;Any text in a query will be tokenized using to the provided tokenizer,
+enforcing the same word stemming, case/accent sensitivity rules as used in the index.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;fuzzy-match-&#34;&gt;Fuzzy match (&lt;code&gt;?&lt;/code&gt;)&lt;/h3&gt;
+&lt;p&gt;By prefixing a search term with &lt;code&gt;?&lt;/code&gt; a fuzzy matching algorithm will be used to match the search term against the index. You can optionally specify the maximum edit distance and maximum number of sequential edits
+for a specific search term using the format:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;?{max edits},{max sequential edits}?term&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;For example &lt;code&gt;?2,1?food&lt;/code&gt; will search for &amp;ldquo;food&amp;rdquo; with a maximum number of edits of 2, and maximum sequential edits of 1.&lt;/p&gt;
+&lt;p&gt;You can omit one or the other parameter if required, so &lt;code&gt;?2,?food&lt;/code&gt; will only set the maximum number of edits to 2, leaving the maximum sequential edits at the default value.&lt;/p&gt;
+&lt;p&gt;See &lt;a href=&#34;../fuzzy-matching&#34;&gt;Fuzzy Matching&lt;/a&gt; for more details.&lt;/p&gt;
+&lt;h4 id=&#34;defaulting-search-terms-to-fuzzy-matching&#34;&gt;Defaulting search terms to fuzzy matching&lt;/h4&gt;
+&lt;p&gt;By default LIFTI will treat a search term as an &lt;a href=&#34;#exact-word-matches&#34;&gt;exact word match&lt;/a&gt;, however &lt;a href=&#34;../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser&#34;&gt;you can configure the index&lt;/a&gt; so that any search term (apart from those containing wildcards)
+will be treated as a fuzzy match.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;wildcard-matching&#34;&gt;Wildcard matching&lt;/h3&gt;
+&lt;p&gt;Any search term containing &lt;code&gt;*&lt;/code&gt; or &lt;code&gt;%&lt;/code&gt; will be considered a wildcard match, where:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;*&lt;/code&gt; matches zero or more characters&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;%&lt;/code&gt; matches any single character. You can use multiple &lt;code&gt;%&lt;/code&gt; in a row to indicate an exact number of characters that need to be matched.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Examples:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;foo*&lt;/code&gt; would match occurrences of &lt;code&gt;food&lt;/code&gt; and &lt;code&gt;football&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;*ing&lt;/code&gt; would match &lt;code&gt;drifting&lt;/code&gt; and &lt;code&gt;flying&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;%%%ld&lt;/code&gt; would match &lt;code&gt;could&lt;/code&gt; and &lt;code&gt;mould&lt;/code&gt; (but &lt;strong&gt;not&lt;/strong&gt; &lt;code&gt;should&lt;/code&gt;, because it has 4 letters before the &lt;code&gt;ld&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;%%p*&lt;/code&gt; matches words starting with any two characters followed by &lt;code&gt;g&lt;/code&gt;, then any zero or more characters, e.g. &lt;code&gt;map&lt;/code&gt;, &lt;code&gt;caps&lt;/code&gt;, &lt;code&gt;duped&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;and-&#34;&gt;And (&lt;code&gt;&amp;amp;&lt;/code&gt;)&lt;/h3&gt;
+&lt;p&gt;The and operator (&lt;code&gt;&amp;amp;&lt;/code&gt;) Performs an intersection of two intermediate query results, combining word positions for successful matches.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Food &amp;amp; Burger&lt;/code&gt; searches for items containing both &lt;code&gt;&amp;quot;food&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;burger&amp;quot;&lt;/code&gt; at any position, and in any field.&lt;/p&gt;
+&lt;p&gt;(Alternatively &lt;code&gt;Food Burger&lt;/code&gt; will have the same effect as the default operator between query parts is an &lt;code&gt;&amp;amp;&lt;/code&gt;.)&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;or-&#34;&gt;Or (&lt;code&gt;|&lt;/code&gt;)&lt;/h3&gt;
+&lt;p&gt;Performs a union of two intermediate query results. Where an items appears in both sets, word positions are combined into one list.&lt;/p&gt;
+&lt;p&gt;Restricts results to same field by default: &lt;strong&gt;false&lt;/strong&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;bracketing-expressions&#34;&gt;Bracketing expressions&lt;/h3&gt;
+&lt;p&gt;Brackets can be used to group expressions together.&lt;/p&gt;
+&lt;p&gt;e.g. &lt;code&gt;(food &amp;amp; cake) | (cheese &amp;amp; biscuit)&lt;/code&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;field-restrictions-field&#34;&gt;Field restrictions (&lt;code&gt;field=...&lt;/code&gt;)&lt;/h3&gt;
+&lt;p&gt;These allow for restricting searches within a given field.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;title=analysis | body=(chocolate &amp;amp; cake)&lt;/code&gt; Searches for items with &lt;code&gt;&amp;quot;analysis&amp;quot;&lt;/code&gt; in the title field &lt;em&gt;or both&lt;/em&gt; &lt;code&gt;&amp;quot;chocolate&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;cake&amp;quot;&lt;/code&gt; in the body field.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;title=analysis food&lt;/code&gt; Searches for items with &lt;code&gt;&amp;quot;analysis&amp;quot;&lt;/code&gt; in the title field &lt;em&gt;and&lt;/em&gt; &lt;code&gt;&amp;quot;food&amp;quot;&lt;/code&gt; in &lt;em&gt;any&lt;/em&gt; field.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;sequential-text-&#34;&gt;Sequential text (&lt;code&gt;&amp;quot;...&amp;quot;&lt;/code&gt;)&lt;/h3&gt;
+&lt;p&gt;Placing quotes around a search phrase will enforce that the words all appear
+immediately next to each other in the source text.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&amp;quot;cheese burger&amp;quot;&lt;/code&gt; will only match items that have text containing &lt;code&gt;&amp;quot;cheese&amp;quot;&lt;/code&gt; followed immediately by &lt;code&gt;&amp;quot;burger&amp;quot;&lt;/code&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;near--and-n&#34;&gt;Near (&lt;code&gt;~&lt;/code&gt; and &lt;code&gt;~n&lt;/code&gt;)&lt;/h3&gt;
+&lt;p&gt;The near operator performs a positional intersection of two results based on the position of the word in a field.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;~&lt;/code&gt; operator requires that words must be within 5 words of one another. This can value can be controlled by specifying a number, e.g. &lt;code&gt;~4&lt;/code&gt; to restrict to only returning results within 4 words of one another.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;cheese ~ cake&lt;/code&gt; will return items containing the words &lt;code&gt;&amp;quot;cheese&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;cake&amp;quot;&lt;/code&gt; in either order, up to 5 words apart, e.g. &lt;code&gt;&amp;quot;the cake was made with cheese&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;I like cheese and cake&amp;quot;&lt;/code&gt; would both match, but &lt;code&gt;&amp;quot;cake is never to be considered a substitute for cheese&amp;quot;&lt;/code&gt; would not.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;near-following--and-n&#34;&gt;Near following (&lt;code&gt;~&amp;gt;&lt;/code&gt; and &lt;code&gt;~n&amp;gt;&lt;/code&gt;)&lt;/h3&gt;
+&lt;p&gt;Same as Near (&lt;code&gt;~&lt;/code&gt;) except that order is important in the positional intersection.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;cheese ~&amp;gt; cake&lt;/code&gt; will match &lt;code&gt;&amp;quot;cheese and cake&amp;quot;&lt;/code&gt; but not &lt;code&gt;&amp;quot;cake and cheese&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id=&#34;following-&#34;&gt;Following (&lt;code&gt;&amp;gt;&lt;/code&gt;)&lt;/h3&gt;
+&lt;p&gt;Same as Near Following (&lt;code&gt;~&amp;gt;&lt;/code&gt;) except there are no constraints on how far apart the words can be.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;cheese &amp;gt; cake&lt;/code&gt; will match any text where &lt;code&gt;&amp;quot;cheese&amp;quot;&lt;/code&gt; precedes &lt;code&gt;&amp;quot;cake&amp;quot;&lt;/code&gt; in a given field.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Docs: Automatic Serialization</title>
       <link>https://mikegoatly.github.io/lifti/docs/serialization/automatic-serialization/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -321,186 +493,6 @@ make use of the full LIFTI query syntax in your queries, however you can still c
 terms as &lt;a href=&#34;../fuzzy-matching&#34;&gt;fuzzy matches&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Search terms are simply combined together with &lt;code&gt;and&lt;/code&gt;s or &lt;code&gt;or&lt;/code&gt;s, depending on your configuration, and punctuation is stripped out as per your 
 index tokenization rules.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: The LIFTI Query Syntax</title>
-      <link>https://mikegoatly.github.io/lifti/docs/searching/lifti-query-syntax/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://mikegoatly.github.io/lifti/docs/searching/lifti-query-syntax/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;quick-examples&#34;&gt;Quick examples&lt;/h2&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Example&lt;/th&gt;
-&lt;th&gt;Meaning&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;West&lt;/td&gt;
-&lt;td&gt;&lt;strong&gt;West&lt;/strong&gt; must appear in the text &lt;a href=&#34;#exact-word-matches&#34;&gt;exactly&lt;/a&gt;.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;?Wst&lt;/td&gt;
-&lt;td&gt;Words that &lt;a href=&#34;#fuzzy-match-&#34;&gt;fuzzy match&lt;/a&gt; with &lt;strong&gt;wst&lt;/strong&gt; must appear in the text.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;title=West&lt;/td&gt;
-&lt;td&gt;A &lt;a href=&#34;#field-restrictions-field&#34;&gt;field restricted&lt;/a&gt; search. &lt;strong&gt;West&lt;/strong&gt; must appear in the &lt;em&gt;&lt;strong&gt;title&lt;/strong&gt;&lt;/em&gt; field of an indexed object.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;doc*&lt;/td&gt;
-&lt;td&gt;Words that starts with &lt;strong&gt;doc&lt;/strong&gt;ument must appear in the text. &lt;a href=&#34;#wildcard-matching&#34;&gt;See wildcard matching&lt;/a&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;%%ing&lt;/td&gt;
-&lt;td&gt;Words that starts with any two letters and end with &lt;strong&gt;ing&lt;/strong&gt;, e.g. &lt;em&gt;doing&lt;/em&gt;. &lt;a href=&#34;#wildcard-matching&#34;&gt;See wildcard matching&lt;/a&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;west &amp;amp; wing&lt;/td&gt;
-&lt;td&gt;The words &lt;strong&gt;west&lt;/strong&gt; &lt;a href=&#34;#and-&#34;&gt;and&lt;/a&gt; &lt;strong&gt;wing&lt;/strong&gt; must appear in the text.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;west wing&lt;/td&gt;
-&lt;td&gt;The words &lt;strong&gt;west&lt;/strong&gt; &lt;a href=&#34;#and-&#34;&gt;and&lt;/a&gt; &lt;strong&gt;wing&lt;/strong&gt; must appear in the text - the default operator is &amp;amp; if none is specified between search words.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;west | wing&lt;/td&gt;
-&lt;td&gt;The words &lt;strong&gt;west&lt;/strong&gt; &lt;a href=&#34;#or-&#34;&gt;or&lt;/a&gt; &lt;strong&gt;wing&lt;/strong&gt; must appear in the text.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;west ~ wing&lt;/td&gt;
-&lt;td&gt;&lt;strong&gt;west&lt;/strong&gt; and &lt;strong&gt;wing&lt;/strong&gt; must appear &lt;a href=&#34;#near--and-n&#34;&gt;near to each other&lt;/a&gt; (within 5 words - the default) in the text.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;west ~3 wing&lt;/td&gt;
-&lt;td&gt;&lt;strong&gt;west&lt;/strong&gt; and &lt;strong&gt;wing&lt;/strong&gt; must appear &lt;a href=&#34;#near--and-n&#34;&gt;near to each other&lt;/a&gt; (within &lt;strong&gt;3&lt;/strong&gt; words) in the text.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;west ~&amp;gt; wing&lt;/td&gt;
-&lt;td&gt;&lt;strong&gt;west&lt;/strong&gt; must be &lt;a href=&#34;#near-following--and-n&#34;&gt;followed by&lt;/a&gt; &lt;strong&gt;wing&lt;/strong&gt; closely (within 5 words - the default) in the text.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;west ~3&amp;gt; wing&lt;/td&gt;
-&lt;td&gt;&lt;strong&gt;west&lt;/strong&gt; must be &lt;a href=&#34;#near-following--and-n&#34;&gt;followed by&lt;/a&gt; &lt;strong&gt;wing&lt;/strong&gt; closely (within &lt;strong&gt;3&lt;/strong&gt; words) in the text.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;west &amp;gt; wing&lt;/td&gt;
-&lt;td&gt;&lt;strong&gt;west&lt;/strong&gt; must &lt;a href=&#34;#following-&#34;&gt;precede&lt;/a&gt; &lt;strong&gt;wing&lt;/strong&gt; anywhere in the text&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&amp;ldquo;the west wing&amp;rdquo;&lt;/td&gt;
-&lt;td&gt;The words &lt;strong&gt;the west wing&lt;/strong&gt; must appear &lt;a href=&#34;#sequential-text-&#34;&gt;in sequence&lt;/a&gt; in the indexed text.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&amp;ldquo;notr* dam*&amp;rdquo;&lt;/td&gt;
-&lt;td&gt;You can use &lt;a href=&#34;#wildcard-matching&#34;&gt;wildcards&lt;/a&gt; and &lt;a href=&#34;#fuzzy-match-&#34;&gt;fuzzy matching&lt;/a&gt; in a &lt;a href=&#34;#sequential-text-&#34;&gt;sequential text&lt;/a&gt; query. In this case, a word starting with &lt;strong&gt;notr&lt;/strong&gt; must be immediately followed by a word starting with &lt;strong&gt;dam&lt;/strong&gt;, e.g. &lt;strong&gt;Notre Dame&lt;/strong&gt;.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;Search terms can be combined and placed in parenthesis:&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Example&lt;/th&gt;
-&lt;th&gt;Meaning&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;&amp;ldquo;west wing&amp;rdquo; ~ &amp;ldquo;oval office&amp;rdquo;&lt;/td&gt;
-&lt;td&gt;&lt;strong&gt;West wing&lt;/strong&gt; must appear near &lt;strong&gt;Oval Office&lt;/strong&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;(west | east) &amp;amp; wing&lt;/td&gt;
-&lt;td&gt;&lt;strong&gt;west wing&lt;/strong&gt; or &lt;strong&gt;east wing&lt;/strong&gt; must appear in the document.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h2 id=&#34;query-operators&#34;&gt;Query Operators&lt;/h2&gt;
-&lt;h3 id=&#34;exact-word-matches&#34;&gt;Exact word matches&lt;/h3&gt;
-&lt;p&gt;Any text in a query will be tokenized using to the provided tokenizer,
-enforcing the same word stemming, case/accent sensitivity rules as used in the index.&lt;/p&gt;
-&lt;hr&gt;
-&lt;h3 id=&#34;fuzzy-match-&#34;&gt;Fuzzy match (&lt;code&gt;?&lt;/code&gt;)&lt;/h3&gt;
-&lt;p&gt;By prefixing a search term with &lt;code&gt;?&lt;/code&gt; a fuzzy matching algorithm will be used to match the search term against the index.&lt;/p&gt;
-&lt;h4 id=&#34;defaulting-search-terms-to-fuzzy-matching&#34;&gt;Defaulting search terms to fuzzy matching&lt;/h4&gt;
-&lt;p&gt;By default LIFTI will treat a search term as an &lt;a href=&#34;#exact-word-matches&#34;&gt;exact word match&lt;/a&gt;, however &lt;a href=&#34;../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser&#34;&gt;you can configure the index&lt;/a&gt; so that any search term (apart from those containing wildcards)
-will be treated as a fuzzy match.&lt;/p&gt;
-&lt;h4 id=&#34;fuzzy-matching&#34;&gt;Fuzzy matching&lt;/h4&gt;
-&lt;p&gt;LIFTI uses &lt;a href=&#34;https://en.wikipedia.org/wiki/Levenshtein_distance&#34;&gt;Levenshtein distance&lt;/a&gt; to perform fuzzy matches between a search term and tokens in the index.
-The distance between two words is the number of edits that are required to match them, including:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;insertions: fid would match fi&lt;strong&gt;n&lt;/strong&gt;d&lt;/li&gt;
-&lt;li&gt;deletions: foood would match food&lt;/li&gt;
-&lt;li&gt;substitutions: frnd would match f&lt;strong&gt;i&lt;/strong&gt;nd&lt;/li&gt;
-&lt;li&gt;transpositions: fnid would match f&lt;strong&gt;in&lt;/strong&gt;d - Transpositions are a special case, because although two characters are affected, it is considered a single edit.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;The resulting Levenshtein distance between any matched term and the search term is used to reduce the score of the match. This means that documents containing
-words that are closer matches will typically be surfaced higher up in the search results.&lt;/p&gt;
-&lt;p&gt;To prevent a &lt;a href=&#34;https://en.wikipedia.org/wiki/Combinatorial_explosion&#34;&gt;combinatorial explosion&lt;/a&gt; of potential matches, LIFTI currently limits the maximum number
-of allowed edits to 3, and sequential edits to 1. This means that as of now:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;feed&lt;/strong&gt; will &lt;em&gt;not&lt;/em&gt; match &lt;strong&gt;food&lt;/strong&gt; because it requires two sequential edits&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;redy&lt;/strong&gt; will &lt;em&gt;not&lt;/em&gt; match &lt;strong&gt;friendly&lt;/strong&gt; because it requires 4 insertions&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;h3 id=&#34;wildcard-matching&#34;&gt;Wildcard matching&lt;/h3&gt;
-&lt;p&gt;Any search term containing &lt;code&gt;*&lt;/code&gt; or &lt;code&gt;%&lt;/code&gt; will be considered a wildcard match, where:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;*&lt;/code&gt; matches zero or more characters&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;%&lt;/code&gt; matches any single character. You can use multiple &lt;code&gt;%&lt;/code&gt; in a row to indicate an exact number of characters that need to be matched.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Examples:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;foo*&lt;/code&gt; would match occurrences of &lt;code&gt;food&lt;/code&gt; and &lt;code&gt;football&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;*ing&lt;/code&gt; would match &lt;code&gt;drifting&lt;/code&gt; and &lt;code&gt;flying&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;%%%ld&lt;/code&gt; would match &lt;code&gt;could&lt;/code&gt; and &lt;code&gt;mould&lt;/code&gt; (but &lt;strong&gt;not&lt;/strong&gt; &lt;code&gt;should&lt;/code&gt;, because it has 4 letters before the &lt;code&gt;ld&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;%%p*&lt;/code&gt; matches words starting with any two characters followed by &lt;code&gt;g&lt;/code&gt;, then any zero or more characters, e.g. &lt;code&gt;map&lt;/code&gt;, &lt;code&gt;caps&lt;/code&gt;, &lt;code&gt;duped&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;h3 id=&#34;and-&#34;&gt;And (&lt;code&gt;&amp;amp;&lt;/code&gt;)&lt;/h3&gt;
-&lt;p&gt;The and operator (&lt;code&gt;&amp;amp;&lt;/code&gt;) Performs an intersection of two intermediate query results, combining word positions for successful matches.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;Food &amp;amp; Burger&lt;/code&gt; searches for items containing both &lt;code&gt;&amp;quot;food&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;burger&amp;quot;&lt;/code&gt; at any position, and in any field.&lt;/p&gt;
-&lt;p&gt;(Alternatively &lt;code&gt;Food Burger&lt;/code&gt; will have the same effect as the default operator between query parts is an &lt;code&gt;&amp;amp;&lt;/code&gt;.)&lt;/p&gt;
-&lt;hr&gt;
-&lt;h3 id=&#34;or-&#34;&gt;Or (&lt;code&gt;|&lt;/code&gt;)&lt;/h3&gt;
-&lt;p&gt;Performs a union of two intermediate query results. Where an items appears in both sets, word positions are combined into one list.&lt;/p&gt;
-&lt;p&gt;Restricts results to same field by default: &lt;strong&gt;false&lt;/strong&gt;&lt;/p&gt;
-&lt;hr&gt;
-&lt;h3 id=&#34;bracketing-expressions&#34;&gt;Bracketing expressions&lt;/h3&gt;
-&lt;p&gt;Brackets can be used to group expressions together.&lt;/p&gt;
-&lt;p&gt;e.g. &lt;code&gt;(food &amp;amp; cake) | (cheese &amp;amp; biscuit)&lt;/code&gt;&lt;/p&gt;
-&lt;hr&gt;
-&lt;h3 id=&#34;field-restrictions-field&#34;&gt;Field restrictions (&lt;code&gt;field=...&lt;/code&gt;)&lt;/h3&gt;
-&lt;p&gt;These allow for restricting searches within a given field.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;title=analysis | body=(chocolate &amp;amp; cake)&lt;/code&gt; Searches for items with &lt;code&gt;&amp;quot;analysis&amp;quot;&lt;/code&gt; in the title field &lt;em&gt;or both&lt;/em&gt; &lt;code&gt;&amp;quot;chocolate&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;cake&amp;quot;&lt;/code&gt; in the body field.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;title=analysis food&lt;/code&gt; Searches for items with &lt;code&gt;&amp;quot;analysis&amp;quot;&lt;/code&gt; in the title field &lt;em&gt;and&lt;/em&gt; &lt;code&gt;&amp;quot;food&amp;quot;&lt;/code&gt; in &lt;em&gt;any&lt;/em&gt; field.&lt;/p&gt;
-&lt;hr&gt;
-&lt;h3 id=&#34;sequential-text-&#34;&gt;Sequential text (&lt;code&gt;&amp;quot;...&amp;quot;&lt;/code&gt;)&lt;/h3&gt;
-&lt;p&gt;Placing quotes around a search phrase will enforce that the words all appear
-immediately next to each other in the source text.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;&amp;quot;cheese burger&amp;quot;&lt;/code&gt; will only match items that have text containing &lt;code&gt;&amp;quot;cheese&amp;quot;&lt;/code&gt; followed immediately by &lt;code&gt;&amp;quot;burger&amp;quot;&lt;/code&gt;.&lt;/p&gt;
-&lt;hr&gt;
-&lt;h3 id=&#34;near--and-n&#34;&gt;Near (&lt;code&gt;~&lt;/code&gt; and &lt;code&gt;~n&lt;/code&gt;)&lt;/h3&gt;
-&lt;p&gt;The near operator performs a positional intersection of two results based on the position of the word in a field.&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;~&lt;/code&gt; operator requires that words must be within 5 words of one another. This can value can be controlled by specifying a number, e.g. &lt;code&gt;~4&lt;/code&gt; to restrict to only returning results within 4 words of one another.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;cheese ~ cake&lt;/code&gt; will return items containing the words &lt;code&gt;&amp;quot;cheese&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;cake&amp;quot;&lt;/code&gt; in either order, up to 5 words apart, e.g. &lt;code&gt;&amp;quot;the cake was made with cheese&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;I like cheese and cake&amp;quot;&lt;/code&gt; would both match, but &lt;code&gt;&amp;quot;cake is never to be considered a substitute for cheese&amp;quot;&lt;/code&gt; would not.&lt;/p&gt;
-&lt;hr&gt;
-&lt;h3 id=&#34;near-following--and-n&#34;&gt;Near following (&lt;code&gt;~&amp;gt;&lt;/code&gt; and &lt;code&gt;~n&amp;gt;&lt;/code&gt;)&lt;/h3&gt;
-&lt;p&gt;Same as Near (&lt;code&gt;~&lt;/code&gt;) except that order is important in the positional intersection.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;cheese ~&amp;gt; cake&lt;/code&gt; will match &lt;code&gt;&amp;quot;cheese and cake&amp;quot;&lt;/code&gt; but not &lt;code&gt;&amp;quot;cake and cheese&amp;quot;&lt;/code&gt;&lt;/p&gt;
-&lt;hr&gt;
-&lt;h3 id=&#34;following-&#34;&gt;Following (&lt;code&gt;&amp;gt;&lt;/code&gt;)&lt;/h3&gt;
-&lt;p&gt;Same as Near Following (&lt;code&gt;~&amp;gt;&lt;/code&gt;) except there are no constraints on how far apart the words can be.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;cheese &amp;gt; cake&lt;/code&gt; will match any text where &lt;code&gt;&amp;quot;cheese&amp;quot;&lt;/code&gt; precedes &lt;code&gt;&amp;quot;cake&amp;quot;&lt;/code&gt; in a given field.&lt;/p&gt;
 
       </description>
     </item>

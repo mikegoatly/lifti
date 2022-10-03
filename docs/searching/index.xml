@@ -14,62 +14,6 @@
     
     
     <item>
-      <title>Docs: Fuzzy Matching</title>
-      <link>https://mikegoatly.github.io/lifti/docs/searching/fuzzy-matching/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://mikegoatly.github.io/lifti/docs/searching/fuzzy-matching/</guid>
-      <description>
-        
-        
-        &lt;p&gt;Fuzzy matches can be explicitly searched for using the &lt;a href=&#34;lifti-query-syntax/#fuzzy-match-&#34;&gt;LIFTI query syntax&lt;/a&gt;, or implied as the default for searches by 
-&lt;a href=&#34;./index-construction/withqueryparser/#configuring-the-default-lifti-queryparser&#34;&gt;configuring the index&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;LIFTI uses &lt;a href=&#34;https://en.wikipedia.org/wiki/Levenshtein_distance&#34;&gt;Levenshtein distance&lt;/a&gt; to perform fuzzy matches between a search term and tokens in the index.
-The distance between two words is the number of edits that are required to match them, including:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;insertions: fid would match fi&lt;strong&gt;n&lt;/strong&gt;d&lt;/li&gt;
-&lt;li&gt;deletions: foood would match food&lt;/li&gt;
-&lt;li&gt;substitutions: frnd would match f&lt;strong&gt;i&lt;/strong&gt;nd&lt;/li&gt;
-&lt;li&gt;transpositions: fnid would match f&lt;strong&gt;in&lt;/strong&gt;d - Transpositions are a special case, because although two characters are affected, it is considered a single edit.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;The resulting Levenshtein distance between any matched term and the search term is used to reduce the score of the match. This means that documents containing
-words that are closer matches will typically be surfaced higher up in the search results.&lt;/p&gt;
-&lt;h3 id=&#34;configuration&#34;&gt;Configuration&lt;/h3&gt;
-&lt;p&gt;To prevent a &lt;a href=&#34;https://en.wikipedia.org/wiki/Combinatorial_explosion&#34;&gt;combinatorial explosion&lt;/a&gt; of potential matches, LIFTI provides two control mechanisms for fuzzy matching:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Maximum number of edits&lt;/strong&gt; - the total number of edits that can be used in any potential match. The default for this value is calculated as &lt;code&gt;search term length/2&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Maximum number of sequential edits&lt;/strong&gt; - the maximum number of edits that can be found sequentially in any potential match. The default for this value is calculated as &lt;code&gt;search term length/4&lt;/code&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;For example, with a max edits of &lt;strong&gt;3&lt;/strong&gt; and max sequential edits of &lt;strong&gt;1&lt;/strong&gt;:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;feed&lt;/strong&gt; will &lt;em&gt;not&lt;/em&gt; match &lt;strong&gt;food&lt;/strong&gt; because it requires two sequential edits&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;redy&lt;/strong&gt; will &lt;em&gt;not&lt;/em&gt; match &lt;strong&gt;friendly&lt;/strong&gt; because it requires 4 insertions&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Default values can be &lt;a href=&#34;../index-construction/withqueryparser/#queryparserbuilder-options&#34;&gt;configured at the index level&lt;/a&gt;, and can either be expressed as a static value,
-or a value calculated from the length of the search term.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Docs: Simple Queries</title>
-      <link>https://mikegoatly.github.io/lifti/docs/searching/simple-queries/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://mikegoatly.github.io/lifti/docs/searching/simple-queries/</guid>
-      <description>
-        
-        
-        &lt;p&gt;When you have &lt;a href=&#34;../../index-construction/withsimplequeryparser&#34;&gt;configured an index to use the simple query parser&lt;/a&gt; you can no longer
-make use of the full LIFTI query syntax in your queries, however you can still configure the simple query parser to treat all search 
-terms as &lt;a href=&#34;../fuzzy-matching&#34;&gt;fuzzy matches&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Search terms are simply combined together with &lt;code&gt;and&lt;/code&gt;s or &lt;code&gt;or&lt;/code&gt;s, depending on your configuration, and punctuation is stripped out as per your 
-index tokenization rules.&lt;/p&gt;
-
-      </description>
-    </item>
-    
-    <item>
       <title>Docs: The LIFTI Query Syntax</title>
       <link>https://mikegoatly.github.io/lifti/docs/searching/lifti-query-syntax/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -94,6 +38,10 @@ index tokenization rules.&lt;/p&gt;
 &lt;tr&gt;
 &lt;td&gt;?Wst&lt;/td&gt;
 &lt;td&gt;Words that &lt;a href=&#34;#fuzzy-match-&#34;&gt;fuzzy match&lt;/a&gt; with &lt;strong&gt;wst&lt;/strong&gt; must appear in the text.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;?3,2?Wst&lt;/td&gt;
+&lt;td&gt;Words that &lt;a href=&#34;#fuzzy-match-&#34;&gt;fuzzy match&lt;/a&gt; with &lt;strong&gt;wst&lt;/strong&gt; must appear in the text, with a specified max edit distance and max sequential edits.&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;title=West&lt;/td&gt;
@@ -174,27 +122,15 @@ index tokenization rules.&lt;/p&gt;
 enforcing the same word stemming, case/accent sensitivity rules as used in the index.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h3 id=&#34;fuzzy-match-&#34;&gt;Fuzzy match (&lt;code&gt;?&lt;/code&gt;)&lt;/h3&gt;
-&lt;p&gt;By prefixing a search term with &lt;code&gt;?&lt;/code&gt; a fuzzy matching algorithm will be used to match the search term against the index.&lt;/p&gt;
+&lt;p&gt;By prefixing a search term with &lt;code&gt;?&lt;/code&gt; a fuzzy matching algorithm will be used to match the search term against the index. You can optionally specify the maximum edit distance and maximum number of sequential edits
+for a specific search term using the format:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;?{max edits},{max sequential edits}?term&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;For example &lt;code&gt;?2,1?food&lt;/code&gt; will search for &amp;ldquo;food&amp;rdquo; with a maximum number of edits of 2, and maximum sequential edits of 1.&lt;/p&gt;
+&lt;p&gt;You can omit one or the other parameter if required, so &lt;code&gt;?2,?food&lt;/code&gt; will only set the maximum number of edits to 2, leaving the maximum sequential edits at the default value.&lt;/p&gt;
+&lt;p&gt;See &lt;a href=&#34;../fuzzy-matching&#34;&gt;Fuzzy Matching&lt;/a&gt; for more details.&lt;/p&gt;
 &lt;h4 id=&#34;defaulting-search-terms-to-fuzzy-matching&#34;&gt;Defaulting search terms to fuzzy matching&lt;/h4&gt;
 &lt;p&gt;By default LIFTI will treat a search term as an &lt;a href=&#34;#exact-word-matches&#34;&gt;exact word match&lt;/a&gt;, however &lt;a href=&#34;../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser&#34;&gt;you can configure the index&lt;/a&gt; so that any search term (apart from those containing wildcards)
 will be treated as a fuzzy match.&lt;/p&gt;
-&lt;h4 id=&#34;fuzzy-matching&#34;&gt;Fuzzy matching&lt;/h4&gt;
-&lt;p&gt;LIFTI uses &lt;a href=&#34;https://en.wikipedia.org/wiki/Levenshtein_distance&#34;&gt;Levenshtein distance&lt;/a&gt; to perform fuzzy matches between a search term and tokens in the index.
-The distance between two words is the number of edits that are required to match them, including:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;insertions: fid would match fi&lt;strong&gt;n&lt;/strong&gt;d&lt;/li&gt;
-&lt;li&gt;deletions: foood would match food&lt;/li&gt;
-&lt;li&gt;substitutions: frnd would match f&lt;strong&gt;i&lt;/strong&gt;nd&lt;/li&gt;
-&lt;li&gt;transpositions: fnid would match f&lt;strong&gt;in&lt;/strong&gt;d - Transpositions are a special case, because although two characters are affected, it is considered a single edit.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;The resulting Levenshtein distance between any matched term and the search term is used to reduce the score of the match. This means that documents containing
-words that are closer matches will typically be surfaced higher up in the search results.&lt;/p&gt;
-&lt;p&gt;To prevent a &lt;a href=&#34;https://en.wikipedia.org/wiki/Combinatorial_explosion&#34;&gt;combinatorial explosion&lt;/a&gt; of potential matches, LIFTI currently limits the maximum number
-of allowed edits to 3, and sequential edits to 1. This means that as of now:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;feed&lt;/strong&gt; will &lt;em&gt;not&lt;/em&gt; match &lt;strong&gt;food&lt;/strong&gt; because it requires two sequential edits&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;redy&lt;/strong&gt; will &lt;em&gt;not&lt;/em&gt; match &lt;strong&gt;friendly&lt;/strong&gt; because it requires 4 insertions&lt;/li&gt;
-&lt;/ul&gt;
 &lt;hr&gt;
 &lt;h3 id=&#34;wildcard-matching&#34;&gt;Wildcard matching&lt;/h3&gt;
 &lt;p&gt;Any search term containing &lt;code&gt;*&lt;/code&gt; or &lt;code&gt;%&lt;/code&gt; will be considered a wildcard match, where:&lt;/p&gt;
@@ -245,6 +181,62 @@ immediately next to each other in the source text.&lt;/p&gt;
 &lt;h3 id=&#34;following-&#34;&gt;Following (&lt;code&gt;&amp;gt;&lt;/code&gt;)&lt;/h3&gt;
 &lt;p&gt;Same as Near Following (&lt;code&gt;~&amp;gt;&lt;/code&gt;) except there are no constraints on how far apart the words can be.&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;cheese &amp;gt; cake&lt;/code&gt; will match any text where &lt;code&gt;&amp;quot;cheese&amp;quot;&lt;/code&gt; precedes &lt;code&gt;&amp;quot;cake&amp;quot;&lt;/code&gt; in a given field.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Fuzzy Matching</title>
+      <link>https://mikegoatly.github.io/lifti/docs/searching/fuzzy-matching/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://mikegoatly.github.io/lifti/docs/searching/fuzzy-matching/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Fuzzy matches can be explicitly searched for using the &lt;a href=&#34;lifti-query-syntax/#fuzzy-match-&#34;&gt;LIFTI query syntax&lt;/a&gt;, or implied as the default for searches by 
+&lt;a href=&#34;./index-construction/withqueryparser/#configuring-the-default-lifti-queryparser&#34;&gt;configuring the index&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;LIFTI uses &lt;a href=&#34;https://en.wikipedia.org/wiki/Levenshtein_distance&#34;&gt;Levenshtein distance&lt;/a&gt; to perform fuzzy matches between a search term and tokens in the index.
+The distance between two words is the number of edits that are required to match them, including:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;insertions: fid would match fi&lt;strong&gt;n&lt;/strong&gt;d&lt;/li&gt;
+&lt;li&gt;deletions: foood would match food&lt;/li&gt;
+&lt;li&gt;substitutions: frnd would match f&lt;strong&gt;i&lt;/strong&gt;nd&lt;/li&gt;
+&lt;li&gt;transpositions: fnid would match f&lt;strong&gt;in&lt;/strong&gt;d - Transpositions are a special case, because although two characters are affected, it is considered a single edit.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The resulting Levenshtein distance between any matched term and the search term is used to reduce the score of the match. This means that documents containing
+words that are closer matches will typically be surfaced higher up in the search results.&lt;/p&gt;
+&lt;h3 id=&#34;configuration&#34;&gt;Configuration&lt;/h3&gt;
+&lt;p&gt;To prevent a &lt;a href=&#34;https://en.wikipedia.org/wiki/Combinatorial_explosion&#34;&gt;combinatorial explosion&lt;/a&gt; of potential matches, LIFTI provides two control mechanisms for fuzzy matching:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Maximum number of edits&lt;/strong&gt; - the total number of edits that can be used in any potential match. The default for this value is calculated as &lt;code&gt;search term length/2&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Maximum number of sequential edits&lt;/strong&gt; - the maximum number of edits that can be found sequentially in any potential match. The default for this value is calculated as &lt;code&gt;search term length/4&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For example, with a max edits of &lt;strong&gt;3&lt;/strong&gt; and max sequential edits of &lt;strong&gt;1&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;feed&lt;/strong&gt; will &lt;em&gt;not&lt;/em&gt; match &lt;strong&gt;food&lt;/strong&gt; because it requires two sequential edits&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;redy&lt;/strong&gt; will &lt;em&gt;not&lt;/em&gt; match &lt;strong&gt;friendly&lt;/strong&gt; because it requires 4 insertions&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Default values can be &lt;a href=&#34;../index-construction/withqueryparser/#queryparserbuilder-options&#34;&gt;configured at the index level&lt;/a&gt;, and can either be expressed as a static value,
+or a value calculated from the length of the search term.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Simple Queries</title>
+      <link>https://mikegoatly.github.io/lifti/docs/searching/simple-queries/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://mikegoatly.github.io/lifti/docs/searching/simple-queries/</guid>
+      <description>
+        
+        
+        &lt;p&gt;When you have &lt;a href=&#34;../../index-construction/withsimplequeryparser&#34;&gt;configured an index to use the simple query parser&lt;/a&gt; you can no longer
+make use of the full LIFTI query syntax in your queries, however you can still configure the simple query parser to treat all search 
+terms as &lt;a href=&#34;../fuzzy-matching&#34;&gt;fuzzy matches&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Search terms are simply combined together with &lt;code&gt;and&lt;/code&gt;s or &lt;code&gt;or&lt;/code&gt;s, depending on your configuration, and punctuation is stripped out as per your 
+index tokenization rules.&lt;/p&gt;
 
       </description>
     </item>

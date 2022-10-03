@@ -8,6 +8,9 @@
     <loc>https://mikegoatly.github.io/lifti/docs/serialization/key-serialization/</loc>
     <lastmod>2020-07-18T09:10:51+01:00</lastmod>
   </url><url>
+    <loc>https://mikegoatly.github.io/lifti/docs/searching/lifti-query-syntax/</loc>
+    <lastmod>2022-02-12T13:20:53+00:00</lastmod>
+  </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/serialization/automatic-serialization/</loc>
     <lastmod>2022-02-06T08:05:54+00:00</lastmod>
   </url><url>
@@ -15,7 +18,7 @@
     <lastmod>2020-07-30T20:46:54+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/</loc>
-    <lastmod>2022-10-03T22:41:18+01:00</lastmod>
+    <lastmod>2022-10-03T22:57:25+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withdefaulttokenization/</loc>
     <lastmod>2020-07-30T09:07:04+01:00</lastmod>
@@ -24,7 +27,7 @@
     <lastmod>2020-07-24T08:02:07+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/searching/fuzzy-matching/</loc>
-    <lastmod>2022-10-03T22:41:18+01:00</lastmod>
+    <lastmod>2022-10-03T22:57:25+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/indexing-mutations/</loc>
     <lastmod>2020-07-30T20:46:54+01:00</lastmod>
@@ -33,19 +36,16 @@
     <lastmod>2020-07-30T20:46:54+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/searching/simple-queries/</loc>
-    <lastmod>2022-10-03T22:41:18+01:00</lastmod>
+    <lastmod>2022-10-03T22:57:25+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/searching/</loc>
-    <lastmod>2022-02-12T13:20:53+00:00</lastmod>
-  </url><url>
-    <loc>https://mikegoatly.github.io/lifti/docs/searching/lifti-query-syntax/</loc>
     <lastmod>2022-02-12T13:20:53+00:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withduplicateitembehavior/</loc>
     <lastmod>2020-07-20T20:44:46+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withqueryparser/</loc>
-    <lastmod>2022-10-03T22:41:18+01:00</lastmod>
+    <lastmod>2022-10-03T22:57:25+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/scoring/</loc>
     <lastmod>2022-02-06T09:34:50+00:00</lastmod>
@@ -54,7 +54,7 @@
     <lastmod>2020-07-17T19:29:39+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withsimplequeryparser/</loc>
-    <lastmod>2022-10-03T22:41:18+01:00</lastmod>
+    <lastmod>2022-10-03T22:57:25+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withtextextraction/</loc>
     <lastmod>2020-07-24T08:02:07+01:00</lastmod>
@@ -69,7 +69,7 @@
     <lastmod>2022-02-06T08:05:54+00:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/</loc>
-    <lastmod>2022-10-03T22:41:18+01:00</lastmod>
+    <lastmod>2022-10-03T22:57:25+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/searching/manually-constructing-queries/</loc>
     <lastmod>2022-02-12T13:20:53+00:00</lastmod>

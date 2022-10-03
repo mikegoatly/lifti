@@ -21,7 +21,7 @@
 <link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
 
 <title>The LIFTI Query Syntax | LIFTI</title><meta property="og:title" content="The LIFTI Query Syntax" />
-<meta property="og:description" content="The LIFTI query syntax
+<meta property="og:description" content="The default query parser for an index makes use of a powerful query syntax.
 " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/searching/lifti-query-syntax/" /><meta property="article:section" content="docs" />
@@ -29,13 +29,13 @@
 <meta property="article:modified_time" content="2022-02-12T13:20:53+00:00" /><meta property="og:site_name" content="LIFTI" />
 
 <meta itemprop="name" content="The LIFTI Query Syntax">
-<meta itemprop="description" content="The LIFTI query syntax
+<meta itemprop="description" content="The default query parser for an index makes use of a powerful query syntax.
 ">
 <meta itemprop="dateModified" content="2022-02-12T13:20:53+00:00" />
-<meta itemprop="wordCount" content="1034">
+<meta itemprop="wordCount" content="974">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="The LIFTI Query Syntax"/>
-<meta name="twitter:description" content="The LIFTI query syntax
+<meta name="twitter:description" content="The default query parser for an index makes use of a powerful query syntax.
 "/>
 
 
@@ -104,7 +104,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/lifti/offline-search-index.ef51c01c27df9c6b9524a00eeb909084c0c95e5bf4fbe63c6dac88f3bc82e2989c905dbe392525f4e557141ec5469dc0474b8593b7454606462d240124ac2c7c.json"
+  data-offline-search-index-json-src="/lifti/offline-search-index.5798d0e3fd62fa169c2be351383222300c57d22ec9fc62732208401644bb8ddfaa001b30b21126dd4bb2604ff6b05ca01cc960462560cf9578f230122148dd20.json"
   data-offline-search-base-href="/"
   data-offlnie-search-max-results="10"
 >
@@ -135,7 +135,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/lifti/offline-search-index.ef51c01c27df9c6b9524a00eeb909084c0c95e5bf4fbe63c6dac88f3bc82e2989c905dbe392525f4e557141ec5469dc0474b8593b7454606462d240124ac2c7c.json"
+  data-offline-search-index-json-src="/lifti/offline-search-index.5798d0e3fd62fa169c2be351383222300c57d22ec9fc62732208401644bb8ddfaa001b30b21126dd4bb2604ff6b05ca01cc960462560cf9578f230122148dd20.json"
   data-offline-search-base-href="/"
   data-offlnie-search-max-results="10"
 >
@@ -312,6 +312,12 @@
       
       
       
+      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocssearchinglifti-query-syntax" href="/lifti/docs/searching/lifti-query-syntax/">The LIFTI Query Syntax</a>
+      
+      
+      
+      
+      
       <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocssearchingfuzzy-matching" href="/lifti/docs/searching/fuzzy-matching/">Fuzzy Matching</a>
       
       
@@ -319,12 +325,6 @@
       
       
       <a class="td-sidebar-link td-sidebar-link__page " id="m-liftidocssearchingsimple-queries" href="/lifti/docs/searching/simple-queries/">Simple Queries</a>
-      
-      
-      
-      
-      
-      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-liftidocssearchinglifti-query-syntax" href="/lifti/docs/searching/lifti-query-syntax/">The LIFTI Query Syntax</a>
       
       
       
@@ -561,7 +561,7 @@
             
 <div class="td-content">
 	<h1>The LIFTI Query Syntax</h1>
-    <div class="lead">The LIFTI query syntax</div>
+    <div class="lead">The default query parser for an index makes use of a powerful query syntax.</div>
 	       
 	<h2 id="quick-examples">Quick examples</h2>
 <table>
@@ -579,6 +579,10 @@
 <tr>
 <td>?Wst</td>
 <td>Words that <a href="#fuzzy-match-">fuzzy match</a> with <strong>wst</strong> must appear in the text.</td>
+</tr>
+<tr>
+<td>?3,2?Wst</td>
+<td>Words that <a href="#fuzzy-match-">fuzzy match</a> with <strong>wst</strong> must appear in the text, with a specified max edit distance and max sequential edits.</td>
 </tr>
 <tr>
 <td>title=West</td>
@@ -659,27 +663,15 @@
 enforcing the same word stemming, case/accent sensitivity rules as used in the index.</p>
 <hr>
 <h3 id="fuzzy-match-">Fuzzy match (<code>?</code>)</h3>
-<p>By prefixing a search term with <code>?</code> a fuzzy matching algorithm will be used to match the search term against the index.</p>
+<p>By prefixing a search term with <code>?</code> a fuzzy matching algorithm will be used to match the search term against the index. You can optionally specify the maximum edit distance and maximum number of sequential edits
+for a specific search term using the format:</p>
+<p><code>?{max edits},{max sequential edits}?term</code></p>
+<p>For example <code>?2,1?food</code> will search for &ldquo;food&rdquo; with a maximum number of edits of 2, and maximum sequential edits of 1.</p>
+<p>You can omit one or the other parameter if required, so <code>?2,?food</code> will only set the maximum number of edits to 2, leaving the maximum sequential edits at the default value.</p>
+<p>See <a href="../fuzzy-matching">Fuzzy Matching</a> for more details.</p>
 <h4 id="defaulting-search-terms-to-fuzzy-matching">Defaulting search terms to fuzzy matching</h4>
 <p>By default LIFTI will treat a search term as an <a href="#exact-word-matches">exact word match</a>, however <a href="../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser">you can configure the index</a> so that any search term (apart from those containing wildcards)
 will be treated as a fuzzy match.</p>
-<h4 id="fuzzy-matching">Fuzzy matching</h4>
-<p>LIFTI uses <a href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein distance</a> to perform fuzzy matches between a search term and tokens in the index.
-The distance between two words is the number of edits that are required to match them, including:</p>
-<ul>
-<li>insertions: fid would match fi<strong>n</strong>d</li>
-<li>deletions: foood would match food</li>
-<li>substitutions: frnd would match f<strong>i</strong>nd</li>
-<li>transpositions: fnid would match f<strong>in</strong>d - Transpositions are a special case, because although two characters are affected, it is considered a single edit.</li>
-</ul>
-<p>The resulting Levenshtein distance between any matched term and the search term is used to reduce the score of the match. This means that documents containing
-words that are closer matches will typically be surfaced higher up in the search results.</p>
-<p>To prevent a <a href="https://en.wikipedia.org/wiki/Combinatorial_explosion">combinatorial explosion</a> of potential matches, LIFTI currently limits the maximum number
-of allowed edits to 3, and sequential edits to 1. This means that as of now:</p>
-<ul>
-<li><strong>feed</strong> will <em>not</em> match <strong>food</strong> because it requires two sequential edits</li>
-<li><strong>redy</strong> will <em>not</em> match <strong>friendly</strong> because it requires 4 insertions</li>
-</ul>
 <hr>
 <h3 id="wildcard-matching">Wildcard matching</h3>
 <p>Any search term containing <code>*</code> or <code>%</code> will be considered a wildcard match, where:</p>
