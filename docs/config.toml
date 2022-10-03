@@ -97,18 +97,19 @@ github_repo = "https://github.com/mikegoatly/lifti"
 github_subdir = "docs"
 
 # Google Custom Search Engine ID. Remove or comment out to disable search.
-gcs_engine_id = "011737558837375720776:fsdu1nryfng"
+# gcs_engine_id = "011737558837375720776:fsdu1nryfng"
 
 # Enable Algolia DocSearch
 algolia_docsearch = false
 
 # Enable Lunr.js offline search
-offlineSearch = false
+offlineSearch = true
 
 # User interface configuration
 [params.ui]
 # Enable to show the side bar menu in its compact state.
 sidebar_menu_compact = false
+
 #  Set to true to disable breadcrumb navigation.
 breadcrumb_disable = false
 #  Set to true to hide the sidebar search box (the top nav search box will still be displayed if search is enabled)
