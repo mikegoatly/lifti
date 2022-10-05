@@ -23,9 +23,20 @@ be tweaked using this overload.
 
 ### QueryParserBuilder options
 
+#### WithDefaultJoiningOperator
+
+`QueryParserBuilder.WithDefaultJoiningOperator(QueryTermJoinOperatorKind joiningOperator)`
+The default joining operator for queries is `and`. This means that without explicitly adding in an `&` or `|` to a LIFTI query,
+`&` will be assumed, and all search terms must match in a document. This method allows you to choose between `and` and `or` as
+the default joining operator.
+
+#### AssumeFuzzySearchTerms
+
 `QueryParserBuilder.AssumeFuzzySearchTerms()`
 When used, uses fuzzy matching for any parsed search terms that don't contain
 wildcard operators, i.e. you don't need to prefix search terms with `?`.
+
+#### WithFuzzySearchDefaults
 
 `QueryParserBuilder.WithFuzzySearchDefaults(ushort maxEditDistance, ushort maxSequentialEdits)`
 Configures the default parameters for a fuzzy search when not provided explicitly as part of the query. This overload
@@ -35,6 +46,8 @@ provides static values to use for the maximum edit distance and maximum sequenti
 Configures the default parameters for a fuzzy search when not provided explicitly as part of the query. This overload
 allows for the maximum edit distance and maximum sequential edits for a fuzzy search to be calculated from the length 
 of a search term.
+
+#### WithQueryParserFactory
 
 `QueryParserBuilder.WithQueryParserFactory(Func<QueryParserOptions, IQueryParser>)`
 Given a `QueryParserOptions`, creates the implementation of `IQueryParser`. You can use this to provide a
