@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.102.3" />
+<meta name="generator" content="Hugo 0.104.2" />
 
 <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
 
@@ -32,7 +32,7 @@
 <meta itemprop="description" content="Prescribes how the QueryParser implementation should be configured for the index.
 ">
 <meta itemprop="dateModified" content="2022-10-03T22:57:25+01:00" />
-<meta itemprop="wordCount" content="218">
+<meta itemprop="wordCount" content="275">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="WithQueryParser"/>
 <meta name="twitter:description" content="Prescribes how the QueryParser implementation should be configured for the index.
@@ -104,7 +104,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/lifti/offline-search-index.5798d0e3fd62fa169c2be351383222300c57d22ec9fc62732208401644bb8ddfaa001b30b21126dd4bb2604ff6b05ca01cc960462560cf9578f230122148dd20.json"
+  data-offline-search-index-json-src="/lifti/offline-search-index.53f7a4344c45649fabe963b1970f1bd7c3a4f291fb9772654b1e98b04aa3f990d73615f8d5bb825063e1a93838ce01aa967ca88c799efe39c39b43465d7ae6a4.json"
   data-offline-search-base-href="/"
   data-offlnie-search-max-results="10"
 >
@@ -135,7 +135,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/lifti/offline-search-index.5798d0e3fd62fa169c2be351383222300c57d22ec9fc62732208401644bb8ddfaa001b30b21126dd4bb2604ff6b05ca01cc960462560cf9578f230122148dd20.json"
+  data-offline-search-index-json-src="/lifti/offline-search-index.53f7a4344c45649fabe963b1970f1bd7c3a4f291fb9772654b1e98b04aa3f990d73615f8d5bb825063e1a93838ce01aa967ca88c799efe39c39b43465d7ae6a4.json"
   data-offline-search-base-href="/"
   data-offlnie-search-max-results="10"
 >
@@ -563,9 +563,16 @@
 <p>By default LIFTI parses query text using the <a href="../../searching/lifti-query-syntax">LIFTI query syntax</a>. The behavior of the parser can
 be tweaked using this overload.</p>
 <h3 id="queryparserbuilder-options">QueryParserBuilder options</h3>
+<h4 id="withdefaultjoiningoperator">WithDefaultJoiningOperator</h4>
+<p><code>QueryParserBuilder.WithDefaultJoiningOperator(QueryTermJoinOperatorKind joiningOperator)</code>
+The default joining operator for queries is <code>and</code>. This means that without explicitly adding in an <code>&amp;</code> or <code>|</code> to a LIFTI query,
+<code>&amp;</code> will be assumed, and all search terms must match in a document. This method allows you to choose between <code>and</code> and <code>or</code> as
+the default joining operator.</p>
+<h4 id="assumefuzzysearchterms">AssumeFuzzySearchTerms</h4>
 <p><code>QueryParserBuilder.AssumeFuzzySearchTerms()</code>
 When used, uses fuzzy matching for any parsed search terms that don&rsquo;t contain
 wildcard operators, i.e. you don&rsquo;t need to prefix search terms with <code>?</code>.</p>
+<h4 id="withfuzzysearchdefaults">WithFuzzySearchDefaults</h4>
 <p><code>QueryParserBuilder.WithFuzzySearchDefaults(ushort maxEditDistance, ushort maxSequentialEdits)</code>
 Configures the default parameters for a fuzzy search when not provided explicitly as part of the query. This overload
 provides static values to use for the maximum edit distance and maximum sequential edits for a fuzzy search.</p>
@@ -573,6 +580,7 @@ provides static values to use for the maximum edit distance and maximum sequenti
 Configures the default parameters for a fuzzy search when not provided explicitly as part of the query. This overload
 allows for the maximum edit distance and maximum sequential edits for a fuzzy search to be calculated from the length
 of a search term.</p>
+<h4 id="withqueryparserfactory">WithQueryParserFactory</h4>
 <p><code>QueryParserBuilder.WithQueryParserFactory(Func&lt;QueryParserOptions, IQueryParser&gt;)</code>
 Given a <code>QueryParserOptions</code>, creates the implementation of <code>IQueryParser</code>. You can use this to provide a
 custom query parsing strategy.</p>

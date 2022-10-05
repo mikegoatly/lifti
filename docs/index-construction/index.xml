@@ -176,9 +176,16 @@ be treated as &lt;code&gt;ABANDON&lt;/code&gt;. Currently only English is suppor
 &lt;p&gt;By default LIFTI parses query text using the &lt;a href=&#34;../../searching/lifti-query-syntax&#34;&gt;LIFTI query syntax&lt;/a&gt;. The behavior of the parser can
 be tweaked using this overload.&lt;/p&gt;
 &lt;h3 id=&#34;queryparserbuilder-options&#34;&gt;QueryParserBuilder options&lt;/h3&gt;
+&lt;h4 id=&#34;withdefaultjoiningoperator&#34;&gt;WithDefaultJoiningOperator&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;QueryParserBuilder.WithDefaultJoiningOperator(QueryTermJoinOperatorKind joiningOperator)&lt;/code&gt;
+The default joining operator for queries is &lt;code&gt;and&lt;/code&gt;. This means that without explicitly adding in an &lt;code&gt;&amp;amp;&lt;/code&gt; or &lt;code&gt;|&lt;/code&gt; to a LIFTI query,
+&lt;code&gt;&amp;amp;&lt;/code&gt; will be assumed, and all search terms must match in a document. This method allows you to choose between &lt;code&gt;and&lt;/code&gt; and &lt;code&gt;or&lt;/code&gt; as
+the default joining operator.&lt;/p&gt;
+&lt;h4 id=&#34;assumefuzzysearchterms&#34;&gt;AssumeFuzzySearchTerms&lt;/h4&gt;
 &lt;p&gt;&lt;code&gt;QueryParserBuilder.AssumeFuzzySearchTerms()&lt;/code&gt;
 When used, uses fuzzy matching for any parsed search terms that don&amp;rsquo;t contain
 wildcard operators, i.e. you don&amp;rsquo;t need to prefix search terms with &lt;code&gt;?&lt;/code&gt;.&lt;/p&gt;
+&lt;h4 id=&#34;withfuzzysearchdefaults&#34;&gt;WithFuzzySearchDefaults&lt;/h4&gt;
 &lt;p&gt;&lt;code&gt;QueryParserBuilder.WithFuzzySearchDefaults(ushort maxEditDistance, ushort maxSequentialEdits)&lt;/code&gt;
 Configures the default parameters for a fuzzy search when not provided explicitly as part of the query. This overload
 provides static values to use for the maximum edit distance and maximum sequential edits for a fuzzy search.&lt;/p&gt;
@@ -186,6 +193,7 @@ provides static values to use for the maximum edit distance and maximum sequenti
 Configures the default parameters for a fuzzy search when not provided explicitly as part of the query. This overload
 allows for the maximum edit distance and maximum sequential edits for a fuzzy search to be calculated from the length
 of a search term.&lt;/p&gt;
+&lt;h4 id=&#34;withqueryparserfactory&#34;&gt;WithQueryParserFactory&lt;/h4&gt;
 &lt;p&gt;&lt;code&gt;QueryParserBuilder.WithQueryParserFactory(Func&amp;lt;QueryParserOptions, IQueryParser&amp;gt;)&lt;/code&gt;
 Given a &lt;code&gt;QueryParserOptions&lt;/code&gt;, creates the implementation of &lt;code&gt;IQueryParser&lt;/code&gt;. You can use this to provide a
 custom query parsing strategy.&lt;/p&gt;
