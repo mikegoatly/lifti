@@ -14,6 +14,14 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
+        public void FuzzySearchTermWithSingleParameter_ShouldSuccessfullyMatch()
+        {
+            var result = ExplicitFuzzySearchTerm.Parse("?5?test");
+            result.Should().BeEquivalentTo(
+                new ExplicitFuzzySearchTerm(true, 3, 5, null));
+        }
+
+        [Fact]
         public void FuzzySearchTermWithoutParameters_ShouldSuccessfullyMatch()
         {
             var result = ExplicitFuzzySearchTerm.Parse("?test");
@@ -55,6 +63,18 @@ namespace Lifti.Tests.Querying
             var result = ExplicitFuzzySearchTerm.Parse($"?{maxEdits},{maxSequentialEdits}?test");
             result.Should().BeEquivalentTo(
                 new ExplicitFuzzySearchTerm(true, expectedTokenStart, maxEdits, maxSequentialEdits));
+        }
+
+        [Fact]
+        public void FuzzySearchTermWithTooManyParameters_ShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => ExplicitFuzzySearchTerm.Parse($"?5,2,9?test"));
+        }
+
+        [Fact]
+        public void FuzzySearchTermWithTooManyEmptyParameters_ShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => ExplicitFuzzySearchTerm.Parse($"?,,?test"));
         }
 
         [Fact]

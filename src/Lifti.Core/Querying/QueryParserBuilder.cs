@@ -54,8 +54,10 @@ namespace Lifti.Querying
         /// Configures the default parameters for a fuzzy search when not provided explicitly as part of the query.
         /// </summary>
         /// <param name="maxEditDistance">A function that can derive the maximum of edits allowed for a query term of a given length. The higher this value, the more divergent 
-        /// matches will be.</param>
-        /// <param name="maxSequentialEdits">A function that can derive the maximum number of edits that are allowed to appear sequentially for a query term of a given length.</param>
+        /// matches will be. If this calculation returns 0, then fuzzy matching will be disabled, which can be used to disable fuzzy matching for short terms, e.g. term_length / 4 
+        /// will disable fuzzy matching for terms of less than 4 characters.</param>
+        /// <param name="maxSequentialEdits">A function that can derive the maximum number of edits that are allowed to appear sequentially for a query term of a given length.
+        /// If this calculation returns 0, then fuzzy matching will be disabled, so take care with your calculation.</param>
         public QueryParserBuilder WithFuzzySearchDefaults(Func<int, ushort> maxEditDistance, Func<int, ushort> maxSequentialEdits)
         {
             this.fuzzySearchMaxEditDistance = maxEditDistance;

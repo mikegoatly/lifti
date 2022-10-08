@@ -5,7 +5,7 @@ namespace Lifti.Querying
 {
     internal struct ExplicitFuzzySearchTerm
     {
-        private static readonly Regex parameterRegex = new Regex(@"^(?<MaxEditDistance>\d*),(?<MaxSequentialEdits>\d*)$");
+        private static readonly Regex parameterRegex = new Regex(@"^(?<MaxEditDistance>\d*)(,(?<MaxSequentialEdits>\d*))?$", RegexOptions.Compiled);
 
         internal ExplicitFuzzySearchTerm(bool isFuzzyMatch, int searchTermStartIndex, ushort? maxEditDistance, ushort? maxSequentialEdits)
         {
