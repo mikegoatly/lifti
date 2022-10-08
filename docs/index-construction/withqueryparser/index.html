@@ -26,13 +26,13 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/index-construction/withqueryparser/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2022-10-03T22:57:25+01:00" /><meta property="og:site_name" content="LIFTI" />
+<meta property="article:modified_time" content="2022-10-05T22:30:57+01:00" /><meta property="og:site_name" content="LIFTI" />
 
 <meta itemprop="name" content="WithQueryParser">
 <meta itemprop="description" content="Prescribes how the QueryParser implementation should be configured for the index.
 ">
-<meta itemprop="dateModified" content="2022-10-03T22:57:25+01:00" />
-<meta itemprop="wordCount" content="275">
+<meta itemprop="dateModified" content="2022-10-05T22:30:57+01:00" />
+<meta itemprop="wordCount" content="346">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="WithQueryParser"/>
 <meta name="twitter:description" content="Prescribes how the QueryParser implementation should be configured for the index.
@@ -104,7 +104,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/lifti/offline-search-index.53f7a4344c45649fabe963b1970f1bd7c3a4f291fb9772654b1e98b04aa3f990d73615f8d5bb825063e1a93838ce01aa967ca88c799efe39c39b43465d7ae6a4.json"
+  data-offline-search-index-json-src="/lifti/offline-search-index.cc463b634bea1db7022fa4b32b8d96fe2cc441c4d021058b421518db7a9c08ac3fc5ce8cded4c57bb839dd16beb191445f0930bb2e4ac3895719b24e89e09e2b.json"
   data-offline-search-base-href="/"
   data-offlnie-search-max-results="10"
 >
@@ -135,7 +135,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/lifti/offline-search-index.53f7a4344c45649fabe963b1970f1bd7c3a4f291fb9772654b1e98b04aa3f990d73615f8d5bb825063e1a93838ce01aa967ca88c799efe39c39b43465d7ae6a4.json"
+  data-offline-search-index-json-src="/lifti/offline-search-index.cc463b634bea1db7022fa4b32b8d96fe2cc441c4d021058b421518db7a9c08ac3fc5ce8cded4c57bb839dd16beb191445f0930bb2e4ac3895719b24e89e09e2b.json"
   data-offline-search-base-href="/"
   data-offlnie-search-max-results="10"
 >
@@ -580,6 +580,10 @@ provides static values to use for the maximum edit distance and maximum sequenti
 Configures the default parameters for a fuzzy search when not provided explicitly as part of the query. This overload
 allows for the maximum edit distance and maximum sequential edits for a fuzzy search to be calculated from the length
 of a search term.</p>
+<p>If <strong>either</strong> of these functions returns zero, then fuzzy matching will be disabled for the search term.</p>
+<p>By default <code>maxEditDistance</code> is calculated as <code>termLength / 2</code>, which means that fuzzy matching will be disabled for any search term less than 2 characters. The default for <code>maxSequentialEdits</code> is <code>Max(1, termLength / 4)</code>, which means that no matter
+how short the search term, at least one sequential edit is allowed.</p>
+<p>See <a href="../../searching/fuzzy-matching">Fuzzy Matching</a>.</p>
 <h4 id="withqueryparserfactory">WithQueryParserFactory</h4>
 <p><code>QueryParserBuilder.WithQueryParserFactory(Func&lt;QueryParserOptions, IQueryParser&gt;)</code>
 Given a <code>QueryParserOptions</code>, creates the implementation of <code>IQueryParser</code>. You can use this to provide a
@@ -591,7 +595,7 @@ custom query parsing strategy.</p>
 </span></span></code></pre></div>
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified October 3, 2022: <a  href="https://github.com/mikegoatly/lifti/commit/7171d2e2af0c2c3e5eba79409de02a744b0e4895">V3.3.0 (#50) (7171d2e)</a>
+	<div class="text-muted mt-5 pt-3 border-top">Last modified October 5, 2022: <a  href="https://github.com/mikegoatly/lifti/commit/18368bccd8b88f1267c9d7baaf89011bdcf8308f">Added WithDefaultJoiningOperator docs (18368bc)</a>
 </div>
 </div>
 

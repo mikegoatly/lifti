@@ -207,10 +207,11 @@ enforcing the same word stemming, case/accent sensitivity rules as used in the i
 &lt;hr&gt;
 &lt;h3 id=&#34;fuzzy-match-&#34;&gt;Fuzzy match (&lt;code&gt;?&lt;/code&gt;)&lt;/h3&gt;
 &lt;p&gt;By prefixing a search term with &lt;code&gt;?&lt;/code&gt; a fuzzy matching algorithm will be used to match the search term against the index. You can optionally specify the maximum edit distance and maximum number of sequential edits
-for a specific search term using the format:&lt;/p&gt;
+for a specific search term using the formats:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;?{max edits},{max sequential edits}?term&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;For example &lt;code&gt;?2,1?food&lt;/code&gt; will search for &amp;ldquo;food&amp;rdquo; with a maximum number of edits of 2, and maximum sequential edits of 1.&lt;/p&gt;
-&lt;p&gt;You can omit one or the other parameter if required, so &lt;code&gt;?2,?food&lt;/code&gt; will only set the maximum number of edits to 2, leaving the maximum sequential edits at the default value.&lt;/p&gt;
+&lt;p&gt;You can omit one or the other parameter if required, so &lt;code&gt;?2?food&lt;/code&gt; will only set the maximum number of edits to 2, leaving the maximum sequential edits at the default value. If you want to only include
+the maximum number of sequential edits, then you must include a leading comma in the parameter set, e.g. &lt;code&gt;?,2?food&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;See &lt;a href=&#34;../fuzzy-matching&#34;&gt;Fuzzy Matching&lt;/a&gt; for more details.&lt;/p&gt;
 &lt;h4 id=&#34;defaulting-search-terms-to-fuzzy-matching&#34;&gt;Defaulting search terms to fuzzy matching&lt;/h4&gt;
 &lt;p&gt;By default LIFTI will treat a search term as an &lt;a href=&#34;#exact-word-matches&#34;&gt;exact word match&lt;/a&gt;, however &lt;a href=&#34;../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser&#34;&gt;you can configure the index&lt;/a&gt; so that any search term (apart from those containing wildcards)
@@ -434,8 +435,8 @@ be treated as &lt;code&gt;ABANDON&lt;/code&gt;. Currently only English is suppor
       <description>
         
         
-        &lt;p&gt;Fuzzy matches can be explicitly searched for using the &lt;a href=&#34;lifti-query-syntax/#fuzzy-match-&#34;&gt;LIFTI query syntax&lt;/a&gt;, or implied as the default for searches by 
-&lt;a href=&#34;./index-construction/withqueryparser/#configuring-the-default-lifti-queryparser&#34;&gt;configuring the index&lt;/a&gt;.&lt;/p&gt;
+        &lt;p&gt;Fuzzy matches can be explicitly searched for using the &lt;a href=&#34;../lifti-query-syntax/#fuzzy-match-&#34;&gt;LIFTI query syntax&lt;/a&gt;, or implied as the default for searches by 
+&lt;a href=&#34;../../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser&#34;&gt;configuring the index&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;LIFTI uses &lt;a href=&#34;https://en.wikipedia.org/wiki/Levenshtein_distance&#34;&gt;Levenshtein distance&lt;/a&gt; to perform fuzzy matches between a search term and tokens in the index.
 The distance between two words is the number of edits that are required to match them, including:&lt;/p&gt;
 &lt;ul&gt;
@@ -449,15 +450,19 @@ words that are closer matches will typically be surfaced higher up in the search
 &lt;h3 id=&#34;configuration&#34;&gt;Configuration&lt;/h3&gt;
 &lt;p&gt;To prevent a &lt;a href=&#34;https://en.wikipedia.org/wiki/Combinatorial_explosion&#34;&gt;combinatorial explosion&lt;/a&gt; of potential matches, LIFTI provides two control mechanisms for fuzzy matching:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Maximum number of edits&lt;/strong&gt; - the total number of edits that can be used in any potential match. The default for this value is calculated as &lt;code&gt;search term length/2&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Maximum number of sequential edits&lt;/strong&gt; - the maximum number of edits that can be found sequentially in any potential match. The default for this value is calculated as &lt;code&gt;search term length/4&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Maximum number of edits&lt;/strong&gt; - the total number of edits that can be used in any potential match. The default for this value is calculated as &lt;code&gt;search term length/2&lt;/code&gt; which allows for a larger number of 
+edits for longer search terms. Search terms of just a single character will not allow any edits, as the resulting value will be zero (the formula is an integer calculation).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Maximum number of sequential edits&lt;/strong&gt; - the maximum number of edits that can be found sequentially in any potential match. The default for this value is calculated as &lt;code&gt;max(1, search term length/4)&lt;/code&gt;. This
+default allows for a growing number of sequential edits, however this will never drop below a value of one.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;For example, with a max edits of &lt;strong&gt;3&lt;/strong&gt; and max sequential edits of &lt;strong&gt;1&lt;/strong&gt;:&lt;/p&gt;
+&lt;p&gt;When providing your own overrides for these calculations, be aware that if your configuration for either  results in a value of zero, then the fuzzy match will become an exact match, as no edits will be allowed.&lt;/p&gt;
+&lt;h3 id=&#34;example&#34;&gt;Example&lt;/h3&gt;
+&lt;p&gt;With a max edits of &lt;strong&gt;3&lt;/strong&gt; and max sequential edits of &lt;strong&gt;1&lt;/strong&gt;:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;feed&lt;/strong&gt; will &lt;em&gt;not&lt;/em&gt; match &lt;strong&gt;food&lt;/strong&gt; because it requires two sequential edits&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;redy&lt;/strong&gt; will &lt;em&gt;not&lt;/em&gt; match &lt;strong&gt;friendly&lt;/strong&gt; because it requires 4 insertions&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Default values can be &lt;a href=&#34;../index-construction/withqueryparser/#queryparserbuilder-options&#34;&gt;configured at the index level&lt;/a&gt;, and can either be expressed as a static value,
+&lt;p&gt;Default values can be &lt;a href=&#34;../../index-construction/withqueryparser/#queryparserbuilder-options&#34;&gt;configured at the index level&lt;/a&gt;, and can either be expressed as a static value,
 or a value calculated from the length of the search term.&lt;/p&gt;
 
       </description>
@@ -554,6 +559,10 @@ provides static values to use for the maximum edit distance and maximum sequenti
 Configures the default parameters for a fuzzy search when not provided explicitly as part of the query. This overload
 allows for the maximum edit distance and maximum sequential edits for a fuzzy search to be calculated from the length
 of a search term.&lt;/p&gt;
+&lt;p&gt;If &lt;strong&gt;either&lt;/strong&gt; of these functions returns zero, then fuzzy matching will be disabled for the search term.&lt;/p&gt;
+&lt;p&gt;By default &lt;code&gt;maxEditDistance&lt;/code&gt; is calculated as &lt;code&gt;termLength / 2&lt;/code&gt;, which means that fuzzy matching will be disabled for any search term less than 2 characters. The default for &lt;code&gt;maxSequentialEdits&lt;/code&gt; is &lt;code&gt;Max(1, termLength / 4)&lt;/code&gt;, which means that no matter
+how short the search term, at least one sequential edit is allowed.&lt;/p&gt;
+&lt;p&gt;See &lt;a href=&#34;../../searching/fuzzy-matching&#34;&gt;Fuzzy Matching&lt;/a&gt;.&lt;/p&gt;
 &lt;h4 id=&#34;withqueryparserfactory&#34;&gt;WithQueryParserFactory&lt;/h4&gt;
 &lt;p&gt;&lt;code&gt;QueryParserBuilder.WithQueryParserFactory(Func&amp;lt;QueryParserOptions, IQueryParser&amp;gt;)&lt;/code&gt;
 Given a &lt;code&gt;QueryParserOptions&lt;/code&gt;, creates the implementation of &lt;code&gt;IQueryParser&lt;/code&gt;. You can use this to provide a

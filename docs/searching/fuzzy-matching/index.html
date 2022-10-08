@@ -32,7 +32,7 @@
 <meta itemprop="description" content="Fuzzy matching provides a mechanism by which you can search for words that are close to a search term, in terms of the number of differences between them.
 ">
 <meta itemprop="dateModified" content="2022-10-03T22:57:25+01:00" />
-<meta itemprop="wordCount" content="277">
+<meta itemprop="wordCount" content="371">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Fuzzy Matching"/>
 <meta name="twitter:description" content="Fuzzy matching provides a mechanism by which you can search for words that are close to a search term, in terms of the number of differences between them.
@@ -104,7 +104,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/lifti/offline-search-index.53f7a4344c45649fabe963b1970f1bd7c3a4f291fb9772654b1e98b04aa3f990d73615f8d5bb825063e1a93838ce01aa967ca88c799efe39c39b43465d7ae6a4.json"
+  data-offline-search-index-json-src="/lifti/offline-search-index.cc463b634bea1db7022fa4b32b8d96fe2cc441c4d021058b421518db7a9c08ac3fc5ce8cded4c57bb839dd16beb191445f0930bb2e4ac3895719b24e89e09e2b.json"
   data-offline-search-base-href="/"
   data-offlnie-search-max-results="10"
 >
@@ -135,7 +135,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/lifti/offline-search-index.53f7a4344c45649fabe963b1970f1bd7c3a4f291fb9772654b1e98b04aa3f990d73615f8d5bb825063e1a93838ce01aa967ca88c799efe39c39b43465d7ae6a4.json"
+  data-offline-search-index-json-src="/lifti/offline-search-index.cc463b634bea1db7022fa4b32b8d96fe2cc441c4d021058b421518db7a9c08ac3fc5ce8cded4c57bb839dd16beb191445f0930bb2e4ac3895719b24e89e09e2b.json"
   data-offline-search-base-href="/"
   data-offlnie-search-max-results="10"
 >
@@ -542,8 +542,8 @@
 	<h1>Fuzzy Matching</h1>
     <div class="lead">Fuzzy matching provides a mechanism by which you can search for words that are close to a search term, in terms of the number of differences between them.</div>
 	       
-	<p>Fuzzy matches can be explicitly searched for using the <a href="lifti-query-syntax/#fuzzy-match-">LIFTI query syntax</a>, or implied as the default for searches by 
-<a href="./index-construction/withqueryparser/#configuring-the-default-lifti-queryparser">configuring the index</a>.</p>
+	<p>Fuzzy matches can be explicitly searched for using the <a href="../lifti-query-syntax/#fuzzy-match-">LIFTI query syntax</a>, or implied as the default for searches by 
+<a href="../../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser">configuring the index</a>.</p>
 <p>LIFTI uses <a href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein distance</a> to perform fuzzy matches between a search term and tokens in the index.
 The distance between two words is the number of edits that are required to match them, including:</p>
 <ul>
@@ -557,15 +557,19 @@ words that are closer matches will typically be surfaced higher up in the search
 <h3 id="configuration">Configuration</h3>
 <p>To prevent a <a href="https://en.wikipedia.org/wiki/Combinatorial_explosion">combinatorial explosion</a> of potential matches, LIFTI provides two control mechanisms for fuzzy matching:</p>
 <ul>
-<li><strong>Maximum number of edits</strong> - the total number of edits that can be used in any potential match. The default for this value is calculated as <code>search term length/2</code>.</li>
-<li><strong>Maximum number of sequential edits</strong> - the maximum number of edits that can be found sequentially in any potential match. The default for this value is calculated as <code>search term length/4</code>.</li>
+<li><strong>Maximum number of edits</strong> - the total number of edits that can be used in any potential match. The default for this value is calculated as <code>search term length/2</code> which allows for a larger number of 
+edits for longer search terms. Search terms of just a single character will not allow any edits, as the resulting value will be zero (the formula is an integer calculation).</li>
+<li><strong>Maximum number of sequential edits</strong> - the maximum number of edits that can be found sequentially in any potential match. The default for this value is calculated as <code>max(1, search term length/4)</code>. This
+default allows for a growing number of sequential edits, however this will never drop below a value of one.</li>
 </ul>
-<p>For example, with a max edits of <strong>3</strong> and max sequential edits of <strong>1</strong>:</p>
+<p>When providing your own overrides for these calculations, be aware that if your configuration for either  results in a value of zero, then the fuzzy match will become an exact match, as no edits will be allowed.</p>
+<h3 id="example">Example</h3>
+<p>With a max edits of <strong>3</strong> and max sequential edits of <strong>1</strong>:</p>
 <ul>
 <li><strong>feed</strong> will <em>not</em> match <strong>food</strong> because it requires two sequential edits</li>
 <li><strong>redy</strong> will <em>not</em> match <strong>friendly</strong> because it requires 4 insertions</li>
 </ul>
-<p>Default values can be <a href="../index-construction/withqueryparser/#queryparserbuilder-options">configured at the index level</a>, and can either be expressed as a static value,
+<p>Default values can be <a href="../../index-construction/withqueryparser/#queryparserbuilder-options">configured at the index level</a>, and can either be expressed as a static value,
 or a value calculated from the length of the search term.</p>
 
 	

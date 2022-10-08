@@ -32,7 +32,7 @@
 <meta itemprop="description" content="The default query parser for an index makes use of a powerful query syntax.
 ">
 <meta itemprop="dateModified" content="2022-10-03T23:14:33+01:00" />
-<meta itemprop="wordCount" content="974">
+<meta itemprop="wordCount" content="999">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="The LIFTI Query Syntax"/>
 <meta name="twitter:description" content="The default query parser for an index makes use of a powerful query syntax.
@@ -104,7 +104,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/lifti/offline-search-index.53f7a4344c45649fabe963b1970f1bd7c3a4f291fb9772654b1e98b04aa3f990d73615f8d5bb825063e1a93838ce01aa967ca88c799efe39c39b43465d7ae6a4.json"
+  data-offline-search-index-json-src="/lifti/offline-search-index.cc463b634bea1db7022fa4b32b8d96fe2cc441c4d021058b421518db7a9c08ac3fc5ce8cded4c57bb839dd16beb191445f0930bb2e4ac3895719b24e89e09e2b.json"
   data-offline-search-base-href="/"
   data-offlnie-search-max-results="10"
 >
@@ -135,7 +135,7 @@
   aria-label="Search this site…"
   autocomplete="off"
   
-  data-offline-search-index-json-src="/lifti/offline-search-index.53f7a4344c45649fabe963b1970f1bd7c3a4f291fb9772654b1e98b04aa3f990d73615f8d5bb825063e1a93838ce01aa967ca88c799efe39c39b43465d7ae6a4.json"
+  data-offline-search-index-json-src="/lifti/offline-search-index.cc463b634bea1db7022fa4b32b8d96fe2cc441c4d021058b421518db7a9c08ac3fc5ce8cded4c57bb839dd16beb191445f0930bb2e4ac3895719b24e89e09e2b.json"
   data-offline-search-base-href="/"
   data-offlnie-search-max-results="10"
 >
@@ -664,10 +664,11 @@ enforcing the same word stemming, case/accent sensitivity rules as used in the i
 <hr>
 <h3 id="fuzzy-match-">Fuzzy match (<code>?</code>)</h3>
 <p>By prefixing a search term with <code>?</code> a fuzzy matching algorithm will be used to match the search term against the index. You can optionally specify the maximum edit distance and maximum number of sequential edits
-for a specific search term using the format:</p>
+for a specific search term using the formats:</p>
 <p><code>?{max edits},{max sequential edits}?term</code></p>
 <p>For example <code>?2,1?food</code> will search for &ldquo;food&rdquo; with a maximum number of edits of 2, and maximum sequential edits of 1.</p>
-<p>You can omit one or the other parameter if required, so <code>?2,?food</code> will only set the maximum number of edits to 2, leaving the maximum sequential edits at the default value.</p>
+<p>You can omit one or the other parameter if required, so <code>?2?food</code> will only set the maximum number of edits to 2, leaving the maximum sequential edits at the default value. If you want to only include
+the maximum number of sequential edits, then you must include a leading comma in the parameter set, e.g. <code>?,2?food</code></p>
 <p>See <a href="../fuzzy-matching">Fuzzy Matching</a> for more details.</p>
 <h4 id="defaulting-search-terms-to-fuzzy-matching">Defaulting search terms to fuzzy matching</h4>
 <p>By default LIFTI will treat a search term as an <a href="#exact-word-matches">exact word match</a>, however <a href="../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser">you can configure the index</a> so that any search term (apart from those containing wildcards)

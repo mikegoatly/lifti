@@ -7,8 +7,8 @@
   "linkerEnabled": true,
   "resources": {
     "assembly": {
-      "Blazor.dll": "sha256-1vpHLCItLBOs+opSoq570ByUmb+jVN05u+g\/yhoFT+s=",
-      "Lifti.Core.dll": "sha256-isGxQ8emYt3PFJme+0NnBJPfC2Usv8wGJVq0SS+iKQg=",
+      "Blazor.dll": "sha256-NeYoglMk0AZliiTnhvscMsJSy2gW9Jkhdm5bVGOyrUE=",
+      "Lifti.Core.dll": "sha256-aTcmaNeMnmB38FsozWiPwOaFlodYAByUO9lRfmMlVis=",
       "Microsoft.AspNetCore.Components.dll": "sha256-ZiBY+xQveKKaPcktieR5K7TdeV67VyaSysTokdRcFUs=",
       "Microsoft.AspNetCore.Components.Forms.dll": "sha256-rTxVQMTKEeewA6L3HJZbGsBJHyDbs2kPHmxwh7AphDY=",
       "Microsoft.AspNetCore.Components.Web.dll": "sha256-zxb4QHh7FD03oodeVlssua3RnvI2nxBrJZszFnkHZgo=",
@@ -25,7 +25,7 @@
       "Microsoft.Extensions.Primitives.dll": "sha256-Kk9trPYi6xuop+bJh7AertZVcNJkEyzyxW3andlyf5U=",
       "Microsoft.JSInterop.dll": "sha256-RASZjaXe16TTvmiCrIpuGU3hBrGD\/lKoLVOJeU368Mg=",
       "Microsoft.JSInterop.WebAssembly.dll": "sha256-ymkw3R8LSzGwCT0fvq0cUpFZzdqbMi2wayvRiZKYT3A=",
-      "netstandard.dll": "sha256-Coy5gJ\/LbikU6vqurOwAcYzrWFP1+uHTL6mu0Vr4S\/E=",
+      "netstandard.dll": "sha256-dtKDH\/4YNwYopxzZK5WT9Mk6ELxh6MxVvhouxH\/eNyQ=",
       "System.Collections.Concurrent.dll": "sha256-8bZS6cor0RyjelUpl5HCowIflfDYKLoW0ZfLSzdYjE4=",
       "System.Collections.dll": "sha256-YUnq6ObWsAd+kfNfINDs9IV\/B4HrielNAz1TduBwskQ=",
       "System.Collections.Immutable.dll": "sha256-34laM66LwX6cbSQa5sKjjMKzSX9mGse\/aLRp0EK7SaU=",
@@ -42,7 +42,7 @@
       "System.Runtime.dll": "sha256-EOOz2dqalUsOF1v+Xoxu0f6AbzNDchgtZ5CI\/Qu0DU4=",
       "System.Text.Encodings.Web.dll": "sha256-PRefvfGmq+15yXh3EKKuSunQjwNsBs3kDuajUKcJCJA=",
       "System.Text.Json.dll": "sha256-Jm++x6Knr34ZmO1mUGF6BjmeZsP1RAOhtOctd\/tAUSw=",
-      "System.Text.RegularExpressions.dll": "sha256-U6sJ3v7IwK1Z5A5m9kdSrw0vT2DT6Mzm2t5E+YR+u3g=",
+      "System.Text.RegularExpressions.dll": "sha256-hXJADHf\/F8zqNPFBDMObr3fhFnHqpwBQZAizBiyK4OQ=",
       "System.Threading.Tasks.Extensions.dll": "sha256-fbpaj\/aYmyWQ0WIJc7QvEIIFU65+dgghzjMxARoac6k="
     },
     "extensions": null,

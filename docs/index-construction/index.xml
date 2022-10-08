@@ -193,6 +193,10 @@ provides static values to use for the maximum edit distance and maximum sequenti
 Configures the default parameters for a fuzzy search when not provided explicitly as part of the query. This overload
 allows for the maximum edit distance and maximum sequential edits for a fuzzy search to be calculated from the length
 of a search term.&lt;/p&gt;
+&lt;p&gt;If &lt;strong&gt;either&lt;/strong&gt; of these functions returns zero, then fuzzy matching will be disabled for the search term.&lt;/p&gt;
+&lt;p&gt;By default &lt;code&gt;maxEditDistance&lt;/code&gt; is calculated as &lt;code&gt;termLength / 2&lt;/code&gt;, which means that fuzzy matching will be disabled for any search term less than 2 characters. The default for &lt;code&gt;maxSequentialEdits&lt;/code&gt; is &lt;code&gt;Max(1, termLength / 4)&lt;/code&gt;, which means that no matter
+how short the search term, at least one sequential edit is allowed.&lt;/p&gt;
+&lt;p&gt;See &lt;a href=&#34;../../searching/fuzzy-matching&#34;&gt;Fuzzy Matching&lt;/a&gt;.&lt;/p&gt;
 &lt;h4 id=&#34;withqueryparserfactory&#34;&gt;WithQueryParserFactory&lt;/h4&gt;
 &lt;p&gt;&lt;code&gt;QueryParserBuilder.WithQueryParserFactory(Func&amp;lt;QueryParserOptions, IQueryParser&amp;gt;)&lt;/code&gt;
 Given a &lt;code&gt;QueryParserOptions&lt;/code&gt;, creates the implementation of &lt;code&gt;IQueryParser&lt;/code&gt;. You can use this to provide a
