@@ -47,6 +47,13 @@ Configures the default parameters for a fuzzy search when not provided explicitl
 allows for the maximum edit distance and maximum sequential edits for a fuzzy search to be calculated from the length 
 of a search term.
 
+If **either** of these functions returns zero, then fuzzy matching will be disabled for the search term. 
+
+By default `maxEditDistance` is calculated as `termLength / 2`, which means that fuzzy matching will be disabled for any search term less than 2 characters. The default for `maxSequentialEdits` is `Max(1, termLength / 4)`, which means that no matter
+how short the search term, at least one sequential edit is allowed.
+
+See [Fuzzy Matching](../../searching/fuzzy-matching).
+
 #### WithQueryParserFactory
 
 `QueryParserBuilder.WithQueryParserFactory(Func<QueryParserOptions, IQueryParser>)`

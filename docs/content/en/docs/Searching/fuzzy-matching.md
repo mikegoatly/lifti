@@ -7,8 +7,8 @@ description: >
   of differences between them.
 ---
 
-Fuzzy matches can be explicitly searched for using the [LIFTI query syntax](lifti-query-syntax/#fuzzy-match-), or implied as the default for searches by 
-[configuring the index](./index-construction/withqueryparser/#configuring-the-default-lifti-queryparser).
+Fuzzy matches can be explicitly searched for using the [LIFTI query syntax](../lifti-query-syntax/#fuzzy-match-), or implied as the default for searches by 
+[configuring the index](../../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser).
 
 LIFTI uses [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) to perform fuzzy matches between a search term and tokens in the index.
 The distance between two words is the number of edits that are required to match them, including:
@@ -25,13 +25,19 @@ words that are closer matches will typically be surfaced higher up in the search
 
 To prevent a [combinatorial explosion](https://en.wikipedia.org/wiki/Combinatorial_explosion) of potential matches, LIFTI provides two control mechanisms for fuzzy matching:
 
-* **Maximum number of edits** - the total number of edits that can be used in any potential match. The default for this value is calculated as `search term length/2`.
-* **Maximum number of sequential edits** - the maximum number of edits that can be found sequentially in any potential match. The default for this value is calculated as `search term length/4`.
+* **Maximum number of edits** - the total number of edits that can be used in any potential match. The default for this value is calculated as `search term length/2` which allows for a larger number of 
+edits for longer search terms. Search terms of just a single character will not allow any edits, as the resulting value will be zero (the formula is an integer calculation).
+* **Maximum number of sequential edits** - the maximum number of edits that can be found sequentially in any potential match. The default for this value is calculated as `max(1, search term length/4)`. This
+default allows for a growing number of sequential edits, however this will never drop below a value of one.
 
-For example, with a max edits of **3** and max sequential edits of **1**:
+When providing your own overrides for these calculations, be aware that if your configuration for either  results in a value of zero, then the fuzzy match will become an exact match, as no edits will be allowed.
+
+### Example
+
+With a max edits of **3** and max sequential edits of **1**:
 
 * **feed** will *not* match **food** because it requires two sequential edits
 * **redy** will *not* match **friendly** because it requires 4 insertions
 
-Default values can be [configured at the index level](../index-construction/withqueryparser/#queryparserbuilder-options), and can either be expressed as a static value,
+Default values can be [configured at the index level](../../index-construction/withqueryparser/#queryparserbuilder-options), and can either be expressed as a static value,
 or a value calculated from the length of the search term.

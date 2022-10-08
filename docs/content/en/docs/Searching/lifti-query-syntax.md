@@ -46,13 +46,14 @@ enforcing the same word stemming, case/accent sensitivity rules as used in the i
 ### Fuzzy match (`?`)
 
 By prefixing a search term with `?` a fuzzy matching algorithm will be used to match the search term against the index. You can optionally specify the maximum edit distance and maximum number of sequential edits
-for a specific search term using the format:
+for a specific search term using the formats:
 
 `?{max edits},{max sequential edits}?term`
 
 For example `?2,1?food` will search for "food" with a maximum number of edits of 2, and maximum sequential edits of 1.
 
-You can omit one or the other parameter if required, so `?2,?food` will only set the maximum number of edits to 2, leaving the maximum sequential edits at the default value.
+You can omit one or the other parameter if required, so `?2?food` will only set the maximum number of edits to 2, leaving the maximum sequential edits at the default value. If you want to only include
+the maximum number of sequential edits, then you must include a leading comma in the parameter set, e.g. `?,2?food`
 
 See [Fuzzy Matching](../fuzzy-matching) for more details.
 
