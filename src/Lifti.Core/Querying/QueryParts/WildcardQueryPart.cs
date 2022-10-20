@@ -70,7 +70,7 @@ namespace Lifti.Querying.QueryParts
                 bookmarks.Swap();
             }
 
-            return results;
+            return queryContext.ApplyTo(results);
         }
 
         /// <inheritdoc />

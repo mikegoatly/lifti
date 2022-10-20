@@ -222,6 +222,34 @@ namespace Lifti.Tests.Querying.QueryParts
                 }));
         }
 
+        [Fact]
+        public async Task WithFieldFilteredInContext_ShouldOnlyMatchOnRequestedField()
+        {
+            var index = new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<TestObject>(
+                o => o.WithKey(x => x.Id)
+                    .WithField("title", x => x.Title)
+                    .WithField("content", x => x.Content))
+                .Build();
+
+            await index.AddRangeAsync(new[]
+            {
+                new TestObject(1, "Item number 1", "Item number one content"),
+                new TestObject(2, "Second", "Item number two content"),
+                new TestObject(3, "Item number 3", "Item number three content")
+            });
+
+            var query = new Query(
+                FieldFilterQueryOperator.CreateForField(
+                    index.FieldLookup, 
+                    "title", 
+                    new WildcardQueryPart(WildcardQueryFragment.CreateText("NUMBE"), WildcardQueryFragment.MultiCharacter)));
+
+            var results = index.Search(query).ToList();
+
+            results.Select(x => x.Key).Should().BeEquivalentTo(1, 3);
+        }
+
         public Task DisposeAsync()
         {
             return Task.CompletedTask;
@@ -235,5 +263,7 @@ namespace Lifti.Tests.Querying.QueryParts
             await this.index.AddAsync(1, "Apparently this also applies");
             await this.index.AddAsync(2, "Angry alternatives to apples, thus");
         }
+
+        private record TestObject(int Id, string Title, string Content);
     }
 }
