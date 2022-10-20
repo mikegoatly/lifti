@@ -75,6 +75,12 @@ namespace Lifti.Querying
 
             return searchResults.OrderByDescending(r => r.Score);
         }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return this.Root.ToString();
+        }
     }
 
 }
