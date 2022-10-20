@@ -138,6 +138,17 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task ParsedQuery_ShouldReturnExpectedResults()
+        {
+            await this.WithIndexedStringsAsync();
+
+            var query = this.index.ParseQuery("fo* te*");
+            var results = this.index.Search(query);
+
+            results.Should().HaveCount(2);
+        }
+
+        [Fact]
         public async Task SearchingByMultipleWildcards_ShouldReturnResult()
         {
             await this.WithIndexedStringsAsync();
