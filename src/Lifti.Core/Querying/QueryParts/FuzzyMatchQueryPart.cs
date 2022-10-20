@@ -324,7 +324,7 @@ namespace Lifti.Querying.QueryParts
             }
             while (stateStore.HasEntries);
 
-            return results;
+            return queryContext.ApplyTo(results);
         }
 
         private static void AddSubstitutionBookmarks(IIndexNavigator navigator, FuzzyMatchStateStore stateStore, char currentCharacter, FuzzyMatchState currentState)

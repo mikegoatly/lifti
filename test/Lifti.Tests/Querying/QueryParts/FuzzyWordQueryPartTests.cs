@@ -108,6 +108,30 @@ namespace Lifti.Tests.Querying.QueryParts
             new FuzzyMatchQueryPart("Test").ToString().Should().Be("?Test");
         }
 
+        [Fact]
+        public async Task WithFieldFilteredInContext_ShouldOnlyMatchOnRequestedField()
+        {
+            var index = new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<TestObject>(
+                o => o.WithKey(x => x.Id)
+                    .WithField("title", x => x.Title)
+                    .WithField("content", x => x.Content))
+                .Build();
+
+            await index.AddRangeAsync(new[]
+            {
+                new TestObject(1, "Item number 1", "Item number one content"),
+                new TestObject(2, "Second", "Item number two content"),
+                new TestObject(3, "Item number 3", "Item number three content")
+            });
+
+            var query = new Query(FieldFilterQueryOperator.CreateForField(index.FieldLookup, "title", new FuzzyMatchQueryPart("NUMBE", 1, 1)));
+
+            var results = index.Search(query).ToList();
+
+            results.Select(x => x.Key).Should().BeEquivalentTo(1, 3);
+        }
+
         [Theory]
         [InlineData(null, 4, "?,4?Test")]
         [InlineData(9, null, "?9,?Test")]
@@ -198,5 +222,7 @@ namespace Lifti.Tests.Querying.QueryParts
 
             }
         }
+
+        private record TestObject(int Id, string Title, string Content);
     }
 }

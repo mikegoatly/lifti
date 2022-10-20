@@ -46,5 +46,20 @@ namespace Lifti.Querying.QueryParts
         {
             return $"{this.FieldName}={this.Statement}";
         }
+
+        /// <summary>
+        /// Creates a new <see cref="FieldFilterQueryOperator"/> instance for the field <paramref name="fieldName"/>.
+        /// </summary>
+        /// <param name="fieldLookup">The <see cref="IIndexedFieldLookup"/> capable of returning the information about the field 
+        /// <paramref name="fieldName"/>. This will typically be <see cref="IFullTextIndex{TKey}.FieldLookup"/>.</param>
+        /// <param name="fieldName">The name of the field for which to filter the statement's results to.</param>
+        /// <param name="statement">The statement that should have its results filtered.</param>
+        public static FieldFilterQueryOperator CreateForField(IIndexedFieldLookup fieldLookup, string fieldName, IQueryPart statement)
+        {
+            return new FieldFilterQueryOperator(
+                fieldName, 
+                fieldLookup?.GetFieldInfo(fieldName).Id ?? throw new ArgumentNullException(nameof(fieldLookup)), 
+                statement);
+        }
     }
 }
