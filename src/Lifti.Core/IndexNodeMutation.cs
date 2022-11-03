@@ -36,6 +36,12 @@ namespace Lifti
         }
 
         public bool IsEmpty => !this.HasChildNodes && !this.HasMatches;
+
+        /// <remarks>
+        /// Important note about <see cref="HasChildNodes"/> and <see cref="HasMatches"/> in an <see cref="IndexNodeMutation"/>:
+        /// We can't easily derive the presence of child nodes or mutations from state, because it could be tracked in the 
+        /// original unmodified node or the mutated state. To reduce compute effort, these flags are cached and manually updated. 
+        /// </remarks>
         public bool HasChildNodes { get; private set; }
         public bool HasMatches { get; private set; }
         public ReadOnlyMemory<char> IntraNodeText { get; private set; }
@@ -104,14 +110,9 @@ namespace Lifti
                     childNodes = childNodes.SetItems(mapNodeMutations());
                 }
 
-                if (this.MutatedMatches == null)
-                {
-                    matches = this.original.Matches;
-                }
-                else
-                {
-                    matches = this.MutatedMatches.ToImmutableDictionary();
-                }
+                matches = this.MutatedMatches == null 
+                    ? this.original.Matches 
+                    : this.MutatedMatches.ToImmutableDictionary();
             }
 
             return this.indexNodeFactory.CreateNode(this.IntraNodeText, childNodes, matches);
@@ -159,7 +160,7 @@ namespace Lifti
             }
         }
 
-        private bool TryRemove(IndexNode node, int itemId, int nodeDepth, [NotNullWhen(true)]out IndexNodeMutation? mutatedNode)
+        private bool TryRemove(IndexNode node, int itemId, int nodeDepth, [NotNullWhen(true)] out IndexNodeMutation? mutatedNode)
         {
             mutatedNode = null;
 
@@ -189,10 +190,7 @@ namespace Lifti
                 var mutatedMatches = node.Matches.Remove(itemId);
                 if (mutatedMatches != node.Matches)
                 {
-                    if (mutatedNode == null)
-                    {
-                        mutatedNode = new IndexNodeMutation(nodeDepth, node, this.indexNodeFactory);
-                    }
+                    mutatedNode ??= new IndexNodeMutation(nodeDepth, node, this.indexNodeFactory);
 
                     mutatedNode.EnsureMutatedMatchesCreated();
                     mutatedNode.MutatedMatches!.Remove(itemId);
@@ -359,6 +357,8 @@ namespace Lifti
         {
             var splitChildNode = new IndexNodeMutation(this)
             {
+                HasMatches = this.HasMatches,
+                HasChildNodes = this.HasChildNodes,
                 MutatedChildNodes = this.MutatedChildNodes,
                 MutatedMatches = this.MutatedMatches,
                 IntraNodeText = splitIndex + 1 == this.IntraNodeText.Length ? null : this.IntraNodeText.Slice(splitIndex + 1),
