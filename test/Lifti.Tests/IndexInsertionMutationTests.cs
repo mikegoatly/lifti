@@ -1,41 +1,18 @@
-﻿using FluentAssertions;
-using Lifti.Tokenization;
-using System;
-using System.Collections.Immutable;
-using System.Linq;
+﻿using Lifti.Tokenization;
 using Xunit;
 
 namespace Lifti.Tests
 {
-    public class IndexInsertionMutationTests
+    public class IndexInsertionMutationTests : MutationTestBase
     {
-        private readonly IndexNodeFactory nodeFactory;
-        private readonly IndexNode rootNode;
-        private readonly IndexMutation sut;
-        private readonly IndexedToken locations1 = CreateLocations(0, (0, 1, 2), (1, 5, 8));
-        private readonly IndexedToken locations2 = CreateLocations(0, (2, 9, 2));
-        private readonly IndexedToken locations3 = CreateLocations(0, (3, 14, 5));
-        private readonly IndexedToken locations4 = CreateLocations(0, (4, 4, 5));
-        private const int item1 = 1;
-        private const int item2 = 2;
-        private const int item3 = 3;
-        private const int item4 = 4;
-        private const byte fieldId1 = 0;
-
-        public IndexInsertionMutationTests()
-        {
-            this.nodeFactory = new IndexNodeFactory(new IndexOptions { SupportIntraNodeTextAfterIndexDepth = 0 } );
-            this.rootNode = this.nodeFactory.CreateRootNode();
-            this.sut = new IndexMutation(this.rootNode, this.nodeFactory);
-        }
 
         [Fact]
         public void IndexingEmptyNode_ShouldResultInItemsDirectlyIndexedAtNode()
         {
-            this.sut.Add(item1, fieldId1, new Token("test", this.locations1.Locations));
-            var result = this.sut.Apply();
+            this.Sut.Add(Item1, FieldId1, new Token("test", this.Locations1.Locations));
+            var result = this.Sut.Apply();
 
-            VerifyResult(result, "test", new[] { (item1, this.locations1) });
+            VerifyResult(result, "test", new[] { (Item1, this.Locations1) });
         }
 
         [Theory]
@@ -43,54 +20,68 @@ namespace Lifti.Tests
         [InlineData("a")]
         public void IndexingAtNodeWithSameTextForDifferentItem_ShouldResultInItemsDirectlyIndexedAtNode(string word)
         {
-            this.sut.Add(item1, fieldId1, new Token(word, this.locations1.Locations));
-            this.sut.Add(item2, fieldId1, new Token(word, this.locations2.Locations));
-            var result = this.sut.Apply();
+            this.Sut.Add(Item1, FieldId1, new Token(word, this.Locations1.Locations));
+            this.Sut.Add(Item2, FieldId1, new Token(word, this.Locations2.Locations));
+            var result = this.Sut.Apply();
 
-            VerifyResult(result, word, new[] { (item1, this.locations1), (item2, this.locations2) });
+            VerifyResult(result, word, new[] { (Item1, this.Locations1), (Item2, this.Locations2) });
         }
 
         [Fact]
         public void IndexingWordEndingAtSplit_ShouldResultInItemIndexedWhereSplitOccurs()
         {
-            this.sut.Add(item1, fieldId1, new Token("apple", this.locations1.Locations));
-            this.sut.Add(item2, fieldId1, new Token("able", this.locations2.Locations));
-            this.sut.Add(item3, fieldId1, new Token("banana", this.locations3.Locations));
-            this.sut.Add(item4, fieldId1, new Token("a", this.locations4.Locations));
-            var result = this.sut.Apply();
+            this.Sut.Add(Item1, FieldId1, new Token("apple", this.Locations1.Locations));
+            this.Sut.Add(Item2, FieldId1, new Token("able", this.Locations2.Locations));
+            this.Sut.Add(Item3, FieldId1, new Token("banana", this.Locations3.Locations));
+            this.Sut.Add(Item4, FieldId1, new Token("a", this.Locations4.Locations));
+            var result = this.Sut.Apply();
 
             VerifyResult(result, null, expectedChildNodes: new[] { 'a', 'b' });
-            VerifyResult(result, new[] { 'a' }, null, new[] { (item4, this.locations4) }, new[] { 'p', 'b' });
-            VerifyResult(result, new[] { 'b' }, "anana", new[] { (item3, this.locations3) });
-            VerifyResult(result, new[] { 'a', 'b' }, "le", new[] { (item2, this.locations2) });
-            VerifyResult(result, new[] { 'a', 'p' }, "ple", new[] { (item1, this.locations1) });
+            VerifyResult(result, new[] { 'a' }, null, new[] { (Item4, this.Locations4) }, new[] { 'p', 'b' });
+            VerifyResult(result, new[] { 'b' }, "anana", new[] { (Item3, this.Locations3) });
+            VerifyResult(result, new[] { 'a', 'b' }, "le", new[] { (Item2, this.Locations2) });
+            VerifyResult(result, new[] { 'a', 'p' }, "ple", new[] { (Item1, this.Locations1) });
         }
 
         [Fact]
         public void IndexingWhenChildNodeAlreadyExists_ShouldContinueIndexingAtExistingChild()
         {
-            this.sut.Add(item1, fieldId1, new Token("freedom", this.locations1.Locations));
-            this.sut.Add(item2, fieldId1, new Token("fred", this.locations2.Locations));
-            this.sut.Add(item3, fieldId1, new Token("freddy", this.locations3.Locations));
-            var result = this.sut.Apply();
+            this.Sut.Add(Item1, FieldId1, new Token("freedom", this.Locations1.Locations));
+            this.Sut.Add(Item2, FieldId1, new Token("fred", this.Locations2.Locations));
+            this.Sut.Add(Item3, FieldId1, new Token("freddy", this.Locations3.Locations));
+            var result = this.Sut.Apply();
 
             VerifyResult(result, "fre", expectedChildNodes: new[] { 'e', 'd' });
-            VerifyResult(result, new[] { 'e' }, "dom", new[] { (item1, this.locations1) });
-            VerifyResult(result, new[] { 'd' }, null, new[] { (item2, this.locations2) }, new[] { 'd' });
-            VerifyResult(result, new[] { 'd', 'd' }, "y", new[] { (item3, this.locations3) });
+            VerifyResult(result, new[] { 'e' }, "dom", new[] { (Item1, this.Locations1) });
+            VerifyResult(result, new[] { 'd' }, null, new[] { (Item2, this.Locations2) }, new[] { 'd' });
+            VerifyResult(result, new[] { 'd', 'd' }, "y", new[] { (Item3, this.Locations3) });
         }
 
         [Fact]
         public void IndexingAtNodeWithTextWithSameSuffix_ShouldCreateNewChildNode()
         {
-            this.sut.Add(item1, fieldId1, new Token("test", this.locations1.Locations));
-            this.sut.Add(item2, fieldId1, new Token("testing", this.locations2.Locations));
-            this.sut.Add(item3, fieldId1, new Token("tester", this.locations3.Locations));
-            var result = this.sut.Apply();
+            this.Sut.Add(Item1, FieldId1, new Token("test", this.Locations1.Locations));
+            this.Sut.Add(Item2, FieldId1, new Token("testing", this.Locations2.Locations));
+            this.Sut.Add(Item3, FieldId1, new Token("tester", this.Locations3.Locations));
+            var result = this.Sut.Apply();
 
-            VerifyResult(result, "test", new[] { (item1, this.locations1) }, new[] { 'i', 'e' });
-            VerifyResult(result, new[] { 'i' }, "ng", new[] { (item2, this.locations2) });
-            VerifyResult(result, new[] { 'e' }, "r", new[] { (item3, this.locations3) });
+            VerifyResult(result, "test", new[] { (Item1, this.Locations1) }, new[] { 'i', 'e' });
+            VerifyResult(result, new[] { 'i' }, "ng", new[] { (Item2, this.Locations2) });
+            VerifyResult(result, new[] { 'e' }, "r", new[] { (Item3, this.Locations3) });
+        }
+
+        [Fact]
+        public void IndexingAtNodeAlreadySplit_ShouldMaintainMatchesAtFirstSplitNode()
+        {
+            this.Sut.Add(Item1, FieldId1, new Token("broker", this.Locations1.Locations));
+            this.Sut.Add(Item2, FieldId1, new Token("broken", this.Locations2.Locations));
+            this.Sut.Add(Item3, FieldId1, new Token("brokerage", this.Locations3.Locations));
+            var result = this.Sut.Apply();
+
+            VerifyResult(result, "broke", expectedChildNodes: new[] { 'r', 'n' });
+            VerifyResult(result, new[] { 'r' }, "", new[] { (Item1, this.Locations1) }, new[] { 'a' });
+            VerifyResult(result, new[] { 'n' }, "", new[] { (Item2, this.Locations2) });
+            VerifyResult(result, new[] { 'r', 'a' }, "ge", new[] { (Item3, this.Locations3) });
         }
 
         [Theory]
@@ -105,86 +96,38 @@ namespace Lifti.Tests
             string splitIntraText,
             string newIntraText)
         {
-            this.sut.Add(item1, fieldId1, new Token("test", this.locations1.Locations));
-            this.sut.Add(item2, fieldId1, new Token(indexText, this.locations2.Locations));
-            var result = this.sut.Apply();
+            this.Sut.Add(Item1, FieldId1, new Token("test", this.Locations1.Locations));
+            this.Sut.Add(Item2, FieldId1, new Token(indexText, this.Locations2.Locations));
+            var result = this.Sut.Apply();
 
             VerifyResult(result, remainingIntraText, expectedChildNodes: new[] { originalSplitChar, newSplitChar });
-            VerifyResult(result, new[] { originalSplitChar }, splitIntraText, new[] { (item1, this.locations1) });
-            VerifyResult(result, new[] { newSplitChar }, newIntraText, new[] { (item2, this.locations2) });
+            VerifyResult(result, new[] { originalSplitChar }, splitIntraText, new[] { (Item1, this.Locations1) });
+            VerifyResult(result, new[] { newSplitChar }, newIntraText, new[] { (Item2, this.Locations2) });
         }
 
         [Fact]
         public void IndexingAtNodeCausingSplitAtMiddleOfIntraNodeText_ShouldPlaceMatchAtSplit()
         {
-            this.sut.Add(item1, fieldId1, new Token("NOITAZI", this.locations1.Locations));
-            this.sut.Add(item2, fieldId1, new Token("NOITA", this.locations2.Locations));
-            var result = this.sut.Apply();
+            this.Sut.Add(Item1, FieldId1, new Token("NOITAZI", this.Locations1.Locations));
+            this.Sut.Add(Item2, FieldId1, new Token("NOITA", this.Locations2.Locations));
+            var result = this.Sut.Apply();
 
-            VerifyResult(result, "NOITA", new[] { (item2, this.locations2) }, expectedChildNodes: new[] { 'Z' });
-            VerifyResult(result, new[] { 'Z' }, "I", new[] { (item1, this.locations1) });
+            VerifyResult(result, "NOITA", new[] { (Item2, this.Locations2) }, expectedChildNodes: new[] { 'Z' });
+            VerifyResult(result, new[] { 'Z' }, "I", new[] { (Item1, this.Locations1) });
         }
 
         [Fact]
         public void IndexingAtNodeCausingSplitAtStartOfIntraNodeText_ShouldReturnInEntryAddedAtSplitNode()
         {
-            this.sut.Add(item1, fieldId1, new Token("www", this.locations1.Locations));
-            this.sut.Add(item2, fieldId1, new Token("w3c", this.locations2.Locations));
-            this.sut.Add(item3, fieldId1, new Token("w3", this.locations3.Locations));
-            var result = this.sut.Apply();
+            this.Sut.Add(Item1, FieldId1, new Token("www", this.Locations1.Locations));
+            this.Sut.Add(Item2, FieldId1, new Token("w3c", this.Locations2.Locations));
+            this.Sut.Add(Item3, FieldId1, new Token("w3", this.Locations3.Locations));
+            var result = this.Sut.Apply();
 
             VerifyResult(result, "w", expectedChildNodes: new[] { 'w', '3' });
-            VerifyResult(result, new[] { 'w' }, "w", new[] { (item1, this.locations1) });
-            VerifyResult(result, new[] { '3' }, null, new[] { (item3, this.locations3) }, new[] { 'c' });
-            VerifyResult(result, new[] { '3', 'c' }, null, new[] { (item2, this.locations2) });
-        }
-
-        // TODO Move to new test suite
-        //[Fact]
-        //public void RemovingItemId_ShouldCauseItemToBeRemovedFromIndexAndChildNodes()
-        //{
-        //    this.sut.Index(item1, fieldId1, new Token("www", this.locations1.Locations));
-        //    this.sut.Index(item1, fieldId1, new Token("wwwww", this.locations2.Locations));
-        //    this.sut.Remove(item1);
-
-        //    var result = this.sut.ApplyMutations();
-
-        //    VerifyResult(result, "www", expectedChildNodes: new[] { 'w' }, expectedMatches: Array.Empty<(int, IndexedWord)>());
-        //    VerifyResult(result, new[] { 'w' }, "w", expectedMatches: Array.Empty<(int, IndexedWord)>());
-        //}
-
-        private static IndexedToken CreateLocations(byte fieldId, params (int, int, ushort)[] locations)
-        {
-            return new IndexedToken(fieldId, locations.Select(r => new TokenLocation(r.Item1, r.Item2, r.Item3)).ToArray());
-        }
-
-        private static void VerifyResult(
-            IndexNode node,
-            string intraNodeText,
-            (int, IndexedToken)[] expectedMatches = null,
-            char[] expectedChildNodes = null)
-        {
-            expectedChildNodes ??= Array.Empty<char>();
-            expectedMatches ??= Array.Empty<(int, IndexedToken)>();
-
-            node.IntraNodeText.ToArray().Should().BeEquivalentTo(intraNodeText?.ToCharArray() ?? Array.Empty<char>());
-            node.ChildNodes.Keys.Should().BeEquivalentTo(expectedChildNodes, o => o.WithoutStrictOrdering());
-            node.Matches.Should().BeEquivalentTo(expectedMatches.ToImmutableDictionary(x => x.Item1, x => new[] { x.Item2 }));
-        }
-
-        private static void VerifyResult(
-            IndexNode node,
-            char[] navigationChars,
-            string intraNodeText,
-            (int, IndexedToken)[] expectedMatches = null,
-            char[] expectedChildNodes = null)
-        {
-            foreach (var navigationChar in navigationChars)
-            {
-                node = node.ChildNodes[navigationChar];
-            }
-
-            VerifyResult(node, intraNodeText, expectedMatches, expectedChildNodes);
-        }
+            VerifyResult(result, new[] { 'w' }, "w", new[] { (Item1, this.Locations1) });
+            VerifyResult(result, new[] { '3' }, null, new[] { (Item3, this.Locations3) }, new[] { 'c' });
+            VerifyResult(result, new[] { '3', 'c' }, null, new[] { (Item2, this.Locations2) });
+        }        
     }
 }
