@@ -28,8 +28,8 @@ namespace BlazorApp.Services
             this.loadedPages = deserializedPages;
         }
 
-        public bool StemmingEnabled { get; set; } = true;
-        public bool FuzzyMatchByDefault { get; set; } = false;
+        public bool StemmingEnabled { get; set; } = false;
+        public bool FuzzyMatchByDefault { get; set; } = true;
 
         private FullTextIndex<string>? index;
 
@@ -38,13 +38,13 @@ namespace BlazorApp.Services
         public async Task BuildIndexAsync()
         {
             this.index = new FullTextIndexBuilder<string>()
-                .WithDefaultTokenization(o => this.StemmingEnabled ? o.WithStemming() : o)
+                .WithDefaultTokenization(o => (this.StemmingEnabled ? o.WithStemming() : o).IgnoreCharacters('\''))
                 .WithObjectTokenization<WikipediaPage>(
                     page => page.WithKey(i => i.Title)
                         .WithField(
                             name: "Content",
                             fieldTextReader: i => i.Text.Content,
-                            tokenizationOptions: o => this.StemmingEnabled ? o.WithStemming() : o,
+                            tokenizationOptions: o => (this.StemmingEnabled ? o.WithStemming() : o).IgnoreCharacters('\''),
                             textExtractor: new XmlTextExtractor()))
                 .WithQueryParser(o => this.FuzzyMatchByDefault ? o.AssumeFuzzySearchTerms() : o)
                 .Build();

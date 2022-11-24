@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lifti.Tokenization;
+using System;
 using System.Collections.Generic;
 
 namespace Lifti.Querying
@@ -8,7 +9,7 @@ namespace Lifti.Querying
     /// </summary>
     internal class QueryTokenizer : IQueryTokenizer
     {
-        private static readonly HashSet<char> wildcardPunctuation = new HashSet<char>
+        private static readonly HashSet<char> wildcardPunctuation = new()
         {
             '*',
             '?',
@@ -17,7 +18,7 @@ namespace Lifti.Querying
 
         // Punctuation characters that shouldn't cause a token to be automatically split - these
         // are part of the LIFTI query syntax and processed on a case by case basis.
-        private static readonly HashSet<char> generalNonSplitPunctuation = new HashSet<char>(wildcardPunctuation)
+        private static readonly HashSet<char> generalNonSplitPunctuation = new(wildcardPunctuation)
         {
             '&',
             '|',
@@ -31,7 +32,7 @@ namespace Lifti.Querying
 
         // Punctuation characters that shouldn't cause a token to be automatically split when processing
         // inside a quoted section
-        private static readonly HashSet<char> quotedSectionNonSplitPunctuation = new HashSet<char>(wildcardPunctuation)
+        private static readonly HashSet<char> quotedSectionNonSplitPunctuation = new(wildcardPunctuation)
         {
             '"'
         };
@@ -50,10 +51,14 @@ namespace Lifti.Querying
             ProcessingFuzzyMatchTerm = 2,
         }
 
-        private record QueryTokenizerState(OperatorParseState OperatorState = OperatorParseState.None, TokenParseState TokenState = TokenParseState.None);
+        private record QueryTokenizerState()
+        {
+            public OperatorParseState OperatorState { get; init; } = OperatorParseState.None;
+            public TokenParseState TokenState { get; init; } = TokenParseState.None;
+        }
 
         /// <inheritdoc />
-        public IEnumerable<QueryToken> ParseQueryTokens(string queryText)
+        public IEnumerable<QueryToken> ParseQueryTokens(string queryText, ITokenizer tokenizer)
         {
             if (queryText is null)
             {
@@ -97,7 +102,7 @@ namespace Lifti.Querying
             {
                 var current = queryText[i];
                 if (state.TokenState == TokenParseState.ProcessingFuzzyMatch
-                                        && current != ',' 
+                                        && current != ','
                                         && char.IsDigit(current) == false)
                 {
                     // As soon as we encounter a non digit or comma when processing a fuzzy match,
@@ -106,7 +111,7 @@ namespace Lifti.Querying
                     state = state with { TokenState = TokenParseState.ProcessingFuzzyMatchTerm };
                 }
 
-                if (IsSplitChar(current, state))
+                if (IsSplitChar(current, state, tokenizer))
                 {
                     token = CreateTokenForYielding(i);
                     if (token != null)
@@ -171,7 +176,7 @@ namespace Lifti.Querying
                                     break;
                                 case '~':
                                     tolerance = 0;
-                                    state = state with { OperatorState = OperatorParseState.ProcessingNearOperator};
+                                    state = state with { OperatorState = OperatorParseState.ProcessingNearOperator };
                                     break;
                                 case '"':
                                     state = state with { OperatorState = OperatorParseState.ProcessingString };
@@ -247,19 +252,19 @@ namespace Lifti.Querying
             }
         }
 
-        private static bool IsSplitChar(char current, QueryTokenizerState state)
+        private static bool IsSplitChar(char current, QueryTokenizerState state, ITokenizer tokenizer)
         {
             var isWhitespace = char.IsWhiteSpace(current);
             return state.OperatorState switch
             {
-                OperatorParseState.None => 
+                OperatorParseState.None =>
                     isWhitespace || // Whitespace is always a split character
-                    (!generalNonSplitPunctuation.Contains(current) 
-                        && char.IsPunctuation(current) // Punctuation other than explicitly non-splitting characters is a split character,
+                    (!generalNonSplitPunctuation.Contains(current)
+                        && tokenizer.IsSplitCharacter(current) // Defer to the tokenizer for the field as to whether this is a split character,
                         && !(state.TokenState == TokenParseState.ProcessingFuzzyMatch && current == ',')), // ..unless it's a comma appearing in the first part of a fuzzy match
 
                 OperatorParseState.ProcessingString => isWhitespace ||
-                    (!quotedSectionNonSplitPunctuation.Contains(current) && char.IsPunctuation(current)),
+                    (!quotedSectionNonSplitPunctuation.Contains(current) && tokenizer.IsSplitCharacter(current)),
 
                 // When processing a near operator, no splitting is possible until the operator processing is complete
                 OperatorParseState.ProcessingNearOperator => false,

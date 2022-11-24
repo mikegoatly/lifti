@@ -101,7 +101,7 @@ namespace Lifti.Tests
             var results = this.index.Search("TAE");
             results.Should().HaveCount(1);
             results.First().FieldMatches.Single().FoundIn.Should().Be("Text4");
-            
+
             results = this.index.Search("EAT");
             results.Should().HaveCount(1);
             results.First().FieldMatches.Single().FoundIn.Should().Be("Text3");

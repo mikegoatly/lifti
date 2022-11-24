@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Lifti.Tokenization;
+using System.Collections.Generic;
 
 namespace Lifti.Querying
 {
@@ -13,9 +14,12 @@ namespace Lifti.Querying
         /// <param name="queryText">
         /// The text to parse.
         /// </param>
+        /// <param name="tokenizer">
+        /// The <see cref="ITokenizer"/> for the field the query is being parsed for.
+        /// </param>
         /// <returns>
         /// The parsed <see cref="QueryToken"/>s.
         /// </returns>
-        IEnumerable<QueryToken> ParseQueryTokens(string queryText);
+        IEnumerable<QueryToken> ParseQueryTokens(string queryText, ITokenizer tokenizer);
     }
 }

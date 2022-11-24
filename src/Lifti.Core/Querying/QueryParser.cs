@@ -25,7 +25,6 @@ namespace Lifti.Querying
             };
         }
 
-
         /// <inheritdoc />
         public IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, ITokenizer tokenizer)
         {
@@ -36,7 +35,7 @@ namespace Lifti.Querying
 
             IQueryPart? rootPart = null;
 
-            var state = new QueryParserState(this.queryTokenizer, queryText);
+            var state = new QueryParserState(this.queryTokenizer, tokenizer, queryText);
             while (state.TryGetNextToken(out var token))
             {
                 rootPart = this.CreateQueryPart(fieldLookup, state, token, tokenizer, rootPart);
@@ -213,9 +212,9 @@ namespace Lifti.Querying
         {
             private readonly IEnumerator<QueryToken> enumerator;
 
-            public QueryParserState(IQueryTokenizer queryTokenizer, string queryText)
+            public QueryParserState(IQueryTokenizer queryTokenizer, ITokenizer tokenizer, string queryText)
             {
-                this.enumerator = queryTokenizer.ParseQueryTokens(queryText).GetEnumerator();
+                this.enumerator = queryTokenizer.ParseQueryTokens(queryText, tokenizer).GetEnumerator();
             }
 
             public bool TryGetNextToken(out QueryToken token)

@@ -88,5 +88,13 @@ namespace Lifti.Tests
             builder.SplitOnCharacters('$', '%', '|');
             builder.Build().Should().BeOfType<Tokenizer>().Subject.Options.AdditionalSplitCharacters.Should().BeEquivalentTo(new[] { '$', '%', '|' });
         }
+
+        [Fact]
+        public void WithIgnoreCharacters_ShouldSetUpIgnoreCharacterListCorrectly()
+        {
+            var builder = new TokenizerBuilder();
+            builder.IgnoreCharacters('\'', '`');
+            builder.Build().Should().BeOfType<Tokenizer>().Subject.Options.IgnoreCharacters.Should().BeEquivalentTo(new[] { '\'', '`' });
+        }
     }
 }

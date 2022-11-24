@@ -234,6 +234,22 @@ namespace Lifti.Tests
             index.Search("Testing").Should().HaveCount(1);
         }
 
+        [Fact]
+        public async Task IgnoredCharacters_ShouldBeAppliedToBothIndexedTermsAndSearchTerms()
+        {
+            var index = this.sut.WithDefaultTokenization(o => o.IgnoreCharacters('\''))
+                .Build();
+
+            await index.AddAsync(12, "O'Reilly Books");
+            await index.AddAsync(24, "O Reilly Books");
+
+            index.DefaultTokenizer.Process("O'Reilly").Should().BeEquivalentTo(new[] { new Token("OREILLY", new TokenLocation(0, 0, 8)) });
+
+            var results = index.Search("O'Reilly").ToList();
+            results.Should().HaveCount(1);
+            results[0].Key.Should().Be(12);
+        }
+
         private QueryParserOptions BuildSutAndGetPassedOptions(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)
         {
             QueryParserOptions? passedOptions = null;

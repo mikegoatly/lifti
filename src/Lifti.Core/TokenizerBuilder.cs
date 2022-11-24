@@ -16,6 +16,7 @@ namespace Lifti
         private bool stemming = false;
         private char[]? additionalSplitCharacters;
         private Func<TokenizationOptions, ITokenizer> factory = defaultTokenizerFactory;
+        private char[]? ignoreCharacters;
 
         /// <summary>
         /// Configures a specific implementation of <see cref="ITokenizer"/> to be used. Use this
@@ -87,6 +88,20 @@ namespace Lifti
         }
 
         /// <summary>
+        /// Configures the tokenizer to ignore certain characters as it is parsing input.
+        /// Ignore characters are processed prior to splitting characters, so care needs to be taken that your source
+        /// text doesn't words delimited only by ignored characters, otherwise you may end up unexpectedly joining search terms
+        /// into one. For example, ignoring the <strong>'</strong> character will mean that <strong>O'Reilly</strong> will be tokenized 
+        /// as <strong>OReilly</strong>, but if your source text also contains <strong>she said'hello'</strong> then <strong>she</strong> and 
+        /// <strong>saidhello</strong> will treated as tokens.
+        /// </summary>
+        public TokenizerBuilder IgnoreCharacters(params char[] ignoreCharacters)
+        {
+            this.ignoreCharacters = ignoreCharacters;
+            return this;
+        }
+
+        /// <summary>
         /// Builds an <see cref="ITokenizer"/> instance matching the current configuration.
         /// </summary>
         public ITokenizer Build()
@@ -98,6 +113,11 @@ namespace Lifti
                 CaseInsensitive = this.caseInsensitive,
                 Stemming = this.stemming
             };
+
+            if (this.ignoreCharacters != null)
+            {
+                options.IgnoreCharacters = this.ignoreCharacters;
+            }
 
             if (this.additionalSplitCharacters != null)
             {

@@ -23,5 +23,10 @@ namespace Lifti.Tokenization
         /// Normalizes a fragment of text according to the rules in the tokenizer.
         /// </summary>
         string Normalize(ReadOnlySpan<char> tokenText);
+
+        /// <summary>
+        /// Returns whether this tokenizer considers the given character to be a split character.
+        /// </summary>
+        bool IsSplitCharacter(char character);
     }
 }

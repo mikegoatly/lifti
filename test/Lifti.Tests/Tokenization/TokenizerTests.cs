@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
 using Lifti.Tokenization.TextExtraction;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,13 +41,19 @@ namespace Lifti.Tests.Tokenization
             output.Should().BeEmpty();
         }
 
-        protected static Tokenizer WithConfiguration(bool splitOnPunctuation = true, char[] additionalSplitChars = null, bool caseInsensitive = false, bool accentInsensitive = false)
+        protected static Tokenizer WithConfiguration(
+            bool splitOnPunctuation = true, 
+            char[] additionalSplitChars = null,
+            char[] ignoreChars = null,
+            bool caseInsensitive = false, 
+            bool accentInsensitive = false)
         {
             return new Tokenizer(
                 new TokenizationOptions()
                 {
                     SplitOnPunctuation = splitOnPunctuation,
                     AdditionalSplitCharacters = additionalSplitChars ?? Array.Empty<char>(),
+                    IgnoreCharacters = ignoreChars ?? Array.Empty<char>(),
                     CaseInsensitive = caseInsensitive,
                     AccentInsensitive = accentInsensitive
                 });
@@ -63,6 +70,108 @@ namespace Lifti.Tests.Tokenization
             }
 
             return tokenizer.Process(fragments);
+        }
+
+        public class WithIgnoredCharacters : TokenizerTests
+        {
+            [Fact]
+            public void WhenIgnoredCharacterIsAlsoSplitCharacter_ShouldNotSplitOnCharacter()
+            {
+                var output = WithConfiguration(ignoreChars: new[] { ',' }, additionalSplitChars: new[] { ',' })
+                .Process("test,test test");
+
+                output.Should().BeEquivalentTo(new[]
+                {
+                    new Token("testtest", new TokenLocation(0, 0, 9)),
+                    new Token("test", new TokenLocation(1, 10, 4))
+                });
+            }
+
+            [Fact]
+            public void WithIgnoredCharacter_ShouldNotIncludeCharactersInTokenMatches()
+            {
+                var output = WithConfiguration(ignoreChars: new[] { '\'' })
+                .Process("O'Reilly's");
+
+                output.Should().BeEquivalentTo(new[]
+                {
+                    new Token("OReillys", new TokenLocation(0, 0, 10))
+                });
+            }
+        }
+
+        public class WithAllInsensitivityProcessors : TokenizerTests
+        {
+            private readonly Tokenizer sut;
+
+            public WithAllInsensitivityProcessors()
+            {
+                this.sut = WithConfiguration(caseInsensitive: true, accentInsensitive: true);
+            }
+
+            [Fact]
+            public void ShouldReturnSingleTokenForStringContainingOnlyOneWord()
+            {
+                var output = Execute(this.sut, "test");
+
+                output.Should().BeEquivalentTo(new[]
+                {
+                        new Token("TEST", new TokenLocation(0, 0, 4))
+                    });
+            }
+
+            [Fact]
+            public void ProcessingWithNonZeroOffset_ShouldReturnTokensWithExistingOffsetApplied()
+            {
+                var output = Execute(this.sut, "test test2 test3");
+
+                output.Should().BeEquivalentTo(new[]
+                {
+                        new Token("TEST", new TokenLocation(0, 0, 4)),
+                        new Token("TEST2", new TokenLocation(1, 5, 5)),
+                        new Token("TEST3", new TokenLocation(2, 11, 5))
+                    });
+            }
+
+            [Fact]
+            public void ProcessingEnumerableContainingMultipleWordStrings_ShouldReturnTokensWithContinuingIndexAndOffset()
+            {
+                var output = Execute(this.sut, "test", "test2 and test3", "test4");
+
+                output.Should().BeEquivalentTo(new[]
+                {
+                        new Token("TEST", new TokenLocation(0, 0, 4)),
+                        new Token("TEST2", new TokenLocation(1, 4, 5)),
+                        new Token("AND", new TokenLocation(2, 10, 3)),
+                        new Token("TEST3", new TokenLocation(3, 14, 5)),
+                        new Token("TEST4", new TokenLocation(4, 19, 5))
+                    });
+            }
+
+            [Fact]
+            public void ShouldReturnSingleTokenForStringContainingOnlyOneWordEnclosedWithWordBreaks()
+            {
+                var output = Execute(this.sut, " test\r\n");
+
+                output.Should().BeEquivalentTo(new[]
+                {
+                        new Token("TEST", new TokenLocation(0, 1, 4))
+                    });
+            }
+
+            [Fact]
+            public void WhenSplittingAtPunctuation_ShouldTokenizeAtWordBreaksAndPunctuation()
+            {
+                var input = "Træ træ moo moǑ";
+
+                var output = Execute(this.sut, input);
+
+                output.OrderBy(o => o.Value[0]).Should().BeEquivalentTo(new[]
+                {
+                        new Token("MOO", new TokenLocation(2, 8, 3), new TokenLocation(3, 12, 3)),
+                        new Token("TRAE", new TokenLocation(0, 0, 3), new TokenLocation(1, 4, 3))
+                    });
+            }
         }
 
         public class WithNoPreprocessors : TokenizerTests
@@ -165,80 +274,6 @@ namespace Lifti.Tests.Tokenization
                     new Token("custom", new TokenLocation(3, 17, 6)),
                     new Token("splits", new TokenLocation(4, 24, 6))
                 });
-            }
-
-            public class WithAllInsensitivityProcessors : TokenizerTests
-            {
-                private readonly Tokenizer sut;
-
-                public WithAllInsensitivityProcessors()
-                {
-                    this.sut = WithConfiguration(caseInsensitive: true, accentInsensitive: true);
-                }
-
-                [Fact]
-                public void ShouldReturnSingleTokenForStringContainingOnlyOneWord()
-                {
-                    var output = Execute(this.sut, "test");
-
-                    output.Should().BeEquivalentTo(new[]
-                    {
-                        new Token("TEST", new TokenLocation(0, 0, 4))
-                    });
-                }
-
-                [Fact]
-                public void ProcessingWithNonZeroOffset_ShouldReturnTokensWithExistingOffsetApplied()
-                {
-                    var output = Execute(this.sut, "test test2 test3");
-
-                    output.Should().BeEquivalentTo(new[]
-                    {
-                        new Token("TEST", new TokenLocation(0, 0, 4)),
-                        new Token("TEST2", new TokenLocation(1, 5, 5)),
-                        new Token("TEST3", new TokenLocation(2, 11, 5))
-                    });
-                }
-
-                [Fact]
-                public void ProcessingEnumerableContainingMultipleWordStrings_ShouldReturnTokensWithContinuingIndexAndOffset()
-                {
-                    var output = Execute(this.sut, "test", "test2 and test3", "test4");
-
-                    output.Should().BeEquivalentTo(new[]
-                    {
-                        new Token("TEST", new TokenLocation(0, 0, 4)),
-                        new Token("TEST2", new TokenLocation(1, 4, 5)),
-                        new Token("AND", new TokenLocation(2, 10, 3)),
-                        new Token("TEST3", new TokenLocation(3, 14, 5)),
-                        new Token("TEST4", new TokenLocation(4, 19, 5))
-                    });
-                }
-
-                [Fact]
-                public void ShouldReturnSingleTokenForStringContainingOnlyOneWordEnclosedWithWordBreaks()
-                {
-                    var output = Execute(this.sut, " test\r\n");
-
-                    output.Should().BeEquivalentTo(new[]
-                    {
-                        new Token("TEST", new TokenLocation(0, 1, 4))
-                    });
-                }
-
-                [Fact]
-                public void WhenSplittingAtPunctuation_ShouldTokenizeAtWordBreaksAndPunctuation()
-                {
-                    var input = "Træ træ moo moǑ";
-
-                    var output = Execute(this.sut, input);
-
-                    output.OrderBy(o => o.Value[0]).Should().BeEquivalentTo(new[]
-                    {
-                        new Token("MOO", new TokenLocation(2, 8, 3), new TokenLocation(3, 12, 3)),
-                        new Token("TRAE", new TokenLocation(0, 0, 3), new TokenLocation(1, 4, 3))
-                    });
-                }
             }
         }
     }

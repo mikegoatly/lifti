@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
 namespace Lifti.Tokenization.Preprocessing
 {
-    
+
     /// <inheritdoc />
     public class InputPreprocessorPipeline : IInputPreprocessorPipeline
     {
-        private readonly List<IInputPreprocessor> inputPreprocessors = new List<IInputPreprocessor>();
-        private static readonly SharedPool<Queue<PreprocessedInput>> queuePool = new SharedPool<Queue<PreprocessedInput>>(
-            () => new Queue<PreprocessedInput>(4), 
+        private readonly List<IInputPreprocessor> inputPreprocessors = new();
+        private static readonly SharedPool<Queue<PreprocessedInput>> queuePool = new(
+            () => new Queue<PreprocessedInput>(4),
             q => q.Clear());
 
         /// <summary>
@@ -22,6 +21,11 @@ namespace Lifti.Tokenization.Preprocessing
             if (options is null)
             {
                 throw new ArgumentNullException(nameof(options));
+            }
+
+            if (options.IgnoreCharacters.Count > 0)
+            {
+                this.inputPreprocessors.Add(new IgnoredCharacterPreprocessor(options.IgnoreCharacters));
             }
 
             if (options.AccentInsensitive)
@@ -44,8 +48,8 @@ namespace Lifti.Tokenization.Preprocessing
                 yield break;
             }
 
-            Queue<PreprocessedInput> processQueue = queuePool.Create();
-            Queue<PreprocessedInput> outputQueue = queuePool.Create();
+            var processQueue = queuePool.Create();
+            var outputQueue = queuePool.Create();
 
             processQueue.Enqueue(input);
 

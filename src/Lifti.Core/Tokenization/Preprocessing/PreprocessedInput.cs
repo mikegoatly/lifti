@@ -37,6 +37,11 @@ namespace Lifti
         }
 
         /// <summary>
+        /// Gets an instance of <see cref="PreprocessedInput"/> that yields no characters.
+        /// </summary>
+        public static PreprocessedInput Empty { get; } = new PreprocessedInput(string.Empty);
+
+        /// <summary>
         /// Gets the single character value that this instance represents. This is <c>\0</c> if
         /// the instance is a multi-character replacement.
         /// </summary>

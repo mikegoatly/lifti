@@ -22,6 +22,11 @@ namespace Lifti.Tests.Querying
 
         public TokenizationOptions Options { get; }
 
+        public bool IsSplitCharacter(char character)
+        {
+            return char.IsSeparator(character)|| char.IsPunctuation(character);
+        }
+
         public string Normalize(ReadOnlySpan<char> text)
         {
             var result = new string(text);

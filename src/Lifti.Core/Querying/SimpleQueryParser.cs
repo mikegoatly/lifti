@@ -33,6 +33,11 @@ namespace Lifti.Querying
                 throw new ArgumentNullException(nameof(queryText));
             }
 
+            if (tokenizer is null)
+            {
+                throw new ArgumentNullException(nameof(tokenizer));
+            }
+
             var tokens = tokenizer.Process(queryText.AsSpan());
             if (tokens.Count == 0)
             {

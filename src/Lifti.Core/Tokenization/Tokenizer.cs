@@ -15,7 +15,8 @@ namespace Lifti.Tokenization
     public class Tokenizer : ITokenizer
     {
         private readonly IInputPreprocessorPipeline inputPreprocessorPipeline;
-        private readonly HashSet<char>? additionalSplitChars;
+        private readonly HashSet<char> additionalSplitChars;
+        private readonly HashSet<char> ignoreChars;
         private readonly IStemmer? stemmer;
 
         /// <summary>
@@ -31,9 +32,8 @@ namespace Lifti.Tokenization
                 this.stemmer = new PorterStemmer();
             }
 
-            this.additionalSplitChars = tokenizationOptions.AdditionalSplitCharacters.Count > 0
-                ? new HashSet<char>(tokenizationOptions.AdditionalSplitCharacters)
-                : null;
+            this.additionalSplitChars = new HashSet<char>(tokenizationOptions.AdditionalSplitCharacters);
+            this.ignoreChars = new HashSet<char>(tokenizationOptions.IgnoreCharacters);
 
             this.inputPreprocessorPipeline = new InputPreprocessorPipeline(tokenizationOptions);
         }
@@ -137,12 +137,20 @@ namespace Lifti.Tokenization
         /// <summary>
         /// Determines whether the given character is considered to be a word splitting character.
         /// </summary>
-        protected virtual bool IsSplitCharacter(char current)
+        public virtual bool IsSplitCharacter(char current)
         {
-            return char.IsSeparator(current) ||
-                char.IsControl(current) ||
-                (this.Options.SplitOnPunctuation == true && char.IsPunctuation(current)) ||
-                (this.additionalSplitChars?.Contains(current) == true);
+            return
+                // Split when the character is well known as a Unicode separator or control character
+                char.IsSeparator(current) || char.IsControl(current) || (
+                    (
+                        // Split if we are splitting on punctuation and the character is a punctuation character
+                        (this.Options.SplitOnPunctuation == true && char.IsPunctuation(current)) ||
+                        // Or the character is in the list of additional split characters
+                        this.additionalSplitChars.Contains(current)
+                    )
+                    // Unless the character is an ignored characters
+                    && this.ignoreChars.Contains(current) == false
+               );
         }
 
         private void CaptureToken(TokenStore processedTokens, ref int tokenIndex, int start, int end, StringBuilder tokenBuilder)
@@ -154,10 +162,7 @@ namespace Lifti.Tokenization
                 throw new LiftiException(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.MaxTokenLengthExceeded, ushort.MaxValue));
             }
 
-            if (this.stemmer != null)
-            {
-                this.stemmer.Stem(tokenBuilder);
-            }
+            this.stemmer?.Stem(tokenBuilder);
 
             processedTokens.MergeOrAdd(tokenBuilder, new TokenLocation(tokenIndex, start, (ushort)length));
 
