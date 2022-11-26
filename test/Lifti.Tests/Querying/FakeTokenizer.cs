@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Lifti.Tests.Querying
 {
-    public class FakeTokenizer : ITokenizer
+    public class FakeTokenizer : IIndexTokenizer
     {
         private readonly bool normalizeToUppercase;
 

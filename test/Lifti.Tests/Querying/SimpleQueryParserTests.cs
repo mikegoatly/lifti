@@ -83,7 +83,7 @@ namespace Lifti.Tests.Querying
             options.DefaultJoiningOperator = defaultJoinOperator;
 
             var parser = new SimpleQueryParser(options);
-            return parser.Parse(null, text, new Tokenizer(new TokenizationOptions()));
+            return parser.Parse(null, text, new IndexTokenizer(new TokenizationOptions()));
         }
     }
 }

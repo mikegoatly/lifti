@@ -11,7 +11,7 @@ namespace Lifti
     {
         /// <summary>
         /// Parses the given <paramref name="queryText"/> using the index's <see cref="IQueryParser"/>
-        /// and default <see cref="ITokenizer"/>.
+        /// and default <see cref="IIndexTokenizer"/>.
         /// </summary>
         public static IQuery ParseQuery<TKey>(this IFullTextIndex<TKey> index, string queryText)
         {

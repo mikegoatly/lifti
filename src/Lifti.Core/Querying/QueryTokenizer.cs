@@ -58,7 +58,7 @@ namespace Lifti.Querying
         }
 
         /// <inheritdoc />
-        public IEnumerable<QueryToken> ParseQueryTokens(string queryText, ITokenizer tokenizer)
+        public IEnumerable<QueryToken> ParseQueryTokens(string queryText, IIndexTokenizer tokenizer)
         {
             if (queryText is null)
             {
@@ -252,7 +252,7 @@ namespace Lifti.Querying
             }
         }
 
-        private static bool IsSplitChar(char current, QueryTokenizerState state, ITokenizer tokenizer)
+        private static bool IsSplitChar(char current, QueryTokenizerState state, IIndexTokenizer tokenizer)
         {
             var isWhitespace = char.IsWhiteSpace(current);
             return state.OperatorState switch

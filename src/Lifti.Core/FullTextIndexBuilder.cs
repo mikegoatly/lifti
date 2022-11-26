@@ -18,7 +18,7 @@ namespace Lifti
         private readonly IndexOptions advancedOptions = new IndexOptions();
         private IIndexScorerFactory? scorerFactory;
         private IQueryParser? queryParser;
-        private ITokenizer defaultTokenizer = Tokenizer.Default;
+        private IIndexTokenizer defaultTokenizer = IndexTokenizer.Default;
         private List<Func<IIndexSnapshot<TKey>, Task>>? indexModifiedActions;
         private ITextExtractor? defaultTextExtractor;
 

@@ -4,28 +4,28 @@ using System;
 namespace Lifti
 {
     /// <summary>
-    /// A builder capable of creating an <see cref="ITokenizer"/> instance for use in an index.
+    /// A builder capable of creating an <see cref="IIndexTokenizer"/> instance for use in an index.
     /// </summary>
     public class TokenizerBuilder
     {
-        private static readonly Func<TokenizationOptions, ITokenizer> defaultTokenizerFactory = o => new Tokenizer(o);
+        private static readonly Func<TokenizationOptions, IIndexTokenizer> defaultTokenizerFactory = o => new IndexTokenizer(o);
 
         private bool splitOnPunctuation = true;
         private bool accentInsensitive = true;
         private bool caseInsensitive = true;
         private bool stemming = false;
         private char[]? additionalSplitCharacters;
-        private Func<TokenizationOptions, ITokenizer> factory = defaultTokenizerFactory;
+        private Func<TokenizationOptions, IIndexTokenizer> factory = defaultTokenizerFactory;
         private char[]? ignoreCharacters;
 
         /// <summary>
-        /// Configures a specific implementation of <see cref="ITokenizer"/> to be used. Use this
+        /// Configures a specific implementation of <see cref="IIndexTokenizer"/> to be used. Use this
         /// method if you need more control over the tokenization process.
         /// </summary>
         /// <param name="tokenizerFactory">
-        /// A delegate capable of creating the required <see cref="ITokenizer"/>.
+        /// A delegate capable of creating the required <see cref="IIndexTokenizer"/>.
         /// </param>
-        public TokenizerBuilder WithFactory(Func<TokenizationOptions, ITokenizer> tokenizerFactory)
+        public TokenizerBuilder WithFactory(Func<TokenizationOptions, IIndexTokenizer> tokenizerFactory)
         {
             this.factory = tokenizerFactory;
             return this;
@@ -102,9 +102,9 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Builds an <see cref="ITokenizer"/> instance matching the current configuration.
+        /// Builds an <see cref="IIndexTokenizer"/> instance matching the current configuration.
         /// </summary>
-        public ITokenizer Build()
+        public IIndexTokenizer Build()
         {
             var options = new TokenizationOptions()
             {

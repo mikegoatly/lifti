@@ -8,7 +8,7 @@ namespace Lifti.Tokenization.Objects
     /// <inheritdoc />
     internal abstract class FieldReader<TItem> : IFieldReader<TItem>
     {
-        internal FieldReader(string name, ITokenizer? tokenizer, ITextExtractor? textExtractor)
+        internal FieldReader(string name, IIndexTokenizer? tokenizer, ITextExtractor? textExtractor)
         {
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
             this.Tokenizer = tokenizer;
@@ -19,7 +19,7 @@ namespace Lifti.Tokenization.Objects
         public string Name { get; }
 
         /// <inheritdoc />
-        public ITokenizer? Tokenizer { get; }
+        public IIndexTokenizer? Tokenizer { get; }
 
         /// <inheritdoc />
         public ITextExtractor? TextExtractor { get; }

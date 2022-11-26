@@ -21,7 +21,7 @@ namespace Lifti.Tests
         public void WithoutChangingTokenizerFactory_ShouldBuildTokenizer()
         {
             var builder = new TokenizerBuilder();
-            builder.Build().Should().BeOfType<Tokenizer>();
+            builder.Build().Should().BeOfType<IndexTokenizer>();
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace Lifti.Tests
         public void WithoutApplyingAnyOptions_ShouldSetDefaultsCorrectly()
         {
             var builder = new TokenizerBuilder();
-            builder.Build().Should().BeOfType<Tokenizer>().Subject
+            builder.Build().Should().BeOfType<IndexTokenizer>().Subject
                 .Options.Should().BeEquivalentTo(expectedDefaultOptions);
         }
 
@@ -48,7 +48,7 @@ namespace Lifti.Tests
         {
             var builder = new TokenizerBuilder();
             builder.WithStemming(setting);
-            builder.Build().Should().BeOfType<Tokenizer>().Subject.Options.Stemming.Should().Be(setting);
+            builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options.Stemming.Should().Be(setting);
         }
 
         [Theory]
@@ -58,7 +58,7 @@ namespace Lifti.Tests
         {
             var builder = new TokenizerBuilder();
             builder.CaseInsensitive(setting);
-            builder.Build().Should().BeOfType<Tokenizer>().Subject.Options.CaseInsensitive.Should().Be(setting);
+            builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options.CaseInsensitive.Should().Be(setting);
         }
 
         [Theory]
@@ -68,7 +68,7 @@ namespace Lifti.Tests
         {
             var builder = new TokenizerBuilder();
             builder.AccentInsensitive(setting);
-            builder.Build().Should().BeOfType<Tokenizer>().Subject.Options.AccentInsensitive.Should().Be(setting);
+            builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options.AccentInsensitive.Should().Be(setting);
         }
 
         [Theory]
@@ -78,7 +78,7 @@ namespace Lifti.Tests
         {
             var builder = new TokenizerBuilder();
             builder.SplitOnPunctuation(setting);
-            builder.Build().Should().BeOfType<Tokenizer>().Subject.Options.SplitOnPunctuation.Should().Be(setting);
+            builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options.SplitOnPunctuation.Should().Be(setting);
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Lifti.Tests
         {
             var builder = new TokenizerBuilder();
             builder.SplitOnCharacters('$', '%', '|');
-            builder.Build().Should().BeOfType<Tokenizer>().Subject.Options.AdditionalSplitCharacters.Should().BeEquivalentTo(new[] { '$', '%', '|' });
+            builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options.AdditionalSplitCharacters.Should().BeEquivalentTo(new[] { '$', '%', '|' });
         }
 
         [Fact]
@@ -94,7 +94,7 @@ namespace Lifti.Tests
         {
             var builder = new TokenizerBuilder();
             builder.IgnoreCharacters('\'', '`');
-            builder.Build().Should().BeOfType<Tokenizer>().Subject.Options.IgnoreCharacters.Should().BeEquivalentTo(new[] { '\'', '`' });
+            builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options.IgnoreCharacters.Should().BeEquivalentTo(new[] { '\'', '`' });
         }
     }
 }

@@ -35,10 +35,10 @@ namespace Lifti
         IIndexSnapshot<TKey> Snapshot { get; }
 
         /// <summary>
-        /// Gets the default <see cref="ITokenizer"/> implementation that the index will use when one is
+        /// Gets the default <see cref="IIndexTokenizer"/> implementation that the index will use when one is
         /// not explicitly configured for a field.
         /// </summary>
-        ITokenizer DefaultTokenizer { get; }
+        IIndexTokenizer DefaultTokenizer { get; }
 
         /// <summary>
         /// Gets the configured <see cref="IQueryParser"/> for the index. If you need to execute the same query against the index multiple

@@ -17,7 +17,7 @@ namespace Lifti
         internal IndexedFieldLookup(
             IEnumerable<IFieldReader> fieldReaders, 
             ITextExtractor defaultTextExtractor,
-            ITokenizer defaultTokenizer)
+            IIndexTokenizer defaultTokenizer)
         {
             if (fieldReaders is null)
             {
@@ -69,7 +69,7 @@ namespace Lifti
             return details;
         }
 
-        private void RegisterField(IFieldReader fieldOptions, ITextExtractor defaultTextExtractor, ITokenizer defaultTokenizer)
+        private void RegisterField(IFieldReader fieldOptions, ITextExtractor defaultTextExtractor, IIndexTokenizer defaultTokenizer)
         {
             var fieldName = fieldOptions.Name;
             if (this.fieldToDetailsLookup.ContainsKey(fieldOptions.Name))

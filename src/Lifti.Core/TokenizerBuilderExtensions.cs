@@ -5,7 +5,7 @@ namespace Lifti
 {
     internal static class TokenizerBuilderExtensions
     {
-        public static ITokenizer? CreateTokenizer(this Func<TokenizerBuilder, TokenizerBuilder>? optionsBuilder)
+        public static IIndexTokenizer? CreateTokenizer(this Func<TokenizerBuilder, TokenizerBuilder>? optionsBuilder)
         {
             return optionsBuilder == null ?
                 null :

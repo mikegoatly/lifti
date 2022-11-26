@@ -54,8 +54,8 @@ namespace Lifti.Tests
 
             var index = this.sut.Build();
 
-            ((Tokenizer)index.FieldLookup.GetFieldInfo("Content").Tokenizer).Options.CaseInsensitive.Should().BeFalse();
-            ((Tokenizer)index.FieldLookup.GetFieldInfo("Title").Tokenizer).Options.CaseInsensitive.Should().BeTrue();
+            ((IndexTokenizer)index.FieldLookup.GetFieldInfo("Content").Tokenizer).Options.CaseInsensitive.Should().BeFalse();
+            ((IndexTokenizer)index.FieldLookup.GetFieldInfo("Title").Tokenizer).Options.CaseInsensitive.Should().BeTrue();
         }
 
         [Fact]
@@ -120,7 +120,7 @@ namespace Lifti.Tests
 
             index.Search("test").Should().BeEmpty();
 
-            parser.Verify(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), "test", It.IsAny<ITokenizer>()), Times.Once);
+            parser.Verify(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), "test", It.IsAny<IIndexTokenizer>()), Times.Once);
         }
 
         [Fact]
@@ -268,7 +268,7 @@ namespace Lifti.Tests
         private Mock<IQueryParser> ConfigureQueryParserMock()
         {
             var parser = new Mock<IQueryParser>();
-            parser.Setup(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), It.IsAny<string>(), It.IsAny<ITokenizer>()))
+            parser.Setup(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), It.IsAny<string>(), It.IsAny<IIndexTokenizer>()))
                 .Returns(new Query(EmptyQueryPart.Instance));
 
             this.sut.WithQueryParser(parser.Object);

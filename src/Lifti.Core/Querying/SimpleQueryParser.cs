@@ -26,7 +26,7 @@ namespace Lifti.Querying
         }
 
         /// <inheritdoc />
-        public IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, ITokenizer tokenizer)
+        public IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, IIndexTokenizer tokenizer)
         {
             if (queryText is null)
             {

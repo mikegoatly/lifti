@@ -15,11 +15,11 @@ namespace Lifti.Querying
         /// The text to parse.
         /// </param>
         /// <param name="tokenizer">
-        /// The <see cref="ITokenizer"/> for the field the query is being parsed for.
+        /// The <see cref="IIndexTokenizer"/> for the field the query is being parsed for.
         /// </param>
         /// <returns>
         /// The parsed <see cref="QueryToken"/>s.
         /// </returns>
-        IEnumerable<QueryToken> ParseQueryTokens(string queryText, ITokenizer tokenizer);
+        IEnumerable<QueryToken> ParseQueryTokens(string queryText, IIndexTokenizer tokenizer);
     }
 }

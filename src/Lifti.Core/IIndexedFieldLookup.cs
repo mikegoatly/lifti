@@ -18,7 +18,7 @@
 
         /// <summary>
         /// Gets the configuration required for indexing a named field, including the <see cref="Lifti.Tokenization.TextExtraction.ITextExtractor"/>
-        /// and <see cref="Lifti.Tokenization.ITokenizer"/> instances to use when processing the field's text.
+        /// and <see cref="Lifti.Tokenization.IIndexTokenizer"/> instances to use when processing the field's text.
         /// </summary>
         IndexedFieldDetails GetFieldInfo(string fieldName);
     }

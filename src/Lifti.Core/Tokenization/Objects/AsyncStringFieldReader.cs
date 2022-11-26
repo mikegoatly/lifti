@@ -18,7 +18,7 @@ namespace Lifti.Tokenization.Objects
         internal AsyncStringFieldReader(
             string name,
             Func<TItem, Task<string>> reader,
-            ITokenizer? tokenizer,
+            IIndexTokenizer? tokenizer,
             ITextExtractor? textExtractor)
             : base(name, tokenizer, textExtractor)
         {
