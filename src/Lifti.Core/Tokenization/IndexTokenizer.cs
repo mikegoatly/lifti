@@ -10,9 +10,9 @@ using System.Text;
 namespace Lifti.Tokenization
 {
     /// <summary>
-    /// The default implementation of <see cref="ITokenizer"/> that just extracts tokens from plain text.
+    /// The default implementation of <see cref="IIndexTokenizer"/>.
     /// </summary>
-    public class Tokenizer : ITokenizer
+    public class IndexTokenizer : IIndexTokenizer
     {
         private readonly IInputPreprocessorPipeline inputPreprocessorPipeline;
         private readonly HashSet<char> additionalSplitChars;
@@ -20,10 +20,10 @@ namespace Lifti.Tokenization
         private readonly IStemmer? stemmer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Tokenizer"/> class.
+        /// Initializes a new instance of the <see cref="IndexTokenizer"/> class.
         /// </summary>
         /// <param name="tokenizationOptions">The tokenization options for this instance.</param>
-        public Tokenizer(TokenizationOptions tokenizationOptions)
+        public IndexTokenizer(TokenizationOptions tokenizationOptions)
         {
             this.Options = tokenizationOptions ?? throw new ArgumentNullException(nameof(tokenizationOptions));
 
@@ -39,9 +39,9 @@ namespace Lifti.Tokenization
         }
 
         /// <summary>
-        /// Gets the default <see cref="ITokenizer"/> implementation, configured with <see cref="TokenizationOptions.Default"/>.
+        /// Gets the default <see cref="IIndexTokenizer"/> implementation, configured with <see cref="TokenizationOptions.Default"/>.
         /// </summary>
-        public static Tokenizer Default { get; } = new Tokenizer(TokenizationOptions.Default);
+        public static IndexTokenizer Default { get; } = new IndexTokenizer(TokenizationOptions.Default);
 
         /// <inheritdoc />
         public TokenizationOptions Options { get; }

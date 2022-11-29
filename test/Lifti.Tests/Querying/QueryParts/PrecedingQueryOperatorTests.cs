@@ -27,13 +27,16 @@ namespace Lifti.Tests.Querying.QueryParts
             // Field 1: 11, 106, 101
             // Field 2: 8, 105, 104
             results.Matches.Should().BeEquivalentTo(
-                ScoredToken(
-                    7,
-                    ScoredFieldMatch(4D, 1, TokenMatch(8), TokenMatch(14), TokenMatch(20), TokenMatch(100), TokenMatch(102))),
-                ScoredToken(
-                    8,
-                    ScoredFieldMatch(6D, 1, TokenMatch(11), TokenMatch(101), TokenMatch(106)),
-                    ScoredFieldMatch(13D, 2, TokenMatch(8), TokenMatch(104), TokenMatch(105))));
+                new[]
+                {
+                    ScoredToken(
+                        7,
+                        ScoredFieldMatch(4D, 1, TokenMatch(8), TokenMatch(14), TokenMatch(20), TokenMatch(100), TokenMatch(102))),
+                    ScoredToken(
+                        8,
+                        ScoredFieldMatch(6D, 1, TokenMatch(11), TokenMatch(101), TokenMatch(106)),
+                        ScoredFieldMatch(13D, 2, TokenMatch(8), TokenMatch(104), TokenMatch(105)))
+                });
         }
     }
 }

@@ -6,16 +6,17 @@ using System.Linq;
 
 namespace Lifti.Tests.Querying
 {
-    public class FakeTokenizer : ITokenizer
+    public class FakeIndexTokenizer : IIndexTokenizer
     {
         private readonly bool normalizeToUppercase;
 
-        public FakeTokenizer(bool normalizeToUppercase = false)
+        public FakeIndexTokenizer(bool normalizeToUppercase = false)
+            : this(new TokenizationOptions())
         {
             this.normalizeToUppercase = normalizeToUppercase;
         }
 
-        public FakeTokenizer(TokenizationOptions options)
+        public FakeIndexTokenizer(TokenizationOptions options)
         {
             this.Options = options;
         }

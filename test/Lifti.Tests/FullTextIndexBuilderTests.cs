@@ -54,8 +54,8 @@ namespace Lifti.Tests
 
             var index = this.sut.Build();
 
-            ((Tokenizer)index.FieldLookup.GetFieldInfo("Content").Tokenizer).Options.CaseInsensitive.Should().BeFalse();
-            ((Tokenizer)index.FieldLookup.GetFieldInfo("Title").Tokenizer).Options.CaseInsensitive.Should().BeTrue();
+            ((IndexTokenizer)index.FieldLookup.GetFieldInfo("Content").Tokenizer).Options.CaseInsensitive.Should().BeFalse();
+            ((IndexTokenizer)index.FieldLookup.GetFieldInfo("Title").Tokenizer).Options.CaseInsensitive.Should().BeTrue();
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace Lifti.Tests
             var passedOptions = BuildSutAndGetPassedOptions(o => o.WithFuzzySearchDefaults(10, 4));
 
             passedOptions.Should().NotBeNull();
-            passedOptions.FuzzySearchMaxEditDistance(1000).Should().Be(10);
+            passedOptions!.FuzzySearchMaxEditDistance(1000).Should().Be(10);
             passedOptions.FuzzySearchMaxSequentialEdits(1000).Should().Be(4);
         }
 
@@ -73,7 +73,7 @@ namespace Lifti.Tests
         {
             var passedOptions = BuildSutAndGetPassedOptions(o => o);
             passedOptions.Should().NotBeNull();
-            passedOptions.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.And);
+            passedOptions!.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.And);
         }
 
         [Fact]
@@ -81,7 +81,7 @@ namespace Lifti.Tests
         {
             var passedOptions = BuildSutAndGetPassedOptions(o => o.WithDefaultJoiningOperator(QueryTermJoinOperatorKind.Or));
             passedOptions.Should().NotBeNull();
-            passedOptions.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.Or);
+            passedOptions!.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.Or);
         }
 
         [Fact]
@@ -107,7 +107,7 @@ namespace Lifti.Tests
             index.Search("test");
 
             passedOptions.Should().NotBeNull();
-            passedOptions.FuzzySearchMaxEditDistance(1000).Should().Be(100);
+            passedOptions!.FuzzySearchMaxEditDistance(1000).Should().Be(100);
             passedOptions.FuzzySearchMaxSequentialEdits(1000).Should().Be(10);
         }
 
@@ -120,13 +120,13 @@ namespace Lifti.Tests
 
             index.Search("test").Should().BeEmpty();
 
-            parser.Verify(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), "test", It.IsAny<ITokenizer>()), Times.Once);
+            parser.Verify(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), "test", index), Times.Once);
         }
 
         [Fact]
         public void WithQueryParserOptions_ShouldPassOptionsToQueryParser()
         {
-            QueryParserOptions providedOptions = null;
+            QueryParserOptions? providedOptions = null;
 
             this.sut.WithQueryParser(o => o
                 .AssumeFuzzySearchTerms()
@@ -205,8 +205,8 @@ namespace Lifti.Tests
 
             await index.AddAsync(9, "Test");
 
-            action1.Should().BeEquivalentTo("1");
-            action2.Should().BeEquivalentTo(1);
+            action1.Should().BeEquivalentTo(new[] { "1" });
+            action2.Should().BeEquivalentTo(new[] { 1 });
         }
 
         [Fact]
@@ -250,7 +250,7 @@ namespace Lifti.Tests
             results[0].Key.Should().Be(12);
         }
 
-        private QueryParserOptions BuildSutAndGetPassedOptions(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)
+        private QueryParserOptions? BuildSutAndGetPassedOptions(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)
         {
             QueryParserOptions? passedOptions = null;
 
@@ -268,7 +268,7 @@ namespace Lifti.Tests
         private Mock<IQueryParser> ConfigureQueryParserMock()
         {
             var parser = new Mock<IQueryParser>();
-            parser.Setup(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), It.IsAny<string>(), It.IsAny<ITokenizer>()))
+            parser.Setup(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), It.IsAny<string>(), It.IsAny<IIndexTokenizerProvider>()))
                 .Returns(new Query(EmptyQueryPart.Instance));
 
             this.sut.WithQueryParser(parser.Object);

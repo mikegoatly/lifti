@@ -34,7 +34,7 @@ namespace Lifti
             IQueryParser queryParser,
             IIndexScorerFactory scorer,
             ITextExtractor defaultTextExtractor,
-            ITokenizer defaultTokenizer,
+            IIndexTokenizer defaultTokenizer,
             Func<IIndexSnapshot<TKey>, Task>[]? indexModifiedActions)
         {
             this.indexNavigatorPool = new IndexNavigatorPool(scorer);
@@ -85,10 +85,13 @@ namespace Lifti
         public IIndexSnapshot<TKey> Snapshot => this.currentSnapshot;
 
         /// <inheritdoc />
-        public ITokenizer DefaultTokenizer { get; }
+        public IIndexTokenizer DefaultTokenizer { get; }
 
         /// <inheritdoc />
         public ITextExtractor DefaultTextExtractor { get; }
+
+        /// <inheritdoc />
+        IIndexTokenizer IIndexTokenizerProvider.this[string fieldName] => this.FieldLookup.GetFieldInfo(fieldName).Tokenizer;
 
         /// <inheritdoc />
         public IIndexNavigator CreateNavigator()
@@ -208,7 +211,7 @@ namespace Lifti
         /// <inheritdoc />
         public IEnumerable<SearchResult<TKey>> Search(string searchText)
         {
-            var query = this.queryParser.Parse(this.FieldLookup, searchText, this.DefaultTokenizer);
+            var query = this.queryParser.Parse(this.FieldLookup, searchText, this);
             return query.Execute(this.currentSnapshot);
         }
 
@@ -234,7 +237,7 @@ namespace Lifti
             this.PerformWriteLockedAction(() => this.Root = indexNode);
         }
 
-        private static IReadOnlyList<Token> ExtractDocumentTokens(IEnumerable<string> documentTextFragments, ITextExtractor textExtractor, ITokenizer tokenizer)
+        private static IReadOnlyList<Token> ExtractDocumentTokens(IEnumerable<string> documentTextFragments, ITextExtractor textExtractor, IIndexTokenizer tokenizer)
         {
             var documentOffset = 0;
             var fragments = Enumerable.Empty<DocumentTextFragment>();
@@ -247,7 +250,7 @@ namespace Lifti
             return tokenizer.Process(fragments);
         }
 
-        private static IReadOnlyList<Token> ExtractDocumentTokens(string documentText, ITextExtractor textExtractor, ITokenizer tokenizer)
+        private static IReadOnlyList<Token> ExtractDocumentTokens(string documentText, ITextExtractor textExtractor, IIndexTokenizer tokenizer)
         {
             var fragments = textExtractor.Extract(documentText.AsMemory(), 0);
             return tokenizer.Process(fragments);

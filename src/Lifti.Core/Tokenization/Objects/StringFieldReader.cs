@@ -18,7 +18,7 @@ namespace Lifti.Tokenization.Objects
         internal StringFieldReader(
             string name,
             Func<TItem, string> reader,
-            ITokenizer? tokenizer,
+            IIndexTokenizer? tokenizer,
             ITextExtractor? textExtractor)
             : base(name, tokenizer, textExtractor)
         {

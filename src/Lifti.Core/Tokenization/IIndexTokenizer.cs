@@ -5,9 +5,9 @@ using System.Collections.Generic;
 namespace Lifti.Tokenization
 {
     /// <summary>
-    /// Defines methods for processing inputs strings to a set of <see cref="Token"/> instances.
+    /// Defines methods for processing text for use in an index.
     /// </summary>
-    public interface ITokenizer
+    public interface IIndexTokenizer
     {
         /// <summary>
         /// Tokenizes the given <see cref="DocumentTextFragment"/>s relating a single document.

@@ -14,10 +14,10 @@ namespace Lifti.Tests.Tokenization.TextExtraction
             var sut = new PlainTextExtractor();
             var results = sut.Extract("Some text".AsMemory(), 10);
 
-            results.Select(r => (r.Offset, r.Text.ToString()))
-            .Should().BeEquivalentTo(
+            results.Select(r => (r.Offset, r.Text.ToString())).Should().BeEquivalentTo(new[]
+            {
                 (10, "Some text")
-            );
+            });
         }
     }
 }

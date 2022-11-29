@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Lifti.Querying;
 using Lifti.Querying.QueryParts;
 using Xunit;
 
@@ -26,14 +25,16 @@ namespace Lifti.Tests.Querying.QueryParts
             // Item 8 matches:
             // Field 1: (101, 106)
             // Field 2: (8, 3) (104, 105)
-            results.Matches.Should().BeEquivalentTo(
+            results.Matches.Should().BeEquivalentTo(new[]
+            {
                 ScoredToken(
                     7,
                     ScoredFieldMatch(4D, 1, CompositeMatch(8, 6), CompositeMatch(100, 102))),
                 ScoredToken(
                     8,
                     ScoredFieldMatch(6D, 1, CompositeMatch(101, 106)),
-                    ScoredFieldMatch(13D, 2, CompositeMatch(8, 3), CompositeMatch(104, 105))));
+                    ScoredFieldMatch(13D, 2, CompositeMatch(8, 3), CompositeMatch(104, 105)))
+            });
         }
     }
 }

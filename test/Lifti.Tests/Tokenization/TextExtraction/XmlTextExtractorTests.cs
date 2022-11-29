@@ -82,13 +82,14 @@ namespace Lifti.Tests.Tokenization.TextExtraction
 
             var results = index.Search("test");
 
-            results.Single().FieldMatches.Single().Locations.Should().BeEquivalentTo(
+            results.Single().FieldMatches.Single().Locations.Should().BeEquivalentTo(new[]
+            {
                 new TokenLocation(0, 5, 4),
                 new TokenLocation(1, 13, 4),
                 new TokenLocation(2, 25, 7),
                 new TokenLocation(3, 37, 4),
                 new TokenLocation(4, 42, 6)
-            );
+            });
         }
     }
 }

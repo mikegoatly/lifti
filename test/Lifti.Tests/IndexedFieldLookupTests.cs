@@ -25,7 +25,7 @@ namespace Lifti.Tests
             this.sut = new IndexedFieldLookup(
                 itemConfig.GetConfiguredFields(), 
                 new PlainTextExtractor(), 
-                Tokenizer.Default);
+                IndexTokenizer.Default);
         }
 
         [Fact]
@@ -39,8 +39,8 @@ namespace Lifti.Tests
         [Fact]
         public void GettingTokenizationOptionsShouldReturnCorrectlyConstructedInstances()
         {
-            ((Tokenizer)this.sut.GetFieldInfo("FieldX").Tokenizer).Options.Stemming.Should().BeTrue();
-            ((Tokenizer)this.sut.GetFieldInfo("FieldY").Tokenizer).Options.Stemming.Should().BeFalse();
+            ((IndexTokenizer)this.sut.GetFieldInfo("FieldX").Tokenizer).Options.Stemming.Should().BeTrue();
+            ((IndexTokenizer)this.sut.GetFieldInfo("FieldY").Tokenizer).Options.Stemming.Should().BeFalse();
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Lifti.Tests
 
             IObjectTokenization config = itemConfigBuilder.Build();
 
-            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(config.GetConfiguredFields(), new PlainTextExtractor(), Tokenizer.Default))
+            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(config.GetConfiguredFields(), new PlainTextExtractor(), IndexTokenizer.Default))
                 .Message.Should().Be("Only 255 distinct fields can currently be indexed");
         }
 
@@ -84,7 +84,7 @@ namespace Lifti.Tests
                 .WithKey(i => i)
                 .Build();
 
-            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(config.GetConfiguredFields(), new PlainTextExtractor(), Tokenizer.Default))
+            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(config.GetConfiguredFields(), new PlainTextExtractor(), IndexTokenizer.Default))
                 .Message.Should().Be("Duplicate field name used: Field1. Field names must be unique across all item types registered with an index.");
         }
     }

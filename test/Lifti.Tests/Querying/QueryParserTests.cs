@@ -13,6 +13,8 @@ namespace Lifti.Tests.Querying
         private const byte TestFieldId = 9;
         private const byte OtherFieldId = 11;
         private readonly Mock<IIndexedFieldLookup> fieldLookupMock;
+        private readonly FakeIndexTokenizer field1Tokenizer;
+        private readonly FakeIndexTokenizer field2Tokenizer;
 
         public QueryParserTests()
         {
@@ -20,10 +22,11 @@ namespace Lifti.Tests.Querying
             var testFieldId = TestFieldId;
             var otherFieldId = OtherFieldId;
 
-            var tokenizer = new FakeTokenizer();
+            this.field1Tokenizer = new FakeIndexTokenizer();
+            this.field2Tokenizer = new FakeIndexTokenizer();
             var textExtractor = new PlainTextExtractor();
-            this.fieldLookupMock.Setup(l => l.GetFieldInfo("testfield")).Returns(new IndexedFieldDetails(testFieldId, textExtractor, tokenizer));
-            this.fieldLookupMock.Setup(l => l.GetFieldInfo("otherfield")).Returns(new IndexedFieldDetails(otherFieldId, textExtractor, tokenizer));
+            this.fieldLookupMock.Setup(l => l.GetFieldInfo("testfield")).Returns(new IndexedFieldDetails(testFieldId, textExtractor, this.field1Tokenizer));
+            this.fieldLookupMock.Setup(l => l.GetFieldInfo("otherfield")).Returns(new IndexedFieldDetails(otherFieldId, textExtractor, this.field2Tokenizer));
         }
 
         [Fact]
@@ -143,7 +146,7 @@ namespace Lifti.Tests.Querying
 
             VerifyResult(result, expectedQuery);
         }
-
+        
         [Fact]
         public void ParsingBracketedAndExpressions_ShouldReturnBracketedQueryPartContainer()
         {
@@ -332,7 +335,13 @@ namespace Lifti.Tests.Querying
             options.DefaultJoiningOperator = defaultJoinOperator;
 
             var parser = new QueryParser(options);
-            return parser.Parse(this.fieldLookupMock.Object, text, new FakeTokenizer());
+            return parser.Parse(
+                this.fieldLookupMock.Object, 
+                text, 
+                new FakeIndexTokenizerProvider(
+                    new FakeIndexTokenizer(),
+                    ("testfield", this.field1Tokenizer),
+                    ("otherfield", this.field2Tokenizer)));
         }
     }
 }

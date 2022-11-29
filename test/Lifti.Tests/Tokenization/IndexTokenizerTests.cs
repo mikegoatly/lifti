@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
 using Lifti.Tokenization.TextExtraction;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ using Xunit;
 
 namespace Lifti.Tests.Tokenization
 {
-    public abstract class TokenizerTests
+    public abstract class IndexTokenizerTests
     {
         [Fact]
         public void ShouldReturnNoTokensForEmptyString()
@@ -26,7 +25,7 @@ namespace Lifti.Tests.Tokenization
         {
             var sut = WithConfiguration();
 
-            var output = Execute(sut, new string[] { null });
+            var output = Execute(sut, new string[] { null! });
 
             output.Should().BeEmpty();
         }
@@ -41,14 +40,14 @@ namespace Lifti.Tests.Tokenization
             output.Should().BeEmpty();
         }
 
-        protected static Tokenizer WithConfiguration(
-            bool splitOnPunctuation = true, 
-            char[] additionalSplitChars = null,
-            char[] ignoreChars = null,
-            bool caseInsensitive = false, 
+        protected static IndexTokenizer WithConfiguration(
+            bool splitOnPunctuation = true,
+            char[]? additionalSplitChars = null,
+            char[]? ignoreChars = null,
+            bool caseInsensitive = false,
             bool accentInsensitive = false)
         {
-            return new Tokenizer(
+            return new IndexTokenizer(
                 new TokenizationOptions()
                 {
                     SplitOnPunctuation = splitOnPunctuation,
@@ -59,7 +58,7 @@ namespace Lifti.Tests.Tokenization
                 });
         }
 
-        protected static IReadOnlyList<Token> Execute(Tokenizer tokenizer, params string[] textParts)
+        protected static IReadOnlyList<Token> Execute(IndexTokenizer tokenizer, params string[] textParts)
         {
             var fragments = new List<DocumentTextFragment>();
             var offset = 0;
@@ -72,7 +71,7 @@ namespace Lifti.Tests.Tokenization
             return tokenizer.Process(fragments);
         }
 
-        public class WithIgnoredCharacters : TokenizerTests
+        public class WithIgnoredCharacters : IndexTokenizerTests
         {
             [Fact]
             public void WhenIgnoredCharacterIsAlsoSplitCharacter_ShouldNotSplitOnCharacter()
@@ -100,9 +99,9 @@ namespace Lifti.Tests.Tokenization
             }
         }
 
-        public class WithAllInsensitivityProcessors : TokenizerTests
+        public class WithAllInsensitivityProcessors : IndexTokenizerTests
         {
-            private readonly Tokenizer sut;
+            private readonly IndexTokenizer sut;
 
             public WithAllInsensitivityProcessors()
             {
@@ -174,7 +173,7 @@ namespace Lifti.Tests.Tokenization
             }
         }
 
-        public class WithNoPreprocessors : TokenizerTests
+        public class WithNoPreprocessors : IndexTokenizerTests
         {
             [Fact]
             public void ShouldReturnSingleTokenForStringContainingOnlyOneWord()

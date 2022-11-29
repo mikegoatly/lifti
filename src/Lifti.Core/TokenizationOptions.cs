@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Lifti
 {
     /// <summary>
-    /// Options that can be provided to an <see cref="ITokenizer"/> to configure its behavior.
+    /// Options that can be provided to an <see cref="IIndexTokenizer"/> to configure its behavior.
     /// </summary>
     public class TokenizationOptions
     {

@@ -9,7 +9,7 @@ namespace Lifti
     /// </summary>
     public struct IndexedFieldDetails : IEquatable<IndexedFieldDetails>
     {
-        internal IndexedFieldDetails(byte id, ITextExtractor textExtractor, ITokenizer tokenizer)
+        internal IndexedFieldDetails(byte id, ITextExtractor textExtractor, IIndexTokenizer tokenizer)
         {
             this.Id = id;
             this.TextExtractor = textExtractor;
@@ -27,9 +27,9 @@ namespace Lifti
         public ITextExtractor TextExtractor { get; }
 
         /// <summary>
-        /// The <see cref="ITokenizer"/> that should be used when tokenizing text for the field.
+        /// The <see cref="IIndexTokenizer"/> that should be used when tokenizing text for the field.
         /// </summary>
-        public ITokenizer Tokenizer { get; }
+        public IIndexTokenizer Tokenizer { get; }
 
         /// <inheritdoc />
         public override bool Equals(object obj)
@@ -52,7 +52,7 @@ namespace Lifti
             return HashCode.Combine(this.Id, this.Tokenizer, this.TextExtractor);
         }
 
-        internal void Deconstruct(out byte fieldId, out ITextExtractor textExtractor, out ITokenizer tokenizer)
+        internal void Deconstruct(out byte fieldId, out ITextExtractor textExtractor, out IIndexTokenizer tokenizer)
         {
             fieldId = this.Id;
             tokenizer = this.Tokenizer;

@@ -222,6 +222,9 @@
   <data name="SingleCharacterWildcardsFollowingMultiCharacterNotSupported" xml:space="preserve">
     <value>Single character wildcards (%) following a multi-character wildcard (*) are not currently supported.</value>
   </data>
+  <data name="TextTokensMustHaveIndexTokenizers" xml:space="preserve">
+    <value>Text tokens must have an associated index tokenizer</value>
+  </data>
   <data name="TimeoutWaitingForWriteLock" xml:space="preserve">
     <value>A timeout occurred waiting for index write lock</value>
   </data>
@@ -230,6 +233,9 @@
   </data>
   <data name="UnableToReadHeaderInformation" xml:space="preserve">
     <value>Unable to read header data from serialized index content.</value>
+  </data>
+  <data name="UnexpectedCloseBracket" xml:space="preserve">
+    <value>Unexpected close bracket encountered in query</value>
   </data>
   <data name="UnexpectedEndOfQuery" xml:space="preserve">
     <value>The query ended unexpectedly - a token was expected.</value>

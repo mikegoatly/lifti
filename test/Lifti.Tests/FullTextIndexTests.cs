@@ -60,10 +60,12 @@ namespace Lifti.Tests
             var results = this.index.Search("test");
             results.Should().HaveCount(1);
             results.Single().FieldMatches.Single().Locations.Should().BeEquivalentTo(
-                new TokenLocation(0, 0, 4),
-                new TokenLocation(1, 5, 4),
-                new TokenLocation(2, 11, 4)
-            );
+                new[]
+                {
+                    new TokenLocation(0, 0, 4),
+                    new TokenLocation(1, 5, 4),
+                    new TokenLocation(2, 11, 4)
+                });
         }
 
         [Fact]
