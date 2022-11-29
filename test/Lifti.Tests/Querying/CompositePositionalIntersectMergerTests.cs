@@ -45,9 +45,10 @@ namespace Lifti.Tests.Querying
             var right = IntermediateQueryResult(ScoredToken(7, ScoredFieldMatch(1D, 1, 35)));
             var result = CompositePositionalIntersectMerger.Apply(left, right, 0, 5);
 
-            result.Should().BeEquivalentTo(
+            result.Should().BeEquivalentTo(new[]
+            {
                 ScoredToken(7,ScoredFieldMatch(2D, 1, (30, 35)))
-            );
+            });
         }
 
         [Fact]
@@ -55,11 +56,13 @@ namespace Lifti.Tests.Querying
         {
             var result = CompositePositionalIntersectMerger.Apply(exactMatchLeft, exactMatchRight, 0, 5);
 
-            result.Should().BeEquivalentTo(
+            result.Should().BeEquivalentTo(new[]
+            {
                 ScoredToken(
                     7,
                     ScoredFieldMatch(2D, 1, (30, 35)),
-                    ScoredFieldMatch(4D, 2, (5, 10))));
+                    ScoredFieldMatch(4D, 2, (5, 10)))
+            });
         }
 
         [Fact]

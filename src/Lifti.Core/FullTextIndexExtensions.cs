@@ -17,7 +17,7 @@ namespace Lifti
         {
             return index is null
                 ? throw new ArgumentNullException(nameof(index))
-                : index.QueryParser.Parse(index.FieldLookup, queryText, index.DefaultTokenizer);
+                : index.QueryParser.Parse(index.FieldLookup, queryText, index);
         }
     }
 }

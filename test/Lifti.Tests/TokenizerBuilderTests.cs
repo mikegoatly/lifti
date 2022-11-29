@@ -28,8 +28,8 @@ namespace Lifti.Tests
         public void WithSpecifiedTokenizerFactory_ShouldReturnConfiguredType()
         {
             var builder = new TokenizerBuilder();
-            builder.WithFactory(o => new FakeTokenizer(o) );
-            builder.Build().Should().BeOfType<FakeTokenizer>().Subject
+            builder.WithFactory(o => new FakeIndexTokenizer(o) );
+            builder.Build().Should().BeOfType<FakeIndexTokenizer>().Subject
                 .Options.Should().BeEquivalentTo(expectedDefaultOptions);
         }
 

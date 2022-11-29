@@ -84,12 +84,14 @@ namespace Lifti.Tests
             this.sut.Add("7", DocumentStatistics((7, 7)));
 
             this.sut.GetIndexedItems().Should().BeEquivalentTo(
-                new ItemMetadata<string>(0, "1", item1DocumentStatistics),
-                new ItemMetadata<string>(1, "2", item2DocumentStatistics),
-                new ItemMetadata<string>(9, "9", DocumentStatistics((9, 9))),
-                new ItemMetadata<string>(10, "10", DocumentStatistics((10, 10))),
-                new ItemMetadata<string>(11, "7", DocumentStatistics((7, 7)))
-            );
+                new[]
+                {
+                    new ItemMetadata<string>(0, "1", item1DocumentStatistics),
+                    new ItemMetadata<string>(1, "2", item2DocumentStatistics),
+                    new ItemMetadata<string>(9, "9", DocumentStatistics((9, 9))),
+                    new ItemMetadata<string>(10, "10", DocumentStatistics((10, 10))),
+                    new ItemMetadata<string>(11, "7", DocumentStatistics((7, 7)))
+                });
         }
 
         [Fact]
@@ -102,9 +104,11 @@ namespace Lifti.Tests
         public void GetIndexedItems_ShouldReturnMetadataForAllItemsInTheIndex()
         {
             this.sut.GetIndexedItems().Should().BeEquivalentTo(
-                new ItemMetadata<string>(0, "1", item1DocumentStatistics),
-                new ItemMetadata<string>(1, "2", item2DocumentStatistics)
-            );
+                new[]
+                {
+                    new ItemMetadata<string>(0, "1", item1DocumentStatistics),
+                    new ItemMetadata<string>(1, "2", item2DocumentStatistics)
+                });
         }
 
         [Fact]

@@ -25,7 +25,7 @@ namespace Lifti.Tests.Tokenization
         {
             var sut = WithConfiguration();
 
-            var output = Execute(sut, new string[] { null });
+            var output = Execute(sut, new string[] { null! });
 
             output.Should().BeEmpty();
         }
@@ -42,8 +42,8 @@ namespace Lifti.Tests.Tokenization
 
         protected static IndexTokenizer WithConfiguration(
             bool splitOnPunctuation = true,
-            char[] additionalSplitChars = null,
-            char[] ignoreChars = null,
+            char[]? additionalSplitChars = null,
+            char[]? ignoreChars = null,
             bool caseInsensitive = false,
             bool accentInsensitive = false)
         {

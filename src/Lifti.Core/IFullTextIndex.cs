@@ -8,7 +8,7 @@ namespace Lifti
 {
     /// <summary>
     /// </summary>
-    public interface IFullTextIndex<TKey>
+    public interface IFullTextIndex<TKey> : IIndexTokenizerProvider
     {
         /// <summary>
         /// Internally an index keeps track of items and their metadata. Can be used get ids for items and 
@@ -33,12 +33,6 @@ namespace Lifti
         /// whilst it is being mutated.
         /// </summary>
         IIndexSnapshot<TKey> Snapshot { get; }
-
-        /// <summary>
-        /// Gets the default <see cref="IIndexTokenizer"/> implementation that the index will use when one is
-        /// not explicitly configured for a field.
-        /// </summary>
-        IIndexTokenizer DefaultTokenizer { get; }
 
         /// <summary>
         /// Gets the configured <see cref="IQueryParser"/> for the index. If you need to execute the same query against the index multiple

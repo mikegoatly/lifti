@@ -19,7 +19,7 @@ namespace Lifti.Tests.Querying.QueryParts
             "Odius ogres obey Mobius"
         };
 
-        public FullTextIndex<int> Index { get; private set; }
+        public FullTextIndex<int> Index { get; private set; } = null!;
 
         public Task DisposeAsync()
         {
@@ -129,7 +129,7 @@ namespace Lifti.Tests.Querying.QueryParts
 
             var results = index.Search(query).ToList();
 
-            results.Select(x => x.Key).Should().BeEquivalentTo(1, 3);
+            results.Select(x => x.Key).Should().BeEquivalentTo(new[] { 1, 3 });
         }
 
         [Theory]

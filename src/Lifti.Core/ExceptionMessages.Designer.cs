@@ -376,6 +376,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Text tokens must have an associated index tokenizer.
+        /// </summary>
+        internal static string TextTokensMustHaveIndexTokenizers {
+            get {
+                return ResourceManager.GetString("TextTokensMustHaveIndexTokenizers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A timeout occurred waiting for index write lock.
         /// </summary>
         internal static string TimeoutWaitingForWriteLock {
@@ -399,6 +408,15 @@ namespace Lifti {
         internal static string UnableToReadHeaderInformation {
             get {
                 return ResourceManager.GetString("UnableToReadHeaderInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected close bracket encountered in query.
+        /// </summary>
+        internal static string UnexpectedCloseBracket {
+            get {
+                return ResourceManager.GetString("UnexpectedCloseBracket", resourceCulture);
             }
         }
         

@@ -1,17 +1,19 @@
-﻿using System;
+﻿using Lifti.Tokenization;
+using System;
 
 namespace Lifti.Querying
 {
     /// <summary>
     /// A token parsed from a query string.
     /// </summary>
-    public struct QueryToken : IEquatable<QueryToken>
+    internal class QueryToken : IEquatable<QueryToken>
     {
-        private QueryToken(string tokenText, QueryTokenType tokenType, int tolerance)
+        private QueryToken(string tokenText, QueryTokenType tokenType, int tolerance, IIndexTokenizer? indexTokenizer)
         {
             this.TokenText = tokenText;
             this.TokenType = tokenType;
             this.Tolerance = tolerance;
+            this.IndexTokenizer = indexTokenizer;
         }
 
         /// <summary>
@@ -29,6 +31,11 @@ namespace Lifti.Querying
         public int Tolerance { get; }
 
         /// <summary>
+        /// The <see cref="IIndexTokenizer"/> to use when further tokenizing the text in this instance.
+        /// </summary>
+        public IIndexTokenizer? IndexTokenizer { get; }
+
+        /// <summary>
         /// Gets the <see cref="QueryTokenType"/> that this instance represents.
         /// </summary>
         public QueryTokenType TokenType { get; }
@@ -39,7 +46,10 @@ namespace Lifti.Querying
         /// <param name="text">
         /// The text to be matched by the query.
         /// </param>
-        public static QueryToken ForText(string text) => new QueryToken(text, QueryTokenType.Text, 0);
+        /// <param name="indexTokenizer">
+        /// The <see cref="IIndexTokenizer"/> to use when further tokenizing the captured text. 
+        /// </param>
+        public static QueryToken ForText(string text, IIndexTokenizer indexTokenizer) => new QueryToken(text, QueryTokenType.Text, 0, indexTokenizer);
 
         /// <summary>
         /// Creates a new <see cref="QueryToken"/> instance representing a field filter.
@@ -47,7 +57,7 @@ namespace Lifti.Querying
         /// <param name="fieldName">
         /// The name of the field to match.
         /// </param>
-        public static QueryToken ForFieldFilter(string fieldName) => new QueryToken(fieldName, QueryTokenType.FieldFilter, 0);
+        public static QueryToken ForFieldFilter(string fieldName) => new QueryToken(fieldName, QueryTokenType.FieldFilter, 0, null);
 
         /// <summary>
         /// Creates a new <see cref="QueryToken"/> instance representing a query operator.
@@ -55,7 +65,7 @@ namespace Lifti.Querying
         /// <param name="operatorType">
         /// The type of operator the token should represent.
         /// </param>
-        public static QueryToken ForOperator(QueryTokenType operatorType) => new QueryToken(string.Empty, operatorType, 0);
+        public static QueryToken ForOperator(QueryTokenType operatorType) => new QueryToken(string.Empty, operatorType, 0, null);
 
         /// <summary>
         /// Creates a new <see cref="QueryToken"/> instance representing a query operator that has additional positional constraints.
@@ -67,7 +77,7 @@ namespace Lifti.Querying
         /// The number of tokens to use as the tolerance for the operator.
         /// </param>
         public static QueryToken ForOperatorWithTolerance(QueryTokenType operatorType, int tolerance) => 
-            new QueryToken(string.Empty, operatorType, tolerance == 0 ? 5 : tolerance);
+            new QueryToken(string.Empty, operatorType, tolerance == 0 ? 5 : tolerance, null);
 
         /// <inheritdoc />
         public override bool Equals(object obj)

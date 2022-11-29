@@ -18,9 +18,11 @@ namespace Lifti.Tests.Querying.QueryParts
             var results = sut.Evaluate(() => navigator, QueryContext.Empty);
 
             results.Matches.Should().BeEquivalentTo(
+                new[]
+                {
                     ScoredToken(2, ScoredFieldMatch(2D, 4, 1)),
                     ScoredToken(4, ScoredFieldMatch(4D, 4, 44, 99))
-                );
+                });
         }
     }
 }

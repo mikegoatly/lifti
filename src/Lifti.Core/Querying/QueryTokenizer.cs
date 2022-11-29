@@ -1,6 +1,7 @@
 ﻿using Lifti.Tokenization;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Lifti.Querying
 {
@@ -51,21 +52,82 @@ namespace Lifti.Querying
             ProcessingFuzzyMatchTerm = 2,
         }
 
-        private record QueryTokenizerState()
+        private record IndexTokenizerStackState(int BracketCaptureDepth, IIndexTokenizer IndexTokenizer);
+
+        private record QueryTokenizerState(IIndexTokenizer IndexTokenizer)
         {
             public OperatorParseState OperatorState { get; init; } = OperatorParseState.None;
             public TokenParseState TokenState { get; init; } = TokenParseState.None;
+            public int BracketDepth { get; init; }
+
+            private ImmutableStack<IndexTokenizerStackState> TokenizerStack { get; init; } = ImmutableStack<IndexTokenizerStackState>.Empty;
+
+            public QueryTokenizerState OpenBracket()
+            {
+                return this with
+                {
+                    BracketDepth = this.BracketDepth + 1
+                };
+            }
+
+            public QueryTokenizerState CloseBracket()
+            {
+                return this.BracketDepth > 0
+                    ? (this with
+                    {
+                        BracketDepth = this.BracketDepth - 1
+                    })
+                    : throw new QueryParserException(ExceptionMessages.UnexpectedCloseBracket);
+            }
+
+            public QueryTokenizerState PushTokenizer(IIndexTokenizer tokenizer)
+            {
+                return this with
+                {
+                    IndexTokenizer = tokenizer,
+                    TokenizerStack = this.TokenizerStack.Push(new IndexTokenizerStackState(this.BracketDepth, this.IndexTokenizer))
+                };
+            }
+
+            public QueryTokenizerState UpdateForYieldedToken()
+            {
+                if (this.OperatorState != OperatorParseState.ProcessingString && this.TokenizerStack.IsEmpty == false)
+                {
+                    var peeked = this.TokenizerStack.Peek();
+                    if (peeked.BracketCaptureDepth >= this.BracketDepth)
+                    {
+                        // We've reached the same bracket depth now that the tokenizer was captured at, so revert to the
+                        // previous one on the stack.
+                        var poppedStack = this.TokenizerStack.Pop(out var previousState);
+
+                        return this with
+                        {
+                            IndexTokenizer = previousState.IndexTokenizer,
+                            TokenizerStack = poppedStack
+                        };
+                    }
+                }
+
+                // Once token processing complete, reset any token state flags
+                if (this.TokenState != TokenParseState.None)
+                {
+                    return this with { TokenState = TokenParseState.None };
+                }
+
+                // We're still deeper in brackets than when we first captured the tokenizer, so don't revert
+                return this;
+            }
         }
 
         /// <inheritdoc />
-        public IEnumerable<QueryToken> ParseQueryTokens(string queryText, IIndexTokenizer tokenizer)
+        public IEnumerable<QueryToken> ParseQueryTokens(string queryText, IIndexTokenizerProvider tokenizerProvider)
         {
             if (queryText is null)
             {
                 throw new ArgumentNullException(nameof(queryText));
             }
 
-            var state = new QueryTokenizerState();
+            var state = new QueryTokenizerState(tokenizerProvider.DefaultTokenizer);
             var tokenStart = (int?)null;
             var tolerance = 0;
 
@@ -74,14 +136,10 @@ namespace Lifti.Querying
                 if (tokenStart != null)
                 {
                     var tokenText = queryText.Substring(tokenStart.Value, endIndex - tokenStart.Value);
-                    var token = QueryToken.ForText(tokenText);
+                    var token = QueryToken.ForText(tokenText, state.IndexTokenizer);
                     tokenStart = null;
 
-                    // Once token processing complete, reset any token state flags
-                    if (state.TokenState != TokenParseState.None)
-                    {
-                        state = state with { TokenState = TokenParseState.None };
-                    }
+                    state = state.UpdateForYieldedToken();
 
                     if (tokenText.Length == 0 || (tokenText[0] == '?' && tokenText[tokenText.Length - 1] == '?'))
                     {
@@ -111,12 +169,12 @@ namespace Lifti.Querying
                     state = state with { TokenState = TokenParseState.ProcessingFuzzyMatchTerm };
                 }
 
-                if (IsSplitChar(current, state, tokenizer))
+                if (IsSplitChar(current, state))
                 {
                     token = CreateTokenForYielding(i);
-                    if (token != null)
+                    if (token is not null)
                     {
-                        yield return token.Value;
+                        yield return token;
                     }
                 }
                 else
@@ -159,20 +217,26 @@ namespace Lifti.Querying
                                         throw new QueryParserException(ExceptionMessages.UnexpectedOperator, "=");
                                     }
 
-                                    yield return QueryToken.ForFieldFilter(queryText.Substring(tokenStart.Value, i - tokenStart.Value));
+                                    var fieldName = queryText.Substring(tokenStart.Value, i - tokenStart.Value);
+                                    yield return QueryToken.ForFieldFilter(fieldName);
+
+                                    state = state.PushTokenizer(tokenizerProvider[fieldName]);
+
                                     tokenStart = null;
                                     break;
                                 case ')':
+                                    state = state.CloseBracket();
                                     token = CreateTokenForYielding(i);
-                                    if (token != null)
+                                    if (token is not null)
                                     {
-                                        yield return token.Value;
+                                        yield return token;
                                     }
 
                                     yield return QueryToken.ForOperator(QueryTokenType.CloseBracket);
                                     break;
                                 case '(':
                                     yield return QueryToken.ForOperator(QueryTokenType.OpenBracket);
+                                    state = state.OpenBracket();
                                     break;
                                 case '~':
                                     tolerance = 0;
@@ -195,9 +259,9 @@ namespace Lifti.Querying
                                 case '"':
                                     state = state with { OperatorState = OperatorParseState.None };
                                     token = CreateTokenForYielding(i);
-                                    if (token != null)
+                                    if (token is not null)
                                     {
-                                        yield return token.Value;
+                                        yield return token;
                                     }
 
                                     yield return QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator);
@@ -245,14 +309,14 @@ namespace Lifti.Querying
             if (tokenStart != null)
             {
                 token = CreateTokenForYielding(queryText.Length);
-                if (token != null)
+                if (token is not null)
                 {
-                    yield return token.GetValueOrDefault();
+                    yield return token;
                 }
             }
         }
 
-        private static bool IsSplitChar(char current, QueryTokenizerState state, IIndexTokenizer tokenizer)
+        private static bool IsSplitChar(char current, QueryTokenizerState state)
         {
             var isWhitespace = char.IsWhiteSpace(current);
             return state.OperatorState switch
@@ -260,11 +324,11 @@ namespace Lifti.Querying
                 OperatorParseState.None =>
                     isWhitespace || // Whitespace is always a split character
                     (!generalNonSplitPunctuation.Contains(current)
-                        && tokenizer.IsSplitCharacter(current) // Defer to the tokenizer for the field as to whether this is a split character,
+                        && state.IndexTokenizer.IsSplitCharacter(current) // Defer to the tokenizer for the field as to whether this is a split character,
                         && !(state.TokenState == TokenParseState.ProcessingFuzzyMatch && current == ',')), // ..unless it's a comma appearing in the first part of a fuzzy match
 
                 OperatorParseState.ProcessingString => isWhitespace ||
-                    (!quotedSectionNonSplitPunctuation.Contains(current) && tokenizer.IsSplitCharacter(current)),
+                    (!quotedSectionNonSplitPunctuation.Contains(current) && state.IndexTokenizer.IsSplitCharacter(current)),
 
                 // When processing a near operator, no splitting is possible until the operator processing is complete
                 OperatorParseState.ProcessingNearOperator => false,

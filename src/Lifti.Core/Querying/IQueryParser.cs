@@ -18,12 +18,12 @@ namespace Lifti.Querying
         /// <param name="queryText">
         /// The text of the query to parse.
         /// </param>
-        /// <param name="tokenizer">
-        /// The <see cref="IIndexTokenizer"/> to use when parsing tokens out of the <paramref name="queryText"/>.
+        /// <param name="tokenizerProvider">
+        /// The <see cref="IIndexTokenizerProvider"/> to use when accessing the tokenizers associated to the index being queried.
         /// </param>
         /// <returns>
         /// The parsed <see cref="IQuery"/> representation of the query.
         /// </returns>
-        IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, IIndexTokenizer tokenizer);
+        IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, IIndexTokenizerProvider tokenizerProvider);
     }
 }

@@ -17,8 +17,8 @@
         string GetFieldForId(byte id);
 
         /// <summary>
-        /// Gets the configuration required for indexing a named field, including the <see cref="Lifti.Tokenization.TextExtraction.ITextExtractor"/>
-        /// and <see cref="Lifti.Tokenization.IIndexTokenizer"/> instances to use when processing the field's text.
+        /// Gets the configuration required for indexing a named field, including the <see cref="Tokenization.TextExtraction.ITextExtractor"/>
+        /// and <see cref="Tokenization.IIndexTokenizer"/> instances to use when processing the field's text.
         /// </summary>
         IndexedFieldDetails GetFieldInfo(string fieldName);
     }

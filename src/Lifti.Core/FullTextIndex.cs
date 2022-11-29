@@ -91,6 +91,9 @@ namespace Lifti
         public ITextExtractor DefaultTextExtractor { get; }
 
         /// <inheritdoc />
+        IIndexTokenizer IIndexTokenizerProvider.this[string fieldName] => this.FieldLookup.GetFieldInfo(fieldName).Tokenizer;
+
+        /// <inheritdoc />
         public IIndexNavigator CreateNavigator()
         {
             return this.Snapshot.CreateNavigator();
@@ -208,7 +211,7 @@ namespace Lifti
         /// <inheritdoc />
         public IEnumerable<SearchResult<TKey>> Search(string searchText)
         {
-            var query = this.queryParser.Parse(this.FieldLookup, searchText, this.DefaultTokenizer);
+            var query = this.queryParser.Parse(this.FieldLookup, searchText, this);
             return query.Execute(this.currentSnapshot);
         }
 
