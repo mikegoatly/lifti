@@ -40,6 +40,11 @@ namespace Lifti.Querying.QueryParts
         /// <exception cref="QueryParserException">Thrown when <paramref name="queryParts"/> is empty.</exception>
         public static IQueryPart CombineAll(IEnumerable<IQueryPart> queryParts)
         {
+            if (queryParts is null)
+            {
+                throw new ArgumentNullException(nameof(queryParts));
+            }
+
             IQueryPart? current = null;
             foreach (var queryPart in queryParts)
             {
