@@ -7,7 +7,7 @@ namespace Lifti.Querying
     /// <summary>
     /// Represents the location of a single token manifested during the execution of a query.
     /// </summary>
-    public struct SingleTokenLocationMatch : ITokenLocationMatch, IEquatable<SingleTokenLocationMatch>
+    public readonly struct SingleTokenLocationMatch : ITokenLocationMatch, IEquatable<SingleTokenLocationMatch>
     {
         private readonly TokenLocation original;
 

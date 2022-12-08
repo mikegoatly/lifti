@@ -112,7 +112,7 @@ namespace Lifti
         /// <returns>
         /// The matching search results.
         /// </returns>
-        IEnumerable<SearchResult<TKey>> Search(string searchText);
+        ISearchResults<TKey> Search(string searchText);
 
         /// <summary>
         /// Performs a search against this index.
@@ -123,6 +123,6 @@ namespace Lifti
         /// <returns>
         /// The matching search results.
         /// </returns>
-        IEnumerable<SearchResult<TKey>> Search(IQuery query);
+        ISearchResults<TKey> Search(IQuery query);
     }
 }

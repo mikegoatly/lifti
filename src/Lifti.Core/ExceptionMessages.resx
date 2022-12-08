@@ -216,6 +216,9 @@
   <data name="NoScorerInitialized" xml:space="preserve">
     <value>Attempting to score a query result with no scorer initialized</value>
   </data>
+  <data name="NotAllRequestedItemsReturned" xml:space="preserve">
+    <value>Not all requested items were returned. Tme missing ids were: {0}</value>
+  </data>
   <data name="NoTokenizationOptionsProvidedForType" xml:space="preserve">
     <value>No tokenization options have been provided for type {0}</value>
   </data>

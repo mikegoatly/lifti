@@ -1,6 +1,6 @@
 ﻿namespace TestConsole
 {
-    public struct CompositeKey
+    public readonly struct CompositeKey
     {
         public CompositeKey(int userId, short companyId)
         {

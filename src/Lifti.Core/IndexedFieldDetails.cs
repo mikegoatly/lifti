@@ -7,7 +7,7 @@ namespace Lifti
     /// <summary>
     /// Information about a field that has been configured for indexing.
     /// </summary>
-    public struct IndexedFieldDetails : IEquatable<IndexedFieldDetails>
+    public readonly struct IndexedFieldDetails : IEquatable<IndexedFieldDetails>
     {
         internal IndexedFieldDetails(byte id, ITextExtractor textExtractor, IIndexTokenizer tokenizer)
         {

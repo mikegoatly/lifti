@@ -6,7 +6,7 @@ namespace Lifti.Querying
     /// <summary>
     /// Information about an item's field that was matched and scored during the execution of a query.
     /// </summary>
-    public struct ScoredFieldMatch : IEquatable<ScoredFieldMatch>
+    public readonly struct ScoredFieldMatch : IEquatable<ScoredFieldMatch>
     {
         /// <summary>
         /// Constructs a new instance of <see cref="ScoredFieldMatch"/>.

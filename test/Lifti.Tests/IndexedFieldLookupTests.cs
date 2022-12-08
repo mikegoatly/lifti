@@ -2,7 +2,7 @@
 using Lifti.Tokenization;
 using Lifti.Tokenization.Objects;
 using Lifti.Tokenization.TextExtraction;
-using Moq;
+using System.Linq;
 using Xunit;
 
 namespace Lifti.Tests
@@ -77,14 +77,22 @@ namespace Lifti.Tests
         [Fact]
         public void UsingDuplicateFieldNameShouldThrowException()
         {
-            IObjectTokenization config = new ObjectTokenizationBuilder<string, string>()
+            IObjectTokenization config1 = new ObjectTokenizationBuilder<string, string>()
                 .WithField("Field1", o => o)
                 .WithField("Field2", o => o)
+                .WithKey(i => i)
+                .Build();
+
+            IObjectTokenization config2 = new ObjectTokenizationBuilder<string, string>()
                 .WithField("Field1", o => o)
                 .WithKey(i => i)
                 .Build();
 
-            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(config.GetConfiguredFields(), new PlainTextExtractor(), IndexTokenizer.Default))
+            Assert.Throws<LiftiException>(
+                () => new IndexedFieldLookup(
+                    config1.GetConfiguredFields().Concat(config2.GetConfiguredFields()), 
+                    new PlainTextExtractor(), 
+                    IndexTokenizer.Default))
                 .Message.Should().Be("Duplicate field name used: Field1. Field names must be unique across all item types registered with an index.");
         }
     }

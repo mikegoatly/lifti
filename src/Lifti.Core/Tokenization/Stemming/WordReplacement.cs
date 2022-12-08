@@ -3,7 +3,7 @@
     /// <summary>
     /// Information about an exception word and what to return if it is matched.
     /// </summary>
-    internal struct WordReplacement
+    internal readonly struct WordReplacement
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="WordReplacement"/> struct.

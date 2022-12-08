@@ -5,7 +5,7 @@ namespace Lifti
     /// <summary>
     /// Provides information about the location of a token in the original text.
     /// </summary>
-    public struct TokenLocation : IComparable<TokenLocation>, IEquatable<TokenLocation>
+    public readonly struct TokenLocation : IComparable<TokenLocation>, IEquatable<TokenLocation>
     {
         /// <summary>
         /// Constructs a new <see cref="TokenLocation"/> instance.

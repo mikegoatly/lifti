@@ -10,6 +10,8 @@ namespace Lifti
     /// <inheritdoc />
     public class IndexedFieldLookup : IIndexedFieldLookup
     {
+        internal const string DefaultFieldName = "Unspecified";
+
         private readonly Dictionary<string, IndexedFieldDetails> fieldToDetailsLookup = new Dictionary<string, IndexedFieldDetails>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<byte, string> idToFieldLookup = new Dictionary<byte, string>();
         private int nextId = 0;
@@ -48,7 +50,7 @@ namespace Lifti
         {
             if (id == 0)
             {
-                return "Unspecified";
+                return DefaultFieldName;
             }
             else if (idToFieldLookup.TryGetValue(id, out var fieldName))
             {

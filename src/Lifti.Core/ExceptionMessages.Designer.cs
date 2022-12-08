@@ -358,6 +358,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not all requested items were returned. Tme missing ids were: {0}.
+        /// </summary>
+        internal static string NotAllRequestedItemsReturned {
+            get {
+                return ResourceManager.GetString("NotAllRequestedItemsReturned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No tokenization options have been provided for type {0}.
         /// </summary>
         internal static string NoTokenizationOptionsProvidedForType {

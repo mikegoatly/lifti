@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Lifti.Querying.QueryParts
 {
-    internal struct SubstitutedCharacters
+    internal readonly struct SubstitutedCharacters
     {
         public SubstitutedCharacters(char expected, char replacedWith)
         {

@@ -10,7 +10,7 @@ namespace Lifti.Querying
     /// materialized as part of a query.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Should not be compared")]
-    public struct IntermediateQueryResult
+    public readonly struct IntermediateQueryResult
     {
         /// <summary>
         /// Creates a new instance of <see cref="IntermediateQueryResult"/>.

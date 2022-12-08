@@ -7,7 +7,7 @@ namespace Lifti.Querying
     /// <summary>
     /// Provides information about an item that was matched whilst executing a query.
     /// </summary>
-    public struct QueryTokenMatch : IEquatable<QueryTokenMatch>
+    public readonly struct QueryTokenMatch : IEquatable<QueryTokenMatch>
     {
         /// <summary>
         /// Constructs a new <see cref="QueryTokenMatch"/> instance.

@@ -16,12 +16,15 @@ namespace Lifti
         private readonly IQueryParser queryParser;
         private readonly Func<IIndexSnapshot<TKey>, Task>[]? indexModifiedActions;
         private readonly IndexOptions indexOptions;
-        private readonly ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions;
         private readonly IdPool<TKey> idPool;
         private readonly IIndexNavigatorPool indexNavigatorPool;
         private readonly SemaphoreSlim writeLock = new SemaphoreSlim(1);
         private readonly TimeSpan writeLockTimeout = TimeSpan.FromSeconds(10);
         private bool isDisposed;
+
+        /// <remarks>
+        /// currentSnapshot and root are set via the Root property when it is initialized by the constructor
+        /// </remarks>
         private IndexSnapshot<TKey> currentSnapshot = null!;
         private IndexNode root = null!;
 
@@ -39,7 +42,7 @@ namespace Lifti
         {
             this.indexNavigatorPool = new IndexNavigatorPool(scorer);
             this.indexOptions = indexOptions;
-            this.itemTokenizationOptions = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
+            this.ItemTokenizationOptions = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
             this.IndexNodeFactory = indexNodeFactory ?? throw new ArgumentNullException(nameof(indexNodeFactory));
             this.queryParser = queryParser ?? throw new ArgumentNullException(nameof(queryParser));
             this.DefaultTextExtractor = defaultTextExtractor;
@@ -47,7 +50,7 @@ namespace Lifti
             this.indexModifiedActions = indexModifiedActions;
             this.idPool = new IdPool<TKey>();
             this.FieldLookup = new IndexedFieldLookup(
-                this.itemTokenizationOptions.GetAllConfiguredFields(),
+                itemTokenizationOptions.GetAllConfiguredFields(),
                 defaultTextExtractor,
                 defaultTokenizer);
 
@@ -89,6 +92,8 @@ namespace Lifti
 
         /// <inheritdoc />
         public ITextExtractor DefaultTextExtractor { get; }
+
+        internal ConfiguredObjectTokenizationOptions<TKey> ItemTokenizationOptions { get; }
 
         /// <inheritdoc />
         IIndexTokenizer IIndexTokenizerProvider.this[string fieldName] => this.FieldLookup.GetFieldInfo(fieldName).Tokenizer;
@@ -163,7 +168,7 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(items));
             }
 
-            var options = this.itemTokenizationOptions.Get<TItem>();
+            var options = this.ItemTokenizationOptions.Get<TItem>();
             await this.PerformWriteLockedActionAsync(async () =>
                 {
                     await this.MutateAsync(async m =>
@@ -179,7 +184,7 @@ namespace Lifti
         /// <inheritdoc />
         public async Task AddAsync<TItem>(TItem item)
         {
-            var options = this.itemTokenizationOptions.Get<TItem>();
+            var options = this.ItemTokenizationOptions.Get<TItem>();
             await this.PerformWriteLockedActionAsync(
                 async () => await this.MutateAsync(
                     async m => await this.AddAsync(item, options, m).ConfigureAwait(false)
@@ -209,21 +214,21 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public IEnumerable<SearchResult<TKey>> Search(string searchText)
+        public ISearchResults<TKey> Search(string searchText)
         {
             var query = this.queryParser.Parse(this.FieldLookup, searchText, this);
-            return query.Execute(this.currentSnapshot);
+            return this.Search(query);
         }
 
         /// <inheritdoc />
-        public IEnumerable<SearchResult<TKey>> Search(IQuery query)
+        public ISearchResults<TKey> Search(IQuery query)
         {
             if (query is null)
             {
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return query.Execute(this.currentSnapshot);
+            return new SearchResults<TKey>(this, query.Execute(this.currentSnapshot));
         }
 
         /// <inheritdoc />
@@ -366,7 +371,7 @@ namespace Lifti
             var itemKey = options.KeyReader(item);
 
             var fieldTokens = new List<(byte fieldId, IReadOnlyList<Token> tokens)>(options.FieldReaders.Count);
-            foreach (var field in options.FieldReaders)
+            foreach (var field in options.FieldReaders.Values)
             {
                 var (fieldId, textExtractor, tokenizer) = this.FieldLookup.GetFieldInfo(field.Name);
                 var tokens = ExtractDocumentTokens(await field.ReadAsync(item).ConfigureAwait(false), textExtractor, tokenizer);

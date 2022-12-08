@@ -9,7 +9,7 @@ namespace TestConsole
     {
         public abstract Task RunAsync();
 
-        protected static IEnumerable<SearchResult<T>> RunSearch<T>(FullTextIndex<T> index, string query, string message = null)
+        protected static ISearchResults<T> RunSearch<T>(FullTextIndex<T> index, string query, string message = null)
         {
             if (message != null)
             {

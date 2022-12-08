@@ -6,7 +6,7 @@ namespace Lifti.Tokenization.TextExtraction
     /// <summary>
     /// Information about a fragment of extracted text from a larger document body.
     /// </summary>
-    public struct DocumentTextFragment : IEquatable<DocumentTextFragment>
+    public readonly struct DocumentTextFragment : IEquatable<DocumentTextFragment>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentTextFragment"/> struct.

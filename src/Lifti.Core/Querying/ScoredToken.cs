@@ -9,7 +9,7 @@ namespace Lifti.Querying
     /// <summary>
     /// Provides information about an item that was matched and scored whilst executing a query.
     /// </summary>
-    public struct ScoredToken : IEquatable<ScoredToken>
+    public readonly struct ScoredToken : IEquatable<ScoredToken>
     {
         /// <summary>
         /// Constructs a new instance of <see cref="ScoredToken"/>.

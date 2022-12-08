@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Lifti.Tokenization
 {
-    internal struct TokenHash : IEquatable<TokenHash>
+    internal readonly struct TokenHash : IEquatable<TokenHash>
     {
         public TokenHash(StringBuilder token)
         {

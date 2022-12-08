@@ -5,7 +5,7 @@ namespace Lifti.Querying.QueryParts
     /// <summary>
     /// Represents a fragment of <see cref="WildcardQueryPart"/>.
     /// </summary>
-    public struct WildcardQueryFragment : IEquatable<WildcardQueryFragment>
+    public readonly struct WildcardQueryFragment : IEquatable<WildcardQueryFragment>
     {
         private WildcardQueryFragment(WildcardQueryFragmentKind kind, string? text)
         {

@@ -3,7 +3,7 @@
     /// <summary>
     /// Information about the index of the R1 and R2 regions within the word being stemmed.
     /// </summary>
-    internal struct StemRegion
+    internal readonly struct StemRegion
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="StemRegion"/> struct.

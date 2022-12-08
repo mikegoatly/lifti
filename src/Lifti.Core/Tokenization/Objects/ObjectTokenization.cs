@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lifti.Tokenization.Objects
 {
@@ -14,7 +15,7 @@ namespace Lifti.Tokenization.Objects
             IReadOnlyList<FieldReader<T>> fieldReaders)
         {
             this.KeyReader = keyReader;
-            this.FieldReaders = fieldReaders;
+            this.FieldReaders = fieldReaders.ToDictionary(x => x.Name);
         }
 
         /// <summary>
@@ -26,12 +27,12 @@ namespace Lifti.Tokenization.Objects
         /// Gets the set of configurations that determine how fields should be read from an object of 
         /// type <typeparamref name="T"/>.
         /// </summary>
-        public IReadOnlyList<FieldReader<T>> FieldReaders { get; }
+        public IDictionary<string, FieldReader<T>> FieldReaders { get; }
 
         /// <inheritdoc />
-        IReadOnlyList<IFieldReader> IObjectTokenization.GetConfiguredFields()
+        IEnumerable<IFieldReader> IObjectTokenization.GetConfiguredFields()
         {
-            return this.FieldReaders;
+            return this.FieldReaders.Values.Cast<IFieldReader>();
         }
     }
 }

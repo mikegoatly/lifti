@@ -7,7 +7,7 @@ namespace Lifti
     /// Describes the output from a <see cref="IInputPreprocessor.Preprocess(char)"/> invocation.
     /// The output of 
     /// </summary>
-    public struct PreprocessedInput : IEquatable<PreprocessedInput>
+    public readonly struct PreprocessedInput : IEquatable<PreprocessedInput>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PreprocessedInput"/> struct. This overload should

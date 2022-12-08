@@ -28,7 +28,7 @@ namespace Lifti.Tokenization.Objects
     internal interface IFieldReader<TItem> : IFieldReader
     {
         /// <summary>
-        /// Reads the field's text fromt he given item.
+        /// Reads the field's text from the given item.
         /// </summary>
         ValueTask<IEnumerable<string>> ReadAsync(TItem item);
     }

@@ -274,7 +274,7 @@ namespace Lifti.Querying
                 match.Value.Select(v => new FieldMatch(v)).ToList());
         }
 
-        internal struct IndexNavigatorBookmark : IIndexNavigatorBookmark, IEquatable<IndexNavigatorBookmark>
+        internal readonly struct IndexNavigatorBookmark : IIndexNavigatorBookmark, IEquatable<IndexNavigatorBookmark>
         {
             private readonly IndexNavigator indexNavigator;
             private readonly IndexNode? currentNode;

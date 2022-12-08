@@ -7,7 +7,7 @@ namespace Lifti.Querying
     /// <summary>
     /// Describes a match that occurred for a query within a field.
     /// </summary>
-    public struct FieldMatch : IEquatable<FieldMatch>
+    public readonly struct FieldMatch : IEquatable<FieldMatch>
     {
         /// <summary>
         /// Constructs a new instance of <see cref="FieldMatch"/>.

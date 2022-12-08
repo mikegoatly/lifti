@@ -10,7 +10,7 @@ namespace Lifti.Querying
     /// that matched positionally, giving quick access to the max and min locations for reference
     /// in further positional intersections if needed.
     /// </summary>
-    public struct CompositeTokenMatchLocation : ITokenLocationMatch, IEquatable<CompositeTokenMatchLocation>
+    public readonly struct CompositeTokenMatchLocation : ITokenLocationMatch, IEquatable<CompositeTokenMatchLocation>
     {
         private readonly ITokenLocationMatch leftToken;
         private readonly ITokenLocationMatch rightToken;

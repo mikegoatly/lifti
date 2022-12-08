@@ -7,7 +7,7 @@ namespace Lifti
     /// <summary>
     /// Information about a token from a document that has been stored an index.
     /// </summary>
-    public struct IndexedToken : IEquatable<IndexedToken>
+    public readonly struct IndexedToken : IEquatable<IndexedToken>
     {
         /// <summary>
         /// Constructs a new <see cref="IndexedToken"/> instance.

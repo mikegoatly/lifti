@@ -136,7 +136,7 @@ namespace Lifti.Tests
 
             var results = this.index.Search("this");
 
-            results.All(i => i.FieldMatches.All(l => l.FoundIn == "Unspecified")).Should().BeTrue();
+            results.All(i => i.FieldMatches.All(l => l.FoundIn == IndexedFieldLookup.DefaultFieldName)).Should().BeTrue();
         }
 
         [Fact]
