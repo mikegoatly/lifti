@@ -10,6 +10,7 @@ namespace Lifti.Serialization.Binary
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     public class BinarySerializer<TKey> : IIndexSerializer<TKey>
+        where TKey : notnull
     {
         private readonly IKeySerializer<TKey> keySerializer;
 
@@ -41,10 +42,8 @@ namespace Lifti.Serialization.Binary
                 throw new ArgumentNullException(nameof(snapshot));
             }
 
-            using (var writer = new IndexWriter<TKey>(stream, disposeStream, this.keySerializer))
-            {
-                await writer.WriteAsync(snapshot).ConfigureAwait(false);
-            }
+            using var writer = new IndexWriter<TKey>(stream, disposeStream, this.keySerializer);
+            await writer.WriteAsync(snapshot).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -71,10 +70,8 @@ namespace Lifti.Serialization.Binary
                 throw new DeserializationException(ExceptionMessages.IndexMustBeEmptyForDeserialization);
             }
 
-            using (var reader = await this.CreateVersionedIndexReaderAsync(stream, disposeStream).ConfigureAwait(false))
-            {
-                await reader.ReadIntoAsync(index).ConfigureAwait(false);
-            }
+            using var reader = await this.CreateVersionedIndexReaderAsync(stream, disposeStream).ConfigureAwait(false);
+            await reader.ReadIntoAsync(index).ConfigureAwait(false);
         }
 
         private async Task<IIndexReader<TKey>> CreateVersionedIndexReaderAsync(Stream stream, bool disposeStream)

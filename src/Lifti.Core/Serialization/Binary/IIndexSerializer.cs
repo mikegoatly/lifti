@@ -10,6 +10,7 @@ namespace Lifti.Serialization.Binary
     /// The type of the key in the index.
     /// </typeparam>
     public interface IIndexSerializer<TKey>
+        where TKey : notnull
     {
         /// <summary>
         /// Serializes an index into a binary format.

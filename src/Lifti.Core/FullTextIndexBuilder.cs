@@ -14,6 +14,7 @@ namespace Lifti
     /// </summary>
     /// <typeparam name="TKey">The type of key to be stored in the index.</typeparam>
     public class FullTextIndexBuilder<TKey>
+        where TKey : notnull
     {
         private readonly ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions = new();
         private readonly IndexOptions advancedOptions = new();

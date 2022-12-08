@@ -13,6 +13,7 @@ namespace Lifti
     /// e.g. re-ordering them and extracting search phrases from the original source text.
     /// </summary>
     internal class SearchResults<TKey> : ISearchResults<TKey>
+        where TKey : notnull
     {
         private readonly IReadOnlyCollection<SearchResult<TKey>> searchResults;
         private readonly FullTextIndex<TKey> index;

@@ -12,6 +12,7 @@ namespace Lifti
 {
     /// <inheritdoc />
     public class FullTextIndex<TKey> : IFullTextIndex<TKey>, IDisposable
+        where TKey : notnull
     {
         private readonly IQueryParser queryParser;
         private readonly Func<IIndexSnapshot<TKey>, CancellationToken, Task>[]? indexModifiedActions;
