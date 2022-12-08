@@ -10,7 +10,7 @@ namespace Lifti.Tests.Querying
 {
     public class QueryTests : IAsyncLifetime
     {
-        private IFullTextIndex<string> index;
+        private IFullTextIndex<string> index = null!;
 
         public async Task InitializeAsync()
         {
@@ -33,8 +33,8 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void WithNullIndexPassed_ShouldThrowException()
         {
-            var query = new Query(null);
-            Assert.Throws<ArgumentNullException>(() => query.Execute<string>(null).ToList());
+            var query = new Query(null!);
+            Assert.Throws<ArgumentNullException>(() => query.Execute<string>(null!).ToList());
         }
     }
 }
