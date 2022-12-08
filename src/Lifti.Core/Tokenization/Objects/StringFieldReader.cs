@@ -1,6 +1,7 @@
 ﻿using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Tokenization.Objects
@@ -26,7 +27,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <inheritdoc />
-        public override ValueTask<IEnumerable<string>> ReadAsync(TItem item)
+        public override ValueTask<IEnumerable<string>> ReadAsync(TItem item, CancellationToken cancellationToken)
         {
             return new ValueTask<IEnumerable<string>>(new[] { this.reader(item) });
         }

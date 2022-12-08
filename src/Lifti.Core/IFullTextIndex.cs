@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Lifti.Querying;
-using Lifti.Tokenization;
+﻿using Lifti.Querying;
 using Lifti.Tokenization.TextExtraction;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lifti
 {
@@ -58,14 +58,16 @@ namespace Lifti
         /// </summary>
         /// <param name="itemKey">The key of the item being indexed.</param>
         /// <param name="text">The text to index against the item.</param>
-        Task AddAsync(TKey itemKey, string text);
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
+        Task AddAsync(TKey itemKey, string text, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Indexes some text against a given key.
         /// </summary>
         /// <param name="itemKey">The key of the item being indexed.</param>
         /// <param name="text">The text to index against the item.</param>
-        Task AddAsync(TKey itemKey, IEnumerable<string> text);
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
+        Task AddAsync(TKey itemKey, IEnumerable<string> text, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Indexes a single item of type <typeparamref name="TItem"/>. This type must have been
@@ -77,7 +79,8 @@ namespace Lifti
         /// <param name="item">
         /// The item to index.
         /// </param>
-        Task AddAsync<TItem>(TItem item);
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
+        Task AddAsync<TItem>(TItem item, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Indexes a set of items of type <typeparamref name="TItem"/>. This type must have been
@@ -89,7 +92,8 @@ namespace Lifti
         /// <param name="items">
         /// The items to index.
         /// </param>
-        Task AddRangeAsync<TItem>(IEnumerable<TItem> items);
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
+        Task AddRangeAsync<TItem>(IEnumerable<TItem> items, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Removes the item with the given key from this index. If the key is not indexed then
@@ -101,7 +105,8 @@ namespace Lifti
         /// <returns>
         /// <c>true</c> if the item was in the index, <c>false</c> if it was not.
         /// </returns>
-        Task<bool> RemoveAsync(TKey itemKey);
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
+        Task<bool> RemoveAsync(TKey itemKey, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Performs a search against this index.

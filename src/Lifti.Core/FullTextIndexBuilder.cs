@@ -4,6 +4,7 @@ using Lifti.Tokenization.Objects;
 using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti
@@ -14,12 +15,12 @@ namespace Lifti
     /// <typeparam name="TKey">The type of key to be stored in the index.</typeparam>
     public class FullTextIndexBuilder<TKey>
     {
-        private readonly ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions = new ConfiguredObjectTokenizationOptions<TKey>();
-        private readonly IndexOptions advancedOptions = new IndexOptions();
+        private readonly ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions = new();
+        private readonly IndexOptions advancedOptions = new();
         private IIndexScorerFactory? scorerFactory;
         private IQueryParser? queryParser;
         private IIndexTokenizer defaultTokenizer = IndexTokenizer.Default;
-        private List<Func<IIndexSnapshot<TKey>, Task>>? indexModifiedActions;
+        private List<Func<IIndexSnapshot<TKey>, CancellationToken, Task>>? indexModifiedActions;
         private ITextExtractor? defaultTextExtractor;
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace Lifti
         /// <param name="asyncAction">
         /// The async action to execute. The argument is the new snapshot of the index.
         /// </param>
-        public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, Task> asyncAction)
+        public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, CancellationToken, Task> asyncAction)
         {
             if (asyncAction is null)
             {
@@ -78,12 +79,23 @@ namespace Lifti
 
             if (this.indexModifiedActions == null)
             {
-                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, Task>>();
+                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, CancellationToken, Task>>();
             }
 
             this.indexModifiedActions.Add(asyncAction);
 
             return this;
+        }
+
+        /// <inheritdoc cref="WithIndexModificationAction(Func{IIndexSnapshot{TKey}, CancellationToken, Task})"/>
+        public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, Task> asyncAction)
+        {
+            if (asyncAction is null)
+            {
+                throw new ArgumentNullException(nameof(asyncAction));
+            }
+
+            return this.WithIndexModificationAction((snapshot, ct) => asyncAction(snapshot));
         }
 
         /// <summary>
@@ -103,18 +115,12 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(action));
             }
 
-            if (this.indexModifiedActions == null)
-            {
-                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, Task>>();
-            }
-
-            this.indexModifiedActions.Add((snapshot) =>
-            {
-                action(snapshot);
-                return Task.CompletedTask;
-            });
-
-            return this;
+            return this.WithIndexModificationAction(
+                (snapshot, ct) =>
+                {
+                    action(snapshot);
+                    return Task.CompletedTask;
+                });
         }
 
         /// <summary>
@@ -190,7 +196,7 @@ namespace Lifti
         {
             return this.WithSimpleQueryParser(static o => o);
         }
-        
+
         /// <summary>
         /// Configures the index to use a <see cref="SimpleQueryParser"/> instead of the full LIFTI query parser. Use this for situations where
         /// you don't need the full complexity of the query language and just want user input to be run directly against the index.

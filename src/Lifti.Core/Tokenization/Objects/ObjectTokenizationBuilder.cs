@@ -1,6 +1,7 @@
 using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Tokenization.Objects
@@ -116,7 +117,7 @@ namespace Lifti.Tokenization.Objects
         /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
-            Func<T, Task<string>> fieldTextReader,
+            Func<T, CancellationToken, Task<string>> fieldTextReader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null)
         {
@@ -126,13 +127,27 @@ namespace Lifti.Tokenization.Objects
             return this;
         }
 
+        /// <inheritdoc cref="WithField(string, Func{T, CancellationToken, Task{string}}, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?)"/>
+        public ObjectTokenizationBuilder<T, TKey> WithField(
+            string name,
+            Func<T, Task<string>> fieldTextReader,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null)
+        {
+            return this.WithField(
+                name,
+                (item, ctx) => fieldTextReader(item),
+                tokenizationOptions,
+                textExtractor);
+        }
+
         /// <summary>
         /// Adds a field to be indexed for the item.
         /// </summary>
         /// <param name="name">
         /// The name of the field. This can be referred to when querying to restrict searches to text read for this field only.
         /// </param>
-        /// <param name="reader">
+        /// <param name="fieldTextReader">
         /// The delegate capable of reading the entire text for the field, where the text is broken in to multiple fragments.
         /// </param>
         /// <param name="tokenizationOptions">
@@ -145,14 +160,28 @@ namespace Lifti.Tokenization.Objects
         /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
-            Func<T, Task<IEnumerable<string>>> reader,
+            Func<T, CancellationToken, Task<IEnumerable<string>>> fieldTextReader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null)
         {
-            ValidateFieldParameters(name, reader);
+            ValidateFieldParameters(name, fieldTextReader);
             var tokenizer = tokenizationOptions.CreateTokenizer();
-            this.fieldReaders.Add(new AsyncStringArrayFieldReader<T>(name, reader, tokenizer, textExtractor));
+            this.fieldReaders.Add(new AsyncStringArrayFieldReader<T>(name, fieldTextReader, tokenizer, textExtractor));
             return this;
+        }
+
+        /// <inheritdoc cref="WithField(string, Func{T, CancellationToken, Task{IEnumerable{string}}}, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?)" />
+        public ObjectTokenizationBuilder<T, TKey> WithField(
+            string name,
+            Func<T, Task<IEnumerable<string>>> fieldTextReader,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null)
+        {
+            return this.WithField(
+                name,
+                (item, ctx) => fieldTextReader(item),
+                tokenizationOptions,
+                textExtractor);
         }
 
         /// <summary>

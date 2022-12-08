@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti
@@ -32,15 +33,19 @@ namespace Lifti
 
         /// <inheritdoc />
         public async Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
-            Func<IReadOnlyList<TKey>, IReadOnlyList<TItem>> loadItems)
+            Func<IReadOnlyList<TKey>, IReadOnlyList<TItem>> loadItems,
+            CancellationToken cancellationToken = default)
         {
-            return await this.CreateMatchPhrasesAsync(keys => new ValueTask<IReadOnlyList<TItem>>(loadItems(keys)))
+            return await this.CreateMatchPhrasesAsync(
+                (keys, ct) => new ValueTask<IReadOnlyList<TItem>>(loadItems(keys)),
+                cancellationToken)
                 .ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
-            Func<IReadOnlyList<TKey>, ValueTask<IReadOnlyList<TItem>>> loadItemsAsync)
+            Func<IReadOnlyList<TKey>, CancellationToken, ValueTask<IReadOnlyList<TItem>>> loadItemsAsync,
+            CancellationToken cancellationToken = default)
         {
             if (loadItemsAsync is null)
             {
@@ -50,56 +55,93 @@ namespace Lifti
             var itemTokenization = this.index.ItemTokenizationOptions.Get<TItem>();
             var itemResults = this.FilterFieldMatches(itemTokenization.FieldReaders.ContainsKey);
 
-            var items = (await loadItemsAsync(itemResults.Select(x => x.ItemKey).ToList()).ConfigureAwait(false))
+            var items = (await loadItemsAsync(itemResults.Select(x => x.ItemKey).ToList(), cancellationToken).ConfigureAwait(false))
                 .ToDictionary(x => itemTokenization.KeyReader(x));
 
             var missingIds = itemResults.Where(x => !items.ContainsKey(x.ItemKey)).ToList();
             return missingIds.Count > 0
                 ? throw new LiftiException(ExceptionMessages.NotAllRequestedItemsReturned, string.Join(",", missingIds))
                 : await this.CreateMatchPhrasesAsync(
-                x => new ValueTask<TItem>(items[x]),
+                (x, ct) => new ValueTask<TItem>(items[x]),
                 itemTokenization,
-                itemResults).ConfigureAwait(false);
+                itemResults,
+                cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+            Func<IReadOnlyList<TKey>, ValueTask<IReadOnlyList<TItem>>> loadItemsAsync,
+            CancellationToken cancellationToken = default)
+        {
+            return this.CreateMatchPhrasesAsync((key, ct) => loadItemsAsync(key), cancellationToken);
         }
 
         /// <inheritdoc />
         public async Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
-            Func<TKey, TItem> loadItem)
+        Func<TKey, TItem> loadItem,
+        CancellationToken cancellationToken = default)
         {
-            return await this.CreateMatchPhrasesAsync(keys => new ValueTask<TItem>(loadItem(keys)))
+            return await this.CreateMatchPhrasesAsync(
+                (keys, ct) => new ValueTask<TItem>(loadItem(keys)),
+                cancellationToken)
                 .ConfigureAwait(false);
         }
 
         /// <inheritdoc />
         public async Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
-            Func<TKey, ValueTask<TItem>> loadItemAsync)
+            Func<TKey, CancellationToken, ValueTask<TItem>> loadItemAsync,
+            CancellationToken cancellationToken = default)
         {
             var itemTokenization = this.index.ItemTokenizationOptions.Get<TItem>();
             var itemResults = this.FilterFieldMatches(itemTokenization.FieldReaders.ContainsKey);
 
-            return await this.CreateMatchPhrasesAsync(loadItemAsync, itemTokenization, itemResults).ConfigureAwait(false);
+            return await this.CreateMatchPhrasesAsync(
+                loadItemAsync,
+                itemTokenization,
+                itemResults,
+                cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MatchedPhrases<TKey>>> CreateMatchPhrasesAsync(
-            Func<TKey, string> loadText)
+        public Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+            Func<TKey, ValueTask<TItem>> loadItemAsync,
+            CancellationToken cancellationToken = default)
         {
-            return await this.CreateMatchPhrasesAsync(key => new ValueTask<string>(loadText(key))).ConfigureAwait(false);
+            return this.CreateMatchPhrasesAsync((key, ct) => loadItemAsync(key), cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<MatchedPhrases<TKey>> CreateMatchPhrases(Func<TKey, string> loadText)
+        {
+            return this.CreateMatchPhrasesAsync((key, ct) => new ValueTask<string>(loadText(key)))
+                .GetAwaiter().GetResult();
         }
 
         /// <inheritdoc />
         public async Task<IEnumerable<MatchedPhrases<TKey>>> CreateMatchPhrasesAsync(
-            Func<TKey, ValueTask<string>> loadTextAsync)
+            Func<TKey, CancellationToken, ValueTask<string>> loadTextAsync,
+            CancellationToken cancellationToken = default)
         {
             var itemTokenization = this.index.DefaultTokenizer;
             var itemResults = this.FilterFieldMatches(field => field == IndexedFieldLookup.DefaultFieldName);
 
-            return await this.CreateMatchPhrasesAsync(loadTextAsync, itemResults).ConfigureAwait(false);
+            return await this.CreateMatchPhrasesAsync(loadTextAsync, itemResults, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public Task<IEnumerable<MatchedPhrases<TKey>>> CreateMatchPhrasesAsync(
+            Func<TKey, ValueTask<string>> loadTextAsync,
+            CancellationToken cancellationToken = default)
+        {
+            return this.CreateMatchPhrasesAsync(
+                (key, ct) => loadTextAsync(key),
+                cancellationToken);
         }
 
         private async Task<IEnumerable<MatchedPhrases<TKey>>> CreateMatchPhrasesAsync(
-            Func<TKey, ValueTask<string>> loadTextAsync,
-            List<(TKey ItemKey, List<FieldSearchResult> FieldMatches)> itemResults)
+        Func<TKey, CancellationToken, ValueTask<string>> loadTextAsync,
+        List<(TKey ItemKey, List<FieldSearchResult> FieldMatches)> itemResults,
+        CancellationToken cancellationToken)
         {
             var matchedPhrases = new List<MatchedPhrases<TKey, TKey>>(this.searchResults.Count);
 
@@ -107,7 +149,7 @@ namespace Lifti
             var textArray = new string[1];
             foreach (var (ItemKey, FieldMatches) in itemResults)
             {
-                textArray[0] = await loadTextAsync(ItemKey).ConfigureAwait(false);
+                textArray[0] = await loadTextAsync(ItemKey, cancellationToken).ConfigureAwait(false);
                 var text = new VirtualString(textArray);
 
                 foreach (var fieldMatch in FieldMatches)
@@ -121,20 +163,21 @@ namespace Lifti
         }
 
         private async Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
-            Func<TKey, ValueTask<TItem>> loadItemAsync,
+            Func<TKey, CancellationToken, ValueTask<TItem>> loadItemAsync,
             ObjectTokenization<TItem, TKey> itemTokenization,
-            List<(TKey ItemKey, List<FieldSearchResult> FieldMatches)> itemResults)
+            List<(TKey ItemKey, List<FieldSearchResult> FieldMatches)> itemResults,
+            CancellationToken cancellationToken)
         {
             var matchedPhrases = new List<MatchedPhrases<TKey, TItem>>(this.searchResults.Count);
             foreach (var (ItemKey, FieldMatches) in itemResults)
             {
-                var item = await loadItemAsync(ItemKey).ConfigureAwait(false);
+                var item = await loadItemAsync(ItemKey, cancellationToken).ConfigureAwait(false);
 
                 foreach (var fieldMatch in FieldMatches)
                 {
                     if (itemTokenization.FieldReaders.TryGetValue(fieldMatch.FoundIn, out var fieldReader))
                     {
-                        var text = new VirtualString(await fieldReader.ReadAsync(item).ConfigureAwait(false));
+                        var text = new VirtualString(await fieldReader.ReadAsync(item, cancellationToken).ConfigureAwait(false));
                         var itemPhrases = CreatePhrases(ItemKey, item, fieldMatch, text);
                         matchedPhrases.Add(itemPhrases);
                     }

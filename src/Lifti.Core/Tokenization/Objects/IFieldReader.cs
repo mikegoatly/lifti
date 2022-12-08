@@ -1,5 +1,6 @@
 ﻿using Lifti.Tokenization.TextExtraction;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Tokenization.Objects
@@ -30,6 +31,6 @@ namespace Lifti.Tokenization.Objects
         /// <summary>
         /// Reads the field's text from the given item.
         /// </summary>
-        ValueTask<IEnumerable<string>> ReadAsync(TItem item);
+        ValueTask<IEnumerable<string>> ReadAsync(TItem item, CancellationToken cancellationToken);
     }
 }

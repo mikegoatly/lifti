@@ -1,6 +1,7 @@
 ﻿using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Tokenization.Objects
@@ -25,6 +26,6 @@ namespace Lifti.Tokenization.Objects
         public ITextExtractor? TextExtractor { get; }
 
         /// <inheritdoc />
-        public abstract ValueTask<IEnumerable<string>> ReadAsync(TItem item);
+        public abstract ValueTask<IEnumerable<string>> ReadAsync(TItem item, CancellationToken cancellationToken);
     }
 }
