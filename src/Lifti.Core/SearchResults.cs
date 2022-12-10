@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Lifti
 {
@@ -33,7 +34,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        public async Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
             Func<IReadOnlyList<TKey>, IReadOnlyList<TItem>> loadItems,
             CancellationToken cancellationToken = default)
         {
@@ -44,7 +45,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        public async Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
             Func<IReadOnlyList<TKey>, CancellationToken, ValueTask<IReadOnlyList<TItem>>> loadItemsAsync,
             CancellationToken cancellationToken = default)
         {
@@ -56,10 +57,10 @@ namespace Lifti
             var itemTokenization = this.index.ItemTokenizationOptions.Get<TItem>();
             var itemResults = this.FilterFieldMatches(itemTokenization.FieldReaders.ContainsKey);
 
-            var items = (await loadItemsAsync(itemResults.Select(x => x.ItemKey).ToList(), cancellationToken).ConfigureAwait(false))
+            var items = (await loadItemsAsync(itemResults.Select(x => x.searchResult.Key).ToList(), cancellationToken).ConfigureAwait(false))
                 .ToDictionary(x => itemTokenization.KeyReader(x));
 
-            var missingIds = itemResults.Where(x => !items.ContainsKey(x.ItemKey)).ToList();
+            var missingIds = itemResults.Where(x => !items.ContainsKey(x.searchResult.Key)).ToList();
             return missingIds.Count > 0
                 ? throw new LiftiException(ExceptionMessages.NotAllRequestedItemsReturned, string.Join(",", missingIds))
                 : await this.CreateMatchPhrasesAsync(
@@ -70,7 +71,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        public Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
             Func<IReadOnlyList<TKey>, ValueTask<IReadOnlyList<TItem>>> loadItemsAsync,
             CancellationToken cancellationToken = default)
         {
@@ -78,7 +79,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        public async Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
         Func<TKey, TItem> loadItem,
         CancellationToken cancellationToken = default)
         {
@@ -89,7 +90,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        public async Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
             Func<TKey, CancellationToken, ValueTask<TItem>> loadItemAsync,
             CancellationToken cancellationToken = default)
         {
@@ -104,7 +105,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        public Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
             Func<TKey, ValueTask<TItem>> loadItemAsync,
             CancellationToken cancellationToken = default)
         {
@@ -112,14 +113,14 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public IEnumerable<MatchedPhrases<TKey>> CreateMatchPhrases(Func<TKey, string> loadText)
+        public IEnumerable<ItemPhrases<TKey>> CreateMatchPhrases(Func<TKey, string> loadText)
         {
             return this.CreateMatchPhrasesAsync((key, ct) => new ValueTask<string>(loadText(key)))
                 .GetAwaiter().GetResult();
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MatchedPhrases<TKey>>> CreateMatchPhrasesAsync(
+        public async Task<IEnumerable<ItemPhrases<TKey>>> CreateMatchPhrasesAsync(
             Func<TKey, CancellationToken, ValueTask<string>> loadTextAsync,
             CancellationToken cancellationToken = default)
         {
@@ -130,7 +131,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<MatchedPhrases<TKey>>> CreateMatchPhrasesAsync(
+        public Task<IEnumerable<ItemPhrases<TKey>>> CreateMatchPhrasesAsync(
             Func<TKey, ValueTask<string>> loadTextAsync,
             CancellationToken cancellationToken = default)
         {
@@ -139,56 +140,60 @@ namespace Lifti
                 cancellationToken);
         }
 
-        private async Task<IEnumerable<MatchedPhrases<TKey>>> CreateMatchPhrasesAsync(
-        Func<TKey, CancellationToken, ValueTask<string>> loadTextAsync,
-        List<(TKey ItemKey, List<FieldSearchResult> FieldMatches)> itemResults,
-        CancellationToken cancellationToken)
+        private async Task<IEnumerable<ItemPhrases<TKey>>> CreateMatchPhrasesAsync(
+            Func<TKey, CancellationToken, ValueTask<string>> loadTextAsync,
+            List<(SearchResult<TKey> searchResult, List<FieldSearchResult> fieldMatches)> itemResults,
+            CancellationToken cancellationToken)
         {
-            var matchedPhrases = new List<MatchedPhrases<TKey, TKey>>(this.searchResults.Count);
+            var matchedPhrases = new List<ItemPhrases<TKey>>(this.searchResults.Count);
 
             // Create an array that can be used on each call to VirtualString
             var textArray = new string[1];
-            foreach (var (ItemKey, FieldMatches) in itemResults)
+            foreach (var (searchResult, fieldMatches) in itemResults)
             {
-                textArray[0] = await loadTextAsync(ItemKey, cancellationToken).ConfigureAwait(false);
+                textArray[0] = await loadTextAsync(searchResult.Key, cancellationToken).ConfigureAwait(false);
                 var text = new VirtualString(textArray);
 
-                foreach (var fieldMatch in FieldMatches)
+                var fieldPhrases = new List<FieldPhrases<TKey>>(fieldMatches.Count);
+                foreach (var fieldMatch in fieldMatches)
                 {
-                    var itemPhrases = CreatePhrases(ItemKey, ItemKey, fieldMatch, text);
-                    matchedPhrases.Add(itemPhrases);
+                    fieldPhrases.Add(CreatePhrases(fieldMatch, text));
                 }
+
+                matchedPhrases.Add(new ItemPhrases<TKey>(searchResult, fieldPhrases));
             }
 
             return matchedPhrases;
         }
 
-        private async Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        private async Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
             Func<TKey, CancellationToken, ValueTask<TItem>> loadItemAsync,
             ObjectTokenization<TItem, TKey> itemTokenization,
-            List<(TKey ItemKey, List<FieldSearchResult> FieldMatches)> itemResults,
+            List<(SearchResult<TKey> searchResult, List<FieldSearchResult> fieldMatches)> itemResults,
             CancellationToken cancellationToken)
         {
-            var matchedPhrases = new List<MatchedPhrases<TKey, TItem>>(this.searchResults.Count);
-            foreach (var (ItemKey, FieldMatches) in itemResults)
+            var matchedPhrases = new List<ItemPhrases<TKey, TItem>>(this.searchResults.Count);
+            foreach (var (searchResult, fieldMatches) in itemResults)
             {
-                var item = await loadItemAsync(ItemKey, cancellationToken).ConfigureAwait(false);
+                var item = await loadItemAsync(searchResult.Key, cancellationToken).ConfigureAwait(false);
 
-                foreach (var fieldMatch in FieldMatches)
+                var fieldPhrases = new List<FieldPhrases<TKey>>(fieldMatches.Count);
+                foreach (var fieldMatch in fieldMatches)
                 {
                     if (itemTokenization.FieldReaders.TryGetValue(fieldMatch.FoundIn, out var fieldReader))
                     {
                         var text = new VirtualString(await fieldReader.ReadAsync(item, cancellationToken).ConfigureAwait(false));
-                        var itemPhrases = CreatePhrases(ItemKey, item, fieldMatch, text);
-                        matchedPhrases.Add(itemPhrases);
+                        fieldPhrases.Add(CreatePhrases(fieldMatch, text));
                     }
                 }
+
+                matchedPhrases.Add(new ItemPhrases<TKey, TItem>(item, searchResult, fieldPhrases));
             }
 
             return matchedPhrases;
         }
 
-        private List<(TKey ItemKey, List<FieldSearchResult> FieldMatches)> FilterFieldMatches(
+        private List<(SearchResult<TKey> searchResult, List<FieldSearchResult> fieldMatches)> FilterFieldMatches(
             Func<string, bool> useFieldForMatch)
         {
             // Technically an index can contain fields from multiple item sources, so not all results may
@@ -196,7 +201,7 @@ namespace Lifti
             return this.searchResults
                 .Select(x =>
                     (
-                        ItemKey: x.Key,
+                        ItemKey: x,
                         FieldMatches: x.FieldMatches
                             .Where(match => useFieldForMatch(match.FoundIn))
                             .ToList())
@@ -205,14 +210,14 @@ namespace Lifti
                 .ToList();
         }
 
-        private static MatchedPhrases<TKey, TItem> CreatePhrases<TItem>(TKey key, TItem item, FieldSearchResult fieldMatch, VirtualString text)
+        private static FieldPhrases<TKey> CreatePhrases(FieldSearchResult fieldMatch, VirtualString text)
         {
             var phrases = new List<(int wordCount, string phrase)>();
             var matchLocations = fieldMatch.Locations;
             if (matchLocations.Count == 0)
             {
                 // This shouldn't really happen - we should always match a field at one location
-                return new MatchedPhrases<TKey, TItem>(item, key, Array.Empty<string>());
+                return new FieldPhrases<TKey>(fieldMatch.FoundIn, Array.Empty<string>());
             }
 
             var startLocation = matchLocations[0];
@@ -239,9 +244,8 @@ namespace Lifti
                 }
             }
 
-            return new MatchedPhrases<TKey, TItem>(
-                item,
-                key,
+            return new FieldPhrases<TKey>(
+                fieldMatch.FoundIn,
                 phrases.GroupBy(x => x.phrase, StringComparer.InvariantCultureIgnoreCase)
                     // Sort by the phrases with the most amount of words
                     .OrderByDescending(x => x.Max(g => g.wordCount))

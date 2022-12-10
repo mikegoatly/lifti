@@ -20,7 +20,7 @@ namespace Lifti
         /// <param name="cancellationToken">
         /// The optional <see cref="CancellationToken"/> to use.
         /// </param>
-        Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
             Func<IReadOnlyList<TKey>, IReadOnlyList<TItem>> loadItems,
             CancellationToken cancellationToken = default);
 
@@ -34,7 +34,7 @@ namespace Lifti
         /// <param name="cancellationToken">
         /// The optional <see cref="CancellationToken"/> to use.
         /// </param>
-        Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
             Func<TKey, TItem> loadItem,
             CancellationToken cancellationToken = default);
 
@@ -48,12 +48,12 @@ namespace Lifti
         /// <param name="cancellationToken">
         /// The optional <see cref="CancellationToken"/> to use.
         /// </param>
-        Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
             Func<IReadOnlyList<TKey>, CancellationToken, ValueTask<IReadOnlyList<TItem>>> loadItemsAsync,
             CancellationToken cancellationToken = default);
 
         /// <inheritdoc cref="CreateMatchPhrasesAsync{TItem}(Func{IReadOnlyList{TKey}, CancellationToken, ValueTask{IReadOnlyList{TItem}}}, CancellationToken)"/>
-        Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
             Func<IReadOnlyList<TKey>, ValueTask<IReadOnlyList<TItem>>> loadItemsAsync,
             CancellationToken cancellationToken = default);
 
@@ -64,19 +64,19 @@ namespace Lifti
         /// <param name="cancellationToken">
         /// The optional <see cref="CancellationToken"/> to use.
         /// </param>
-        Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
             Func<TKey, CancellationToken, ValueTask<TItem>> loadItemAsync,
             CancellationToken cancellationToken = default);
 
         /// <inheritdoc cref="CreateMatchPhrasesAsync(Func{TKey, CancellationToken, ValueTask{string}}, CancellationToken)"/>
-        Task<IEnumerable<MatchedPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
+        Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
              Func<TKey, ValueTask<TItem>> loadItemAsync,
              CancellationToken cancellationToken = default);
 
         /// <inheritdoc cref="CreateMatchPhrasesAsync{TItem}(Func{TKey, TItem}, CancellationToken)"/>
         /// <param name="loadText">A function capable of retrieving the original text that was indexed against the key. The loaded text will be assumed to be 
         /// unchanged since it was indexed.</param>
-        IEnumerable<MatchedPhrases<TKey>> CreateMatchPhrases(
+        IEnumerable<ItemPhrases<TKey>> CreateMatchPhrases(
             Func<TKey, string> loadText);
 
         /// <inheritdoc cref="CreateMatchPhrasesAsync{TItem}(Func{TKey, TItem}, CancellationToken)"/>
@@ -85,12 +85,12 @@ namespace Lifti
         /// <param name="cancellationToken">
         /// The optional <see cref="CancellationToken"/> to use.
         /// </param>
-        Task<IEnumerable<MatchedPhrases<TKey>>> CreateMatchPhrasesAsync(
+        Task<IEnumerable<ItemPhrases<TKey>>> CreateMatchPhrasesAsync(
             Func<TKey, CancellationToken, ValueTask<string>> loadTextAsync,
             CancellationToken cancellationToken = default);
 
         /// <inheritdoc cref="CreateMatchPhrasesAsync(Func{TKey, CancellationToken, ValueTask{string}}, CancellationToken)"/>
-        Task<IEnumerable<MatchedPhrases<TKey>>> CreateMatchPhrasesAsync(
+        Task<IEnumerable<ItemPhrases<TKey>>> CreateMatchPhrasesAsync(
             Func<TKey, ValueTask<string>> loadTextAsync,
             CancellationToken cancellationToken = default);
 

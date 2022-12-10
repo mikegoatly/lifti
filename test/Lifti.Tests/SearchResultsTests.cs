@@ -66,7 +66,7 @@ namespace Lifti.Tests
         {
             var phrases = await this.sut.CreateMatchPhrasesAsync(x => this.testData[x]);
 
-            this.VerifyObjectResults(this.testData, phrases);
+            this.VerifyObjectResults(this.testData, "SimpleText", phrases);
         }
 
         [Fact]
@@ -74,7 +74,7 @@ namespace Lifti.Tests
         {
             var phrases = await this.sut.CreateMatchPhrasesAsync(x => this.testDataWithArray[x]);
 
-            this.VerifyObjectResults(this.testDataWithArray, phrases);
+            this.VerifyObjectResults(this.testDataWithArray, "ArrayText", phrases);
         }
 
         [Fact]
@@ -82,7 +82,7 @@ namespace Lifti.Tests
         {
             var phrases = await this.sut.CreateMatchPhrasesAsync(async x => await Task.Run(() => this.testData[x]));
 
-            this.VerifyObjectResults(this.testData, phrases);
+            this.VerifyObjectResults(this.testData, "SimpleText", phrases);
         }
 
         [Fact]
@@ -90,7 +90,7 @@ namespace Lifti.Tests
         {
             var phrases = await this.sut.CreateMatchPhrasesAsync(async (x, ct) => await Task.Run(() => this.testData[x], ct));
 
-            this.VerifyObjectResults(this.testData, phrases);
+            this.VerifyObjectResults(this.testData, "SimpleText", phrases);
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace Lifti.Tests
         {
             var phrases = await this.sut.CreateMatchPhrasesAsync(async x => await Task.Run(() => this.testDataWithArray[x]));
 
-            this.VerifyObjectResults(this.testDataWithArray, phrases);
+            this.VerifyObjectResults(this.testDataWithArray, "ArrayText", phrases);
         }
 
         [Fact]
@@ -116,7 +116,7 @@ namespace Lifti.Tests
         {
             var phrases = await this.sut.CreateMatchPhrasesAsync(async (x, ct) => await Task.Run(() => this.testDataWithArray[x], ct));
 
-            this.VerifyObjectResults(this.testDataWithArray, phrases);
+            this.VerifyObjectResults(this.testDataWithArray, "ArrayText", phrases);
         }
 
         [Fact]
@@ -134,7 +134,7 @@ namespace Lifti.Tests
         {
             var phrases = this.sut.CreateMatchPhrases(x => this.defaultFieldTestData[x]);
 
-            VerifyDefaultFieldPhrases(phrases);
+            this.VerifyDefaultFieldPhrases(phrases);
         }
 
         [Fact]
@@ -142,7 +142,7 @@ namespace Lifti.Tests
         {
             var phrases = await this.sut.CreateMatchPhrasesAsync(async x => await Task.Run(() => this.defaultFieldTestData[x]));
 
-            VerifyDefaultFieldPhrases(phrases);
+            this.VerifyDefaultFieldPhrases(phrases);
         }
 
         [Fact]
@@ -150,7 +150,7 @@ namespace Lifti.Tests
         {
             var phrases = await this.sut.CreateMatchPhrasesAsync(async (x, ct) => await Task.Run(() => this.defaultFieldTestData[x], ct));
 
-            VerifyDefaultFieldPhrases(phrases);
+            this.VerifyDefaultFieldPhrases(phrases);
         }
 
         [Fact]
@@ -163,27 +163,42 @@ namespace Lifti.Tests
                 async () => await this.sut.CreateMatchPhrasesAsync(async (x, ct) => await Task.Run(() => this.defaultFieldTestData[x], ct), cts.Token));
         }
 
-        private static void VerifyDefaultFieldPhrases(IEnumerable<MatchedPhrases<int>> phrases)
+        private void VerifyDefaultFieldPhrases(IEnumerable<ItemPhrases<int>> phrases)
         {
             phrases.Should().BeEquivalentTo(
                 new[]
-                            {
-                    new MatchedPhrases<int>(101, new[] { "quick brown fox" }),
-                    new MatchedPhrases<int>(102, new[] { "brown" }),
-                    new MatchedPhrases<int>(103, new[] { "quick fox", "brown" })
+                {
+                    new ItemPhrases<int>(
+                        this.sut.Single(x => x.Key == 101),
+                        new[] { new FieldPhrases<int>(IndexedFieldLookup.DefaultFieldName, "quick brown fox") }),
+                    new ItemPhrases<int>(
+                        this.sut.Single(x => x.Key == 102),
+                        new[] { new FieldPhrases<int>(IndexedFieldLookup.DefaultFieldName, "brown") }),
+                    new ItemPhrases<int>(
+                        this.sut.Single(x => x.Key == 103),
+                        new[] { new FieldPhrases<int>(IndexedFieldLookup.DefaultFieldName, "quick fox", "brown") })
                  });
         }
 
-        private void VerifyObjectResults<TItem>(Dictionary<int, TItem> sourceItems, IEnumerable<MatchedPhrases<int, TItem>> phrases)
+        private void VerifyObjectResults<TItem>(Dictionary<int, TItem> sourceItems, string expectedFieldName, IEnumerable<ItemPhrases<int, TItem>> phrases)
         {
             var source = sourceItems.ToList();
 
             phrases.Should().BeEquivalentTo(
                 new[]
                 {
-                    new MatchedPhrases<int, TItem>(source[0].Value, source[0].Key, new[] { "quick brown fox" }),
-                    new MatchedPhrases<int, TItem>(source[1].Value, source[1].Key, new[] { "brown" }),
-                    new MatchedPhrases<int, TItem>(source[2].Value, source[2].Key, new[] { "quick fox", "brown" })
+                    new ItemPhrases<int, TItem>(
+                        source[0].Value,
+                        this.sut.Single(x => x.Key == source[0].Key),
+                        new[] { new FieldPhrases<int>(expectedFieldName, "quick brown fox" )}),
+                    new ItemPhrases<int, TItem>(
+                        source[1].Value,
+                        this.sut.Single(x => x.Key == source[1].Key),
+                        new[] { new FieldPhrases<int>(expectedFieldName,  "brown" )}),
+                    new ItemPhrases<int, TItem>(
+                        source[2].Value,
+                        this.sut.Single(x => x.Key == source[2].Key),
+                        new[] { new FieldPhrases<int>(expectedFieldName,  "quick fox", "brown") })
                 });
         }
 
