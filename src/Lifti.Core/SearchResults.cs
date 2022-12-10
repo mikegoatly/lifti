@@ -3,9 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace Lifti
 {
@@ -145,6 +145,7 @@ namespace Lifti
             List<(SearchResult<TKey> searchResult, List<FieldSearchResult> fieldMatches)> itemResults,
             CancellationToken cancellationToken)
         {
+            var phraseBuilder = new StringBuilder();
             var matchedPhrases = new List<ItemPhrases<TKey>>(this.searchResults.Count);
 
             // Create an array that can be used on each call to VirtualString
@@ -157,7 +158,7 @@ namespace Lifti
                 var fieldPhrases = new List<FieldPhrases<TKey>>(fieldMatches.Count);
                 foreach (var fieldMatch in fieldMatches)
                 {
-                    fieldPhrases.Add(CreatePhrases(fieldMatch, text));
+                    fieldPhrases.Add(CreatePhrases(fieldMatch, text, phraseBuilder));
                 }
 
                 matchedPhrases.Add(new ItemPhrases<TKey>(searchResult, fieldPhrases));
@@ -172,6 +173,7 @@ namespace Lifti
             List<(SearchResult<TKey> searchResult, List<FieldSearchResult> fieldMatches)> itemResults,
             CancellationToken cancellationToken)
         {
+            var phraseBuilder = new StringBuilder();
             var matchedPhrases = new List<ItemPhrases<TKey, TItem>>(this.searchResults.Count);
             foreach (var (searchResult, fieldMatches) in itemResults)
             {
@@ -183,7 +185,7 @@ namespace Lifti
                     if (itemTokenization.FieldReaders.TryGetValue(fieldMatch.FoundIn, out var fieldReader))
                     {
                         var text = new VirtualString(await fieldReader.ReadAsync(item, cancellationToken).ConfigureAwait(false));
-                        fieldPhrases.Add(CreatePhrases(fieldMatch, text));
+                        fieldPhrases.Add(CreatePhrases(fieldMatch, text, phraseBuilder));
                     }
                 }
 
@@ -210,7 +212,7 @@ namespace Lifti
                 .ToList();
         }
 
-        private static FieldPhrases<TKey> CreatePhrases(FieldSearchResult fieldMatch, VirtualString text)
+        private static FieldPhrases<TKey> CreatePhrases(FieldSearchResult fieldMatch, VirtualString text, StringBuilder phraseBuilder)
         {
             var phrases = new List<(int wordCount, string phrase)>();
             var matchLocations = fieldMatch.Locations;
@@ -221,10 +223,14 @@ namespace Lifti
             }
 
             var startLocation = matchLocations[0];
+            phraseBuilder.Length = 0;
+            phraseBuilder.Append(text.Substring(startLocation.Start, startLocation.Length));
             for (var i = 1; i <= matchLocations.Count; i++)
             {
+                var lastWordProcessed = i == matchLocations.Count;
+
                 var previousLocation = matchLocations[i - 1];
-                if (i == matchLocations.Count || matchLocations[i].TokenIndex != previousLocation.TokenIndex + 1)
+                if (lastWordProcessed || matchLocations[i].TokenIndex != previousLocation.TokenIndex + 1)
                 {
                     // Word is not part of the previous phrase, or we've processed all the matched words.
                     // Emit the previous phrase now.
@@ -233,14 +239,29 @@ namespace Lifti
                     phrases.Add(
                         (
                             previousLocation.TokenIndex - startLocation.TokenIndex + 1,
-                            text.Substring(startOffset, totalLength)
+                            phraseBuilder.ToString()
                         ));
 
-                    if (i < matchLocations.Count)
+                    if (!lastWordProcessed)
                     {
                         // This word starts the next phrase
                         startLocation = matchLocations[i];
+                        phraseBuilder.Length = 0;
+                        phraseBuilder.Append(text.Substring(startLocation.Start, startLocation.Length));
                     }
+                }
+                else
+                {
+                    // Keep building the current phrase text
+                    var currentLocation = matchLocations[i];
+
+                    if (phraseBuilder.Length > 0)
+                    {
+                        phraseBuilder.Append(' ');
+                    }
+
+                    // This word starts the next phrase
+                    phraseBuilder.Append(text.Substring(currentLocation.Start, currentLocation.Length));
                 }
             }
 
