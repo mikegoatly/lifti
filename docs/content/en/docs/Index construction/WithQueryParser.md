@@ -49,7 +49,7 @@ of a search term.
 
 If **either** of these functions returns zero, then fuzzy matching will be disabled for the search term. 
 
-By default `maxEditDistance` is calculated as `termLength / 2`, which means that fuzzy matching will be disabled for any search term less than 2 characters. The default for `maxSequentialEdits` is `Max(1, termLength / 4)`, which means that no matter
+By default `maxEditDistance` is calculated as `termLength / 3`, which means that fuzzy matching will be disabled for any search term less than 2 characters. The default for `maxSequentialEdits` is `Max(1, termLength / 4)`, which means that no matter
 how short the search term, at least one sequential edit is allowed.
 
 See [Fuzzy Matching](../../searching/fuzzy-matching).

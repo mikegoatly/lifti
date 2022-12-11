@@ -25,7 +25,7 @@ namespace Lifti.Querying
         /// <summary>
         /// Gets a function capable of deriving the maximum of edits allowed for a fuzzy search term of a given length.
         /// </summary>
-        public Func<int, ushort> FuzzySearchMaxEditDistance { get; internal set; } = static termLength => (ushort)(termLength / 2);
+        public Func<int, ushort> FuzzySearchMaxEditDistance { get; internal set; } = static termLength => (ushort)(termLength / 3);
 
         /// <summary>
         /// Gets a function capable of deriving the maximum number of edits that are allowed to appear sequentially for a fuzzy search term of a given length.
