@@ -20,7 +20,7 @@ The default `IQueryParser` that is configured against an index parses the [LIFTI
 
 ## Searching with a `Query`
 
-You can manually construct a `Query` using any combination of `IQueryPart`s, but take care to normalize any text to match in the same way that it has been indexed. You can do this using either the `ITokenizer` for the index, or if specific tokenization rules have been [configured for a field](../index-construction/withobjecttokenization), then the tokenizer for that field:
+You can manually construct a `Query` using any combination of `IQueryPart`s, but take care to normalize any text to match in the same way that it has been indexed. You can do this using either the `IIndexTokenizer` for the index, or if specific tokenization rules have been [configured for a field](../index-construction/withobjecttokenization), then the tokenizer for that field:
 
 ``` csharp
 var tokenizer = index.DefaultTokenizer;
