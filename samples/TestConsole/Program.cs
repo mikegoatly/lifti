@@ -42,9 +42,13 @@ namespace TestConsole
                     }
 
                     key = char.ToLowerInvariant(pressed.KeyChar);
-                    Console.CursorLeft -= 1;
-                    Console.Write(' ');
-                    Console.CursorLeft -= 1;
+
+                    if (Console.CursorLeft > 0)
+                    {
+                        Console.CursorLeft -= 1;
+                        Console.Write(' ');
+                        Console.CursorLeft -= 1;
+                    }
                 } while (key < firstLetter|| key > lastLetter);
 
                 var selectedSample = samples[key - 'a'];
