@@ -22,21 +22,16 @@ var index = new FullTextIndexBuilder<int>()
 
 ## TokenizerBuilder methods
 
-### Word break modifiers
-
-A tokenizer will always break words on separator (`Char.IsSeparator`) or control (`Char.IsControl`) characters.
-
-#### `SplitOnPunctuation(bool)`
-
-`true`: **Default** The tokenizer will split words on punctuation characters (e.g. those that match `Char.IsPunctuation(char)`)
-
-`false`: Only characters explicitly specified using `SplitOnCharacters` will be treated as word breaks.
-
-#### `SplitOnCharacters(params char[])`
-
-Allows for additional characters to cause word breaks for a tokenizer. E.g. `SplitOnCharacters('$', '£')`.
-
 ### Text Normalization
+
+#### `IgnoreCharacters(char[])`
+
+Configures the tokenizer to ignore certain characters as it is parsing input.
+Ignoring characters will prevent them from acting as split characters, so care needs to be taken that your source
+text doesn't words delimited only by ignored characters, otherwise you may end up unexpectedly joining search terms
+into one. For example, ignoring the `'` character will mean that `O'Reilly` will be tokenized 
+as `OReilly`, but if your source text also contains `she said'hello'` then `she` and 
+`saidhello` will treated as tokens.
 
 #### `AccentInsensitive(bool)`
 
@@ -57,3 +52,17 @@ Additionally, characters that can be logically expressed as two characters are e
 be treated as `ABANDON`. Currently only English is supported.
 
 `false`: **Default** No stemming will be performed on words.
+
+### Word break modifiers
+
+A tokenizer will always break words on separator (`Char.IsSeparator`) or control (`Char.IsControl`) characters.
+
+#### `SplitOnPunctuation(bool)`
+
+`true`: **Default** The tokenizer will split words on punctuation characters (e.g. those that match `Char.IsPunctuation(char)`)
+
+`false`: Only characters explicitly specified using `SplitOnCharacters` will be treated as word breaks.
+
+#### `SplitOnCharacters(params char[])`
+
+Allows for additional characters to cause word breaks for a tokenizer. E.g. `SplitOnCharacters('$', '£')`.
