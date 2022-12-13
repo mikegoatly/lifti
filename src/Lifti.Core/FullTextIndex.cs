@@ -269,7 +269,7 @@ namespace Lifti
             this.PerformWriteLockedAction(() => this.Root = indexNode);
         }
 
-        private static IReadOnlyList<Token> ExtractDocumentTokens(IEnumerable<string> documentTextFragments, ITextExtractor textExtractor, IIndexTokenizer tokenizer)
+        private static IReadOnlyCollection<Token> ExtractDocumentTokens(IEnumerable<string> documentTextFragments, ITextExtractor textExtractor, IIndexTokenizer tokenizer)
         {
             var documentOffset = 0;
             var fragments = Enumerable.Empty<DocumentTextFragment>();
@@ -282,13 +282,13 @@ namespace Lifti
             return tokenizer.Process(fragments);
         }
 
-        private static IReadOnlyList<Token> ExtractDocumentTokens(string documentText, ITextExtractor textExtractor, IIndexTokenizer tokenizer)
+        private static IReadOnlyCollection<Token> ExtractDocumentTokens(string documentText, ITextExtractor textExtractor, IIndexTokenizer tokenizer)
         {
             var fragments = textExtractor.Extract(documentText.AsMemory(), 0);
             return tokenizer.Process(fragments);
         }
 
-        private void AddForDefaultField(IndexMutation mutation, TKey itemKey, IReadOnlyList<Token> tokens)
+        private void AddForDefaultField(IndexMutation mutation, TKey itemKey, IReadOnlyCollection<Token> tokens)
         {
             var fieldId = this.FieldLookup.DefaultField;
             var itemId = this.GetUniqueIdForItem(
@@ -382,7 +382,7 @@ namespace Lifti
             }
         }
 
-        private static int CalculateTotalTokenCount(IReadOnlyList<Token> tokens)
+        private static int CalculateTotalTokenCount(IReadOnlyCollection<Token> tokens)
         {
             return tokens.Aggregate(0, (current, token) => current + token.Locations.Count);
         }
@@ -397,7 +397,7 @@ namespace Lifti
         {
             var itemKey = options.KeyReader(item);
 
-            var fieldTokens = new List<(byte fieldId, IReadOnlyList<Token> tokens)>(options.FieldReaders.Count);
+            var fieldTokens = new List<(byte fieldId, IReadOnlyCollection<Token> tokens)>(options.FieldReaders.Count);
             foreach (var field in options.FieldReaders.Values)
             {
                 var (fieldId, textExtractor, tokenizer) = this.FieldLookup.GetFieldInfo(field.Name);

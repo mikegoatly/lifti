@@ -12,12 +12,12 @@ namespace Lifti.Tokenization
         /// <summary>
         /// Tokenizes the given <see cref="DocumentTextFragment"/>s relating a single document.
         /// </summary>
-        IReadOnlyList<Token> Process(IEnumerable<DocumentTextFragment> input);
+        IReadOnlyCollection<Token> Process(IEnumerable<DocumentTextFragment> input);
 
         /// <summary>
         /// Tokenizes a single string.
         /// </summary>
-        IReadOnlyList<Token> Process(ReadOnlySpan<char> tokenText);
+        IReadOnlyCollection<Token> Process(ReadOnlySpan<char> tokenText);
 
         /// <summary>
         /// Normalizes a fragment of text according to the rules in the tokenizer.

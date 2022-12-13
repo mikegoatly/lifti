@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
 
 namespace Lifti.Tokenization
@@ -11,45 +9,34 @@ namespace Lifti.Tokenization
     /// </summary>
     internal class TokenStore
     {
-        private readonly Dictionary<int, List<Token>> materializedTokens = new Dictionary<int, List<Token>>();
+        private readonly Dictionary<string, Token> materializedTokens = new();
 
         /// <summary>
         /// Captures a token at a location, merging the token with any locations
         /// it previously matched at.
         /// </summary>
-        public void MergeOrAdd(StringBuilder token, TokenLocation location)
+        public Token MergeOrAdd(StringBuilder tokenText, TokenLocation location)
         {
-            var hash = new TokenHash(token);
-            if (this.materializedTokens.TryGetValue(hash.HashValue, out var existingEntries))
+            var text = tokenText.ToString();
+            if (materializedTokens.TryGetValue(text, out var token))
             {
-                foreach (var existingEntry in existingEntries)
-                {
-                    if (token.SequenceEqual(existingEntry.Value))
-                    {
-                        existingEntry.AddLocation(location);
-                        return;
-                    }
-                }
-
-                existingEntries.Add(new Token(token.ToString(), location));
+                token.AddLocation(location);
             }
             else
             {
-                this.materializedTokens.Add(
-                    hash.HashValue,
-                    new List<Token>()
-                    {
-                        new Token(token.ToString(), location)
-                    });
+                token = new Token(text, location);
+                materializedTokens.Add(text, token);
             }
+
+            return token;
         }
 
         /// <summary>
         /// Converts the set of captured tokens to a list.
         /// </summary>
-        public IReadOnlyList<Token> ToList()
+        public IReadOnlyCollection<Token> ToList()
         {
-            return this.materializedTokens.Values.SelectMany(v => v).ToList();
+            return this.materializedTokens.Values;
         }
     }
 }

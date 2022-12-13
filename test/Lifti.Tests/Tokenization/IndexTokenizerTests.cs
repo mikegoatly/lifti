@@ -58,7 +58,7 @@ namespace Lifti.Tests.Tokenization
                 });
         }
 
-        protected static IReadOnlyList<Token> Execute(IndexTokenizer tokenizer, params string[] textParts)
+        protected static IReadOnlyCollection<Token> Execute(IndexTokenizer tokenizer, params string[] textParts)
         {
             var fragments = new List<DocumentTextFragment>();
             var offset = 0;

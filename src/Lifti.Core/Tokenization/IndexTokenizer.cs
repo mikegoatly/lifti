@@ -47,7 +47,7 @@ namespace Lifti.Tokenization
         public TokenizationOptions Options { get; }
 
         /// <inheritdoc />
-        public IReadOnlyList<Token> Process(IEnumerable<DocumentTextFragment> document)
+        public IReadOnlyCollection<Token> Process(IEnumerable<DocumentTextFragment> document)
         {
             if (document is null)
             {
@@ -72,7 +72,7 @@ namespace Lifti.Tokenization
         }
 
         /// <inheritdoc />
-        public IReadOnlyList<Token> Process(ReadOnlySpan<char> text)
+        public IReadOnlyCollection<Token> Process(ReadOnlySpan<char> text)
         {
             var processedTokens = new TokenStore();
             var tokenIndex = 0;

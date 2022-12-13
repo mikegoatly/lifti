@@ -39,12 +39,12 @@ namespace Lifti.Tests.Querying
             return result;
         }
 
-        public IReadOnlyList<Token> Process(ReadOnlySpan<char> text)
+        public IReadOnlyCollection<Token> Process(ReadOnlySpan<char> text)
         {
             return new[] { new Token(new string(text), new TokenLocation(0, 0, (ushort)text.Length)) };
         }
 
-        public IReadOnlyList<Token> Process(IEnumerable<DocumentTextFragment> input)
+        public IReadOnlyCollection<Token> Process(IEnumerable<DocumentTextFragment> input)
         {
             return new[] { new Token(string.Join("", input.Select(i => i.Text)), new TokenLocation(0, 0, (ushort)input.Sum(i => i.Text.Length))) };
         }
