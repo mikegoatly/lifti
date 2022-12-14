@@ -4,13 +4,13 @@ using System.Linq;
 
 namespace Lifti.Tokenization.Objects
 {
-    internal class ConfiguredObjectTokenizationOptions<TKey>
+    internal class ObjectTokenizationLookup<TKey>
     {
-        private readonly Dictionary<Type, IObjectTokenization> options = new Dictionary<Type, IObjectTokenization>();
+        private readonly Dictionary<Type, IObjectTokenization> options;
 
-        public void Add<TItem>(ObjectTokenization<TItem, TKey> options)
+        public ObjectTokenizationLookup(IEnumerable<IObjectTokenization> objectTokenizers)
         {
-            this.options[typeof(TItem)] = options;
+            this.options = objectTokenizers.ToDictionary(x => x.ItemType);
         }
 
         public ObjectTokenization<TItem, TKey> Get<TItem>()

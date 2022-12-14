@@ -56,7 +56,7 @@ namespace Lifti.Querying
             return new Query(combined);
         }
 
-        private IEnumerable<IQueryPart> CreateSearchTermTokens(IReadOnlyList<Token> tokens)
+        private IEnumerable<IQueryPart> CreateSearchTermTokens(IReadOnlyCollection<Token> tokens)
         {
             if (this.options.AssumeFuzzySearchTerms)
             {

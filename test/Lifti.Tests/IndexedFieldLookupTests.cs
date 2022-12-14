@@ -13,19 +13,16 @@ namespace Lifti.Tests
 
         public IndexedFieldLookupTests()
         {
-            IObjectTokenization itemConfig = new ObjectTokenizationBuilder<string, string>()
+            IObjectTokenization itemConfig = (new ObjectTokenizationBuilder<string, string>()
                 .WithKey(i => i)
                 .WithField("Field1", r => r)
                 .WithField("Field2", r => r)
                 .WithField("Field3", r => r)
                 .WithField("FieldX", r => r, o => o.WithStemming())
-                .WithField("FieldY", r => r)
-                .Build();
+                .WithField("FieldY", r => r) as IObjectTokenizationBuilder)
+                .Build(IndexTokenizer.Default, new ThesaurusBuilder(), new PlainTextExtractor());
 
-            this.sut = new IndexedFieldLookup(
-                itemConfig.GetConfiguredFields(), 
-                new PlainTextExtractor(), 
-                IndexTokenizer.Default);
+            this.sut = new IndexedFieldLookup(itemConfig.GetConfiguredFields());
         }
 
         [Fact]
@@ -68,32 +65,33 @@ namespace Lifti.Tests
                 itemConfigBuilder = itemConfigBuilder.WithField("Field" + i, r => r);
             }
 
-            IObjectTokenization config = itemConfigBuilder.Build();
+            IObjectTokenization config = Build(itemConfigBuilder);
 
-            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(config.GetConfiguredFields(), new PlainTextExtractor(), IndexTokenizer.Default))
+            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(config.GetConfiguredFields()))
                 .Message.Should().Be("Only 255 distinct fields can currently be indexed");
         }
 
         [Fact]
         public void UsingDuplicateFieldNameShouldThrowException()
         {
-            IObjectTokenization config1 = new ObjectTokenizationBuilder<string, string>()
+            IObjectTokenization config1 = Build(new ObjectTokenizationBuilder<string, string>()
                 .WithField("Field1", o => o)
                 .WithField("Field2", o => o)
-                .WithKey(i => i)
-                .Build();
+                .WithKey(i => i));
 
-            IObjectTokenization config2 = new ObjectTokenizationBuilder<string, string>()
+            IObjectTokenization config2 = Build(new ObjectTokenizationBuilder<string, string>()
                 .WithField("Field1", o => o)
-                .WithKey(i => i)
-                .Build();
+                .WithKey(i => i));
 
             Assert.Throws<LiftiException>(
-                () => new IndexedFieldLookup(
-                    config1.GetConfiguredFields().Concat(config2.GetConfiguredFields()), 
-                    new PlainTextExtractor(), 
-                    IndexTokenizer.Default))
+                () => new IndexedFieldLookup(config1.GetConfiguredFields().Concat(config2.GetConfiguredFields())))
                 .Message.Should().Be("Duplicate field name used: Field1. Field names must be unique across all item types registered with an index.");
+        }
+
+        private IObjectTokenization Build(ObjectTokenizationBuilder<string, string> objectTokenizationBuilder)
+        {
+            return (objectTokenizationBuilder as IObjectTokenizationBuilder)
+                .Build(IndexTokenizer.Default, new ThesaurusBuilder(), new PlainTextExtractor());
         }
     }
 }

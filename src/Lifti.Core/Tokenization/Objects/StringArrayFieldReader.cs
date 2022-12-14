@@ -20,9 +20,10 @@ namespace Lifti.Tokenization.Objects
         internal StringArrayFieldReader(
             string name,
             Func<TItem, IEnumerable<string>> reader,
-            IIndexTokenizer? tokenizer,
-            ITextExtractor? textExtractor)
-            : base(name, tokenizer, textExtractor)
+            IIndexTokenizer tokenizer,
+            ITextExtractor textExtractor,
+            IThesaurus thesaurus)
+            : base(name, tokenizer, textExtractor, thesaurus)
         {
             this.reader = reader ?? throw new ArgumentNullException(nameof(reader));
         }

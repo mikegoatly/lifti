@@ -4,6 +4,7 @@ using Lifti.Tokenization.Objects;
 using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,8 +17,9 @@ namespace Lifti
     public class FullTextIndexBuilder<TKey>
         where TKey : notnull
     {
-        private readonly ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions = new();
+        private readonly List<IObjectTokenizationBuilder> itemTokenizationOptions = new();
         private readonly IndexOptions advancedOptions = new();
+        private ThesaurusBuilder? defaultThesaurusBuilder;
         private IIndexScorerFactory? scorerFactory;
         private IQueryParser? queryParser;
         private IIndexTokenizer defaultTokenizer = IndexTokenizer.Default;
@@ -139,7 +141,7 @@ namespace Lifti
             }
 
             var builder = new ObjectTokenizationBuilder<TItem, TKey>();
-            this.itemTokenizationOptions.Add(optionsBuilder(builder).Build());
+            this.itemTokenizationOptions.Add(optionsBuilder(builder));
 
             return this;
         }
@@ -157,6 +159,16 @@ namespace Lifti
 
             this.defaultTokenizer = optionsBuilder.CreateTokenizer()!;
 
+            return this;
+        }
+
+        /// <summary>
+        /// Builds the default thesaurus to use for the index. This thesaurus will be used for fields
+        /// that have no explicit thesaurus defined for them.
+        /// </summary>
+        public FullTextIndexBuilder<TKey> WithThesaurus(Func<ThesaurusBuilder, ThesaurusBuilder> thesaurusBuilder)
+        {
+            this.defaultThesaurusBuilder = thesaurusBuilder(new ThesaurusBuilder());
             return this;
         }
 
@@ -237,14 +249,19 @@ namespace Lifti
         /// </summary>
         public FullTextIndex<TKey> Build()
         {
+            var thesaurusBuilder = this.defaultThesaurusBuilder ?? new ThesaurusBuilder();
+            var textExtractor = this.defaultTextExtractor ?? new PlainTextExtractor();
+
             return new FullTextIndex<TKey>(
                 this.advancedOptions,
-                this.itemTokenizationOptions,
+                new ObjectTokenizationLookup<TKey>(
+                    this.itemTokenizationOptions.Select(x => x.Build(this.defaultTokenizer, thesaurusBuilder, textExtractor))),
                 new IndexNodeFactory(this.advancedOptions),
                 this.queryParser ?? new QueryParser(new QueryParserOptions()),
                 this.scorerFactory ?? new OkapiBm25ScorerFactory(),
-                this.defaultTextExtractor ?? new PlainTextExtractor(),
+                textExtractor,
                 this.defaultTokenizer,
+                thesaurusBuilder.Build(this.defaultTokenizer),
                 this.indexModifiedActions?.ToArray());
         }
     }

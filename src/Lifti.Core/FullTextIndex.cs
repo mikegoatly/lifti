@@ -19,7 +19,7 @@ namespace Lifti
         private readonly IndexOptions indexOptions;
         private readonly IdPool<TKey> idPool;
         private readonly IIndexNavigatorPool indexNavigatorPool;
-        private readonly SemaphoreSlim writeLock = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim writeLock = new(1);
         private readonly TimeSpan writeLockTimeout = TimeSpan.FromSeconds(10);
         private bool isDisposed;
 
@@ -33,27 +33,26 @@ namespace Lifti
 
         internal FullTextIndex(
             IndexOptions indexOptions,
-            ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions,
+            ObjectTokenizationLookup<TKey> itemTokenizationOptions,
             IIndexNodeFactory indexNodeFactory,
             IQueryParser queryParser,
             IIndexScorerFactory scorer,
             ITextExtractor defaultTextExtractor,
             IIndexTokenizer defaultTokenizer,
+            IThesaurus defaultThesaurus,
             Func<IIndexSnapshot<TKey>, CancellationToken, Task>[]? indexModifiedActions)
         {
             this.indexNavigatorPool = new IndexNavigatorPool(scorer);
             this.indexOptions = indexOptions;
-            this.ItemTokenizationOptions = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
+            this.ItemTokenization = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
             this.IndexNodeFactory = indexNodeFactory ?? throw new ArgumentNullException(nameof(indexNodeFactory));
             this.queryParser = queryParser ?? throw new ArgumentNullException(nameof(queryParser));
             this.DefaultTextExtractor = defaultTextExtractor;
             this.DefaultTokenizer = defaultTokenizer ?? throw new ArgumentNullException(nameof(defaultTokenizer));
+            this.DefaultThesaurus = defaultThesaurus;
             this.indexModifiedActions = indexModifiedActions;
             this.idPool = new IdPool<TKey>();
-            this.FieldLookup = new IndexedFieldLookup(
-                itemTokenizationOptions.GetAllConfiguredFields(),
-                defaultTextExtractor,
-                defaultTokenizer);
+            this.FieldLookup = new IndexedFieldLookup(itemTokenizationOptions.GetAllConfiguredFields());
 
             this.Root = this.IndexNodeFactory.CreateRootNode();
         }
@@ -90,11 +89,14 @@ namespace Lifti
 
         /// <inheritdoc />
         public IIndexTokenizer DefaultTokenizer { get; }
-
+       
         /// <inheritdoc />
         public ITextExtractor DefaultTextExtractor { get; }
 
-        internal ConfiguredObjectTokenizationOptions<TKey> ItemTokenizationOptions { get; }
+        /// <inheritdoc />
+        public IThesaurus DefaultThesaurus { get; }
+
+        internal ObjectTokenizationLookup<TKey> ItemTokenization { get; }
 
         /// <inheritdoc />
         IIndexTokenizer IIndexTokenizerProvider.this[string fieldName] => this.FieldLookup.GetFieldInfo(fieldName).Tokenizer;
@@ -147,7 +149,7 @@ namespace Lifti
                     await this.MutateAsync(
                         m =>
                         {
-                            var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer);
+                            var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer, this.DefaultThesaurus);
                             this.AddForDefaultField(m, itemKey, tokens);
                         },
                         cancellationToken)
@@ -166,7 +168,7 @@ namespace Lifti
                     await this.MutateAsync(
                         m =>
                         {
-                            var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer);
+                            var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer, this.DefaultThesaurus);
                             this.AddForDefaultField(m, itemKey, tokens);
                         },
                         cancellationToken)
@@ -184,7 +186,7 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(items));
             }
 
-            var options = this.ItemTokenizationOptions.Get<TItem>();
+            var options = this.ItemTokenization.Get<TItem>();
             await this.PerformWriteLockedActionAsync(
                 async () =>
                 {
@@ -205,7 +207,7 @@ namespace Lifti
         /// <inheritdoc />
         public async Task AddAsync<TItem>(TItem item, CancellationToken cancellationToken = default)
         {
-            var options = this.ItemTokenizationOptions.Get<TItem>();
+            var options = this.ItemTokenization.Get<TItem>();
             await this.PerformWriteLockedActionAsync(
                 async () => await this.MutateAsync(
                     async m => await this.AddAsync(item, options, m, cancellationToken).ConfigureAwait(false),
@@ -269,7 +271,11 @@ namespace Lifti
             this.PerformWriteLockedAction(() => this.Root = indexNode);
         }
 
-        private static IReadOnlyCollection<Token> ExtractDocumentTokens(IEnumerable<string> documentTextFragments, ITextExtractor textExtractor, IIndexTokenizer tokenizer)
+        private static IReadOnlyCollection<Token> ExtractDocumentTokens(
+            IEnumerable<string> documentTextFragments, 
+            ITextExtractor textExtractor, 
+            IIndexTokenizer tokenizer,
+            IThesaurus thesaurus)
         {
             var documentOffset = 0;
             var fragments = Enumerable.Empty<DocumentTextFragment>();
@@ -279,13 +285,22 @@ namespace Lifti
                 documentOffset += documentText.Length;
             }
 
-            return tokenizer.Process(fragments);
+            return TokenizeFragments(tokenizer, thesaurus, fragments);
         }
 
-        private static IReadOnlyCollection<Token> ExtractDocumentTokens(string documentText, ITextExtractor textExtractor, IIndexTokenizer tokenizer)
+        private static IReadOnlyCollection<Token> ExtractDocumentTokens(
+            string documentText, 
+            ITextExtractor textExtractor, 
+            IIndexTokenizer tokenizer,
+            IThesaurus thesaurus)
         {
             var fragments = textExtractor.Extract(documentText.AsMemory(), 0);
-            return tokenizer.Process(fragments);
+            return TokenizeFragments(tokenizer, thesaurus, fragments);
+        }
+
+        private static List<Token> TokenizeFragments(IIndexTokenizer tokenizer, IThesaurus thesaurus, IEnumerable<DocumentTextFragment> fragments)
+        {
+            return tokenizer.Process(fragments).SelectMany(x => thesaurus.Process(x)).ToList();
         }
 
         private void AddForDefaultField(IndexMutation mutation, TKey itemKey, IReadOnlyCollection<Token> tokens)
@@ -400,8 +415,13 @@ namespace Lifti
             var fieldTokens = new List<(byte fieldId, IReadOnlyCollection<Token> tokens)>(options.FieldReaders.Count);
             foreach (var field in options.FieldReaders.Values)
             {
-                var (fieldId, textExtractor, tokenizer) = this.FieldLookup.GetFieldInfo(field.Name);
-                var tokens = ExtractDocumentTokens(await field.ReadAsync(item, cancellationToken).ConfigureAwait(false), textExtractor, tokenizer);
+                var (fieldId, textExtractor, tokenizer, thesaurus) = this.FieldLookup.GetFieldInfo(field.Name);
+                var tokens = ExtractDocumentTokens(
+                    await field.ReadAsync(item, cancellationToken).ConfigureAwait(false),
+                    textExtractor,
+                    tokenizer,
+                    thesaurus);
+
                 fieldTokens.Add((fieldId, tokens));
             }
 
