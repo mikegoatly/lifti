@@ -1,15 +1,15 @@
 ﻿using FluentAssertions;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Lifti.Tests
 {
-    public class ThesaurusTests : IAsyncLifetime
+    public class ThesaurusTests
     {
+        private record TestObject(int Id, string Text);
+
         private static Dictionary<int, string> source = new()
         {
             { 1, "The big bird flew" },
@@ -17,25 +17,13 @@ namespace Lifti.Tests
             { 3, "The vehicle flew through the air" },
         };
 
-        private FullTextIndex<int> sut;
-
-        public ThesaurusTests()
-        {
-            this.sut = new FullTextIndexBuilder<int>()
-                .WithThesaurus(
-                    b => b
-                        .AddSynonyms("happy", "joyous", "delighted")
-                        .AddSynonyms("large", "big", "massive")
-                        .AddHypernyms("vehicle", "car", "truck", "motorcycle")
-                        .AddHypernyms("animal", "mammal", "bird", "reptile"))
-                .Build();
-        }
-
         [Fact]
-        public void SearchingForSynonym_ShouldReturnMatch()
+        public async Task LooseTextIndex_SearchingForSynonym_ShouldReturnMatch()
         {
-            var results = this.sut.Search("massive");
-            
+            var sut = await CreateLooseTextIndexAsync();
+
+            var results = sut.Search("massive");
+
             results.CreateMatchPhrases(x => source[x])
                 .Should()
                 .BeEquivalentTo(
@@ -43,14 +31,16 @@ namespace Lifti.Tests
                 {
                     new ItemPhrases<int>(
                         results.Single(x => x.Key == 1),
-                        new[] { new FieldPhrases<int>(IndexedFieldLookup.DefaultFieldName, "big") })
+                        new[] { new FieldPhrases<int>(IndexedFieldLookup.DefaultFieldName , "big") })
                  });
         }
 
         [Fact]
-        public void SearchingForHyponym_ShouldOnlyReturnSearchedWord()
+        public async Task LooseTextIndex_SearchingForHyponym_ShouldOnlyReturnSearchedWord()
         {
-            var results = this.sut.Search("vehicle");
+            var sut = await CreateLooseTextIndexAsync();
+
+            var results = sut.Search("vehicle");
 
             results.CreateMatchPhrases(x => source[x])
                 .Should()
@@ -64,9 +54,11 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void SearchingForHypernum_ShouldReturnMatch()
+        public async Task LooseTextIndex_SearchingForHypernym_ShouldReturnMatch()
         {
-            var results = this.sut.Search("car");
+            var sut = await CreateLooseTextIndexAsync();
+
+            var results = sut.Search("car");
 
             results.CreateMatchPhrases(x => source[x])
                 .Should()
@@ -82,18 +74,117 @@ namespace Lifti.Tests
                  });
         }
 
-        public async Task InitializeAsync()
+        [Fact]
+        public async Task ObjectIndex_SearchingForSynonym_ShouldReturnMatch()
         {
-            foreach (var item in source)
-            {
-                await this.sut.AddAsync(item.Key, item.Value);
-            }
+            var sut = await CreateObjectIndexAsync();
+
+            var results = sut.Search("massive");
+
+            (await results.CreateMatchPhrasesAsync(x => new TestObject(x, source[x])))
+                .Should()
+                .BeEquivalentTo(
+                new[]
+                {
+                    new ItemPhrases<int>(
+                        results.Single(x => x.Key == 1),
+                        new[] { new FieldPhrases<int>("Field" , "big") })
+                 });
         }
 
-        public Task DisposeAsync()
+        [Fact]
+        public async Task ObjectIndex_SearchingForHyponym_ShouldOnlyReturnSearchedWord()
         {
-            this.sut.Dispose();
-            return Task.CompletedTask;
+            var sut = await CreateObjectIndexAsync();
+
+            var results = sut.Search("vehicle");
+
+            (await results.CreateMatchPhrasesAsync(x => new TestObject(x, source[x])))
+                .Should()
+                .BeEquivalentTo(
+                new[]
+                {
+                    new ItemPhrases<int>(
+                        results.Single(x => x.Key == 3),
+                        new[] { new FieldPhrases<int>("Field", "vehicle") })
+                 });
+        }
+
+        [Fact]
+        public async Task ObjectIndex_SearchingForHypernym_ShouldReturnMatch()
+        {
+            var sut = await CreateObjectIndexAsync();
+
+            var results = sut.Search("car");
+
+            (await results.CreateMatchPhrasesAsync(x => new TestObject(x, source[x])))
+                .Should()
+                .BeEquivalentTo(
+                new[]
+                {
+                    new ItemPhrases<int>(
+                        results.Single(x => x.Key == 2),
+                        new[] { new FieldPhrases<int>("Field", "car") }),
+                    new ItemPhrases<int>(
+                        results.Single(x => x.Key == 3),
+                        new[] { new FieldPhrases<int>("Field", "vehicle") })
+                 });
+        }
+
+        private static async Task<IFullTextIndex<int>> CreateIndexAsync(bool useObjectTokenization)
+        {
+            if (useObjectTokenization)
+            {
+                return await CreateObjectIndexAsync();
+            }
+
+            return await CreateLooseTextIndexAsync();
+        }
+
+        private static async Task<FullTextIndex<int>> CreateObjectIndexAsync()
+        {
+            var sut = new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<TestObject>(
+                    o => o.WithKey(x => x.Id)
+                        .WithField(
+                            "Field",
+                            x => x.Text,
+                            thesaurusOptions: b => b
+                                .AddSynonyms("happy", "joyous", "delighted")
+                                .AddSynonyms("large", "big", "massive")
+                                .AddHypernyms("vehicle", "car", "truck", "motorcycle")
+                                .AddHypernyms("animal", "mammal", "bird", "reptile")))
+                .Build();
+
+            sut.BeginBatchChange();
+            foreach (var item in source)
+            {
+                await sut.AddAsync(new TestObject(item.Key, item.Value));
+            }
+            await sut.CommitBatchChangeAsync();
+
+            return sut;
+        }
+
+        private static async Task<FullTextIndex<int>> CreateLooseTextIndexAsync()
+        {
+            var sut = new FullTextIndexBuilder<int>()
+                .WithThesaurus(
+                    b => b
+                        .AddSynonyms("happy", "joyous", "delighted")
+                        .AddSynonyms("large", "big", "massive")
+                        .AddHypernyms("vehicle", "car", "truck", "motorcycle")
+                        .AddHypernyms("animal", "mammal", "bird", "reptile"))
+                .Build();
+
+            sut.BeginBatchChange();
+            foreach (var item in source)
+            {
+                await sut.AddAsync(item.Key, item.Value);
+            }
+            await sut.CommitBatchChangeAsync();
+
+            return sut;
         }
     }
 }
