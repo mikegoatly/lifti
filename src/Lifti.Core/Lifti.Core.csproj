@@ -14,10 +14,12 @@
     <NeutralLanguage>en</NeutralLanguage>
     <PackageId>Lifti.Core</PackageId>
     <Copyright>Mike Goatly</Copyright>
-    <PackageLicenseFile></PackageLicenseFile>
     <AssemblyName>Lifti.Core</AssemblyName>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
+    <Title>LIFTI</Title>
+    <PackageIcon>favicon-256.png</PackageIcon>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -33,6 +35,17 @@
     <DocumentationFile>Lifti.Core.xml</DocumentationFile>
 	  <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\static\favicons\favicon-256.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
