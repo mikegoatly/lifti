@@ -29,6 +29,8 @@ namespace Lifti.Tokenization.Objects
         /// </summary>
         public IDictionary<string, FieldReader<T>> FieldReaders { get; }
 
+        Type IObjectTokenization.ItemType { get; } = typeof(T);
+
         /// <inheritdoc />
         IEnumerable<IFieldReader> IObjectTokenization.GetConfiguredFields()
         {

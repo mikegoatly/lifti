@@ -54,7 +54,7 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(loadItemsAsync));
             }
 
-            var itemTokenization = this.index.ItemTokenizationOptions.Get<TItem>();
+            var itemTokenization = this.index.ItemTokenization.Get<TItem>();
             var itemResults = this.FilterFieldMatches(itemTokenization.FieldReaders.ContainsKey);
 
             var items = (await loadItemsAsync(itemResults.Select(x => x.searchResult.Key).ToList(), cancellationToken).ConfigureAwait(false))
@@ -94,7 +94,7 @@ namespace Lifti
             Func<TKey, CancellationToken, ValueTask<TItem>> loadItemAsync,
             CancellationToken cancellationToken = default)
         {
-            var itemTokenization = this.index.ItemTokenizationOptions.Get<TItem>();
+            var itemTokenization = this.index.ItemTokenization.Get<TItem>();
             var itemResults = this.FilterFieldMatches(itemTokenization.FieldReaders.ContainsKey);
 
             return await this.CreateMatchPhrasesAsync(

@@ -59,6 +59,50 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public void WithObjectConfiguration_ShouldUseDefaultThesaurusIfNotProvided()
+        {
+            this.sut.WithThesaurus(o => o.AddSynonyms("a", "b", "c"))
+                .WithDefaultTokenization(o => o.CaseInsensitive(false))
+                .WithObjectTokenization<TestObject2>(
+                o => o
+                    .WithKey(i => i.Id)
+                    .WithField("Content", i => i.Content, tokenizationOptions: o => o.CaseInsensitive(true))
+                    .WithField("Title", i => i.Title, thesaurusOptions: s => s.AddSynonyms("A", "b")));
+
+            var index = this.sut.Build();
+
+            var defaultThesaurus = (Thesaurus)index.DefaultThesaurus;
+
+            // Thesaurus should have been built without case insensitivity - casing should be unchanged
+            defaultThesaurus.WordLookup.Should().BeEquivalentTo(
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    { "a", new[] { "a", "b", "c" } },
+                    { "b", new[] { "a", "b", "c" } },
+                    { "c", new[] { "a", "b", "c" } },
+                });
+
+            // Thesaurus should contain the same words as the default thesaurus, but have been built WITH case insensitivity,
+            // so casing should be uppercase
+            ((Thesaurus)index.FieldLookup.GetFieldInfo("Content").Thesaurus).WordLookup.Should().BeEquivalentTo(
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    { "A", new[] { "A", "B", "C" } },
+                    { "B", new[] { "A", "B", "C" } },
+                    { "C", new[] { "A", "B", "C" } },
+                });
+
+            // Thesaurus should have been built using the default tokenizer, but only contain the thesaurus words specified
+            // at the field level
+            ((Thesaurus)index.FieldLookup.GetFieldInfo("Title").Thesaurus).WordLookup.Should().BeEquivalentTo(
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    { "A", new[] { "A", "b" } },
+                    { "b", new[] { "A", "b" } },
+                });
+        }
+
+        [Fact]
         public void WithConfiguredExplicitFuzzyMatchParameters_ShouldPassParametersToConstructedQueryParsers()
         {
             var passedOptions = BuildSutAndGetPassedOptions(o => o.WithFuzzySearchDefaults(10, 4));

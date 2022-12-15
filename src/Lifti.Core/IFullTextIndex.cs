@@ -1,4 +1,5 @@
 ﻿using Lifti.Querying;
+using Lifti.Tokenization;
 using Lifti.Tokenization.TextExtraction;
 using System.Collections.Generic;
 using System.Threading;
@@ -45,6 +46,12 @@ namespace Lifti
         /// not explicitly configured for a field.
         /// </summary>
         ITextExtractor DefaultTextExtractor { get; }
+
+        /// <summary>
+        /// Gets the default <see cref="IThesaurus"/> implementation that will be used while indexing text when one
+        /// is not explicitly configured for a field.
+        /// </summary>
+        IThesaurus DefaultThesaurus { get; }
 
         /// <summary>
         /// Uses the current snapshot of the index to create an implementation of <see cref="IIndexNavigator"/> that can be used to 

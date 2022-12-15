@@ -228,6 +228,12 @@
   <data name="TextTokensMustHaveIndexTokenizers" xml:space="preserve">
     <value>Text tokens must have an associated index tokenizer</value>
   </data>
+  <data name="ThesaurusEntriesCannotResultInMultipleWords" xml:space="preserve">
+    <value>Thesaurus entries cannot result in multiple words because each word will be considered equivalent which is probably not what you expect. The word was: {0} and was split into {1}</value>
+  </data>
+  <data name="ThesaurusEntriesMustResultInACompleteWord" xml:space="preserve">
+    <value>The word "{0}" resulted in an empty value after tokenization.</value>
+  </data>
   <data name="TimeoutWaitingForWriteLock" xml:space="preserve">
     <value>A timeout occurred waiting for index write lock</value>
   </data>

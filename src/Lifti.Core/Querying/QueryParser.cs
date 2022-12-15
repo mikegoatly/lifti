@@ -57,7 +57,7 @@ namespace Lifti.Querying
                     return this.ComposePart(currentQuery, this.CreateWordQueryPart(token));
 
                 case QueryTokenType.FieldFilter:
-                    var (fieldId, _, _) = fieldLookup.GetFieldInfo(token.TokenText);
+                    var fieldId = fieldLookup.GetFieldInfo(token.TokenText).Id;
                     var filteredPart = this.CreateQueryPart(fieldLookup, state, state.GetNextToken(), null);
                     return this.ComposePart(
                         currentQuery,

@@ -1,4 +1,5 @@
 ﻿using Lifti.Tokenization.Objects;
+using System;
 using System.Collections.Generic;
 
 namespace Lifti
@@ -9,6 +10,11 @@ namespace Lifti
     /// </summary>
     internal interface IObjectTokenization
     {
+        /// <summary>
+        /// Gets the type of the item this instance represents.
+        /// </summary>
+        Type ItemType { get; }
+
         /// <summary>
         /// Gets the configuration for the fields associated to this instance.
         /// </summary>

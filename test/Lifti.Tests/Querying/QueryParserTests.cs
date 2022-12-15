@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
 using Lifti.Querying.QueryParts;
+using Lifti.Tokenization;
 using Lifti.Tokenization.TextExtraction;
 using Moq;
 using System;
@@ -22,11 +23,12 @@ namespace Lifti.Tests.Querying
             var testFieldId = TestFieldId;
             var otherFieldId = OtherFieldId;
 
+            var thesaurus = Thesaurus.Empty;
             this.field1Tokenizer = new FakeIndexTokenizer();
             this.field2Tokenizer = new FakeIndexTokenizer();
             var textExtractor = new PlainTextExtractor();
-            this.fieldLookupMock.Setup(l => l.GetFieldInfo("testfield")).Returns(new IndexedFieldDetails(testFieldId, textExtractor, this.field1Tokenizer));
-            this.fieldLookupMock.Setup(l => l.GetFieldInfo("otherfield")).Returns(new IndexedFieldDetails(otherFieldId, textExtractor, this.field2Tokenizer));
+            this.fieldLookupMock.Setup(l => l.GetFieldInfo("testfield")).Returns(new IndexedFieldDetails(testFieldId, textExtractor, this.field1Tokenizer, thesaurus));
+            this.fieldLookupMock.Setup(l => l.GetFieldInfo("otherfield")).Returns(new IndexedFieldDetails(otherFieldId, textExtractor, this.field2Tokenizer, thesaurus));
         }
 
         [Fact]
