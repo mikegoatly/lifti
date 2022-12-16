@@ -30,7 +30,7 @@ namespace Lifti.Tests.Querying
 
         public string Normalize(ReadOnlySpan<char> text)
         {
-            var result = new string(text);
+            var result = text.ToString();
             if (this.normalizeToUppercase)
             {
                 result = result.ToUpper();
@@ -41,7 +41,7 @@ namespace Lifti.Tests.Querying
 
         public IReadOnlyCollection<Token> Process(ReadOnlySpan<char> text)
         {
-            return new[] { new Token(new string(text), new TokenLocation(0, 0, (ushort)text.Length)) };
+            return new[] { new Token(text.ToString(), new TokenLocation(0, 0, (ushort)text.Length)) };
         }
 
         public IReadOnlyCollection<Token> Process(IEnumerable<DocumentTextFragment> input)

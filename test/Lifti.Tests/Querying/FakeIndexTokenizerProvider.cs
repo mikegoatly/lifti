@@ -19,7 +19,7 @@ namespace Lifti.Tests.Querying
             this.fieldIndexTokenizers = fieldIndexTokenizers.ToDictionary(x => x.Item1, x => x.Item2);
         }
 
-        public IIndexTokenizer this[string fieldName] => this.fieldIndexTokenizers[fieldName];
+        public IIndexTokenizer GetTokenizerForField(string fieldName) => this.fieldIndexTokenizers[fieldName];
 
         public IIndexTokenizer DefaultTokenizer { get; private set; }
     }

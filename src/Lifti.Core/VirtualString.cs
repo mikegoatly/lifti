@@ -49,7 +49,11 @@ namespace Lifti
                     // Calculate the substring length for the current string
                     var substringLength = Math.Min(currentLength - start, length);
 
+#if NET6_0_OR_GREATER
+                    this.stringBuilder.Append(currentString.AsSpan(start, substringLength));
+#else
                     this.stringBuilder.Append(currentString.Substring(start, substringLength));
+#endif
 
                     // Update the start index and length for the next string
                     start = 0;

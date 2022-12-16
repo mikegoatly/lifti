@@ -56,7 +56,7 @@ namespace Lifti.Tests.Querying
 
         private static void RunTest(string text, WildcardQueryPart? expectedQueryPart, bool expectedResult = true)
         {
-            var result = WildcardQueryPartParser.TryParse(text, new FakeIndexTokenizer(normalizeToUppercase: true), out var part);
+            var result = WildcardQueryPartParser.TryParse(text.AsSpan(), new FakeIndexTokenizer(normalizeToUppercase: true), out var part);
 
             result.Should().Be(expectedResult);
             if (expectedQueryPart != null)

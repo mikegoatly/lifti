@@ -77,7 +77,7 @@ namespace Lifti.Tests.Tokenization
             public void WhenIgnoredCharacterIsAlsoSplitCharacter_ShouldNotSplitOnCharacter()
             {
                 var output = WithConfiguration(ignoreChars: new[] { ',' }, additionalSplitChars: new[] { ',' })
-                .Process("test,test test");
+                    .Process("test,test test".AsSpan());
 
                 output.Should().BeEquivalentTo(new[]
                 {
@@ -90,7 +90,7 @@ namespace Lifti.Tests.Tokenization
             public void WithIgnoredCharacter_ShouldNotIncludeCharactersInTokenMatches()
             {
                 var output = WithConfiguration(ignoreChars: new[] { '\'' })
-                .Process("O'Reilly's");
+                    .Process("O'Reilly's".AsSpan());
 
                 output.Should().BeEquivalentTo(new[]
                 {

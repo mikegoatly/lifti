@@ -91,7 +91,11 @@ namespace Lifti.Serialization.Binary
         private static async Task<ushort> ReadFileVersionAsync(Stream stream)
         {
             var data = new byte[4];
+#if NET6_0_OR_GREATER
+            if (await stream.ReadAsync(data.AsMemory(0, 4)).ConfigureAwait(false) != 4)
+#else
             if (await stream.ReadAsync(data, 0, 4).ConfigureAwait(false) != 4)
+#endif
             {
                 throw new DeserializationException(ExceptionMessages.UnableToReadHeaderInformation);
             }

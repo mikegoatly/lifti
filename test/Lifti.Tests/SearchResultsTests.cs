@@ -51,9 +51,9 @@ namespace Lifti.Tests
 
             await this.index.AddRangeAsync(this.testDataWithArray.Values);
 
-            foreach (var (key, value) in this.defaultFieldTestData)
+            foreach (var data in this.defaultFieldTestData)
             {
-                await this.index.AddAsync(key, value);
+                await this.index.AddAsync(data.Key, data.Value);
             }
 
             await this.index.CommitBatchChangeAsync();

@@ -1,5 +1,6 @@
 ﻿namespace System.Diagnostics.CodeAnalysis
 {
+#if !NET6_0_OR_GREATER
     /// <summary>Specifies that when a method returns <see cref="ReturnValue"/>, the parameter will not be null even if the corresponding type allows it.</summary>
     [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
     internal sealed class NotNullWhenAttribute : Attribute
@@ -13,4 +14,5 @@
         /// <summary>Gets the return value condition.</summary>
         public bool ReturnValue { get; }
     }
+#endif
 }

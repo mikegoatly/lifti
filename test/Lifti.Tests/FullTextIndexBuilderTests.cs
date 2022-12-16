@@ -287,7 +287,7 @@ namespace Lifti.Tests
             await index.AddAsync(12, "O'Reilly Books");
             await index.AddAsync(24, "O Reilly Books");
 
-            index.DefaultTokenizer.Process("O'Reilly").Should().BeEquivalentTo(new[] { new Token("OREILLY", new TokenLocation(0, 0, 8)) });
+            index.DefaultTokenizer.Process("O'Reilly".AsSpan()).Should().BeEquivalentTo(new[] { new Token("OREILLY", new TokenLocation(0, 0, 8)) });
 
             var results = index.Search("O'Reilly").ToList();
             results.Should().HaveCount(1);
