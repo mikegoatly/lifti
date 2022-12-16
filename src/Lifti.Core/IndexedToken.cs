@@ -39,7 +39,7 @@ namespace Lifti
         public IReadOnlyList<TokenLocation> Locations { get; }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is IndexedToken location &&
                 this.Equals(location);

@@ -31,7 +31,7 @@ namespace Lifti.Querying
         public IReadOnlyList<ScoredFieldMatch> FieldMatches { get; }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is ScoredToken match &&
                    this.Equals(match);

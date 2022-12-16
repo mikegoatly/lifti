@@ -63,7 +63,7 @@ namespace Lifti.Querying
         }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is FieldMatch match &&
                 this.Equals(match);

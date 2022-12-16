@@ -13,7 +13,7 @@ namespace Lifti
         private bool splitOnPunctuation = true;
         private bool accentInsensitive = true;
         private bool caseInsensitive = true;
-        private bool stemming = false;
+        private bool stemming;
         private char[]? additionalSplitCharacters;
         private Func<TokenizationOptions, IIndexTokenizer> factory = defaultTokenizerFactory;
         private char[]? ignoreCharacters;

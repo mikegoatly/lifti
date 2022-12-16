@@ -28,7 +28,7 @@ namespace BlazorApp.Services
             this.loadedPages = deserializedPages;
         }
 
-        public bool StemmingEnabled { get; set; } = false;
+        public bool StemmingEnabled { get; set; }
         public bool FuzzyMatchByDefault { get; set; } = true;
 
         private FullTextIndex<string>? index;

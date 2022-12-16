@@ -29,7 +29,7 @@ namespace Lifti.Querying
         public IReadOnlyList<FieldMatch> FieldMatches { get; }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is QueryTokenMatch match &&
                    this.Equals(match);

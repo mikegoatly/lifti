@@ -18,7 +18,7 @@ namespace Lifti.Querying
         /// * leftLocations: The locations from the left match
         /// * rightLocations: The locations from the right match
         /// </returns>
-        protected static List<(
+        protected static IList<(
             byte fieldId,
             double score,
             IReadOnlyList<ITokenLocationMatch> leftLocations,

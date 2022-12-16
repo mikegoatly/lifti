@@ -168,6 +168,11 @@ namespace Lifti
         /// </summary>
         public FullTextIndexBuilder<TKey> WithThesaurus(Func<ThesaurusBuilder, ThesaurusBuilder> thesaurusBuilder)
         {
+            if (thesaurusBuilder is null)
+            {
+                throw new ArgumentNullException(nameof(thesaurusBuilder));
+            }
+
             this.defaultThesaurusBuilder = thesaurusBuilder(new ThesaurusBuilder());
             return this;
         }

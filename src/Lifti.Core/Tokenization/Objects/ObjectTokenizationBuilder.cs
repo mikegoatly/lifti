@@ -101,7 +101,7 @@ namespace Lifti.Tokenization.Objects
             return this;
         }
 
-        private IThesaurus CreateFieldThesaurus(
+        private static IThesaurus CreateFieldThesaurus(
             IIndexTokenizer defaultTokenizer,
             IIndexTokenizer? fieldTokenizer,
             ThesaurusBuilder defaultThesaurusBuilder,

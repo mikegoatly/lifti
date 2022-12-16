@@ -220,7 +220,7 @@ namespace Lifti.Querying
                                     var fieldName = queryText.Substring(tokenStart.Value, i - tokenStart.Value);
                                     yield return QueryToken.ForFieldFilter(fieldName);
 
-                                    state = state.PushTokenizer(tokenizerProvider[fieldName]);
+                                    state = state.PushTokenizer(tokenizerProvider.GetTokenizerForField(fieldName));
 
                                     tokenStart = null;
                                     break;

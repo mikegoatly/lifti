@@ -33,7 +33,7 @@ namespace Lifti
         public ushort Length { get; }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is TokenLocation location &&
                    ((IEquatable<TokenLocation>)this).Equals(location);

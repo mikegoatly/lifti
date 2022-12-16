@@ -47,9 +47,9 @@ namespace Lifti.Tokenization
         public TokenizationOptions Options { get; }
 
         /// <inheritdoc />
-        public IReadOnlyCollection<Token> Process(IEnumerable<DocumentTextFragment> document)
+        public IReadOnlyCollection<Token> Process(IEnumerable<DocumentTextFragment> input)
         {
-            if (document is null)
+            if (input is null)
             {
                 return Array.Empty<Token>();
             }
@@ -58,7 +58,7 @@ namespace Lifti.Tokenization
             var tokenIndex = 0;
             var tokenBuilder = new StringBuilder();
 
-            foreach (var documentFragment in document)
+            foreach (var documentFragment in input)
             {
                 this.Process(
                     documentFragment.Text.Span,
@@ -72,23 +72,23 @@ namespace Lifti.Tokenization
         }
 
         /// <inheritdoc />
-        public IReadOnlyCollection<Token> Process(ReadOnlySpan<char> text)
+        public IReadOnlyCollection<Token> Process(ReadOnlySpan<char> input)
         {
             var processedTokens = new TokenStore();
             var tokenIndex = 0;
             var tokenBuilder = new StringBuilder();
 
-            this.Process(text, ref tokenIndex, 0, processedTokens, tokenBuilder);
+            this.Process(input, ref tokenIndex, 0, processedTokens, tokenBuilder);
 
             return processedTokens.ToList();
         }
 
         /// <inheritdoc />
-        public string Normalize(ReadOnlySpan<char> text)
+        public string Normalize(ReadOnlySpan<char> tokenText)
         {
-            var tokenBuilder = new StringBuilder(text.Length);
+            var tokenBuilder = new StringBuilder(tokenText.Length);
 
-            foreach (var character in text)
+            foreach (var character in tokenText)
             {
                 foreach (var processed in this.inputPreprocessorPipeline.Process(character))
                 {
@@ -137,19 +137,19 @@ namespace Lifti.Tokenization
         /// <summary>
         /// Determines whether the given character is considered to be a word splitting character.
         /// </summary>
-        public virtual bool IsSplitCharacter(char current)
+        public virtual bool IsSplitCharacter(char character)
         {
             return
                 // Split when the character is well known as a Unicode separator or control character
-                char.IsSeparator(current) || char.IsControl(current) || (
+                char.IsSeparator(character) || char.IsControl(character) || (
                     (
                         // Split if we are splitting on punctuation and the character is a punctuation character
-                        (this.Options.SplitOnPunctuation == true && char.IsPunctuation(current)) ||
+                        (this.Options.SplitOnPunctuation == true && char.IsPunctuation(character)) ||
                         // Or the character is in the list of additional split characters
-                        this.additionalSplitChars.Contains(current)
+                        this.additionalSplitChars.Contains(character)
                     )
                     // Unless the character is an ignored characters
-                    && this.ignoreChars.Contains(current) == false
+                    && this.ignoreChars.Contains(character) == false
                );
         }
 

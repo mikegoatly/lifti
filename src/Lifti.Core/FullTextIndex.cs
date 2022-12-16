@@ -99,7 +99,7 @@ namespace Lifti
         internal ObjectTokenizationLookup<TKey> ItemTokenization { get; }
 
         /// <inheritdoc />
-        IIndexTokenizer IIndexTokenizerProvider.this[string fieldName] => this.FieldLookup.GetFieldInfo(fieldName).Tokenizer;
+        public IIndexTokenizer GetTokenizerForField(string fieldName) => this.FieldLookup.GetFieldInfo(fieldName).Tokenizer;
 
         /// <inheritdoc />
         public IIndexNavigator CreateNavigator()

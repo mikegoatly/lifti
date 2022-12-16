@@ -17,6 +17,6 @@ namespace Lifti
         /// <summary>
         /// Gets the <see cref="IIndexTokenizer"/> for the given field.
         /// </summary>
-        IIndexTokenizer this[string fieldName] { get; }
+        IIndexTokenizer GetTokenizerForField(string fieldName);
     }
 }

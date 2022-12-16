@@ -35,7 +35,7 @@ namespace Lifti.Querying
         public int MinTokenIndex => this.minTokenIndex.Value;
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is CompositeTokenMatchLocation location &&
                    this.Equals(location);

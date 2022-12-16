@@ -60,7 +60,7 @@ namespace Lifti
         public string? Replacement { get; }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is PreprocessedInput input &&
                 this.Equals(input);

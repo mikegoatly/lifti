@@ -80,7 +80,7 @@ namespace Lifti.Querying
             new QueryToken(string.Empty, operatorType, tolerance == 0 ? 5 : tolerance, null);
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is QueryToken token &&
                    this.Equals(token);
@@ -105,8 +105,13 @@ namespace Lifti.Querying
         }
 
         /// <inheritdoc />
-        public bool Equals(QueryToken other)
+        public bool Equals(QueryToken? other)
         {
+            if (other is null)
+            {
+                return false;
+            }
+
             return this.TokenText == other.TokenText &&
                    this.TokenType == other.TokenType &&
                    this.Tolerance == other.Tolerance;

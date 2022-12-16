@@ -40,7 +40,7 @@ namespace Lifti.Querying.QueryParts
         public static WildcardQueryFragment CreateText(string text) => new WildcardQueryFragment(WildcardQueryFragmentKind.Text, text);
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is WildcardQueryFragment fragment && this.Equals(fragment);
         }

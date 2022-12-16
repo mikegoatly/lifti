@@ -12,7 +12,7 @@ namespace Lifti
 
         private readonly Dictionary<string, IndexedFieldDetails> fieldToDetailsLookup = new Dictionary<string, IndexedFieldDetails>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<byte, string> idToFieldLookup = new Dictionary<byte, string>();
-        private int nextId = 0;
+        private int nextId;
 
         internal IndexedFieldLookup(IEnumerable<IFieldReader> fieldReaders)
         {
@@ -28,7 +28,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public byte DefaultField { get; } = 0;
+        public byte DefaultField { get; }
 
         /// <inheritdoc />
         public string GetFieldForId(byte id)

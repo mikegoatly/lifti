@@ -33,7 +33,7 @@ namespace Lifti.Tokenization
             return HashCode.Combine(current, next);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is TokenHash hash &&
                    this.Equals(hash);
