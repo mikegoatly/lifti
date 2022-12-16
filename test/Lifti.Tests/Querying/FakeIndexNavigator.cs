@@ -72,9 +72,15 @@ namespace Lifti.Tests.Querying
             return true;
         }
 
+        public bool Process(string text)
+        {
+            this.NavigatedStrings.Add(text);
+            return true;
+        }
+
         public bool Process(ReadOnlySpan<char> text)
         {
-            this.NavigatedStrings.Add(new string(text));
+            this.NavigatedStrings.Add(text.ToString());
             return true;
         }
 

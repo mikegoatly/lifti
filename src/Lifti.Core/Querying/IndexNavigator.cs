@@ -101,6 +101,11 @@ namespace Lifti.Querying
             return CreateIntermediateQueryResult(queryTokenMatches, weighting);
         }
 
+        public bool Process(string text)
+        {
+            return this.Process(text.AsSpan());
+        }
+
         public bool Process(ReadOnlySpan<char> text)
         {
             foreach (var next in text)
