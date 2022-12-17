@@ -15,6 +15,7 @@ var index = new FullTextIndexBuilder<int>()
         .CaseInsensitive(true) // Default
         .SplitOnPunctuation(true) // Default
         .SplitOnCharacters('%', '#', '@')
+        .IgnoreCharacters('<', '>')
         .WithStemming()
     )
     .Build();
