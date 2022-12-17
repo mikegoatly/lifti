@@ -56,11 +56,15 @@ And their async equivalents:
 
 ### `tokenizationOptions`
 
-Equivalent to [WithDefaultTokenization](./WithDefaultTokenization) but for use exclusively with this field. If this is null then default tokenizer configured for the index will be used.
+Equivalent to [WithDefaultTokenization](./WithDefaultTokenization) but for use exclusively with this field. Left null, the default tokenizer for the index will be used.
 
 ### `textExtractor`
 
-Equivalent to [WithTextExtraction](./WithTextExtraction) but for use exclusive use with this field. If this is null then the default text extractor configured for the index will be used.
+Equivalent to [WithTextExtraction](./WithTextExtraction) but for use exclusively use with this field. Left null, the default text extractor for the index will be used.
+
+### `thesaurusOptions`
+
+Equivalent to [WithDefaultThesaurus](./WithDefaultThesaurus) but for use exclusively with this field. Left null, the default thesaurus builder for the index will be used.
 
 ## Indexing multiple object types
 

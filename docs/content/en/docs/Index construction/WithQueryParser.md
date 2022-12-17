@@ -6,6 +6,13 @@ description: >
   Prescribes how the QueryParser implementation should be configured for the index.
 ---
 
+## Configuring the default LIFTI `QueryParser`
+
+`FullTextIndexBuilder<TKey> WithQueryParser(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)`
+
+By default LIFTI parses query text using the [LIFTI query syntax](../../searching/lifti-query-syntax). The behavior of the parser can
+be tweaked using this overload.
+
 ## Providing a complete `IQueryParser` implementation
 
 `FullTextIndexBuilder<TKey> WithQueryParser(IQueryParser queryParser)`
@@ -13,13 +20,6 @@ description: >
 Allows you to provide your own implementation of `IQueryParser` capable of parsing text into an `IQuery`.
 
 To see an example of a custom `IQueryParser` implementation, see this [blog post](https://www.goatly.net/post/custom-query-parsers-with-lifti/).
-
-## Configuring the default LIFTI `QueryParser`
-
-`FullTextIndexBuilder<TKey> WithQueryParser(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)`
-
-By default LIFTI parses query text using the [LIFTI query syntax](../../searching/lifti-query-syntax). The behavior of the parser can
-be tweaked using this overload.
 
 ### QueryParserBuilder options
 
