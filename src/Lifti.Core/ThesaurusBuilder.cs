@@ -11,8 +11,8 @@ namespace Lifti
     /// </summary>
     public class ThesaurusBuilder
     {
-        private readonly Dictionary<string, HashSet<string>> synonymLookup = new(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, HashSet<string>> hypernymLookup = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, HashSet<string>> synonymLookup = new();
+        private readonly Dictionary<string, HashSet<string>> hypernymLookup = new();
 
         internal ThesaurusBuilder()
         {
@@ -40,7 +40,7 @@ namespace Lifti
             // If no existing synonyms were found, add the new synonym set to the lookup
             if (existingSynonymSets.Count == 0)
             {
-                var synonymSet = new HashSet<string>(synonyms, StringComparer.OrdinalIgnoreCase);
+                var synonymSet = new HashSet<string>(synonyms);
                 foreach (var synonym in synonymSet)
                 {
                     this.synonymLookup.Add(synonym, synonymSet);
@@ -49,7 +49,7 @@ namespace Lifti
             else
             {
                 // Otherwise, combine the synonym sets into one unique list, now including the new words
-                var synonymSet = new HashSet<string>(synonyms.Concat(existingSynonymSets.SelectMany(x => x)), StringComparer.OrdinalIgnoreCase);
+                var synonymSet = new HashSet<string>(synonyms.Concat(existingSynonymSets.SelectMany(x => x)));
                 foreach (var synonym in synonymSet)
                 {
                     this.synonymLookup[synonym] = synonymSet;
@@ -60,9 +60,9 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Adds a set of hypernyms to the thesaurus for a given word. (A hypernym is a word that is more general than another word)
-        /// They differ from synonyms in that configuring <code>AddHyernyms("dog", "animal")</code> means that "dog" will be expanded to 
-        /// be searchable as "animal" but "animal" will not automatically be expanded to be searchable as "dog".
+        /// Adds a set of hypernyms to the thesaurus for a given word. A hypernym is a word that is more general than another word.
+        /// They differ from synonyms in that configuring <code>AddHypernyms("dog", "animal")</code> means that "dog" will be expanded to 
+        /// be searchable as "animal" and "dog", but "animal" will not automatically be expanded to be searchable as "dog".
         /// </summary>
         public ThesaurusBuilder AddHypernyms(string word, params string[] hypernyms)
         {
@@ -75,24 +75,62 @@ namespace Lifti
             // Make sure that the resulting list associated to the word includes the word itself
             hypernyms = hypernyms.Concat(new[] { word });
 
-            if (this.hypernymLookup.TryGetValue(word, out var existingHypernyms))
+            AddHypernymsImpl(word, hypernyms);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a set of hyponyms to the thesaurus for a given word. A hyponym is a word that is more specific than another word.
+        /// They differ from synonyms in that configuring <code>AddHyponyms("mammal", "dog", "cat")</code> means that "mammal" will 
+        /// be expanded to be searchable as "mammal", "dog" and "cat", but searches for "dog" will not return matches for text containing
+        /// "cat".
+        /// </summary>
+        public ThesaurusBuilder AddHyponyms(string word, params string[] hyponyms)
+        {
+            return this.AddHyponyms(word, (ICollection<string>)hyponyms);
+        }
+
+        /// <inheritdoc cref="AddHyponyms(string, IEnumerable{string})"/>
+        public ThesaurusBuilder AddHyponyms(string word, IEnumerable<string> hyponyms)
+        {
+            if (hyponyms is null)
             {
-                this.hypernymLookup[word] = new HashSet<string>(existingHypernyms.Concat(hypernyms), StringComparer.OrdinalIgnoreCase);
+                throw new ArgumentNullException(nameof(hyponyms));
             }
-            else
+
+            // A hyponym is just a reversed hypernym relationship
+            var hypernymsIncludingWord = new string[2];
+            hypernymsIncludingWord[0] = word;
+
+            foreach (var hyponym in hyponyms)
             {
-                this.hypernymLookup.Add(word, new HashSet<string>(hypernyms, StringComparer.OrdinalIgnoreCase));
+                hypernymsIncludingWord[1] = hyponym;
+                this.AddHypernymsImpl(hyponym, hypernymsIncludingWord);
             }
 
             return this;
+        }
+
+        private void AddHypernymsImpl(string word, IEnumerable<string> hypernymsIncludingWord)
+        {
+            if (this.hypernymLookup.TryGetValue(word, out var existingHypernyms))
+            {
+                this.hypernymLookup[word] = new HashSet<string>(existingHypernyms.Concat(hypernymsIncludingWord));
+            }
+            else
+            {
+                this.hypernymLookup.Add(word, new HashSet<string>(hypernymsIncludingWord));
+            }
         }
 
         internal Thesaurus Build(IIndexTokenizer tokenizer)
         {
             var bakedLookup = new Dictionary<string, IReadOnlyList<string>>();
 
-            var distinctKeys = this.synonymLookup.Keys.Concat(this.hypernymLookup.Keys)
-                .Distinct(StringComparer.OrdinalIgnoreCase);
+            var distinctKeys = this.synonymLookup.Keys
+                .Concat(this.hypernymLookup.Keys)
+                .Distinct();
 
             string Tokenize(string word)
             {

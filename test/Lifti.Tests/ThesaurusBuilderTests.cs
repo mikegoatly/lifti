@@ -37,6 +37,28 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public void AddingSameHyponyms_ValuesAreDeduplicated()
+        {
+            sut.AddHyponyms("mammal", "dog", "cat", "dog");
+
+            VerifyResults(
+                ("dog", new[] { "dog", "mammal" }),
+                ("cat", new[] { "cat", "mammal" }));
+        }
+
+        [Fact]
+        public void AddingSameHyponymsMultipleTimes_ValuesAreDeduplicated()
+        {
+            sut.AddHyponyms("mammal", "dog", "cat");
+            sut.AddHyponyms("mammal", "dog", "cat", "mouse");
+
+            VerifyResults(
+                ("dog", new[] { "dog", "mammal" }),
+                ("cat", new[] { "cat", "mammal" }),
+                ("mouse", new[] { "mouse", "mammal" }));
+        }
+
+        [Fact]
         public void AddingSameHypernyms_ValuesAreDeduplicated()
         {
             sut.AddHypernyms("dog", "mammal", "vertebrate", "mammal");

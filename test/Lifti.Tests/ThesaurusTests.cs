@@ -169,7 +169,7 @@ namespace Lifti.Tests
         private static async Task<FullTextIndex<int>> CreateLooseTextIndexAsync()
         {
             var sut = new FullTextIndexBuilder<int>()
-                .WithThesaurus(
+                .WithDefaultThesaurus(
                     b => b
                         .AddSynonyms("happy", "joyous", "delighted")
                         .AddSynonyms("large", "big", "massive")

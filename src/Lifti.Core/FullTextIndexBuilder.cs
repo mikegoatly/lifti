@@ -163,10 +163,10 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Builds the default thesaurus to use for the index. This thesaurus will be used for fields
+        /// Builds the default thesaurus to use for the index. This thesaurus will be used for text added directly to the index and also fields
         /// that have no explicit thesaurus defined for them.
         /// </summary>
-        public FullTextIndexBuilder<TKey> WithThesaurus(Func<ThesaurusBuilder, ThesaurusBuilder> thesaurusBuilder)
+        public FullTextIndexBuilder<TKey> WithDefaultThesaurus(Func<ThesaurusBuilder, ThesaurusBuilder> thesaurusBuilder)
         {
             if (thesaurusBuilder is null)
             {
