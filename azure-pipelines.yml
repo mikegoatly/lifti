@@ -8,9 +8,9 @@ trigger:
     - test
 
 variables:
-  majorVersion: 3
-  minorVersion: 5
-  patchVersion: 2
+  majorVersion: 4
+  minorVersion: 0
+  patchVersion: 0
   project: src/Lifti.Core/Lifti.Core.csproj
   testProject: test/Lifti.Tests/Lifti.Tests.csproj
   buildConfiguration: 'Release'
