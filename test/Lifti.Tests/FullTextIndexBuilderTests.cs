@@ -61,13 +61,13 @@ namespace Lifti.Tests
         [Fact]
         public void WithObjectConfiguration_ShouldUseDefaultThesaurusIfNotProvided()
         {
-            this.sut.WithDefaultThesaurus(o => o.AddSynonyms("a", "b", "c"))
+            this.sut.WithDefaultThesaurus(o => o.WithSynonyms("a", "b", "c"))
                 .WithDefaultTokenization(o => o.CaseInsensitive(false))
                 .WithObjectTokenization<TestObject2>(
                 o => o
                     .WithKey(i => i.Id)
                     .WithField("Content", i => i.Content, tokenizationOptions: o => o.CaseInsensitive(true))
-                    .WithField("Title", i => i.Title, thesaurusOptions: s => s.AddSynonyms("A", "b")));
+                    .WithField("Title", i => i.Title, thesaurusOptions: s => s.WithSynonyms("A", "b")));
 
             var index = this.sut.Build();
 

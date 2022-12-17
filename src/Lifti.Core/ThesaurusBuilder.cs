@@ -23,13 +23,13 @@ namespace Lifti
         /// for any one of them will result in matches for the other. For example adding the synonyms "big" and "large"
         /// will mean that searching for "big" will also match on documents containing the word "large", and visa-versa.
         /// </summary>
-        public ThesaurusBuilder AddSynonyms(params string[] synonyms)
+        public ThesaurusBuilder WithSynonyms(params string[] synonyms)
         {
-            return this.AddSynonyms((ICollection<string>)synonyms);
+            return this.WithSynonyms((ICollection<string>)synonyms);
         }
 
-        /// <inheritdoc cref="AddSynonyms(string[])"/>
-        public ThesaurusBuilder AddSynonyms(ICollection<string> synonyms)
+        /// <inheritdoc cref="WithSynonyms(string[])"/>
+        public ThesaurusBuilder WithSynonyms(ICollection<string> synonyms)
         {
             var existingSynonymSets = synonyms
                 .Where(x => synonymLookup.ContainsKey(x))
@@ -61,38 +61,38 @@ namespace Lifti
 
         /// <summary>
         /// Adds a set of hypernyms to the thesaurus for a given word. A hypernym is a word that is more general than another word.
-        /// They differ from synonyms in that configuring <code>AddHypernyms("dog", "animal")</code> means that "dog" will be expanded to 
+        /// They differ from synonyms in that configuring <code>WithHypernyms("dog", "animal")</code> means that "dog" will be expanded to 
         /// be searchable as "animal" and "dog", but "animal" will not automatically be expanded to be searchable as "dog".
         /// </summary>
-        public ThesaurusBuilder AddHypernyms(string word, params string[] hypernyms)
+        public ThesaurusBuilder WithHypernyms(string word, params string[] hypernyms)
         {
-            return this.AddHypernyms(word, (ICollection<string>)hypernyms);
+            return this.WithHypernyms(word, (ICollection<string>)hypernyms);
         }
 
-        /// <inheritdoc cref="AddHypernyms(string, IEnumerable{string})"/>
-        public ThesaurusBuilder AddHypernyms(string word, IEnumerable<string> hypernyms)
+        /// <inheritdoc cref="WithHypernyms(string, IEnumerable{string})"/>
+        public ThesaurusBuilder WithHypernyms(string word, IEnumerable<string> hypernyms)
         {
             // Make sure that the resulting list associated to the word includes the word itself
             hypernyms = hypernyms.Concat(new[] { word });
 
-            AddHypernymsImpl(word, hypernyms);
+            WithHypernymsImpl(word, hypernyms);
 
             return this;
         }
 
         /// <summary>
         /// Adds a set of hyponyms to the thesaurus for a given word. A hyponym is a word that is more specific than another word.
-        /// They differ from synonyms in that configuring <code>AddHyponyms("mammal", "dog", "cat")</code> means that "mammal" will 
+        /// They differ from synonyms in that configuring <code>WithHyponyms("mammal", "dog", "cat")</code> means that "mammal" will 
         /// be expanded to be searchable as "mammal", "dog" and "cat", but searches for "dog" will not return matches for text containing
         /// "cat".
         /// </summary>
-        public ThesaurusBuilder AddHyponyms(string word, params string[] hyponyms)
+        public ThesaurusBuilder WithHyponyms(string word, params string[] hyponyms)
         {
-            return this.AddHyponyms(word, (ICollection<string>)hyponyms);
+            return this.WithHyponyms(word, (ICollection<string>)hyponyms);
         }
 
-        /// <inheritdoc cref="AddHyponyms(string, IEnumerable{string})"/>
-        public ThesaurusBuilder AddHyponyms(string word, IEnumerable<string> hyponyms)
+        /// <inheritdoc cref="WithHyponyms(string, IEnumerable{string})"/>
+        public ThesaurusBuilder WithHyponyms(string word, IEnumerable<string> hyponyms)
         {
             if (hyponyms is null)
             {
@@ -106,13 +106,13 @@ namespace Lifti
             foreach (var hyponym in hyponyms)
             {
                 hypernymsIncludingWord[1] = hyponym;
-                this.AddHypernymsImpl(hyponym, hypernymsIncludingWord);
+                this.WithHypernymsImpl(hyponym, hypernymsIncludingWord);
             }
 
             return this;
         }
 
-        private void AddHypernymsImpl(string word, IEnumerable<string> hypernymsIncludingWord)
+        private void WithHypernymsImpl(string word, IEnumerable<string> hypernymsIncludingWord)
         {
             if (this.hypernymLookup.TryGetValue(word, out var existingHypernyms))
             {

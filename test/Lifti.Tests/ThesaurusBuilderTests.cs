@@ -17,7 +17,7 @@ namespace Lifti.Tests
         [Fact]
         public void AddingSameSynonyms_ValuesAreDeduplicated()
         {
-            sut.AddSynonyms("one", "word", "one");
+            sut.WithSynonyms("one", "word", "one");
 
             VerifyResults(
                 ("one", new[] { "one", "word" }),
@@ -27,8 +27,8 @@ namespace Lifti.Tests
         [Fact]
         public void AddingSameSynonymsMultipleTimes_ValuesAreDeduplicated()
         {
-            sut.AddSynonyms("one", "word", "one");
-            sut.AddSynonyms("one", "word", "one", "same");
+            sut.WithSynonyms("one", "word", "one");
+            sut.WithSynonyms("one", "word", "one", "same");
 
             VerifyResults(
                 ("one", new[] { "one", "word", "same" }),
@@ -39,7 +39,7 @@ namespace Lifti.Tests
         [Fact]
         public void AddingSameHyponyms_ValuesAreDeduplicated()
         {
-            sut.AddHyponyms("mammal", "dog", "cat", "dog");
+            sut.WithHyponyms("mammal", "dog", "cat", "dog");
 
             VerifyResults(
                 ("dog", new[] { "dog", "mammal" }),
@@ -49,8 +49,8 @@ namespace Lifti.Tests
         [Fact]
         public void AddingSameHyponymsMultipleTimes_ValuesAreDeduplicated()
         {
-            sut.AddHyponyms("mammal", "dog", "cat");
-            sut.AddHyponyms("mammal", "dog", "cat", "mouse");
+            sut.WithHyponyms("mammal", "dog", "cat");
+            sut.WithHyponyms("mammal", "dog", "cat", "mouse");
 
             VerifyResults(
                 ("dog", new[] { "dog", "mammal" }),
@@ -61,7 +61,7 @@ namespace Lifti.Tests
         [Fact]
         public void AddingSameHypernyms_ValuesAreDeduplicated()
         {
-            sut.AddHypernyms("dog", "mammal", "vertebrate", "mammal");
+            sut.WithHypernyms("dog", "mammal", "vertebrate", "mammal");
 
             VerifyResults(
                 ("dog", new[] { "dog", "mammal", "vertebrate" }));
@@ -70,8 +70,8 @@ namespace Lifti.Tests
         [Fact]
         public void AddingSameHypernymsMultipleTimes_ValuesAreDeduplicated()
         {
-            sut.AddHypernyms("dog", "mammal", "vertebrate");
-            sut.AddHypernyms("dog", "mammal", "vertebrate", "canine");
+            sut.WithHypernyms("dog", "mammal", "vertebrate");
+            sut.WithHypernyms("dog", "mammal", "vertebrate", "canine");
 
             VerifyResults(
                 ("dog", new[] { "dog", "mammal", "vertebrate", "canine" }));
@@ -80,8 +80,8 @@ namespace Lifti.Tests
         [Fact]
         public void AddingHypernymsAndSynonymsForSameWord_OnlySetHypernymsOnCorrectWord()
         {
-            sut.AddSynonyms("dog", "doggy");
-            sut.AddHypernyms("dog", "mammal", "vertebrate", "canine");
+            sut.WithSynonyms("dog", "doggy");
+            sut.WithHypernyms("dog", "mammal", "vertebrate", "canine");
 
             VerifyResults(
                 ("dog", new[] { "dog", "doggy", "mammal", "vertebrate", "canine" }),
@@ -91,8 +91,8 @@ namespace Lifti.Tests
         [Fact]
         public void UsingStemmingTokenizer_ShouldCombineTermsThatResultInTheSameStemmedForm()
         {
-            sut.AddSynonyms("HYPOCRITE", "DECEPTION");
-            sut.AddSynonyms("HYPOCRITICAL", "DECEPTIVE", "INSINCERE");
+            sut.WithSynonyms("HYPOCRITE", "DECEPTION");
+            sut.WithSynonyms("HYPOCRITICAL", "DECEPTIVE", "INSINCERE");
 
             VerifyResults(
                 new IndexTokenizer(new TokenizationOptions { Stemming = true }),

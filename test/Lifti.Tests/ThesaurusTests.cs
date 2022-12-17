@@ -150,10 +150,10 @@ namespace Lifti.Tests
                             "Field",
                             x => x.Text,
                             thesaurusOptions: b => b
-                                .AddSynonyms("happy", "joyous", "delighted")
-                                .AddSynonyms("large", "big", "massive")
-                                .AddHypernyms("vehicle", "car", "truck", "motorcycle")
-                                .AddHypernyms("animal", "mammal", "bird", "reptile")))
+                                .WithSynonyms("happy", "joyous", "delighted")
+                                .WithSynonyms("large", "big", "massive")
+                                .WithHypernyms("vehicle", "car", "truck", "motorcycle")
+                                .WithHypernyms("animal", "mammal", "bird", "reptile")))
                 .Build();
 
             sut.BeginBatchChange();
@@ -171,10 +171,10 @@ namespace Lifti.Tests
             var sut = new FullTextIndexBuilder<int>()
                 .WithDefaultThesaurus(
                     b => b
-                        .AddSynonyms("happy", "joyous", "delighted")
-                        .AddSynonyms("large", "big", "massive")
-                        .AddHypernyms("vehicle", "car", "truck", "motorcycle")
-                        .AddHypernyms("animal", "mammal", "bird", "reptile"))
+                        .WithSynonyms("happy", "joyous", "delighted")
+                        .WithSynonyms("large", "big", "massive")
+                        .WithHypernyms("vehicle", "car", "truck", "motorcycle")
+                        .WithHypernyms("animal", "mammal", "bird", "reptile"))
                 .Build();
 
             sut.BeginBatchChange();
