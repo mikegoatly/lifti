@@ -10,35 +10,21 @@ namespace Lifti.Querying
     public readonly struct FieldMatch : IEquatable<FieldMatch>
     {
         /// <summary>
-        /// Constructs a new instance of <see cref="FieldMatch"/>.
+        /// Constructs a new instance of <see cref="FieldMatch"/> from a <see cref="IndexedToken"/>.
         /// </summary>
         public FieldMatch(IndexedToken token)
-            : this(token.FieldId, token.Locations)
         {
+            this.FieldId = token.FieldId;
+            this.Locations = token.Locations.Select(l => (ITokenLocationMatch)new SingleTokenLocationMatch(l)).ToList();
         }
 
         /// <summary>
         /// Constructs a new instance of <see cref="FieldMatch"/>.
         /// </summary>
-        public FieldMatch(byte fieldId, IReadOnlyList<ITokenLocationMatch> locations)
+        public FieldMatch(byte fieldId, IEnumerable<ITokenLocationMatch> locations)
         {
             this.FieldId = fieldId;
-            this.Locations = locations;
-        }
-
-        /// <summary>
-        /// Constructs a new instance of <see cref="FieldMatch"/>.
-        /// </summary>
-        public FieldMatch(byte fieldId, params ITokenLocationMatch[] locations)
-        {
-            this.FieldId = fieldId;
-            this.Locations = locations;
-        }
-
-        private FieldMatch(byte fieldId, IReadOnlyList<TokenLocation> locations)
-        {
-            this.FieldId = fieldId;
-            this.Locations = locations.Select(l => (ITokenLocationMatch)new SingleTokenLocationMatch(l)).ToList();
+            this.Locations = CreateLocationsList(locations);
         }
 
         /// <summary>
@@ -92,6 +78,11 @@ namespace Lifti.Querying
         public static bool operator !=(FieldMatch left, FieldMatch right)
         {
             return !(left == right);
+        }
+
+        private static List<ITokenLocationMatch> CreateLocationsList(IEnumerable<ITokenLocationMatch> matches)
+        {
+            return matches.OrderBy(x => x.MinTokenIndex).ToList();
         }
     }
 }

@@ -268,7 +268,7 @@ namespace Lifti.Querying
             return fieldMatches.ToLookup(m => m.FieldId)
                 .Select(m => new FieldMatch(
                     m.Key,
-                    m.SelectMany(w => w.Locations).OrderBy(w => w.MinTokenIndex).ToList()));
+                    m.SelectMany(w => w.Locations)));
         }
 
         private static QueryTokenMatch CreateQueryTokenMatch(

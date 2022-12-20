@@ -58,7 +58,7 @@ namespace Lifti.Querying
                         leftField.Score + rightField.Score,
                         new FieldMatch(
                             leftField.FieldId,
-                            leftField.Locations.Concat(rightField.Locations).OrderBy(f => f.MinTokenIndex).ToList()));
+                            leftField.Locations.Concat(rightField.Locations)));
 
                     rightFields.Remove(leftField.FieldId);
                 }

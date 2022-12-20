@@ -33,8 +33,8 @@ namespace Lifti.Tests.Querying
         protected static FieldMatch FieldMatch(byte fieldId, params int[] wordIndexes)
         {
             return new FieldMatch(
-                    fieldId,
-                    wordIndexes.Select(i => TokenMatch(i)).ToList());
+                fieldId,
+                wordIndexes.Select(i => TokenMatch(i)));
         }
 
         protected static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params (int, int)[] compositeMatches)
