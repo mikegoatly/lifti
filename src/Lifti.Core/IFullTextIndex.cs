@@ -136,5 +136,17 @@ namespace Lifti
         /// The matching search results.
         /// </returns>
         ISearchResults<TKey> Search(IQuery query);
+
+        /// <summary>
+        /// Starts a batch change within the index so that any subsequent mutations that are made using AddAsync and RemoveAsync will
+        /// not be committed until <see cref="CommitBatchChangeAsync(CancellationToken)"/> is called. It is significantly more efficient
+        /// to batch changes to an index, if possible.
+        /// </summary>
+        void BeginBatchChange();
+
+        /// <summary>
+        /// Commits a batch change that was started using <see cref="BeginBatchChange"/>.
+        /// </summary>
+        Task CommitBatchChangeAsync(CancellationToken cancellationToken = default);
     }
 }
