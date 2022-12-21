@@ -13,7 +13,7 @@ namespace PerformanceProfiling
     [RankColumn, MemoryDiagnoser]
     public class SerializationBenchmarks : IndexBenchmarkBase
     {
-        private BinarySerializer<string> serializer;
+        private BinarySerializer<int> serializer;
         private string fileName;
 
         [GlobalSetup]
@@ -22,7 +22,7 @@ namespace PerformanceProfiling
             var index = CreateNewIndex(2);
             await this.PopulateIndexAsync(index);
 
-            this.serializer = new BinarySerializer<string>();
+            this.serializer = new BinarySerializer<int>();
             this.fileName = $"{Guid.NewGuid()}.dat";
             using var stream = File.OpenWrite(this.fileName);
             await this.serializer.SerializeAsync(index, stream, true);
