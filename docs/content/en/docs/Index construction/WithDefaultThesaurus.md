@@ -9,7 +9,7 @@ description: >
 ## Defining a thesaurus
 
 A thesaurus is a tool used to organize and categorize words based on their meanings and relationships. It can be built using
-the `ThesaurusBuilder` class, which allows you to add both *synonyms* and *hypernyms*.
+the `ThesaurusBuilder` class, which allows you to add both *synonyms*, *hyponyms* and *hypernyms*.
 
 ### `WithSynonyms(ICollection<string> synonyms)`
 
