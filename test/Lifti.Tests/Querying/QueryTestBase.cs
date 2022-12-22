@@ -1,5 +1,4 @@
 ﻿using Lifti.Querying;
-using System.Configuration;
 using System.Linq;
 
 namespace Lifti.Tests.Querying
@@ -40,7 +39,7 @@ namespace Lifti.Tests.Querying
         protected static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params (int, int)[] compositeMatches)
         {
             return ScoredFieldMatch(
-                score, 
+                score,
                 fieldId,
                 compositeMatches.Select(i => (ITokenLocationMatch)CompositeMatch(i.Item1, i.Item2)).ToArray());
         }
@@ -70,7 +69,7 @@ namespace Lifti.Tests.Querying
         protected static ScoredToken ScoredToken(int itemId, params ScoredFieldMatch[] matches)
         {
             return new ScoredToken(
-                itemId, 
+                itemId,
                 matches);
         }
     }
