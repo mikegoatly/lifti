@@ -8,6 +8,7 @@ namespace Lifti
     /// the addition and removal of items, caching and reusing the item ids.
     /// </summary>
     public class IdPool<T> : ItemStore<T>, IIdPool<T>
+        where T : notnull
     {
         private readonly Queue<int> reusableIds = new Queue<int>();
         private int nextId;

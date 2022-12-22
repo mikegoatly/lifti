@@ -7,8 +7,8 @@ namespace Lifti.Tests.Querying
     public class QueryParserOptionsTests
     {
         [Theory]
-        [InlineData(4, 2)]
-        [InlineData(2, 1)]
+        [InlineData(6, 2)]
+        [InlineData(3, 1)]
         [InlineData(1, 0)]
         public void DefaultMaxEditDistance_ShouldCalculateExpectedValues(int termLength, ushort expectedResult)
         {

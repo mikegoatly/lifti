@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Lifti
 {
     /// <summary>
-    /// Options that can be provided to an <see cref="ITokenizer"/> to configure its behavior.
+    /// Options that can be provided to an <see cref="IIndexTokenizer"/> to configure its behavior.
     /// </summary>
     public class TokenizationOptions
     {
@@ -26,18 +26,18 @@ namespace Lifti
         public static TokenizationOptions Default { get; } = new TokenizationOptions();
 
         /// <summary>
-        /// Gets or sets a value indicating whether tokens should be split on punctuation in addition to standard 
+        /// Gets a value indicating whether tokens should be split on punctuation in addition to standard 
         /// separator characters. Defaults to <c>true</c>.
         /// </summary>
         public bool SplitOnPunctuation { get; internal set; } = true;
 
         /// <summary>
-        /// Gets or sets any additional characters that should cause tokens to be split. Defaults to an empty array.
+        /// Gets any additional characters that should cause tokens to be split. Defaults to an empty array.
         /// </summary>
         public IReadOnlyList<char> AdditionalSplitCharacters { get; internal set; } = Array.Empty<char>();
 
         /// <summary>
-        /// Gets or sets a value indicating whether case insensitivity should be enforced when tokenizing. Defaults to <c>true</c>.
+        /// Gets a value indicating whether case insensitivity should be enforced when tokenizing. Defaults to <c>true</c>.
         /// </summary>
         public bool CaseInsensitive
         {
@@ -46,7 +46,7 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether accents should be stripped from characters when tokenizing. Defaults to <c>true</c>.
+        /// Gets a value indicating whether accents should be stripped from characters when tokenizing. Defaults to <c>true</c>.
         /// </summary>
         public bool AccentInsensitive
         {
@@ -56,9 +56,14 @@ namespace Lifti
 
 
         /// <summary>
-        /// Gets or sets a value indicating whether word stemming should be applied when tokenizing. Setting this value to true 
+        /// Gets a value indicating whether word stemming should be applied when tokenizing. Setting this value to true 
         /// forces both <see cref="CaseInsensitive"/> and <see cref="AccentInsensitive"/> to be <c>true</c>.
         /// </summary>
         public bool Stemming { get; internal set; }
+
+        /// <summary>
+        /// Gets the set of characters that should be ignored in any input.
+        /// </summary>
+        public IReadOnlyList<char> IgnoreCharacters { get; internal set; } = Array.Empty<char>();
     }
 }

@@ -10,12 +10,13 @@ namespace Lifti.Serialization.Binary
     /// The type of the key in the index.
     /// </typeparam>
     public interface IIndexSerializer<TKey>
+        where TKey : notnull
     {
         /// <summary>
         /// Serializes an index into a binary format.
         /// </summary>
-        /// <param name="snapshot">
-        /// A snapshot of the index to serialize.
+        /// <param name="index">
+        /// A index to serialize.
         /// </param>
         /// <param name="stream">
         /// The stream to serialize into.
@@ -23,7 +24,7 @@ namespace Lifti.Serialization.Binary
         /// <param name="disposeStream">
         /// Whether the stream should be disposed of after serialization.
         /// </param>
-        Task SerializeAsync(FullTextIndex<TKey> snapshot, Stream stream, bool disposeStream = true);
+        Task SerializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true);
 
         /// <summary>
         /// Serializes an index into a binary format.

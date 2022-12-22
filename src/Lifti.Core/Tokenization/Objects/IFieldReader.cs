@@ -1,5 +1,6 @@
 ﻿using Lifti.Tokenization.TextExtraction;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Tokenization.Objects
@@ -15,21 +16,26 @@ namespace Lifti.Tokenization.Objects
         string Name { get; }
 
         /// <summary>
-        /// Gets the <see cref="ITokenizer"/> to be used for this field. If this is null then the default tokenizer for the index will be used.
+        /// Gets the <see cref="IIndexTokenizer"/> to be used for this field.
         /// </summary>
-        ITokenizer? Tokenizer { get; }
+        IIndexTokenizer Tokenizer { get; }
 
         /// <summary>
         /// Gets the <see cref="ITextExtractor"/> to be used for this field. If this is null then the default text extractor for the index will be used.
         /// </summary>
-        ITextExtractor? TextExtractor { get; }
+        ITextExtractor TextExtractor { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IThesaurus"/> configured for use with this field.
+        /// </summary>
+        IThesaurus Thesaurus { get; }
     }
 
     internal interface IFieldReader<TItem> : IFieldReader
     {
         /// <summary>
-        /// Reads the field's text fromt he given item.
+        /// Reads the field's text from the given item.
         /// </summary>
-        ValueTask<IEnumerable<string>> ReadAsync(TItem item);
+        ValueTask<IEnumerable<string>> ReadAsync(TItem item, CancellationToken cancellationToken);
     }
 }

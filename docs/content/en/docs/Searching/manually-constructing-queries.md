@@ -6,7 +6,7 @@ description:
     Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index.
 ---
 
-You can manually construct a `Query` using any combination of `IQueryPart`s, but take care to normalize any text to match in the same way that it has been indexed. You can do this using either the `ITokenizer` for the index, or if specific tokenization rules have been [configured for a field](../index-construction/withobjecttokenization), then the tokenizer for that field:
+You can manually construct a `Query` using any combination of `IQueryPart`s, but take care to normalize any text to match in the same way that it has been indexed. You can do this using either the `IIndexTokenizer` for the index, or if specific tokenization rules have been [configured for a field](../index-construction/withobjecttokenization), then the tokenizer for that field:
 
 ``` csharp
 var tokenizer = index.DefaultTokenizer;

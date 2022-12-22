@@ -36,9 +36,12 @@ namespace Lifti.Tests.Querying
             var rightLeftResult = UnionMerger.Apply(right, left);
 
             leftRightResult.Should().BeEquivalentTo(
-                ScoredToken(1, ScoredFieldMatch(1D, 1, 30)),
-                ScoredToken(6, ScoredFieldMatch(6D, 1, 20, 60)),
-                ScoredToken(9, ScoredFieldMatch(8D, 1, 10, 80)));
+                new[]
+                {
+                    ScoredToken(1, ScoredFieldMatch(1D, 1, 30)),
+                    ScoredToken(6, ScoredFieldMatch(6D, 1, 20, 60)),
+                    ScoredToken(9, ScoredFieldMatch(8D, 1, 10, 80))
+                });
 
             leftRightResult.Should().BeEquivalentTo(rightLeftResult);
         }

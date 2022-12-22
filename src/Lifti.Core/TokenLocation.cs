@@ -5,7 +5,7 @@ namespace Lifti
     /// <summary>
     /// Provides information about the location of a token in the original text.
     /// </summary>
-    public struct TokenLocation : IComparable<TokenLocation>, IEquatable<TokenLocation>
+    public readonly struct TokenLocation : IComparable<TokenLocation>, IEquatable<TokenLocation>
     {
         /// <summary>
         /// Constructs a new <see cref="TokenLocation"/> instance.
@@ -33,7 +33,7 @@ namespace Lifti
         public ushort Length { get; }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is TokenLocation location &&
                    ((IEquatable<TokenLocation>)this).Equals(location);

@@ -54,8 +54,52 @@ namespace Lifti.Tests
 
             var index = this.sut.Build();
 
-            ((Tokenizer)index.FieldLookup.GetFieldInfo("Content").Tokenizer).Options.CaseInsensitive.Should().BeFalse();
-            ((Tokenizer)index.FieldLookup.GetFieldInfo("Title").Tokenizer).Options.CaseInsensitive.Should().BeTrue();
+            ((IndexTokenizer)index.FieldLookup.GetFieldInfo("Content").Tokenizer).Options.CaseInsensitive.Should().BeFalse();
+            ((IndexTokenizer)index.FieldLookup.GetFieldInfo("Title").Tokenizer).Options.CaseInsensitive.Should().BeTrue();
+        }
+
+        [Fact]
+        public void WithObjectConfiguration_ShouldUseDefaultThesaurusIfNotProvided()
+        {
+            this.sut.WithDefaultThesaurus(o => o.WithSynonyms("a", "b", "c"))
+                .WithDefaultTokenization(o => o.CaseInsensitive(false))
+                .WithObjectTokenization<TestObject2>(
+                o => o
+                    .WithKey(i => i.Id)
+                    .WithField("Content", i => i.Content, tokenizationOptions: o => o.CaseInsensitive(true))
+                    .WithField("Title", i => i.Title, thesaurusOptions: s => s.WithSynonyms("A", "b")));
+
+            var index = this.sut.Build();
+
+            var defaultThesaurus = (Thesaurus)index.DefaultThesaurus;
+
+            // Thesaurus should have been built without case insensitivity - casing should be unchanged
+            defaultThesaurus.WordLookup.Should().BeEquivalentTo(
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    { "a", new[] { "a", "b", "c" } },
+                    { "b", new[] { "a", "b", "c" } },
+                    { "c", new[] { "a", "b", "c" } },
+                });
+
+            // Thesaurus should contain the same words as the default thesaurus, but have been built WITH case insensitivity,
+            // so casing should be uppercase
+            ((Thesaurus)index.FieldLookup.GetFieldInfo("Content").Thesaurus).WordLookup.Should().BeEquivalentTo(
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    { "A", new[] { "A", "B", "C" } },
+                    { "B", new[] { "A", "B", "C" } },
+                    { "C", new[] { "A", "B", "C" } },
+                });
+
+            // Thesaurus should have been built using the default tokenizer, but only contain the thesaurus words specified
+            // at the field level
+            ((Thesaurus)index.FieldLookup.GetFieldInfo("Title").Thesaurus).WordLookup.Should().BeEquivalentTo(
+                new Dictionary<string, IReadOnlyList<string>>
+                {
+                    { "A", new[] { "A", "b" } },
+                    { "b", new[] { "A", "b" } },
+                });
         }
 
         [Fact]
@@ -64,7 +108,7 @@ namespace Lifti.Tests
             var passedOptions = BuildSutAndGetPassedOptions(o => o.WithFuzzySearchDefaults(10, 4));
 
             passedOptions.Should().NotBeNull();
-            passedOptions.FuzzySearchMaxEditDistance(1000).Should().Be(10);
+            passedOptions!.FuzzySearchMaxEditDistance(1000).Should().Be(10);
             passedOptions.FuzzySearchMaxSequentialEdits(1000).Should().Be(4);
         }
 
@@ -73,7 +117,7 @@ namespace Lifti.Tests
         {
             var passedOptions = BuildSutAndGetPassedOptions(o => o);
             passedOptions.Should().NotBeNull();
-            passedOptions.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.And);
+            passedOptions!.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.And);
         }
 
         [Fact]
@@ -81,7 +125,7 @@ namespace Lifti.Tests
         {
             var passedOptions = BuildSutAndGetPassedOptions(o => o.WithDefaultJoiningOperator(QueryTermJoinOperatorKind.Or));
             passedOptions.Should().NotBeNull();
-            passedOptions.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.Or);
+            passedOptions!.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.Or);
         }
 
         [Fact]
@@ -107,7 +151,7 @@ namespace Lifti.Tests
             index.Search("test");
 
             passedOptions.Should().NotBeNull();
-            passedOptions.FuzzySearchMaxEditDistance(1000).Should().Be(100);
+            passedOptions!.FuzzySearchMaxEditDistance(1000).Should().Be(100);
             passedOptions.FuzzySearchMaxSequentialEdits(1000).Should().Be(10);
         }
 
@@ -120,13 +164,13 @@ namespace Lifti.Tests
 
             index.Search("test").Should().BeEmpty();
 
-            parser.Verify(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), "test", It.IsAny<ITokenizer>()), Times.Once);
+            parser.Verify(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), "test", index), Times.Once);
         }
 
         [Fact]
         public void WithQueryParserOptions_ShouldPassOptionsToQueryParser()
         {
-            QueryParserOptions providedOptions = null;
+            QueryParserOptions? providedOptions = null;
 
             this.sut.WithQueryParser(o => o
                 .AssumeFuzzySearchTerms()
@@ -205,8 +249,8 @@ namespace Lifti.Tests
 
             await index.AddAsync(9, "Test");
 
-            action1.Should().BeEquivalentTo("1");
-            action2.Should().BeEquivalentTo(1);
+            action1.Should().BeEquivalentTo(new[] { "1" });
+            action2.Should().BeEquivalentTo(new[] { 1 });
         }
 
         [Fact]
@@ -234,7 +278,23 @@ namespace Lifti.Tests
             index.Search("Testing").Should().HaveCount(1);
         }
 
-        private QueryParserOptions BuildSutAndGetPassedOptions(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)
+        [Fact]
+        public async Task IgnoredCharacters_ShouldBeAppliedToBothIndexedTermsAndSearchTerms()
+        {
+            var index = this.sut.WithDefaultTokenization(o => o.IgnoreCharacters('\''))
+                .Build();
+
+            await index.AddAsync(12, "O'Reilly Books");
+            await index.AddAsync(24, "O Reilly Books");
+
+            index.DefaultTokenizer.Process("O'Reilly".AsSpan()).Should().BeEquivalentTo(new[] { new Token("OREILLY", new TokenLocation(0, 0, 8)) });
+
+            var results = index.Search("O'Reilly").ToList();
+            results.Should().HaveCount(1);
+            results[0].Key.Should().Be(12);
+        }
+
+        private QueryParserOptions? BuildSutAndGetPassedOptions(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)
         {
             QueryParserOptions? passedOptions = null;
 
@@ -252,7 +312,7 @@ namespace Lifti.Tests
         private Mock<IQueryParser> ConfigureQueryParserMock()
         {
             var parser = new Mock<IQueryParser>();
-            parser.Setup(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), It.IsAny<string>(), It.IsAny<ITokenizer>()))
+            parser.Setup(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), It.IsAny<string>(), It.IsAny<IIndexTokenizerProvider>()))
                 .Returns(new Query(EmptyQueryPart.Instance));
 
             this.sut.WithQueryParser(parser.Object);

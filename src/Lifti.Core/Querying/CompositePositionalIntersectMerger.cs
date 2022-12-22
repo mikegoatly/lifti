@@ -66,11 +66,14 @@ namespace Lifti.Querying
                     return new CompositeTokenMatchLocation(currentToken, nextToken);
                 }
 
-                // TODO Unoptimised O(n^2) implementation for now - big optimisations be made when location order can be guaranteed
-                foreach (var currentToken in leftLocations)
+                int leftIndex = 0;
+                int rightIndex = 0;
+
+                while (leftIndex < leftLocations.Count && rightIndex < rightLocations.Count)
                 {
-                    foreach (var nextToken in rightLocations)
-                    {
+                    var currentToken = leftLocations[leftIndex];
+                    var nextToken = rightLocations[rightIndex];
+
                         if (leftTolerance > 0)
                         {
                             if ((currentToken.MinTokenIndex - nextToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(leftTolerance))
@@ -85,7 +88,15 @@ namespace Lifti.Querying
                             {
                                 fieldTokenMatches.Add(CreateCompositeTokenMatchLocation(leftAndRightSwapped, currentToken, nextToken));
                             }
-                        }
+                    }
+
+                    if (currentToken.MinTokenIndex < nextToken.MinTokenIndex)
+                    {
+                        leftIndex++;
+                    }
+                    else
+                    {
+                        rightIndex++;
                     }
                 }
 
@@ -94,7 +105,7 @@ namespace Lifti.Querying
                     fieldResults.Add(
                         new ScoredFieldMatch(
                             score,
-                            new FieldMatch(fieldId, fieldTokenMatches.OrderBy(m => m.MinTokenIndex).ToList())));
+                            new FieldMatch(fieldId, fieldTokenMatches)));
                 }
             }
 

@@ -7,26 +7,32 @@ namespace PerformanceProfiling
     public abstract class IndexBenchmarkBase
     {
 
-        protected async Task PopulateIndexAsync(IFullTextIndex<string> index)
+        protected async Task PopulateIndexAsync(IFullTextIndex<int> index)
         {
-            await index.AddRangeAsync(WikipediaData.SampleData);
+            index.BeginBatchChange();
+
+            await this.PopulateIndexOneByOne(index);
+
+            await index.CommitBatchChangeAsync();
         }
 
-        protected async Task PopulateIndexOneByOne(IFullTextIndex<string> index)
+        protected async Task PopulateIndexOneByOne(IFullTextIndex<int> index)
         {
-            foreach (var page in WikipediaData.SampleData)
+            for (var i = 0; i < WikipediaData.SampleData.Count; i++)
             {
-                await index.AddAsync(page);
+                var (name, text) = WikipediaData.SampleData[i];
+                await index.AddAsync((i, name, text));
             }
         }
 
-        protected static FullTextIndex<string> CreateNewIndex(int supportSplitAtIndex)
+        protected static FullTextIndex<int> CreateNewIndex(int supportSplitAtIndex)
         {
-            return new FullTextIndexBuilder<string>()
+            return new FullTextIndexBuilder<int>()
                 .WithIntraNodeTextSupportedAfterIndexDepth(supportSplitAtIndex)
-                .WithObjectTokenization<(string name, string text)>(
+                .WithObjectTokenization<(int id, string name, string text)>(
                     o => o
-                    .WithKey(p => p.name)
+                    .WithKey(p => p.id)
+                    .WithField("Title", p => p.name)
                     .WithField("Text", p => p.text, t => t.WithStemming(), new XmlTextExtractor()))
                 .Build();
         }

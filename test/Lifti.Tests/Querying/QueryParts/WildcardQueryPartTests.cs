@@ -9,10 +9,20 @@ namespace Lifti.Tests.Querying.QueryParts
 {
     public class WildcardQueryPartTests : IAsyncLifetime
     {
-        private FullTextIndex<int> index;
+        private FullTextIndex<int> index = null!;
 
-        public WildcardQueryPartTests()
+        public Task DisposeAsync()
         {
+            return Task.CompletedTask;
+        }
+
+        public async Task InitializeAsync()
+        {
+            this.index = new FullTextIndexBuilder<int>()
+                .Build();
+
+            await this.index.AddAsync(1, "Apparently this also applies");
+            await this.index.AddAsync(2, "Angry alternatives to apples, thus");
         }
 
         [Fact]
@@ -247,21 +257,7 @@ namespace Lifti.Tests.Querying.QueryParts
 
             var results = index.Search(query).ToList();
 
-            results.Select(x => x.Key).Should().BeEquivalentTo(1, 3);
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
-        }
-
-        public async Task InitializeAsync()
-        {
-            this.index = new FullTextIndexBuilder<int>()
-                .Build();
-
-            await this.index.AddAsync(1, "Apparently this also applies");
-            await this.index.AddAsync(2, "Angry alternatives to apples, thus");
+            results.Select(x => x.Key).Should().BeEquivalentTo(new[] { 1, 3 });
         }
 
         private record TestObject(int Id, string Title, string Content);

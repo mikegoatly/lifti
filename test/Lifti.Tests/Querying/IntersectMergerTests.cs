@@ -13,12 +13,13 @@ namespace Lifti.Tests.Querying
             var right = IntermediateQueryResult(ScoredToken(7, ScoredFieldMatch(3D, 1, 35, 37, 42)));
             var result = IntersectMerger.Apply(left, right);
 
-            result.Should().BeEquivalentTo(new[]
-            {
-                ScoredToken(
-                    7,
-                    ScoredFieldMatch(4D, 1, 30, 35, 37, 41, 42))
-            });
+            result.Should().BeEquivalentTo(
+                new[]
+                {
+                    ScoredToken(
+                        7,
+                        ScoredFieldMatch(4D, 1, 30, 35, 37, 41, 42))
+                });
         }
 
         [Fact]
@@ -36,8 +37,11 @@ namespace Lifti.Tests.Querying
             var rightLeftResult = IntersectMerger.Apply(right, left);
 
             leftRightResult.Should().BeEquivalentTo(
-                ScoredToken(6, ScoredFieldMatch(6D, 1, 20, 60)),
-                ScoredToken(9, ScoredFieldMatch(8D, 1, 10, 80)));
+                new[]
+                {
+                    ScoredToken(6, ScoredFieldMatch(6D, 1, 20, 60)),
+                    ScoredToken(9, ScoredFieldMatch(8D, 1, 10, 80))
+                });
 
             leftRightResult.Should().BeEquivalentTo(rightLeftResult);
         }

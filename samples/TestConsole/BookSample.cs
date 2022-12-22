@@ -19,9 +19,9 @@ namespace TestConsole
             new Book
             {
                 BookId = 2,
-                Title = "Dragons of Autumn Twilight",
-                Authors = new[] { "Margaret Weis", "Tracy Hickman" },
-                Synopsis = "Dragons of Autumn Twilight is a 1984 fantasy novel by American writers Margaret Weis and Tracy Hickman, based on a series of Dungeons & Dragons (D&D) game modules.[1] It was the first Dragonlance novel, and first in the Chronicles trilogy, which, along with the Dragonlance Legends trilogy, are generally regarded as the core novels of the Dragonlance world."
+                Title = "First on Mars",
+                Authors = new[] { "Cecil Warwick" },
+                Synopsis = "This novel, which was first published in 1934, tells the story of a group of astronauts who become the first humans to land on the planet Mars."
             },
         };
 
@@ -39,14 +39,16 @@ namespace TestConsole
             Console.WriteLine(@$"Indexing two sample books with 3 different fields, Title, Authors and Synposis:{Environment.NewLine}{string.Join(Environment.NewLine, books.Select(b => b.Title))}");
             await bookIndex.AddRangeAsync(books);
             Console.WriteLine();
-            RunSearch(
+            await RunSearchAsync(
                 bookIndex,
-                "first",
-                "Both books contain 'first' in at least one field");
+                "first | novel",
+                i => books.First(x => x.BookId == i),
+                "Both books contain 'first' or 'novel' in at least one field");
 
-            RunSearch(
+            await RunSearchAsync(
                 bookIndex,
                 "title=the",
+                i => books.First(x => x.BookId == i),
                 "Only the first book contains 'the' in the title field");
             
             WaitForEnterToReturnToMenu();

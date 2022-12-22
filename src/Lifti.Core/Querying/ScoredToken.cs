@@ -9,7 +9,7 @@ namespace Lifti.Querying
     /// <summary>
     /// Provides information about an item that was matched and scored whilst executing a query.
     /// </summary>
-    public struct ScoredToken : IEquatable<ScoredToken>
+    public readonly struct ScoredToken : IEquatable<ScoredToken>
     {
         /// <summary>
         /// Constructs a new instance of <see cref="ScoredToken"/>.
@@ -31,7 +31,7 @@ namespace Lifti.Querying
         public IReadOnlyList<ScoredFieldMatch> FieldMatches { get; }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is ScoredToken match &&
                    this.Equals(match);

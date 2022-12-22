@@ -3,6 +3,7 @@
 namespace Lifti.Serialization.Binary
 {
     internal class V4IndexReader<TKey> : V3IndexReader<TKey>
+        where TKey : notnull
     {
         public V4IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer)
             : base(stream, disposeStream, keySerializer)

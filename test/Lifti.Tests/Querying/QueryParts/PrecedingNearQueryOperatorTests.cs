@@ -28,13 +28,16 @@ namespace Lifti.Tests.Querying.QueryParts
             // Field 1: (101, 106)
             // Field 2: (104, 105)
             results.Matches.Should().BeEquivalentTo(
-                ScoredToken(
-                    7,
-                    ScoredFieldMatch(4D, 1, CompositeMatch(100, 102))),
-                ScoredToken(
-                    8,
-                    ScoredFieldMatch(6D, 1, CompositeMatch(101, 106)),
-                    ScoredFieldMatch(13D, 2, CompositeMatch(104, 105))));
+                new[]
+                {
+                    ScoredToken(
+                        7,
+                        ScoredFieldMatch(4D, 1, CompositeMatch(100, 102))),
+                    ScoredToken(
+                        8,
+                        ScoredFieldMatch(6D, 1, CompositeMatch(101, 106)),
+                        ScoredFieldMatch(13D, 2, CompositeMatch(104, 105)))
+                });
         }
 
         [Fact]
@@ -50,8 +53,11 @@ namespace Lifti.Tests.Querying.QueryParts
 
             var fieldMatch = result.FieldMatches.Single();
             fieldMatch.Locations.Should().BeEquivalentTo(
-                new TokenLocation(11, 67, 8),
-                new TokenLocation(12, 76, 7));
+                new[]
+                {
+                    new TokenLocation(11, 67, 8),
+                    new TokenLocation(12, 76, 7)
+                });
         }
 
         protected static async Task<IFullTextIndex<int>> CreateTestIndexAsync()

@@ -1,9 +1,9 @@
 ---
 title: "Search Result Scoring"
 linkTitle: "Result Scoring"
-weight: 6
+weight: 2
 description: >
-  How does LIFTI score results?
+  Explains how  the results provided in `ISearchResults<T>` are ordered, and how LIFTI calculates its scores.
 ---
 
 LIFTI uses a version of the [Okapi BM25](https://en.wikipedia.org/wiki/Okapi_BM25) algorithm to score search results. At the simplest level this means that search results will come back ordered by relevance. Fuzzy matching affects the 
@@ -11,7 +11,7 @@ scores for search results depending on the distance between the target word and 
 
 Once nice feature of LIFTI is that in you also get each field scored independently. The overall score for a document is just a sum of these, but you could easily just re-order the results by one field over another should you so wish. 
 
-`OrderByField` is a convenience method that can re-order results by a single field:
+`ISearchResults<T>.OrderByField` returns a new instance of `ISearchResults<T>` with the results re-ordered considering only the scores for a single field:
 
 ``` csharp
 var index = new FullTextIndexBuilder<int>()

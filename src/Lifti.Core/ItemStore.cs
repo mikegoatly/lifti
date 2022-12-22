@@ -5,6 +5,7 @@ namespace Lifti
 {
     /// <inheritdoc />
     public class ItemStore<T> : IItemStore<T>
+        where T : notnull
     {
         internal ItemStore()
             : this(

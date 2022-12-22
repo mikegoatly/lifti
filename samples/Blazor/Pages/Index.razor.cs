@@ -18,7 +18,7 @@ namespace Blazor.Pages
         //    new PageSummary(0, "Game_of_Thrones", ""),
         //    new PageSummary(0, "Fantastic_Mr_Fox", "")
         //};
-        private IList<SearchResult<string>>? results = null;
+        private IList<SearchResult<string>>? results;
         private bool errored;
         private bool indexing;
         private string? selectedContent;

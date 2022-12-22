@@ -6,7 +6,7 @@
     public interface IIndexedFieldLookup
     {
         /// <summary>
-        /// The id of the default field used when an <see cref="IFullTextIndex{T}.AddAsync(T, string)"/> overload has been used, 
+        /// The id of the default field used when an <see cref="IFullTextIndex{T}.AddAsync(T, string, System.Threading.CancellationToken)"/> overload has been used, 
         /// as opposed to indexing text read from properties of object.
         /// </summary>
         byte DefaultField { get; }
@@ -17,8 +17,8 @@
         string GetFieldForId(byte id);
 
         /// <summary>
-        /// Gets the configuration required for indexing a named field, including the <see cref="Lifti.Tokenization.TextExtraction.ITextExtractor"/>
-        /// and <see cref="Lifti.Tokenization.ITokenizer"/> instances to use when processing the field's text.
+        /// Gets the configuration required for indexing a named field, including the <see cref="Tokenization.TextExtraction.ITextExtractor"/>
+        /// and <see cref="Tokenization.IIndexTokenizer"/> instances to use when processing the field's text.
         /// </summary>
         IndexedFieldDetails GetFieldInfo(string fieldName);
     }

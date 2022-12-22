@@ -36,15 +36,15 @@ namespace Lifti.Tests
 
         protected static void VerifyResult(
             IndexNode node,
-            string intraNodeText,
-            (int, IndexedToken)[] expectedMatches = null,
-            char[] expectedChildNodes = null)
+            string? intraNodeText,
+            (int, IndexedToken)[]? expectedMatches = null,
+            char[]? expectedChildNodes = null)
         {
             expectedChildNodes ??= Array.Empty<char>();
             expectedMatches ??= Array.Empty<(int, IndexedToken)>();
 
-            node.HasChildNodes.Should().Be(expectedChildNodes.Count() > 0);
-            node.HasMatches.Should().Be(expectedMatches.Count() > 0);
+            node.HasChildNodes.Should().Be(expectedChildNodes.Length > 0);
+            node.HasMatches.Should().Be(expectedMatches.Length > 0);
             node.IntraNodeText.ToArray().Should().BeEquivalentTo(intraNodeText?.ToCharArray() ?? Array.Empty<char>());
             node.ChildNodes.Keys.Should().BeEquivalentTo(expectedChildNodes, o => o.WithoutStrictOrdering());
             node.Matches.Should().BeEquivalentTo(expectedMatches.ToImmutableDictionary(x => x.Item1, x => new[] { x.Item2 }));
@@ -53,9 +53,9 @@ namespace Lifti.Tests
         protected static void VerifyResult(
             IndexNode node,
             char[] navigationChars,
-            string intraNodeText,
-            (int, IndexedToken)[] expectedMatches = null,
-            char[] expectedChildNodes = null)
+            string? intraNodeText,
+            (int, IndexedToken)[]? expectedMatches = null,
+            char[]? expectedChildNodes = null)
         {
             foreach (var navigationChar in navigationChars)
             {

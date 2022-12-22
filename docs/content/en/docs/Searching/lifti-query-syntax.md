@@ -6,6 +6,8 @@ description: >
   The default query parser for an index makes use of a powerful query syntax.
 ---
 
+> Don't want to use advanced queries? You'll want to configure the [simple query parser](../simple-queries).
+
 ## Quick examples
 
 Example|Meaning

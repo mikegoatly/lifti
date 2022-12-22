@@ -8,9 +8,9 @@ trigger:
     - test
 
 variables:
-  majorVersion: 3
-  minorVersion: 5
-  patchVersion: 2
+  majorVersion: 4
+  minorVersion: 0
+  patchVersion: 0
   project: src/Lifti.Core/Lifti.Core.csproj
   testProject: test/Lifti.Tests/Lifti.Tests.csproj
   buildConfiguration: 'Release'
@@ -27,9 +27,15 @@ stages:
 
     steps:
     - task: UseDotNet@2
+      displayName: "Use .NET 6"
       inputs:
         packageType: 'sdk'
         version: '6.0.x'
+    - task: UseDotNet@2
+      displayName: "Use .NET 7"
+      inputs:
+        packageType: 'sdk'
+        version: '7.0.x'
     - task: DotNetCoreCLI@2
       displayName: "NuGet Restore"
       inputs:

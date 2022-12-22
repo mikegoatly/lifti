@@ -26,14 +26,19 @@ namespace Lifti.Querying
         }
 
         /// <inheritdoc />
-        public IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, ITokenizer tokenizer)
+        public IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, IIndexTokenizerProvider tokenizerProvider)
         {
             if (queryText is null)
             {
                 throw new ArgumentNullException(nameof(queryText));
             }
 
-            var tokens = tokenizer.Process(queryText.AsSpan());
+            if (tokenizerProvider is null)
+            {
+                throw new ArgumentNullException(nameof(tokenizerProvider));
+            }
+
+            var tokens = tokenizerProvider.DefaultTokenizer.Process(queryText.AsSpan());
             if (tokens.Count == 0)
             {
                 return Query.Empty;
@@ -51,7 +56,7 @@ namespace Lifti.Querying
             return new Query(combined);
         }
 
-        private IEnumerable<IQueryPart> CreateSearchTermTokens(IReadOnlyList<Token> tokens)
+        private IEnumerable<IQueryPart> CreateSearchTermTokens(IReadOnlyCollection<Token> tokens)
         {
             if (this.options.AssumeFuzzySearchTerms)
             {

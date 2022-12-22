@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Lifti.Querying.QueryParts
 {
-    internal struct SubstitutedCharacters
+    internal readonly struct SubstitutedCharacters
     {
         public SubstitutedCharacters(char expected, char replacedWith)
         {
@@ -247,6 +247,11 @@ namespace Lifti.Querying.QueryParts
             if (navigatorCreator == null)
             {
                 throw new ArgumentNullException(nameof(navigatorCreator));
+            }
+
+            if (queryContext is null)
+            {
+                throw new ArgumentNullException(nameof(queryContext));
             }
 
             using var navigator = navigatorCreator();

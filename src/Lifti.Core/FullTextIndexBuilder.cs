@@ -4,6 +4,8 @@ using Lifti.Tokenization.Objects;
 using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti
@@ -13,13 +15,15 @@ namespace Lifti
     /// </summary>
     /// <typeparam name="TKey">The type of key to be stored in the index.</typeparam>
     public class FullTextIndexBuilder<TKey>
+        where TKey : notnull
     {
-        private readonly ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions = new ConfiguredObjectTokenizationOptions<TKey>();
-        private readonly IndexOptions advancedOptions = new IndexOptions();
+        private readonly List<IObjectTokenizationBuilder> itemTokenizationOptions = new();
+        private readonly IndexOptions advancedOptions = new();
+        private ThesaurusBuilder? defaultThesaurusBuilder;
         private IIndexScorerFactory? scorerFactory;
         private IQueryParser? queryParser;
-        private ITokenizer defaultTokenizer = Tokenizer.Default;
-        private List<Func<IIndexSnapshot<TKey>, Task>>? indexModifiedActions;
+        private IIndexTokenizer defaultTokenizer = IndexTokenizer.Default;
+        private List<Func<IIndexSnapshot<TKey>, CancellationToken, Task>>? indexModifiedActions;
         private ITextExtractor? defaultTextExtractor;
 
         /// <summary>
@@ -69,7 +73,7 @@ namespace Lifti
         /// <param name="asyncAction">
         /// The async action to execute. The argument is the new snapshot of the index.
         /// </param>
-        public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, Task> asyncAction)
+        public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, CancellationToken, Task> asyncAction)
         {
             if (asyncAction is null)
             {
@@ -78,12 +82,23 @@ namespace Lifti
 
             if (this.indexModifiedActions == null)
             {
-                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, Task>>();
+                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, CancellationToken, Task>>();
             }
 
             this.indexModifiedActions.Add(asyncAction);
 
             return this;
+        }
+
+        /// <inheritdoc cref="WithIndexModificationAction(Func{IIndexSnapshot{TKey}, CancellationToken, Task})"/>
+        public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, Task> asyncAction)
+        {
+            if (asyncAction is null)
+            {
+                throw new ArgumentNullException(nameof(asyncAction));
+            }
+
+            return this.WithIndexModificationAction((snapshot, ct) => asyncAction(snapshot));
         }
 
         /// <summary>
@@ -103,18 +118,12 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(action));
             }
 
-            if (this.indexModifiedActions == null)
-            {
-                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, Task>>();
-            }
-
-            this.indexModifiedActions.Add((snapshot) =>
-            {
-                action(snapshot);
-                return Task.CompletedTask;
-            });
-
-            return this;
+            return this.WithIndexModificationAction(
+                (snapshot, ct) =>
+                {
+                    action(snapshot);
+                    return Task.CompletedTask;
+                });
         }
 
         /// <summary>
@@ -132,7 +141,7 @@ namespace Lifti
             }
 
             var builder = new ObjectTokenizationBuilder<TItem, TKey>();
-            this.itemTokenizationOptions.Add(optionsBuilder(builder).Build());
+            this.itemTokenizationOptions.Add(optionsBuilder(builder));
 
             return this;
         }
@@ -150,6 +159,21 @@ namespace Lifti
 
             this.defaultTokenizer = optionsBuilder.CreateTokenizer()!;
 
+            return this;
+        }
+
+        /// <summary>
+        /// Builds the default thesaurus to use for the index. This thesaurus will be used for text added directly to the index and also fields
+        /// that have no explicit thesaurus defined for them.
+        /// </summary>
+        public FullTextIndexBuilder<TKey> WithDefaultThesaurus(Func<ThesaurusBuilder, ThesaurusBuilder> thesaurusBuilder)
+        {
+            if (thesaurusBuilder is null)
+            {
+                throw new ArgumentNullException(nameof(thesaurusBuilder));
+            }
+
+            this.defaultThesaurusBuilder = thesaurusBuilder(new ThesaurusBuilder());
             return this;
         }
 
@@ -190,7 +214,7 @@ namespace Lifti
         {
             return this.WithSimpleQueryParser(static o => o);
         }
-        
+
         /// <summary>
         /// Configures the index to use a <see cref="SimpleQueryParser"/> instead of the full LIFTI query parser. Use this for situations where
         /// you don't need the full complexity of the query language and just want user input to be run directly against the index.
@@ -230,14 +254,19 @@ namespace Lifti
         /// </summary>
         public FullTextIndex<TKey> Build()
         {
+            var thesaurusBuilder = this.defaultThesaurusBuilder ?? new ThesaurusBuilder();
+            var textExtractor = this.defaultTextExtractor ?? new PlainTextExtractor();
+
             return new FullTextIndex<TKey>(
                 this.advancedOptions,
-                this.itemTokenizationOptions,
+                new ObjectTokenizationLookup<TKey>(
+                    this.itemTokenizationOptions.Select(x => x.Build(this.defaultTokenizer, thesaurusBuilder, textExtractor))),
                 new IndexNodeFactory(this.advancedOptions),
                 this.queryParser ?? new QueryParser(new QueryParserOptions()),
                 this.scorerFactory ?? new OkapiBm25ScorerFactory(),
-                this.defaultTextExtractor ?? new PlainTextExtractor(),
+                textExtractor,
                 this.defaultTokenizer,
+                thesaurusBuilder.Build(this.defaultTokenizer),
                 this.indexModifiedActions?.ToArray());
         }
     }

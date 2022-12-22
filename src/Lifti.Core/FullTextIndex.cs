@@ -12,16 +12,20 @@ namespace Lifti
 {
     /// <inheritdoc />
     public class FullTextIndex<TKey> : IFullTextIndex<TKey>, IDisposable
+        where TKey : notnull
     {
         private readonly IQueryParser queryParser;
-        private readonly Func<IIndexSnapshot<TKey>, Task>[]? indexModifiedActions;
+        private readonly Func<IIndexSnapshot<TKey>, CancellationToken, Task>[]? indexModifiedActions;
         private readonly IndexOptions indexOptions;
-        private readonly ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions;
         private readonly IdPool<TKey> idPool;
         private readonly IIndexNavigatorPool indexNavigatorPool;
-        private readonly SemaphoreSlim writeLock = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim writeLock = new(1);
         private readonly TimeSpan writeLockTimeout = TimeSpan.FromSeconds(10);
         private bool isDisposed;
+
+        /// <remarks>
+        /// currentSnapshot and root are set via the Root property when it is initialized by the constructor
+        /// </remarks>
         private IndexSnapshot<TKey> currentSnapshot = null!;
         private IndexNode root = null!;
 
@@ -29,27 +33,26 @@ namespace Lifti
 
         internal FullTextIndex(
             IndexOptions indexOptions,
-            ConfiguredObjectTokenizationOptions<TKey> itemTokenizationOptions,
+            ObjectTokenizationLookup<TKey> itemTokenizationOptions,
             IIndexNodeFactory indexNodeFactory,
             IQueryParser queryParser,
             IIndexScorerFactory scorer,
             ITextExtractor defaultTextExtractor,
-            ITokenizer defaultTokenizer,
-            Func<IIndexSnapshot<TKey>, Task>[]? indexModifiedActions)
+            IIndexTokenizer defaultTokenizer,
+            IThesaurus defaultThesaurus,
+            Func<IIndexSnapshot<TKey>, CancellationToken, Task>[]? indexModifiedActions)
         {
             this.indexNavigatorPool = new IndexNavigatorPool(scorer);
             this.indexOptions = indexOptions;
-            this.itemTokenizationOptions = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
+            this.ItemTokenization = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
             this.IndexNodeFactory = indexNodeFactory ?? throw new ArgumentNullException(nameof(indexNodeFactory));
             this.queryParser = queryParser ?? throw new ArgumentNullException(nameof(queryParser));
             this.DefaultTextExtractor = defaultTextExtractor;
             this.DefaultTokenizer = defaultTokenizer ?? throw new ArgumentNullException(nameof(defaultTokenizer));
+            this.DefaultThesaurus = defaultThesaurus;
             this.indexModifiedActions = indexModifiedActions;
             this.idPool = new IdPool<TKey>();
-            this.FieldLookup = new IndexedFieldLookup(
-                this.itemTokenizationOptions.GetAllConfiguredFields(),
-                defaultTextExtractor,
-                defaultTokenizer);
+            this.FieldLookup = new IndexedFieldLookup(itemTokenizationOptions.GetAllConfiguredFields());
 
             this.Root = this.IndexNodeFactory.CreateRootNode();
         }
@@ -85,10 +88,18 @@ namespace Lifti
         public IIndexSnapshot<TKey> Snapshot => this.currentSnapshot;
 
         /// <inheritdoc />
-        public ITokenizer DefaultTokenizer { get; }
-
+        public IIndexTokenizer DefaultTokenizer { get; }
+       
         /// <inheritdoc />
         public ITextExtractor DefaultTextExtractor { get; }
+
+        /// <inheritdoc />
+        public IThesaurus DefaultThesaurus { get; }
+
+        internal ObjectTokenizationLookup<TKey> ItemTokenization { get; }
+
+        /// <inheritdoc />
+        public IIndexTokenizer GetTokenizerForField(string fieldName) => this.FieldLookup.GetFieldInfo(fieldName).Tokenizer;
 
         /// <inheritdoc />
         public IIndexNavigator CreateNavigator()
@@ -111,116 +122,142 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public async Task CommitBatchChangeAsync()
+        public async Task CommitBatchChangeAsync(CancellationToken cancellationToken = default)
         {
-            await this.PerformWriteLockedActionAsync(async () =>
-            {
-                if (this.batchMutation == null)
+            await this.PerformWriteLockedActionAsync(
+                async () =>
                 {
-                    throw new LiftiException(ExceptionMessages.NoBatchChangeInProgress);
-                }
+                    if (this.batchMutation == null)
+                    {
+                        throw new LiftiException(ExceptionMessages.NoBatchChangeInProgress);
+                    }
 
-                await this.ApplyMutationsAsync(this.batchMutation).ConfigureAwait(false);
+                    await this.ApplyMutationsAsync(this.batchMutation, cancellationToken).ConfigureAwait(false);
 
-                this.batchMutation = null;
-            }).ConfigureAwait(false);
+                    this.batchMutation = null;
+                },
+                cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task AddAsync(TKey itemKey, IEnumerable<string> text)
+        public async Task AddAsync(TKey itemKey, IEnumerable<string> text, CancellationToken cancellationToken = default)
         {
-            await this.PerformWriteLockedActionAsync(async () =>
-            {
-                await this.MutateAsync(m =>
+            await this.PerformWriteLockedActionAsync(
+                async () =>
                 {
-                    var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer);
-                    this.AddForDefaultField(m, itemKey, tokens);
-                }).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+                    await this.MutateAsync(
+                        m =>
+                        {
+                            var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer, this.DefaultThesaurus);
+                            this.AddForDefaultField(m, itemKey, tokens);
+                        },
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                },
+                cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task AddAsync(TKey itemKey, string text)
+        public async Task AddAsync(TKey itemKey, string text, CancellationToken cancellationToken = default)
         {
-            await this.PerformWriteLockedActionAsync(async () =>
-            {
-                await this.MutateAsync(m =>
+            await this.PerformWriteLockedActionAsync(
+                async () =>
                 {
-                    var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer);
-                    this.AddForDefaultField(m, itemKey, tokens);
-                }).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+                    await this.MutateAsync(
+                        m =>
+                        {
+                            var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer, this.DefaultThesaurus);
+                            this.AddForDefaultField(m, itemKey, tokens);
+                        },
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                },
+                cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task AddRangeAsync<TItem>(IEnumerable<TItem> items)
+        public async Task AddRangeAsync<TItem>(IEnumerable<TItem> items, CancellationToken cancellationToken = default)
         {
             if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
             }
 
-            var options = this.itemTokenizationOptions.Get<TItem>();
-            await this.PerformWriteLockedActionAsync(async () =>
+            var options = this.ItemTokenization.Get<TItem>();
+            await this.PerformWriteLockedActionAsync(
+                async () =>
                 {
-                    await this.MutateAsync(async m =>
-                    {
-                        foreach (var item in items)
+                    await this.MutateAsync(
+                        async m =>
                         {
-                            await this.AddAsync(item, options, m).ConfigureAwait(false);
-                        }
-                    }).ConfigureAwait(false);
-                }).ConfigureAwait(false);
+                            foreach (var item in items)
+                            {
+                                await this.AddAsync(item, options, m, cancellationToken).ConfigureAwait(false);
+                            }
+                        },
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                },
+                cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task AddAsync<TItem>(TItem item)
+        public async Task AddAsync<TItem>(TItem item, CancellationToken cancellationToken = default)
         {
-            var options = this.itemTokenizationOptions.Get<TItem>();
+            var options = this.ItemTokenization.Get<TItem>();
             await this.PerformWriteLockedActionAsync(
                 async () => await this.MutateAsync(
-                    async m => await this.AddAsync(item, options, m).ConfigureAwait(false)
-                ).ConfigureAwait(false)
-            ).ConfigureAwait(false);
+                    async m => await this.AddAsync(item, options, m, cancellationToken).ConfigureAwait(false),
+                    cancellationToken
+                ).ConfigureAwait(false), 
+                cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task<bool> RemoveAsync(TKey itemKey)
+        public async Task<bool> RemoveAsync(TKey itemKey, CancellationToken cancellationToken = default)
         {
             var result = false;
-            await this.PerformWriteLockedActionAsync(async () =>
-            {
-                if (!this.idPool.Contains(itemKey))
+            await this.PerformWriteLockedActionAsync(
+                async () =>
                 {
-                    result = false;
-                    return;
-                }
+                    if (!this.idPool.Contains(itemKey))
+                    {
+                        result = false;
+                        return;
+                    }
 
-                await this.MutateAsync(m => this.RemoveKeyFromIndex(itemKey, m))
-                    .ConfigureAwait(false);
+                    await this.MutateAsync(
+                        m => this.RemoveKeyFromIndex(itemKey, m), 
+                        cancellationToken)
+                        .ConfigureAwait(false);
 
-                result = true;
-            }).ConfigureAwait(false);
+                    result = true;
+                }, 
+                cancellationToken)
+                .ConfigureAwait(false);
 
             return result;
         }
 
         /// <inheritdoc />
-        public IEnumerable<SearchResult<TKey>> Search(string searchText)
+        public ISearchResults<TKey> Search(string searchText)
         {
-            var query = this.queryParser.Parse(this.FieldLookup, searchText, this.DefaultTokenizer);
-            return query.Execute(this.currentSnapshot);
+            var query = this.queryParser.Parse(this.FieldLookup, searchText, this);
+            return this.Search(query);
         }
 
         /// <inheritdoc />
-        public IEnumerable<SearchResult<TKey>> Search(IQuery query)
+        public ISearchResults<TKey> Search(IQuery query)
         {
             if (query is null)
             {
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return query.Execute(this.currentSnapshot);
+            return new SearchResults<TKey>(this, query.Execute(this.currentSnapshot));
         }
 
         /// <inheritdoc />
@@ -234,7 +271,11 @@ namespace Lifti
             this.PerformWriteLockedAction(() => this.Root = indexNode);
         }
 
-        private static IReadOnlyList<Token> ExtractDocumentTokens(IEnumerable<string> documentTextFragments, ITextExtractor textExtractor, ITokenizer tokenizer)
+        private static IReadOnlyCollection<Token> ExtractDocumentTokens(
+            IEnumerable<string> documentTextFragments, 
+            ITextExtractor textExtractor, 
+            IIndexTokenizer tokenizer,
+            IThesaurus thesaurus)
         {
             var documentOffset = 0;
             var fragments = Enumerable.Empty<DocumentTextFragment>();
@@ -244,16 +285,25 @@ namespace Lifti
                 documentOffset += documentText.Length;
             }
 
-            return tokenizer.Process(fragments);
+            return TokenizeFragments(tokenizer, thesaurus, fragments);
         }
 
-        private static IReadOnlyList<Token> ExtractDocumentTokens(string documentText, ITextExtractor textExtractor, ITokenizer tokenizer)
+        private static IReadOnlyCollection<Token> ExtractDocumentTokens(
+            string documentText, 
+            ITextExtractor textExtractor, 
+            IIndexTokenizer tokenizer,
+            IThesaurus thesaurus)
         {
             var fragments = textExtractor.Extract(documentText.AsMemory(), 0);
-            return tokenizer.Process(fragments);
+            return TokenizeFragments(tokenizer, thesaurus, fragments);
         }
 
-        private void AddForDefaultField(IndexMutation mutation, TKey itemKey, IReadOnlyList<Token> tokens)
+        private static List<Token> TokenizeFragments(IIndexTokenizer tokenizer, IThesaurus thesaurus, IEnumerable<DocumentTextFragment> fragments)
+        {
+            return tokenizer.Process(fragments).SelectMany(x => thesaurus.Process(x)).ToList();
+        }
+
+        private void AddForDefaultField(IndexMutation mutation, TKey itemKey, IReadOnlyCollection<Token> tokens)
         {
             var fieldId = this.FieldLookup.DefaultField;
             var itemId = this.GetUniqueIdForItem(
@@ -281,9 +331,9 @@ namespace Lifti
             }
         }
 
-        private async Task PerformWriteLockedActionAsync(Func<Task> asyncAction)
+        private async Task PerformWriteLockedActionAsync(Func<Task> asyncAction, CancellationToken cancellationToken)
         {
-            if (!await this.writeLock.WaitAsync(this.writeLockTimeout).ConfigureAwait(false))
+            if (!await this.writeLock.WaitAsync(this.writeLockTimeout, cancellationToken).ConfigureAwait(false))
             {
                 throw new LiftiException(ExceptionMessages.TimeoutWaitingForWriteLock);
             }
@@ -298,7 +348,7 @@ namespace Lifti
             }
         }
 
-        private async Task MutateAsync(Action<IndexMutation> mutationAction)
+        private async Task MutateAsync(Action<IndexMutation> mutationAction, CancellationToken cancellationToken)
         {
             var indexMutation = this.GetCurrentMutationOrCreateTransient();
 
@@ -306,18 +356,18 @@ namespace Lifti
 
             if (indexMutation != this.batchMutation)
             {
-                await this.ApplyMutationsAsync(indexMutation).ConfigureAwait(false);
+                await this.ApplyMutationsAsync(indexMutation, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        private async Task ApplyMutationsAsync(IndexMutation indexMutation)
+        private async Task ApplyMutationsAsync(IndexMutation indexMutation, CancellationToken cancellationToken)
         {
             this.Root = indexMutation.Apply();
             if (this.indexModifiedActions != null)
             {
                 foreach (var indexModifiedAction in this.indexModifiedActions)
                 {
-                    await indexModifiedAction(this.currentSnapshot).ConfigureAwait(false);
+                    await indexModifiedAction(this.currentSnapshot, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
@@ -327,7 +377,7 @@ namespace Lifti
             return this.batchMutation ?? new IndexMutation(this.Root, this.IndexNodeFactory);
         }
 
-        private async Task MutateAsync(Func<IndexMutation, Task> asyncMutationAction)
+        private async Task MutateAsync(Func<IndexMutation, Task> asyncMutationAction, CancellationToken cancellationToken)
         {
             var indexMutation = this.GetCurrentMutationOrCreateTransient();
 
@@ -335,7 +385,7 @@ namespace Lifti
 
             if (indexMutation != this.batchMutation)
             {
-                await this.ApplyMutationsAsync(indexMutation).ConfigureAwait(false);
+                await this.ApplyMutationsAsync(indexMutation, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -347,7 +397,7 @@ namespace Lifti
             }
         }
 
-        private static int CalculateTotalTokenCount(IReadOnlyList<Token> tokens)
+        private static int CalculateTotalTokenCount(IReadOnlyCollection<Token> tokens)
         {
             return tokens.Aggregate(0, (current, token) => current + token.Locations.Count);
         }
@@ -358,15 +408,20 @@ namespace Lifti
             mutation.Remove(id);
         }
 
-        private async Task AddAsync<TItem>(TItem item, ObjectTokenization<TItem, TKey> options, IndexMutation indexMutation)
+        private async Task AddAsync<TItem>(TItem item, ObjectTokenization<TItem, TKey> options, IndexMutation indexMutation, CancellationToken cancellationToken)
         {
             var itemKey = options.KeyReader(item);
 
-            var fieldTokens = new List<(byte fieldId, IReadOnlyList<Token> tokens)>(options.FieldReaders.Count);
-            foreach (var field in options.FieldReaders)
+            var fieldTokens = new List<(byte fieldId, IReadOnlyCollection<Token> tokens)>(options.FieldReaders.Count);
+            foreach (var field in options.FieldReaders.Values)
             {
-                var (fieldId, textExtractor, tokenizer) = this.FieldLookup.GetFieldInfo(field.Name);
-                var tokens = ExtractDocumentTokens(await field.ReadAsync(item).ConfigureAwait(false), textExtractor, tokenizer);
+                var (fieldId, textExtractor, tokenizer, thesaurus) = this.FieldLookup.GetFieldInfo(field.Name);
+                var tokens = ExtractDocumentTokens(
+                    await field.ReadAsync(item, cancellationToken).ConfigureAwait(false),
+                    textExtractor,
+                    tokenizer,
+                    thesaurus);
+
                 fieldTokens.Add((fieldId, tokens));
             }
 

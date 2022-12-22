@@ -5,7 +5,7 @@ namespace Lifti.Querying.QueryParts
     /// <summary>
     /// Represents a fragment of <see cref="WildcardQueryPart"/>.
     /// </summary>
-    public struct WildcardQueryFragment : IEquatable<WildcardQueryFragment>
+    public readonly struct WildcardQueryFragment : IEquatable<WildcardQueryFragment>
     {
         private WildcardQueryFragment(WildcardQueryFragmentKind kind, string? text)
         {
@@ -40,7 +40,7 @@ namespace Lifti.Querying.QueryParts
         public static WildcardQueryFragment CreateText(string text) => new WildcardQueryFragment(WildcardQueryFragmentKind.Text, text);
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is WildcardQueryFragment fragment && this.Equals(fragment);
         }

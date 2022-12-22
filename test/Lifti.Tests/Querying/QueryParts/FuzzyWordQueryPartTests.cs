@@ -19,7 +19,7 @@ namespace Lifti.Tests.Querying.QueryParts
             "Odius ogres obey Mobius"
         };
 
-        public FullTextIndex<int> Index { get; private set; }
+        public FullTextIndex<int> Index { get; private set; } = null!;
 
         public Task DisposeAsync()
         {
@@ -129,7 +129,7 @@ namespace Lifti.Tests.Querying.QueryParts
 
             var results = index.Search(query).ToList();
 
-            results.Select(x => x.Key).Should().BeEquivalentTo(1, 3);
+            results.Select(x => x.Key).Should().BeEquivalentTo(new[] { 1, 3 });
         }
 
         [Theory]
@@ -174,6 +174,7 @@ namespace Lifti.Tests.Querying.QueryParts
                     id,
                     expectedMatchRegex.Match(text).Groups["word"]
                         .Captures
+                        .OfType<Capture>()
                         .Select((x, index) => (index, startLocation: x.Index, x.Value))
                         .Where(c => expectedWordLookup.Contains(c.Value))
                         .ToList()
@@ -185,8 +186,11 @@ namespace Lifti.Tests.Querying.QueryParts
                 .Should().HaveCount(expectedWords.Length, because: "Each of the expected words should be found at least once in the source articles");
 
             var expectedResults = expectedResultCaptures.Select(
-                r => (r.id, r.Item2.Select(
-                    x => new TokenLocation(x.index, x.startLocation, (ushort)x.Value.Length)).ToList()))
+                r => Tuple.Create(
+                    r.id, 
+                    r.Item2.Select(
+                        x => new TokenLocation(x.index, x.startLocation, (ushort)x.Value.Length)).ToList()
+                    ))
                 .ToList();
 
             var part = new FuzzyMatchQueryPart(word, maxEditDistance, maxSequentialEdits);
@@ -197,27 +201,27 @@ namespace Lifti.Tests.Querying.QueryParts
             this.WriteMatches(expectedResults);
 
             this.outputHelper.WriteLine("Actual matches:");
-            this.WriteMatches(results.Select(r => (r.Key, r.FieldMatches.SelectMany(m => m.Locations).ToList())));
+            this.WriteMatches(results.Select(r => Tuple.Create(r.Key, r.FieldMatches.SelectMany(m => m.Locations).ToList())));
 
-            results.Should().HaveCount(expectedResults.Count);
+            results.Should().HaveCount(expectedResults.Count());
 
-            foreach (var (expectedId, expectedLocations) in expectedResults)
+            foreach (var expectedResult in expectedResults)
             {
-                results.Single(r => r.Key == expectedId).FieldMatches.Should().SatisfyRespectively(
-                    x => x.Locations.Should().BeEquivalentTo(expectedLocations));
+                results.Single(r => r.Key == expectedResult.Item1).FieldMatches.Should().SatisfyRespectively(
+                    x => x.Locations.Should().BeEquivalentTo(expectedResult.Item2));
             }
         }
 
-        private void WriteMatches(IEnumerable<(int id, List<TokenLocation>)> results)
+        private void WriteMatches(IEnumerable<Tuple<int, List<TokenLocation>>> results)
         {
             foreach (var result in results)
             {
                 this.outputHelper.WriteLine("");
-                this.outputHelper.WriteLine("Item " + result.id);
+                this.outputHelper.WriteLine("Item " + result.Item1);
 
                 foreach (var match in result.Item2)
                 {
-                    this.outputHelper.WriteLine($"index {match.TokenIndex} start {match.Start}: {this.fixture.IndexedText[result.id].Substring(match.Start, match.Length)}");
+                    this.outputHelper.WriteLine($"index {match.TokenIndex} start {match.Start}: {this.fixture.IndexedText[result.Item1].Substring(match.Start, match.Length)}");
                 }
 
             }

@@ -11,18 +11,21 @@ namespace TestConsole
     {
         public override async Task RunAsync()
         {
-            var index = new FullTextIndexBuilder<string>()
-                .WithTextExtractor<XmlTextExtractor>()
+            var index = new FullTextIndexBuilder<int>()
                 .WithQueryParser(o => o.AssumeFuzzySearchTerms())
+                .WithObjectTokenization<(int id, string name, string text)>(
+                    o => o.WithKey(x => x.id)
+                        .WithField("Source", x => x.name)
+                        .WithField("Content", x => x.text, textExtractor: new XmlTextExtractor()))
                 .Build();
 
             Console.WriteLine("Indexing sample wikipedia pages using an XmlTextExtractor...");
 
-            var wikipediaTests = WikipediaDataLoader.Load(typeof(WikipediaSample));
-            foreach (var (name, text) in wikipediaTests)
-            {
-                await index.AddAsync(name, text);
-            }
+            var wikipediaTests = WikipediaDataLoader.Load(typeof(WikipediaSample))
+                .Select((x, index) => (id: index, x.name, x.text))
+                .ToDictionary(x => x.id);
+
+            await index.AddRangeAsync(wikipediaTests.Values);
 
             Console.WriteLine($"Indexed {index.Count} entries");
             Console.WriteLine("Type a LIFTI query, or enter to quit:");
@@ -35,20 +38,9 @@ namespace TestConsole
                     return;
                 }
 
-                var matches = index.Search(query).ToList();
+                var matches = index.Search(query);
 
-                Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine($"{matches.Count} Match(es)");
-
-                //Console.ForegroundColor = ConsoleColor.DarkCyan;
-                //foreach (var match in matches)
-                //{
-                //    Console.WriteLine(match.Key);
-                //}
-
-                Console.WriteLine();
-                Console.ResetColor();
+                await PrintSearchResultsAsync(matches, i => wikipediaTests[i]);
             } while (true);
         }
     }

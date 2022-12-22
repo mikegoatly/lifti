@@ -15,7 +15,7 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void TextOnly_ShouldReturnFalse()
         {
-            RunTest("Foo", null, false);
+            RunTest("Foo", null!, false);
         }
 
         [Fact]
@@ -33,7 +33,7 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void SingleWildcardFollowingMultiple_ShouldThrowException()
         {
-            Assert.Throws<QueryParserException>(() => RunTest("****%", null));
+            Assert.Throws<QueryParserException>(() => RunTest("****%", null!));
         }
 
         [Fact]
@@ -54,12 +54,15 @@ namespace Lifti.Tests.Querying
             RunTest("%%foo*bar", new WildcardQueryPart(SingleCharacter, SingleCharacter, CreateText("FOO"), MultiCharacter, CreateText("BAR")));
         }
 
-        private static void RunTest(string text, WildcardQueryPart expectedQueryPart, bool expectedResult = true)
+        private static void RunTest(string text, WildcardQueryPart? expectedQueryPart, bool expectedResult = true)
         {
-            var result = WildcardQueryPartParser.TryParse(text, new FakeTokenizer(normalizeToUppercase: true), out var part);
+            var result = WildcardQueryPartParser.TryParse(text.AsSpan(), new FakeIndexTokenizer(normalizeToUppercase: true), out var part);
 
             result.Should().Be(expectedResult);
-            part.Should().BeEquivalentTo(expectedQueryPart);
+            if (expectedQueryPart != null)
+            {
+                part!.Fragments.Should().BeEquivalentTo(expectedQueryPart.Fragments);
+            }
         }
     }
 }

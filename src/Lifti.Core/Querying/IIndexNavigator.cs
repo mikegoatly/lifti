@@ -52,6 +52,9 @@ namespace Lifti.Querying
         /// </returns>
         bool Process(ReadOnlySpan<char> text);
 
+        /// <inheritdoc cref="Process(ReadOnlySpan{char})"/>
+        bool Process(string text);
+
         /// <summary>
         /// Creates an <see cref="IIndexNavigatorBookmark"/> for the current state of this instance.
         /// </summary>

@@ -7,7 +7,7 @@ namespace Lifti
     /// <summary>
     /// Information about a token from a document that has been stored an index.
     /// </summary>
-    public struct IndexedToken : IEquatable<IndexedToken>
+    public readonly struct IndexedToken : IEquatable<IndexedToken>
     {
         /// <summary>
         /// Constructs a new <see cref="IndexedToken"/> instance.
@@ -39,7 +39,7 @@ namespace Lifti
         public IReadOnlyList<TokenLocation> Locations { get; }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is IndexedToken location &&
                 this.Equals(location);

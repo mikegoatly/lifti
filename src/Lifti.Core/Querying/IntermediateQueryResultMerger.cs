@@ -18,7 +18,7 @@ namespace Lifti.Querying
         /// * leftLocations: The locations from the left match
         /// * rightLocations: The locations from the right match
         /// </returns>
-        protected static List<(
+        protected static IList<(
             byte fieldId,
             double score,
             IReadOnlyList<ITokenLocationMatch> leftLocations,
@@ -58,7 +58,7 @@ namespace Lifti.Querying
                         leftField.Score + rightField.Score,
                         new FieldMatch(
                             leftField.FieldId,
-                            leftField.Locations.Concat(rightField.Locations).OrderBy(f => f.MinTokenIndex).ToList()));
+                            leftField.Locations.Concat(rightField.Locations)));
 
                     rightFields.Remove(leftField.FieldId);
                 }

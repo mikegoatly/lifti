@@ -10,19 +10,20 @@ using System.Text;
 namespace Lifti.Tokenization
 {
     /// <summary>
-    /// The default implementation of <see cref="ITokenizer"/> that just extracts tokens from plain text.
+    /// The default implementation of <see cref="IIndexTokenizer"/>.
     /// </summary>
-    public class Tokenizer : ITokenizer
+    public class IndexTokenizer : IIndexTokenizer
     {
         private readonly IInputPreprocessorPipeline inputPreprocessorPipeline;
-        private readonly HashSet<char>? additionalSplitChars;
+        private readonly HashSet<char> additionalSplitChars;
+        private readonly HashSet<char> ignoreChars;
         private readonly IStemmer? stemmer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Tokenizer"/> class.
+        /// Initializes a new instance of the <see cref="IndexTokenizer"/> class.
         /// </summary>
         /// <param name="tokenizationOptions">The tokenization options for this instance.</param>
-        public Tokenizer(TokenizationOptions tokenizationOptions)
+        public IndexTokenizer(TokenizationOptions tokenizationOptions)
         {
             this.Options = tokenizationOptions ?? throw new ArgumentNullException(nameof(tokenizationOptions));
 
@@ -31,25 +32,24 @@ namespace Lifti.Tokenization
                 this.stemmer = new PorterStemmer();
             }
 
-            this.additionalSplitChars = tokenizationOptions.AdditionalSplitCharacters.Count > 0
-                ? new HashSet<char>(tokenizationOptions.AdditionalSplitCharacters)
-                : null;
+            this.additionalSplitChars = new HashSet<char>(tokenizationOptions.AdditionalSplitCharacters);
+            this.ignoreChars = new HashSet<char>(tokenizationOptions.IgnoreCharacters);
 
             this.inputPreprocessorPipeline = new InputPreprocessorPipeline(tokenizationOptions);
         }
 
         /// <summary>
-        /// Gets the default <see cref="ITokenizer"/> implementation, configured with <see cref="TokenizationOptions.Default"/>.
+        /// Gets the default <see cref="IIndexTokenizer"/> implementation, configured with <see cref="TokenizationOptions.Default"/>.
         /// </summary>
-        public static Tokenizer Default { get; } = new Tokenizer(TokenizationOptions.Default);
+        public static IndexTokenizer Default { get; } = new IndexTokenizer(TokenizationOptions.Default);
 
         /// <inheritdoc />
         public TokenizationOptions Options { get; }
 
         /// <inheritdoc />
-        public IReadOnlyList<Token> Process(IEnumerable<DocumentTextFragment> document)
+        public IReadOnlyCollection<Token> Process(IEnumerable<DocumentTextFragment> input)
         {
-            if (document is null)
+            if (input is null)
             {
                 return Array.Empty<Token>();
             }
@@ -58,7 +58,7 @@ namespace Lifti.Tokenization
             var tokenIndex = 0;
             var tokenBuilder = new StringBuilder();
 
-            foreach (var documentFragment in document)
+            foreach (var documentFragment in input)
             {
                 this.Process(
                     documentFragment.Text.Span,
@@ -72,23 +72,23 @@ namespace Lifti.Tokenization
         }
 
         /// <inheritdoc />
-        public IReadOnlyList<Token> Process(ReadOnlySpan<char> text)
+        public IReadOnlyCollection<Token> Process(ReadOnlySpan<char> input)
         {
             var processedTokens = new TokenStore();
             var tokenIndex = 0;
             var tokenBuilder = new StringBuilder();
 
-            this.Process(text, ref tokenIndex, 0, processedTokens, tokenBuilder);
+            this.Process(input, ref tokenIndex, 0, processedTokens, tokenBuilder);
 
             return processedTokens.ToList();
         }
 
         /// <inheritdoc />
-        public string Normalize(ReadOnlySpan<char> text)
+        public string Normalize(ReadOnlySpan<char> tokenText)
         {
-            var tokenBuilder = new StringBuilder(text.Length);
+            var tokenBuilder = new StringBuilder(tokenText.Length);
 
-            foreach (var character in text)
+            foreach (var character in tokenText)
             {
                 foreach (var processed in this.inputPreprocessorPipeline.Process(character))
                 {
@@ -137,12 +137,20 @@ namespace Lifti.Tokenization
         /// <summary>
         /// Determines whether the given character is considered to be a word splitting character.
         /// </summary>
-        protected virtual bool IsSplitCharacter(char current)
+        public virtual bool IsSplitCharacter(char character)
         {
-            return char.IsSeparator(current) ||
-                char.IsControl(current) ||
-                (this.Options.SplitOnPunctuation == true && char.IsPunctuation(current)) ||
-                (this.additionalSplitChars?.Contains(current) == true);
+            return
+                // Split when the character is well known as a Unicode separator or control character
+                char.IsSeparator(character) || char.IsControl(character) || (
+                    (
+                        // Split if we are splitting on punctuation and the character is a punctuation character
+                        (this.Options.SplitOnPunctuation == true && char.IsPunctuation(character)) ||
+                        // Or the character is in the list of additional split characters
+                        this.additionalSplitChars.Contains(character)
+                    )
+                    // Unless the character is an ignored characters
+                    && this.ignoreChars.Contains(character) == false
+               );
         }
 
         private void CaptureToken(TokenStore processedTokens, ref int tokenIndex, int start, int end, StringBuilder tokenBuilder)
@@ -154,10 +162,7 @@ namespace Lifti.Tokenization
                 throw new LiftiException(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.MaxTokenLengthExceeded, ushort.MaxValue));
             }
 
-            if (this.stemmer != null)
-            {
-                this.stemmer.Stem(tokenBuilder);
-            }
+            this.stemmer?.Stem(tokenBuilder);
 
             processedTokens.MergeOrAdd(tokenBuilder, new TokenLocation(tokenIndex, start, (ushort)length));
 

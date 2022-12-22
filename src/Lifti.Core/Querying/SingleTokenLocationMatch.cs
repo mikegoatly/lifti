@@ -7,7 +7,7 @@ namespace Lifti.Querying
     /// <summary>
     /// Represents the location of a single token manifested during the execution of a query.
     /// </summary>
-    public struct SingleTokenLocationMatch : ITokenLocationMatch, IEquatable<SingleTokenLocationMatch>
+    public readonly struct SingleTokenLocationMatch : ITokenLocationMatch, IEquatable<SingleTokenLocationMatch>
     {
         private readonly TokenLocation original;
 
@@ -26,7 +26,7 @@ namespace Lifti.Querying
         public int MinTokenIndex => this.original.TokenIndex;
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is SingleTokenLocationMatch match &&
                    this.Equals(match);

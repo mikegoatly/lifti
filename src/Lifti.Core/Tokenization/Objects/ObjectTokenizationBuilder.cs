@@ -1,10 +1,31 @@
 using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Tokenization.Objects
 {
+    internal interface IObjectTokenizationBuilder
+    {
+        /// <summary>
+        /// Builds this instance.
+        /// </summary>
+        /// <param name="defaultTokenizer">The default <see cref="IIndexTokenizer"/> to use when one is not 
+        /// explicitly configured for a field.</param>
+        /// <param name="defaultThesaurusBuilder">The default <see cref="ThesaurusBuilder"/>
+        /// to use when one is not explicitly configured for a field.</param>
+        /// <param name="defaultTextExtractor">The default <see cref="ITextExtractor"/> to use when one is not 
+        /// explicitly configured for a field.</param>
+        /// <exception cref="LiftiException">
+        /// Thrown if:
+        /// * <see cref="ObjectTokenizationBuilder{T, TKey}.WithKey(Func{T, TKey})"/> has not been called.
+        /// * No fields have been configured.
+        /// </exception>
+        IObjectTokenization Build(IIndexTokenizer defaultTokenizer, ThesaurusBuilder defaultThesaurusBuilder, ITextExtractor defaultTextExtractor);
+    }
+
     /// <summary>
     /// The builder class used to configure an object type for indexing. The object type <typeparamref name="T"/>
     /// must expose an id property of type <typeparamref name="TKey"/> configured using the <see cref="WithKey(Func{T, TKey})"/>
@@ -16,9 +37,9 @@ namespace Lifti.Tokenization.Objects
     /// <typeparam name="TKey">
     /// The type of key in the index.
     /// </typeparam>
-    public class ObjectTokenizationBuilder<T, TKey>
+    public class ObjectTokenizationBuilder<T, TKey> : IObjectTokenizationBuilder
     {
-        private readonly List<FieldReader<T>> fieldReaders = new List<FieldReader<T>>();
+        private readonly List<Func<IIndexTokenizer, ThesaurusBuilder, ITextExtractor, FieldReader<T>>> fieldReaderBuilders = new();
         private Func<T, TKey>? keyReader;
 
         /// <summary>
@@ -52,6 +73,10 @@ namespace Lifti.Tokenization.Objects
         /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
         /// null then default tokenizer configured for the index will be used.
         /// </param>
+        /// <param name="thesaurusOptions">
+        /// An optional delefate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// for the index will be used.
+        /// </param>
         /// <param name="textExtractor">
         /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
         /// text extractor for the index will be used.
@@ -60,12 +85,36 @@ namespace Lifti.Tokenization.Objects
             string name,
             Func<T, string> fieldTextReader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
-            ITextExtractor? textExtractor = null)
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
         {
             ValidateFieldParameters(name, fieldTextReader);
             var tokenizer = tokenizationOptions.CreateTokenizer();
-            this.fieldReaders.Add(new StringFieldReader<T>(name, fieldTextReader, tokenizer, textExtractor));
+            this.fieldReaderBuilders.Add(
+                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringFieldReader<T>(
+                    name,
+                    fieldTextReader,
+                    tokenizer ?? defaultTokenizer,
+                    textExtractor ?? defaultTextExtractor,
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+
             return this;
+        }
+
+        private static IThesaurus CreateFieldThesaurus(
+            IIndexTokenizer defaultTokenizer,
+            IIndexTokenizer? fieldTokenizer,
+            ThesaurusBuilder defaultThesaurusBuilder,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions)
+        {
+            var tokenizer = fieldTokenizer ?? defaultTokenizer;
+            if (thesaurusOptions == null)
+            {
+                // Use the default thesaurus. Note we need to build it again in case the tokenization is configured differently for this field.
+                return defaultThesaurusBuilder.Build(tokenizer);
+            }
+
+            return thesaurusOptions(new ThesaurusBuilder()).Build(tokenizer);
         }
 
         /// <summary>
@@ -85,15 +134,27 @@ namespace Lifti.Tokenization.Objects
         /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
         /// text extractor for the index will be used.
         /// </param>
+        /// <param name="thesaurusOptions">
+        /// An optional delefate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// for the index will be used.
+        /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
             Func<T, IEnumerable<string>> reader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
-            ITextExtractor? textExtractor = null)
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
         {
             ValidateFieldParameters(name, reader);
             var tokenizer = tokenizationOptions.CreateTokenizer();
-            this.fieldReaders.Add(new StringArrayFieldReader<T>(name, reader, tokenizer, textExtractor));
+            this.fieldReaderBuilders.Add((defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) =>
+                new StringArrayFieldReader<T>(
+                    name,
+                    reader,
+                    tokenizer ?? defaultTokenizer,
+                    textExtractor ?? defaultTextExtractor,
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+
             return this;
         }
 
@@ -114,16 +175,44 @@ namespace Lifti.Tokenization.Objects
         /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
         /// text extractor for the index will be used.
         /// </param>
+        /// <param name="thesaurusOptions">
+        /// An optional delefate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// for the index will be used.
+        /// </param>
+        public ObjectTokenizationBuilder<T, TKey> WithField(
+            string name,
+            Func<T, CancellationToken, Task<string>> fieldTextReader,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+        {
+            ValidateFieldParameters(name, fieldTextReader);
+            var tokenizer = tokenizationOptions.CreateTokenizer();
+            this.fieldReaderBuilders.Add((defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) =>
+                new AsyncStringFieldReader<T>(
+                    name,
+                    fieldTextReader,
+                    tokenizer ?? defaultTokenizer,
+                    textExtractor ?? defaultTextExtractor,
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+
+            return this;
+        }
+
+        /// <inheritdoc cref="WithField(string, Func{T, CancellationToken, Task{string}}, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?)"/>
         public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
             Func<T, Task<string>> fieldTextReader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
-            ITextExtractor? textExtractor = null)
+            ITextExtractor? textExtractor = null, 
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
         {
-            ValidateFieldParameters(name, fieldTextReader);
-            var tokenizer = tokenizationOptions.CreateTokenizer();
-            this.fieldReaders.Add(new AsyncStringFieldReader<T>(name, fieldTextReader, tokenizer, textExtractor));
-            return this;
+            return this.WithField(
+                name,
+                (item, ctx) => fieldTextReader(item),
+                tokenizationOptions,
+                textExtractor,
+                thesaurusOptions);
         }
 
         /// <summary>
@@ -132,7 +221,7 @@ namespace Lifti.Tokenization.Objects
         /// <param name="name">
         /// The name of the field. This can be referred to when querying to restrict searches to text read for this field only.
         /// </param>
-        /// <param name="reader">
+        /// <param name="fieldTextReader">
         /// The delegate capable of reading the entire text for the field, where the text is broken in to multiple fragments.
         /// </param>
         /// <param name="tokenizationOptions">
@@ -143,42 +232,62 @@ namespace Lifti.Tokenization.Objects
         /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
         /// text extractor for the index will be used.
         /// </param>
+        /// <param name="thesaurusOptions">
+        /// An optional delefate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// for the index will be used.
+        /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
-            Func<T, Task<IEnumerable<string>>> reader,
+            Func<T, CancellationToken, Task<IEnumerable<string>>> fieldTextReader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
-            ITextExtractor? textExtractor = null)
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
         {
-            ValidateFieldParameters(name, reader);
+            ValidateFieldParameters(name, fieldTextReader);
             var tokenizer = tokenizationOptions.CreateTokenizer();
-            this.fieldReaders.Add(new AsyncStringArrayFieldReader<T>(name, reader, tokenizer, textExtractor));
+            this.fieldReaderBuilders.Add((defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) =>
+                new AsyncStringArrayFieldReader<T>(
+                    name,
+                    fieldTextReader,
+                    tokenizer ?? defaultTokenizer,
+                    textExtractor ?? defaultTextExtractor,
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+
             return this;
         }
 
-        /// <summary>
-        /// Builds this instance.
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="LiftiException">
-        /// Thrown if:
-        /// * <see cref="WithKey(Func{T, TKey})"/> has not been called.
-        /// * No fields have been configured.
-        /// </exception>
-        internal ObjectTokenization<T, TKey> Build()
+        /// <inheritdoc cref="WithField(string, Func{T, CancellationToken, Task{IEnumerable{string}}}, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?)" />
+        public ObjectTokenizationBuilder<T, TKey> WithField(
+            string name,
+            Func<T, Task<IEnumerable<string>>> fieldTextReader,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            ITextExtractor? textExtractor = null)
+        {
+            return this.WithField(
+                name,
+                (item, ctx) => fieldTextReader(item),
+                tokenizationOptions,
+                textExtractor,
+                thesaurusOptions);
+        }
+
+        /// <inheritdoc />
+        IObjectTokenization IObjectTokenizationBuilder.Build(IIndexTokenizer defaultTokenizer, ThesaurusBuilder defaultThesaurusBuilder, ITextExtractor defaultTextExtractor)
         {
             if (this.keyReader == null)
             {
                 throw new LiftiException(ExceptionMessages.KeyReaderMustBeProvided);
             }
 
-            if (this.fieldReaders.Count == 0)
+            if (this.fieldReaderBuilders.Count == 0)
             {
                 throw new LiftiException(ExceptionMessages.AtLeastOneFieldMustBeIndexed);
             }
 
             return new ObjectTokenization<T, TKey>(
                 this.keyReader,
-                this.fieldReaders);
+                this.fieldReaderBuilders.Select(builder => builder(defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor)).ToList());
         }
 
         private static void ValidateFieldParameters(string name, object fieldTextReader)

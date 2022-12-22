@@ -101,6 +101,11 @@ namespace Lifti.Querying
             return CreateIntermediateQueryResult(queryTokenMatches, weighting);
         }
 
+        public bool Process(string text)
+        {
+            return this.Process(text.AsSpan());
+        }
+
         public bool Process(ReadOnlySpan<char> text)
         {
             foreach (var next in text)
@@ -263,7 +268,7 @@ namespace Lifti.Querying
             return fieldMatches.ToLookup(m => m.FieldId)
                 .Select(m => new FieldMatch(
                     m.Key,
-                    m.SelectMany(w => w.Locations).OrderBy(w => w.MinTokenIndex).ToList()));
+                    m.SelectMany(w => w.Locations)));
         }
 
         private static QueryTokenMatch CreateQueryTokenMatch(
@@ -274,7 +279,7 @@ namespace Lifti.Querying
                 match.Value.Select(v => new FieldMatch(v)).ToList());
         }
 
-        internal struct IndexNavigatorBookmark : IIndexNavigatorBookmark, IEquatable<IndexNavigatorBookmark>
+        internal readonly struct IndexNavigatorBookmark : IIndexNavigatorBookmark, IEquatable<IndexNavigatorBookmark>
         {
             private readonly IndexNavigator indexNavigator;
             private readonly IndexNode? currentNode;

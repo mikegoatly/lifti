@@ -37,7 +37,7 @@ namespace Lifti.Querying
             }
         }
 
-        private static IReadOnlyList<ScoredFieldMatch> EnumerateFieldMatches(IEnumerable<ScoredFieldMatch> leftFields, IEnumerable<ScoredFieldMatch> rightFields)
+        private static IReadOnlyList<ScoredFieldMatch> EnumerateFieldMatches(IReadOnlyList<ScoredFieldMatch> leftFields, IReadOnlyList<ScoredFieldMatch> rightFields)
         {
             var matchedFields = JoinFields(leftFields, rightFields);
 
@@ -47,9 +47,8 @@ namespace Lifti.Querying
             {
                 fieldTokenMatches.Clear();
 
-                // TODO could be optimised if order of tokens was guaranteed
-                var furthestRightTokenStart = rightLocations.Max(l => l.MinTokenIndex);
-                var earliestLeftTokenStart = leftLocations.Min(l => l.MinTokenIndex);
+                var furthestRightTokenStart = rightLocations[rightLocations.Count - 1].MinTokenIndex;
+                var earliestLeftTokenStart = leftLocations[0].MinTokenIndex;
 
                 // We're only interested in tokens on the LEFT that start BEFORE the furthest RIGHT token
                 // and tokens on the RIGHT thast start AFTER the earliest LEFT token
@@ -70,7 +69,7 @@ namespace Lifti.Querying
                     fieldResults.Add(
                         new ScoredFieldMatch(
                             score,
-                            new FieldMatch(fieldId, fieldTokenMatches.OrderBy(f => f.MinTokenIndex).ToList())));
+                            new FieldMatch(fieldId, fieldTokenMatches)));
                 }
             }
 

@@ -8,8 +8,8 @@ namespace Lifti.Tests.Querying
 {
     public class IndexNavigatorTests : QueryTestBase, IAsyncLifetime
     {
-        private FullTextIndex<string> index;
-        private IIndexNavigator sut;
+        private FullTextIndex<string> index = null!;
+        private IIndexNavigator sut = null!;
 
         public async Task InitializeAsync()
         {
@@ -70,7 +70,7 @@ namespace Lifti.Tests.Querying
                 },
                 o => o.ComparingByMembers<ScoredToken>()
                       .ComparingByMembers<ScoredFieldMatch>()
-                      .Excluding(i => i.SelectedMemberPath.EndsWith("Score")));
+                      .Excluding(i => i.Path.EndsWith("Score")));
         }
 
         [Theory]
@@ -172,7 +172,7 @@ namespace Lifti.Tests.Querying
                 expectedTokens,
                 o => o.ComparingByMembers<ScoredToken>()
                       .ComparingByMembers<ScoredFieldMatch>()
-                      .Excluding(i => i.SelectedMemberPath.EndsWith("Score")));
+                      .Excluding(i => i.Path.EndsWith("Score")));
         }
 
         [Theory]

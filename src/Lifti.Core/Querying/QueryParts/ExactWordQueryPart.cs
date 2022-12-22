@@ -23,6 +23,11 @@ namespace Lifti.Querying.QueryParts
                 throw new ArgumentNullException(nameof(navigatorCreator));
             }
 
+            if (queryContext is null)
+            {
+                throw new ArgumentNullException(nameof(queryContext));
+            }
+
             using var navigator = navigatorCreator();
             navigator.Process(this.Word.AsSpan());
             return queryContext.ApplyTo(navigator.GetExactMatches());

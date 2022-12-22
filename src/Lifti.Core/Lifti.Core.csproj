@@ -1,63 +1,103 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Library</OutputType>
-    <TargetFramework>netstandard2</TargetFramework>
-    <RootNamespace>Lifti</RootNamespace>
-    <Authors>Mike Goatly</Authors>
-    <Product>LIFTI</Product>
-    <Description>A simple to use in-memory full text indexing library.</Description>
-    <PackageProjectUrl>https://github.com/mikegoatly/lifti</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/mikegoatly/lifti</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>Full Text Search Index Indexing</PackageTags>
-    <NeutralLanguage>en</NeutralLanguage>
-    <PackageId>Lifti.Core</PackageId>
-    <Copyright>Mike Goatly</Copyright>
-    <PackageLicenseFile></PackageLicenseFile>
-    <AssemblyName>Lifti.Core</AssemblyName>
-    <LangVersion>9.0</LangVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFrameworks>netstandard2;net6.0;net7.0</TargetFrameworks>
+		<RootNamespace>Lifti</RootNamespace>
+		<Authors>Mike Goatly</Authors>
+		<Product>LIFTI</Product>
+		<Description>A simple to use in-memory full text indexing library.</Description>
+		<PackageProjectUrl>https://github.com/mikegoatly/lifti</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/mikegoatly/lifti</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>Full Text Search Index Indexing</PackageTags>
+		<NeutralLanguage>en</NeutralLanguage>
+		<PackageId>Lifti.Core</PackageId>
+		<Copyright>Mike Goatly</Copyright>
+		<AssemblyName>Lifti.Core</AssemblyName>
+		<LangVersion>9.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<Title>LIFTI</Title>
+		<PackageIcon>favicon-256.png</PackageIcon>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>latest-all</AnalysisLevel>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>Lifti.Core.xml</DocumentationFile>
-	<WarningsAsErrors>true</WarningsAsErrors>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<DocumentationFile>Lifti.Core.xml</DocumentationFile>
+		<WarningsAsErrors>true</WarningsAsErrors>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>Lifti.Core.xml</DocumentationFile>
-	  <WarningsAsErrors>true</WarningsAsErrors>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<DocumentationFile>Lifti.Core.xml</DocumentationFile>
+		<WarningsAsErrors>true</WarningsAsErrors>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
-    <PackageReference Include="System.Memory" Version="4.5.4" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2|AnyCPU'">
+		<WarningLevel>5</WarningLevel>
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Update="ExceptionMessages.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ExceptionMessages.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2|AnyCPU'">
+		<WarningLevel>5</WarningLevel>
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="ExceptionMessages.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ExceptionMessages.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\docs\static\favicons\favicon-256.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" Condition="'$(TargetFramework)' == 'netstandard2'" />
+		<PackageReference Include="System.Collections.Immutable" Version="1.7.1" Condition="'$(TargetFramework)' == 'netstandard2'" />
+		<PackageReference Include="System.Collections.Immutable" Version="6.0.0" Condition="'$(TargetFramework)' == 'net6.0'" />
+		<PackageReference Include="System.Collections.Immutable" Version="7.0.0" Condition="'$(TargetFramework)' == 'net7.0'" />
+		<PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFramework)' == 'netstandard2'" />
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" Condition="'$(TargetFramework)' == 'netstandard2'"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="ExceptionMessages.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>ExceptionMessages.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="ExceptionMessages.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>ExceptionMessages.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
 
 </Project>

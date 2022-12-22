@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
 using Lifti.Tokenization.Preprocessing;
+using System;
 using System.Linq;
 using Xunit;
 
@@ -9,7 +10,7 @@ namespace Lifti.Tests.Tokenization.Preprocessing
     public class InputPreprocessorPipelineTests
     {
         [Fact]
-        public void WithMultiplePreprocessors_ShouldApplyAllProcessorsInOrder()
+        public void WithCaseInsensitiveAndAccentInsensitivePreprocessors_ShouldApplyAccentRulesThenCaseInsensitivity()
         {
             var input = 'Ч';
             var expectedOutput = "CH";
@@ -18,11 +19,11 @@ namespace Lifti.Tests.Tokenization.Preprocessing
 
             var actual = pipeline.Process(input);
 
-            actual.ToArray().Should().BeEquivalentTo(expectedOutput);
+            actual.Should().BeEquivalentTo(expectedOutput);
         }
 
         [Fact]
-        public void WithSinglePreprocessor_ShouldApplyProvidedPreprocesor()
+        public void WithOnlyCaseInsensitivePreprocessor()
         {
             var input = 'Ч';
             var expectedOutput = "Ch";
@@ -31,7 +32,7 @@ namespace Lifti.Tests.Tokenization.Preprocessing
 
             var actual = pipeline.Process(input);
 
-            actual.ToArray().Should().BeEquivalentTo(expectedOutput);
+            actual.Should().BeEquivalentTo(expectedOutput);
         }
 
         [Fact]
@@ -43,15 +44,28 @@ namespace Lifti.Tests.Tokenization.Preprocessing
 
             var actual = pipeline.Process(input);
 
-            actual.ToArray().Should().BeEquivalentTo(new[] { input });
+            actual.Should().BeEquivalentTo(new[] { input });
         }
 
-        private static IInputPreprocessorPipeline CreatePipeline(bool caseInsensitive = false, bool accentInsensitive = false)
+        [Fact]
+        public void WithIgnoreCharacters_ShouldReturnEmptyForIgnoredCharacter()
+        {
+            var input = 'Ч';
+
+            var pipeline = CreatePipeline(ignoreCharacters: new[] { input });
+
+            pipeline.Process(input).Should().BeEmpty();
+
+            pipeline.Process('p').Should().BeEquivalentTo(new[] { 'p' });
+        }
+
+        private static IInputPreprocessorPipeline CreatePipeline(bool caseInsensitive = false, bool accentInsensitive = false, char[]? ignoreCharacters = null)
         {
             return new InputPreprocessorPipeline(new TokenizationOptions()
             {
                 CaseInsensitive = caseInsensitive,
-                AccentInsensitive = accentInsensitive
+                AccentInsensitive = accentInsensitive,
+                IgnoreCharacters = ignoreCharacters ?? Array.Empty<char>()
             });
         }
     }

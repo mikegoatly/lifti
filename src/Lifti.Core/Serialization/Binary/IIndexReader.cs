@@ -10,6 +10,7 @@ namespace Lifti.Serialization.Binary
     /// The type of the key in the index.
     /// </typeparam>
     public interface IIndexReader<TKey> : IDisposable
+        where TKey : notnull
     {
         /// <summary>
         /// Populates the given <see cref="FullTextIndex{TKey}"/>.

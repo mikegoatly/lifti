@@ -8,12 +8,13 @@ namespace Lifti.Serialization.Binary
 {
 
     internal class V2IndexReader<TKey> : IIndexReader<TKey>
+        where TKey : notnull
     {
         private readonly Stream underlyingStream;
         private readonly bool disposeStream;
         private readonly IKeySerializer<TKey> keySerializer;
         private readonly MemoryStream buffer;
-        private long initialUnderlyingStreamOffset = 0L;
+        private long initialUnderlyingStreamOffset;
         protected readonly BinaryReader reader;
 
         public V2IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer)

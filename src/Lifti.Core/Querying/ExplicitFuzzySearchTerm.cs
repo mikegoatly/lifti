@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Lifti.Querying
 {
-    internal struct ExplicitFuzzySearchTerm
+    internal readonly struct ExplicitFuzzySearchTerm
     {
         private static readonly Regex parameterRegex = new Regex(@"^(?<MaxEditDistance>\d*)(,(?<MaxSequentialEdits>\d*))?$", RegexOptions.Compiled);
 

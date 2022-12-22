@@ -60,10 +60,12 @@ namespace Lifti.Tests
             var results = this.index.Search("test");
             results.Should().HaveCount(1);
             results.Single().FieldMatches.Single().Locations.Should().BeEquivalentTo(
-                new TokenLocation(0, 0, 4),
-                new TokenLocation(1, 5, 4),
-                new TokenLocation(2, 11, 4)
-            );
+                new[]
+                {
+                    new TokenLocation(0, 0, 4),
+                    new TokenLocation(1, 5, 4),
+                    new TokenLocation(2, 11, 4)
+                });
         }
 
         [Fact]
@@ -101,7 +103,7 @@ namespace Lifti.Tests
             var results = this.index.Search("TAE");
             results.Should().HaveCount(1);
             results.First().FieldMatches.Single().FoundIn.Should().Be("Text4");
-            
+
             results = this.index.Search("EAT");
             results.Should().HaveCount(1);
             results.First().FieldMatches.Single().FoundIn.Should().Be("Text3");
@@ -134,7 +136,7 @@ namespace Lifti.Tests
 
             var results = this.index.Search("this");
 
-            results.All(i => i.FieldMatches.All(l => l.FoundIn == "Unspecified")).Should().BeTrue();
+            results.All(i => i.FieldMatches.All(l => l.FoundIn == IndexedFieldLookup.DefaultFieldName)).Should().BeTrue();
         }
 
         [Fact]
@@ -187,7 +189,7 @@ namespace Lifti.Tests
             this.index.Search("Text1=One").Should().HaveCount(2);
 
             this.index.Search("Text2=*t").Should().HaveCount(2); //Text and not
-            this.index.Search("Text2=?toxt").Should().HaveCount(2); //Text and not
+            this.index.Search("Text2=?toxt").Should().HaveCount(1); //Text
 
             this.index.Search("Text3=eat").Should().HaveCount(1);
             this.index.Search("Text3=eats").Should().HaveCount(1);

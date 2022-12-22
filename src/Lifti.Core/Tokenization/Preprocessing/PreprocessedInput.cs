@@ -7,7 +7,7 @@ namespace Lifti
     /// Describes the output from a <see cref="IInputPreprocessor.Preprocess(char)"/> invocation.
     /// The output of 
     /// </summary>
-    public struct PreprocessedInput : IEquatable<PreprocessedInput>
+    public readonly struct PreprocessedInput : IEquatable<PreprocessedInput>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PreprocessedInput"/> struct. This overload should
@@ -37,6 +37,11 @@ namespace Lifti
         }
 
         /// <summary>
+        /// Gets an instance of <see cref="PreprocessedInput"/> that yields no characters.
+        /// </summary>
+        public static PreprocessedInput Empty { get; } = new PreprocessedInput(string.Empty);
+
+        /// <summary>
         /// Gets the single character value that this instance represents. This is <c>\0</c> if
         /// the instance is a multi-character replacement.
         /// </summary>
@@ -55,7 +60,7 @@ namespace Lifti
         public string? Replacement { get; }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is PreprocessedInput input &&
                 this.Equals(input);

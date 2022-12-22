@@ -358,6 +358,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not all requested items were returned. Tme missing ids were: {0}.
+        /// </summary>
+        internal static string NotAllRequestedItemsReturned {
+            get {
+                return ResourceManager.GetString("NotAllRequestedItemsReturned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No tokenization options have been provided for type {0}.
         /// </summary>
         internal static string NoTokenizationOptionsProvidedForType {
@@ -372,6 +381,33 @@ namespace Lifti {
         internal static string SingleCharacterWildcardsFollowingMultiCharacterNotSupported {
             get {
                 return ResourceManager.GetString("SingleCharacterWildcardsFollowingMultiCharacterNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text tokens must have an associated index tokenizer.
+        /// </summary>
+        internal static string TextTokensMustHaveIndexTokenizers {
+            get {
+                return ResourceManager.GetString("TextTokensMustHaveIndexTokenizers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thesaurus entries cannot result in multiple words because each word will be considered equivalent which is probably not what you expect. The word was: {0} and was split into {1}.
+        /// </summary>
+        internal static string ThesaurusEntriesCannotResultInMultipleWords {
+            get {
+                return ResourceManager.GetString("ThesaurusEntriesCannotResultInMultipleWords", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The word &quot;{0}&quot; resulted in an empty value after tokenization..
+        /// </summary>
+        internal static string ThesaurusEntriesMustResultInACompleteWord {
+            get {
+                return ResourceManager.GetString("ThesaurusEntriesMustResultInACompleteWord", resourceCulture);
             }
         }
         
@@ -399,6 +435,15 @@ namespace Lifti {
         internal static string UnableToReadHeaderInformation {
             get {
                 return ResourceManager.GetString("UnableToReadHeaderInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected close bracket encountered in query.
+        /// </summary>
+        internal static string UnexpectedCloseBracket {
+            get {
+                return ResourceManager.GetString("UnexpectedCloseBracket", resourceCulture);
             }
         }
         

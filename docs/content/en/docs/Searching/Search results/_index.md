@@ -2,13 +2,12 @@
 title: Search Results
 linkTitle: "Search Results"
 date: 2020-07-14
-description:
-    Results from `FullTextIndex<T>.Search` are an enumeration of `SearchResult<T>`
+description: "`FullTextIndex<T>.Search` returns `ISearchResults<T>`, which implements `IEnumerable<SearchResult<T>>` and provides other utilities for processing the matched search locations further."
 ---
 
 ## Search result order
 
-Search results are returned sorted according to the total document score, in descending order. See [scoring](../../scoring) for more information.
+Search results are returned sorted according to the total document score, in descending order. See [scoring](./scoring) for more information.
 
 ## SearchResult&lt;T&gt;
 

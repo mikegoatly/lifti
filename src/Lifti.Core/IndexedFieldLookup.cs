@@ -1,6 +1,4 @@
-﻿using Lifti.Tokenization;
-using Lifti.Tokenization.Objects;
-using Lifti.Tokenization.TextExtraction;
+﻿using Lifti.Tokenization.Objects;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -10,45 +8,34 @@ namespace Lifti
     /// <inheritdoc />
     public class IndexedFieldLookup : IIndexedFieldLookup
     {
+        internal const string DefaultFieldName = "Unspecified";
+
         private readonly Dictionary<string, IndexedFieldDetails> fieldToDetailsLookup = new Dictionary<string, IndexedFieldDetails>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<byte, string> idToFieldLookup = new Dictionary<byte, string>();
-        private int nextId = 0;
+        private int nextId;
 
-        internal IndexedFieldLookup(
-            IEnumerable<IFieldReader> fieldReaders, 
-            ITextExtractor defaultTextExtractor,
-            ITokenizer defaultTokenizer)
+        internal IndexedFieldLookup(IEnumerable<IFieldReader> fieldReaders)
         {
             if (fieldReaders is null)
             {
                 throw new ArgumentNullException(nameof(fieldReaders));
             }
 
-            if (defaultTextExtractor is null)
-            {
-                throw new ArgumentNullException(nameof(defaultTextExtractor));
-            }
-
-            if (defaultTokenizer is null)
-            {
-                throw new ArgumentNullException(nameof(defaultTokenizer));
-            }
-
             foreach (var field in fieldReaders)
             {
-                this.RegisterField(field, defaultTextExtractor, defaultTokenizer);
+                this.RegisterField(field);
             }
         }
 
         /// <inheritdoc />
-        public byte DefaultField { get; } = 0;
+        public byte DefaultField { get; }
 
         /// <inheritdoc />
         public string GetFieldForId(byte id)
         {
             if (id == 0)
             {
-                return "Unspecified";
+                return DefaultFieldName;
             }
             else if (idToFieldLookup.TryGetValue(id, out var fieldName))
             {
@@ -69,7 +56,7 @@ namespace Lifti
             return details;
         }
 
-        private void RegisterField(IFieldReader fieldOptions, ITextExtractor defaultTextExtractor, ITokenizer defaultTokenizer)
+        private void RegisterField(IFieldReader fieldOptions)
         {
             var fieldName = fieldOptions.Name;
             if (this.fieldToDetailsLookup.ContainsKey(fieldOptions.Name))
@@ -84,9 +71,12 @@ namespace Lifti
             }
 
             var id = (byte)newId;
-            var fieldTokenizer = fieldOptions.Tokenizer ?? defaultTokenizer;
-            var textExtractor = fieldOptions.TextExtractor ?? defaultTextExtractor;
-            this.fieldToDetailsLookup[fieldName] = new IndexedFieldDetails((byte)id, textExtractor, fieldTokenizer);
+            this.fieldToDetailsLookup[fieldName] = new IndexedFieldDetails(
+                id,
+                fieldOptions.TextExtractor,
+                fieldOptions.Tokenizer,
+                fieldOptions.Thesaurus);
+
             this.idToFieldLookup[id] = fieldName;
         }
     }

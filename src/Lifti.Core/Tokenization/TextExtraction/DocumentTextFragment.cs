@@ -6,7 +6,7 @@ namespace Lifti.Tokenization.TextExtraction
     /// <summary>
     /// Information about a fragment of extracted text from a larger document body.
     /// </summary>
-    public struct DocumentTextFragment : IEquatable<DocumentTextFragment>
+    public readonly struct DocumentTextFragment : IEquatable<DocumentTextFragment>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentTextFragment"/> struct.
@@ -43,10 +43,10 @@ namespace Lifti.Tokenization.TextExtraction
         }
 
         /// <inheritdoc />
-        public bool Equals(DocumentTextFragment fragment)
+        public bool Equals(DocumentTextFragment other)
         {
-            return this.Offset == fragment.Offset &&
-                   EqualityComparer<ReadOnlyMemory<char>>.Default.Equals(this.Text, fragment.Text);
+            return this.Offset == other.Offset &&
+                   EqualityComparer<ReadOnlyMemory<char>>.Default.Equals(this.Text, other.Text);
         }
 
         /// <summary>

@@ -77,7 +77,7 @@ namespace Lifti.Querying
         }
 
         /// <inheritdoc />
-        public override string ToString()
+        public override string? ToString()
         {
             return this.Root.ToString();
         }

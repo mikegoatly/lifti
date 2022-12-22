@@ -87,7 +87,7 @@ namespace Lifti.Querying
         }
 
         /// <summary>
-        /// Builds an <see cref="ITokenizer"/> instance matching the current configuration.
+        /// Builds an <see cref="IIndexTokenizer"/> instance matching the current configuration.
         /// </summary>
         public IQueryParser Build()
         {
