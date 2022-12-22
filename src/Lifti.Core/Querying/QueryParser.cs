@@ -1,5 +1,4 @@
 ﻿using Lifti.Querying.QueryParts;
-using Lifti.Tokenization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -158,8 +157,8 @@ namespace Lifti.Querying
 
         private IQueryPart ComposePart(IQueryPart? existingPart, IQueryPart newPart)
         {
-            return existingPart == null 
-                ? newPart 
+            return existingPart == null
+                ? newPart
                 : CombineParts(existingPart, newPart, this.defaultJoiningOperator, 0);
         }
 
@@ -203,8 +202,8 @@ namespace Lifti.Querying
             {
                 QueryTokenType.AndOperator => OperatorPrecedence.And,
                 QueryTokenType.OrOperator => OperatorPrecedence.Or,
-                QueryTokenType.PrecedingNearOperator 
-                    or QueryTokenType.NearOperator 
+                QueryTokenType.PrecedingNearOperator
+                    or QueryTokenType.NearOperator
                     or QueryTokenType.PrecedingOperator => OperatorPrecedence.Positional,
                 _ => throw new QueryParserException(ExceptionMessages.UnexpectedOperatorInternal, tokenType),
             };
@@ -219,7 +218,7 @@ namespace Lifti.Querying
                 this.enumerator = queryTokenizer.ParseQueryTokens(queryText, tokenizerProvider).GetEnumerator();
             }
 
-            public bool TryGetNextToken([NotNullWhen(true)]out QueryToken? token)
+            public bool TryGetNextToken([NotNullWhen(true)] out QueryToken? token)
             {
                 if (this.enumerator.MoveNext())
                 {
@@ -233,8 +232,8 @@ namespace Lifti.Querying
 
             public QueryToken GetNextToken()
             {
-                return this.enumerator.MoveNext() 
-                    ? this.enumerator.Current 
+                return this.enumerator.MoveNext()
+                    ? this.enumerator.Current
                     : throw new QueryParserException(ExceptionMessages.UnexpectedEndOfQuery);
             }
 
