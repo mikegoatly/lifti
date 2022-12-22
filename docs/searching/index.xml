@@ -22,7 +22,10 @@
       <description>
         
         
-        &lt;h2 id=&#34;quick-examples&#34;&gt;Quick examples&lt;/h2&gt;
+        &lt;blockquote&gt;
+&lt;p&gt;Don&amp;rsquo;t want to use advanced queries? You&amp;rsquo;ll want to configure the &lt;a href=&#34;../simple-queries&#34;&gt;simple query parser&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;quick-examples&#34;&gt;Quick examples&lt;/h2&gt;
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -195,7 +198,7 @@ immediately next to each other in the source text.&lt;/p&gt;
       <description>
         
         
-        &lt;p&gt;Fuzzy matches can be explicitly searched for using the &lt;a href=&#34;../lifti-query-syntax/#fuzzy-match-&#34;&gt;LIFTI query syntax&lt;/a&gt;, or implied as the default for searches by 
+        &lt;p&gt;Fuzzy matches can be explicitly searched for using the &lt;a href=&#34;../lifti-query-syntax/#fuzzy-match-&#34;&gt;LIFTI query syntax&lt;/a&gt;, or implied as the default for searches by
 &lt;a href=&#34;../../index-construction/withqueryparser/#configuring-the-default-lifti-queryparser&#34;&gt;configuring the index&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;LIFTI uses &lt;a href=&#34;https://en.wikipedia.org/wiki/Levenshtein_distance&#34;&gt;Levenshtein distance&lt;/a&gt; to perform fuzzy matches between a search term and tokens in the index.
 The distance between two words is the number of edits that are required to match them, including:&lt;/p&gt;
@@ -210,7 +213,7 @@ words that are closer matches will typically be surfaced higher up in the search
 &lt;h3 id=&#34;configuration&#34;&gt;Configuration&lt;/h3&gt;
 &lt;p&gt;To prevent a &lt;a href=&#34;https://en.wikipedia.org/wiki/Combinatorial_explosion&#34;&gt;combinatorial explosion&lt;/a&gt; of potential matches, LIFTI provides two control mechanisms for fuzzy matching:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Maximum number of edits&lt;/strong&gt; - the total number of edits that can be used in any potential match. The default for this value is calculated as &lt;code&gt;search term length/2&lt;/code&gt; which allows for a larger number of 
+&lt;li&gt;&lt;strong&gt;Maximum number of edits&lt;/strong&gt; - the total number of edits that can be used in any potential match. The default for this value is calculated as &lt;code&gt;search term length/2&lt;/code&gt; which allows for a larger number of
 edits for longer search terms. Search terms of just a single character will not allow any edits, as the resulting value will be zero (the formula is an integer calculation).&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;Maximum number of sequential edits&lt;/strong&gt; - the maximum number of edits that can be found sequentially in any potential match. The default for this value is calculated as &lt;code&gt;max(1, search term length/4)&lt;/code&gt;. This
 default allows for a growing number of sequential edits, however this will never drop below a value of one.&lt;/li&gt;
@@ -238,9 +241,9 @@ or a value calculated from the length of the search term.&lt;/p&gt;
         
         
         &lt;p&gt;When you have &lt;a href=&#34;../../index-construction/withsimplequeryparser&#34;&gt;configured an index to use the simple query parser&lt;/a&gt; you can no longer
-make use of the full LIFTI query syntax in your queries, however you can still configure the simple query parser to treat all search 
+make use of the full LIFTI query syntax in your queries, however you can still configure the simple query parser to treat all search
 terms as &lt;a href=&#34;../fuzzy-matching&#34;&gt;fuzzy matches&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Search terms are simply combined together with &lt;code&gt;and&lt;/code&gt;s or &lt;code&gt;or&lt;/code&gt;s, depending on your configuration, and punctuation is stripped out as per your 
+&lt;p&gt;Search terms are simply combined together with &lt;code&gt;and&lt;/code&gt;s or &lt;code&gt;or&lt;/code&gt;s, depending on your configuration, and punctuation is stripped out as per your
 index tokenization rules.&lt;/p&gt;
 
       </description>
@@ -255,7 +258,7 @@ index tokenization rules.&lt;/p&gt;
       <description>
         
         
-        &lt;p&gt;You can manually construct a &lt;code&gt;Query&lt;/code&gt; using any combination of &lt;code&gt;IQueryPart&lt;/code&gt;s, but take care to normalize any text to match in the same way that it has been indexed. You can do this using either the &lt;code&gt;ITokenizer&lt;/code&gt; for the index, or if specific tokenization rules have been &lt;a href=&#34;../index-construction/withobjecttokenization&#34;&gt;configured for a field&lt;/a&gt;, then the tokenizer for that field:&lt;/p&gt;
+        &lt;p&gt;You can manually construct a &lt;code&gt;Query&lt;/code&gt; using any combination of &lt;code&gt;IQueryPart&lt;/code&gt;s, but take care to normalize any text to match in the same way that it has been indexed. You can do this using either the &lt;code&gt;IIndexTokenizer&lt;/code&gt; for the index, or if specific tokenization rules have been &lt;a href=&#34;../index-construction/withobjecttokenization&#34;&gt;configured for a field&lt;/a&gt;, then the tokenizer for that field:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;tokenizer&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;index&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;DefaultTokenizer&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;query&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Query&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;AndQueryOperator&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;
@@ -429,7 +432,7 @@ navigation of the index.&lt;/p&gt;
         
         
         &lt;h2 id=&#34;search-result-order&#34;&gt;Search result order&lt;/h2&gt;
-&lt;p&gt;Search results are returned sorted according to the total document score, in descending order. See &lt;a href=&#34;../../scoring&#34;&gt;scoring&lt;/a&gt; for more information.&lt;/p&gt;
+&lt;p&gt;Search results are returned sorted according to the total document score, in descending order. See &lt;a href=&#34;./scoring&#34;&gt;scoring&lt;/a&gt; for more information.&lt;/p&gt;
 &lt;h2 id=&#34;searchresultlttgt&#34;&gt;SearchResult&amp;lt;T&amp;gt;&lt;/h2&gt;
 &lt;h3 id=&#34;t-item--get-&#34;&gt;T Item { get; }&lt;/h3&gt;
 &lt;p&gt;The item that matched the search criteria.&lt;/p&gt;
