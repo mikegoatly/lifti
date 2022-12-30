@@ -90,7 +90,7 @@ namespace Lifti.Querying
                             }
                     }
 
-                    if (currentToken.MinTokenIndex < nextToken.MinTokenIndex)
+                    if (currentToken.MaxTokenIndex < nextToken.MaxTokenIndex)
                     {
                         leftIndex++;
                     }

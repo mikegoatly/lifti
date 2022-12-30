@@ -35,6 +35,37 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task SequentialWildcardMatches_ShouldResultInCorrectMatchedPhrases()
+        {
+            var data = new[] {
+                (1, "This is some text and seems to some"),
+                (2, "This one seems to be the one containing the match"),
+                (3, "It seems to me that this one won't work either"),
+                (4, "This ought to work too"),
+            };
+
+            var index = new FullTextIndexBuilder<int>()
+                .Build();
+
+            foreach (var entry in data)
+            {
+                await index.AddAsync(entry.Item1, entry.Item2);
+            }
+
+            index.Search("\"* to  *\"").CreateMatchPhrases(x => data.First(d => d.Item1 == x).Item2)
+                .SelectMany(x => x.FieldPhrases.SelectMany(x => x.Phrases))
+                .Should()
+                .BeEquivalentTo(
+                new[]
+                {
+                    "seems to some",
+                    "seems to be",
+                    "seems to me",
+                    "ought to work"
+                });
+        }
+
+        [Fact]
         public async Task IndexedEmoji_ShouldBeSearchable()
         {
             await this.index.AddAsync("A", new[] { "🎶" });
