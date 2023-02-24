@@ -74,7 +74,7 @@ namespace Lifti.Tokenization.Objects
         /// null then default tokenizer configured for the index will be used.
         /// </param>
         /// <param name="thesaurusOptions">
-        /// An optional delefate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
         /// for the index will be used.
         /// </param>
         /// <param name="textExtractor">
@@ -135,7 +135,7 @@ namespace Lifti.Tokenization.Objects
         /// text extractor for the index will be used.
         /// </param>
         /// <param name="thesaurusOptions">
-        /// An optional delefate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
         /// for the index will be used.
         /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
@@ -164,6 +164,52 @@ namespace Lifti.Tokenization.Objects
         /// <param name="name">
         /// The name of the field. This can be referred to when querying to restrict searches to text read for this field only.
         /// </param>
+        /// <param name="reader">
+        /// The delegate capable of reading a set of nested objects from the object, from which text can be extracted as multiple fragments.
+        /// </param>
+        /// <param name="nestedObjectTextReader">
+        /// The delegate capable of reading the text from a nested object.
+        /// </param>
+        /// <param name="tokenizationOptions">
+        /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
+        /// null then default tokenizer configured for the index will be used.
+        /// </param>
+        /// <param name="textExtractor">
+        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
+        /// text extractor for the index will be used.
+        /// </param>
+        /// <param name="thesaurusOptions">
+        /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// for the index will be used.
+        /// </param>
+        public ObjectTokenizationBuilder<T, TKey> WithField<TNestedObject>(
+            string name,
+            Func<T, IEnumerable<TNestedObject>> reader,
+            Func<TNestedObject, string> nestedObjectTextReader,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+        {
+            ValidateFieldParameters(name, reader);
+            var tokenizer = tokenizationOptions.CreateTokenizer();
+            this.fieldReaderBuilders.Add((defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) =>
+                new NestedObjectFieldReader<T, TNestedObject>(
+                    name,
+                    reader,
+                    nestedObjectTextReader,
+                    tokenizer ?? defaultTokenizer,
+                    textExtractor ?? defaultTextExtractor,
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a field to be indexed for the item.
+        /// </summary>
+        /// <param name="name">
+        /// The name of the field. This can be referred to when querying to restrict searches to text read for this field only.
+        /// </param>
         /// <param name="fieldTextReader">
         /// The delegate capable of reading the entire text for the field.
         /// </param>
@@ -176,7 +222,7 @@ namespace Lifti.Tokenization.Objects
         /// text extractor for the index will be used.
         /// </param>
         /// <param name="thesaurusOptions">
-        /// An optional delefate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
         /// for the index will be used.
         /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
@@ -233,7 +279,7 @@ namespace Lifti.Tokenization.Objects
         /// text extractor for the index will be used.
         /// </param>
         /// <param name="thesaurusOptions">
-        /// An optional delefate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
         /// for the index will be used.
         /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(

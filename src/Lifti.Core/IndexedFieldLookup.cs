@@ -6,7 +6,7 @@ using System.Threading;
 namespace Lifti
 {
     /// <inheritdoc />
-    public class IndexedFieldLookup : IIndexedFieldLookup
+    internal class IndexedFieldLookup : IIndexedFieldLookup
     {
         internal const string DefaultFieldName = "Unspecified";
 
