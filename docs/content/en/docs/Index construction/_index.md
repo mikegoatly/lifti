@@ -6,6 +6,16 @@ description: >
   Use a `FullTextIndexBuilder<TKey>` to configure the behavior of your index.
 ---
 
+## `FullTextIndexBuilder<TKey>`
+
+`FullTextIndexBuilder` requires a single generic type provided to it. 
+This defines the type of the key that items will be indexed against.
+
+In simple cases this will just be a `string`, `Guid`, `Int32` or `UInt32`. 
+Indexes can be built with other key types, including composite types, but special care needs 
+to be made when using the binary serializer. See [Key Serialization](../serialization/key-serialization) 
+for more information.
+
 ## Quick examples
 
 Create an index with defaults:
