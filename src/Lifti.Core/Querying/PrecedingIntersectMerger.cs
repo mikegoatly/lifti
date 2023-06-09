@@ -37,7 +37,7 @@ namespace Lifti.Querying
             }
         }
 
-        private static IReadOnlyList<ScoredFieldMatch> EnumerateFieldMatches(IReadOnlyList<ScoredFieldMatch> leftFields, IReadOnlyList<ScoredFieldMatch> rightFields)
+        private static List<ScoredFieldMatch> EnumerateFieldMatches(IReadOnlyList<ScoredFieldMatch> leftFields, IReadOnlyList<ScoredFieldMatch> rightFields)
         {
             var matchedFields = JoinFields(leftFields, rightFields);
 
@@ -51,7 +51,7 @@ namespace Lifti.Querying
                 var earliestLeftTokenStart = leftLocations[0].MinTokenIndex;
 
                 // We're only interested in tokens on the LEFT that start BEFORE the furthest RIGHT token
-                // and tokens on the RIGHT thast start AFTER the earliest LEFT token
+                // and tokens on the RIGHT that start AFTER the earliest LEFT token
                 // E.g. searching "B A B A B A" with "A > B":
                 // B(0) - excluded - before first A
                 // A(1) - included - the first A - exists before a B

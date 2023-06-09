@@ -271,7 +271,7 @@ namespace Lifti
             this.PerformWriteLockedAction(() => this.Root = indexNode);
         }
 
-        private static IReadOnlyCollection<Token> ExtractDocumentTokens(
+        private static List<Token> ExtractDocumentTokens(
             IEnumerable<string> documentTextFragments, 
             ITextExtractor textExtractor, 
             IIndexTokenizer tokenizer,
@@ -288,7 +288,7 @@ namespace Lifti
             return TokenizeFragments(tokenizer, thesaurus, fragments);
         }
 
-        private static IReadOnlyCollection<Token> ExtractDocumentTokens(
+        private static List<Token> ExtractDocumentTokens(
             string documentText, 
             ITextExtractor textExtractor, 
             IIndexTokenizer tokenizer,

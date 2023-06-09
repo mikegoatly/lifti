@@ -5,7 +5,7 @@ namespace Lifti.Serialization.Binary
 {
     internal static class StandardKeySerializerFactory
     {
-        private static readonly IDictionary<Type, object> standardKeySerializers = new Dictionary<Type, object>
+        private static readonly Dictionary<Type, object> standardKeySerializers = new()
         {
             { typeof(string), new StringFormatterKeySerializer() },
             { typeof(int), new IntFormatterKeySerializer() },

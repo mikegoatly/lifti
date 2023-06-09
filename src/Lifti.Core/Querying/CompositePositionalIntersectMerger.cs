@@ -41,7 +41,7 @@ namespace Lifti.Querying
             }
         }
 
-        private static IReadOnlyList<ScoredFieldMatch> PositionallyMatchAndCombineTokens(
+        private static List<ScoredFieldMatch> PositionallyMatchAndCombineTokens(
             bool leftAndRightSwapped,
             IEnumerable<ScoredFieldMatch> leftFields,
             IEnumerable<ScoredFieldMatch> rightFields,
@@ -66,28 +66,28 @@ namespace Lifti.Querying
                     return new CompositeTokenMatchLocation(currentToken, nextToken);
                 }
 
-                int leftIndex = 0;
-                int rightIndex = 0;
+                var leftIndex = 0;
+                var rightIndex = 0;
 
                 while (leftIndex < leftLocations.Count && rightIndex < rightLocations.Count)
                 {
                     var currentToken = leftLocations[leftIndex];
                     var nextToken = rightLocations[rightIndex];
 
-                        if (leftTolerance > 0)
+                    if (leftTolerance > 0)
+                    {
+                        if ((currentToken.MinTokenIndex - nextToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(leftTolerance))
                         {
-                            if ((currentToken.MinTokenIndex - nextToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(leftTolerance))
-                            {
-                                fieldTokenMatches.Add(CreateCompositeTokenMatchLocation(leftAndRightSwapped, currentToken, nextToken));
-                            }
+                            fieldTokenMatches.Add(CreateCompositeTokenMatchLocation(leftAndRightSwapped, currentToken, nextToken));
                         }
+                    }
 
-                        if (rightTolerance > 0)
+                    if (rightTolerance > 0)
+                    {
+                        if ((nextToken.MinTokenIndex - currentToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(rightTolerance))
                         {
-                            if ((nextToken.MinTokenIndex - currentToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(rightTolerance))
-                            {
-                                fieldTokenMatches.Add(CreateCompositeTokenMatchLocation(leftAndRightSwapped, currentToken, nextToken));
-                            }
+                            fieldTokenMatches.Add(CreateCompositeTokenMatchLocation(leftAndRightSwapped, currentToken, nextToken));
+                        }
                     }
 
                     if (currentToken.MaxTokenIndex < nextToken.MaxTokenIndex)
