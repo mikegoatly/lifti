@@ -10,11 +10,11 @@ namespace Lifti
     {
         internal const string DefaultFieldName = "Unspecified";
 
-        private readonly Dictionary<string, IndexedFieldDetails> fieldToDetailsLookup = new Dictionary<string, IndexedFieldDetails>(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<byte, string> idToFieldLookup = new Dictionary<byte, string>();
+        private readonly Dictionary<string, IndexedFieldDetails> fieldToDetailsLookup = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<byte, string> idToFieldLookup = new();
         private int nextId;
 
-        internal IndexedFieldLookup(IEnumerable<IFieldReader> fieldReaders)
+        internal IndexedFieldLookup(IEnumerable<IStaticFieldReader> fieldReaders)
         {
             if (fieldReaders is null)
             {
@@ -23,9 +23,12 @@ namespace Lifti
 
             foreach (var field in fieldReaders)
             {
-                this.RegisterField(field);
+                this.RegisterField(field.Name, field);
             }
         }
+
+        /// <inheritdoc />
+        public IReadOnlyCollection<string> AllFieldNames => this.fieldToDetailsLookup.Keys;
 
         /// <inheritdoc />
         public byte DefaultField { get; }
@@ -37,7 +40,7 @@ namespace Lifti
             {
                 return DefaultFieldName;
             }
-            else if (idToFieldLookup.TryGetValue(id, out var fieldName))
+            else if (this.idToFieldLookup.TryGetValue(id, out var fieldName))
             {
                 return fieldName;
             }
@@ -56,28 +59,42 @@ namespace Lifti
             return details;
         }
 
-        private void RegisterField(IFieldReader fieldOptions)
+        internal IndexedFieldDetails GetOrCreateDynamicFieldInfo(string fieldName, IFieldConfig fieldConfig)
         {
-            var fieldName = fieldOptions.Name;
-            if (this.fieldToDetailsLookup.ContainsKey(fieldOptions.Name))
+            if (!this.fieldToDetailsLookup.TryGetValue(fieldName, out var details))
+            {
+                details = this.RegisterField(fieldName, fieldConfig);
+            }
+
+            return details;
+        }
+
+        private IndexedFieldDetails RegisterField(string name, IFieldConfig fieldConfig)
+        {
+            var fieldName = name;
+            if (this.fieldToDetailsLookup.ContainsKey(name))
             {
                 throw new LiftiException(ExceptionMessages.FieldNameAlreadyUsed, fieldName);
             }
 
-            var newId = Interlocked.Increment(ref nextId);
+            var newId = Interlocked.Increment(ref this.nextId);
             if (newId > byte.MaxValue)
             {
                 throw new LiftiException(ExceptionMessages.MaximumDistinctFieldsIndexReached);
             }
 
             var id = (byte)newId;
-            this.fieldToDetailsLookup[fieldName] = new IndexedFieldDetails(
+            var details = new IndexedFieldDetails(
                 id,
-                fieldOptions.TextExtractor,
-                fieldOptions.Tokenizer,
-                fieldOptions.Thesaurus);
+                fieldConfig.TextExtractor,
+                fieldConfig.Tokenizer,
+                fieldConfig.Thesaurus);
+
+            this.fieldToDetailsLookup[fieldName] = details;
 
             this.idToFieldLookup[id] = fieldName;
+
+            return details;
         }
     }
 }

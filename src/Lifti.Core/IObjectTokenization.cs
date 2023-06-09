@@ -16,8 +16,8 @@ namespace Lifti
         Type ItemType { get; }
 
         /// <summary>
-        /// Gets the configuration for the fields associated to this instance.
+        /// Gets the configuration for the static fields associated to this instance.
         /// </summary>
-        IEnumerable<IFieldReader> GetConfiguredFields();
+        IEnumerable<IStaticFieldReader> GetStaticFields();
     }
 }

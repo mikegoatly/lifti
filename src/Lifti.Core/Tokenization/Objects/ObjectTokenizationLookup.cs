@@ -23,9 +23,9 @@ namespace Lifti.Tokenization.Objects
             throw new LiftiException(ExceptionMessages.NoTokenizationOptionsProvidedForType, typeof(TItem));
         }
 
-        internal IEnumerable<IFieldReader> GetAllConfiguredFields()
+        internal IEnumerable<IStaticFieldReader> GetAllConfiguredStaticFields()
         {
-            return this.options.Values.SelectMany(o => o.GetConfiguredFields());
+            return this.options.Values.SelectMany(o => o.GetStaticFields());
         }
     }
 }

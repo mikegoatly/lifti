@@ -39,8 +39,9 @@ namespace Lifti.Tokenization.Objects
     /// </typeparam>
     public class ObjectTokenizationBuilder<T, TKey> : IObjectTokenizationBuilder
     {
-        private readonly List<Func<IIndexTokenizer, ThesaurusBuilder, ITextExtractor, FieldReader<T>>> fieldReaderBuilders = new();
+        private readonly List<Func<IIndexTokenizer, ThesaurusBuilder, ITextExtractor, StaticFieldReader<T>>> fieldReaderBuilders = new();
         private Func<T, TKey>? keyReader;
+        private readonly List<Func<IIndexTokenizer, ThesaurusBuilder, ITextExtractor, DynamicFieldReader<T>>> dynamicFieldReaderBuilders = new();
 
         /// <summary>
         /// Indicates how the unique key of the item can be read.
@@ -74,7 +75,7 @@ namespace Lifti.Tokenization.Objects
         /// null then default tokenizer configured for the index will be used.
         /// </param>
         /// <param name="thesaurusOptions">
-        /// An optional delefate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
         /// for the index will be used.
         /// </param>
         /// <param name="textExtractor">
@@ -101,20 +102,53 @@ namespace Lifti.Tokenization.Objects
             return this;
         }
 
-        private static Thesaurus CreateFieldThesaurus(
-            IIndexTokenizer defaultTokenizer,
-            IIndexTokenizer? fieldTokenizer,
-            ThesaurusBuilder defaultThesaurusBuilder,
-            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions)
+        /// <summary>
+        /// Registers a property on the item that exposes a set of dynamic fields and the text to be indexed for each.
+        /// Dynamic fields are automatically registered with the index's <see cref="IndexedFieldLookup"/> as they are encountered
+        /// during indexing.
+        /// </summary>
+        /// <param name="dynamicFieldReader">
+        /// The delegate capable of reading the the field name/text pairs from the item.
+        /// </param>
+        /// <param name="fieldNamePrefix">
+        /// The optional prefix to apply to any field names read using the <paramref name="dynamicFieldReader"/>.
+        /// Use this if you need to register multiple sets of dynamic fields for the same item and there is a 
+        /// chance the field names will overlap.
+        /// </param>
+        /// <param name="tokenizationOptions">
+        /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
+        /// null then default tokenizer configured for the index will be used.
+        /// </param>
+        /// <param name="thesaurusOptions">
+        /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// for the index will be used.
+        /// </param>
+        /// <param name="textExtractor">
+        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
+        /// text extractor for the index will be used.
+        /// </param>
+        public ObjectTokenizationBuilder<T, TKey> WithDynamicFields(
+            Func<T, ICollection<KeyValuePair<string, string>>> dynamicFieldReader,
+            string? fieldNamePrefix = null,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
         {
-            var tokenizer = fieldTokenizer ?? defaultTokenizer;
-            if (thesaurusOptions == null)
+            if (dynamicFieldReader == null)
             {
-                // Use the default thesaurus. Note we need to build it again in case the tokenization is configured differently for this field.
-                return defaultThesaurusBuilder.Build(tokenizer);
+                throw new ArgumentNullException(nameof(dynamicFieldReader));
             }
 
-            return thesaurusOptions(new ThesaurusBuilder()).Build(tokenizer);
+            var tokenizer = tokenizationOptions.CreateTokenizer();
+            this.dynamicFieldReaderBuilders.Add(
+                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new DictionaryDynamicFieldReader<T>(
+                    dynamicFieldReader,
+                    fieldNamePrefix,
+                    tokenizer ?? defaultTokenizer,
+                    textExtractor ?? defaultTextExtractor,
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+
+            return this;
         }
 
         /// <summary>
@@ -135,7 +169,7 @@ namespace Lifti.Tokenization.Objects
         /// text extractor for the index will be used.
         /// </param>
         /// <param name="thesaurusOptions">
-        /// An optional delefate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
         /// for the index will be used.
         /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
@@ -176,7 +210,7 @@ namespace Lifti.Tokenization.Objects
         /// text extractor for the index will be used.
         /// </param>
         /// <param name="thesaurusOptions">
-        /// An optional delefate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
         /// for the index will be used.
         /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
@@ -233,7 +267,7 @@ namespace Lifti.Tokenization.Objects
         /// text extractor for the index will be used.
         /// </param>
         /// <param name="thesaurusOptions">
-        /// An optional delefate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
         /// for the index will be used.
         /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
@@ -272,6 +306,22 @@ namespace Lifti.Tokenization.Objects
                 thesaurusOptions);
         }
 
+        private static Thesaurus CreateFieldThesaurus(
+            IIndexTokenizer defaultTokenizer,
+            IIndexTokenizer? fieldTokenizer,
+            ThesaurusBuilder defaultThesaurusBuilder,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions)
+        {
+            var tokenizer = fieldTokenizer ?? defaultTokenizer;
+            if (thesaurusOptions == null)
+            {
+                // Use the default thesaurus. Note we need to build it again in case the tokenization is configured differently for this field.
+                return defaultThesaurusBuilder.Build(tokenizer);
+            }
+
+            return thesaurusOptions(new ThesaurusBuilder()).Build(tokenizer);
+        }
+
         /// <inheritdoc />
         IObjectTokenization IObjectTokenizationBuilder.Build(IIndexTokenizer defaultTokenizer, ThesaurusBuilder defaultThesaurusBuilder, ITextExtractor defaultTextExtractor)
         {
@@ -280,14 +330,15 @@ namespace Lifti.Tokenization.Objects
                 throw new LiftiException(ExceptionMessages.KeyReaderMustBeProvided);
             }
 
-            if (this.fieldReaderBuilders.Count == 0)
+            if (this.fieldReaderBuilders.Count == 0 && this.dynamicFieldReaderBuilders.Count == 0)
             {
                 throw new LiftiException(ExceptionMessages.AtLeastOneFieldMustBeIndexed);
             }
 
             return new ObjectTokenization<T, TKey>(
                 this.keyReader,
-                this.fieldReaderBuilders.Select(builder => builder(defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor)).ToList());
+                this.fieldReaderBuilders.Select(builder => builder(defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor)).ToList(),
+                this.dynamicFieldReaderBuilders.Select(builder => builder(defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor)).ToList());
         }
 
         private static void ValidateFieldParameters(string name, object fieldTextReader)

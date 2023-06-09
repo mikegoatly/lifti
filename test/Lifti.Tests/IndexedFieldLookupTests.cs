@@ -22,7 +22,7 @@ namespace Lifti.Tests
                 .WithField("FieldY", r => r) as IObjectTokenizationBuilder)
                 .Build(IndexTokenizer.Default, new ThesaurusBuilder(), new PlainTextExtractor());
 
-            this.sut = new IndexedFieldLookup(itemConfig.GetConfiguredFields());
+            this.sut = new IndexedFieldLookup(itemConfig.GetStaticFields());
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace Lifti.Tests
 
             IObjectTokenization config = Build(itemConfigBuilder);
 
-            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(config.GetConfiguredFields()))
+            Assert.Throws<LiftiException>(() => new IndexedFieldLookup(config.GetStaticFields()))
                 .Message.Should().Be("Only 255 distinct fields can currently be indexed");
         }
 
@@ -84,7 +84,7 @@ namespace Lifti.Tests
                 .WithKey(i => i));
 
             Assert.Throws<LiftiException>(
-                () => new IndexedFieldLookup(config1.GetConfiguredFields().Concat(config2.GetConfiguredFields())))
+                () => new IndexedFieldLookup(config1.GetStaticFields().Concat(config2.GetStaticFields())))
                 .Message.Should().Be("Duplicate field name used: Field1. Field names must be unique across all item types registered with an index.");
         }
 

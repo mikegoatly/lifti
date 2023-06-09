@@ -14,13 +14,13 @@ namespace Lifti
     public class FullTextIndex<TKey> : IFullTextIndex<TKey>, IDisposable
         where TKey : notnull
     {
-        private readonly IQueryParser queryParser;
         private readonly Func<IIndexSnapshot<TKey>, CancellationToken, Task>[]? indexModifiedActions;
         private readonly IndexOptions indexOptions;
         private readonly IdPool<TKey> idPool;
         private readonly IIndexNavigatorPool indexNavigatorPool;
         private readonly SemaphoreSlim writeLock = new(1);
         private readonly TimeSpan writeLockTimeout = TimeSpan.FromSeconds(10);
+        private readonly IndexedFieldLookup fieldLookup;
         private bool isDisposed;
 
         /// <remarks>
@@ -46,13 +46,13 @@ namespace Lifti
             this.indexOptions = indexOptions;
             this.ItemTokenization = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
             this.IndexNodeFactory = indexNodeFactory ?? throw new ArgumentNullException(nameof(indexNodeFactory));
-            this.queryParser = queryParser ?? throw new ArgumentNullException(nameof(queryParser));
+            this.QueryParser = queryParser ?? throw new ArgumentNullException(nameof(queryParser));
             this.DefaultTextExtractor = defaultTextExtractor;
             this.DefaultTokenizer = defaultTokenizer ?? throw new ArgumentNullException(nameof(defaultTokenizer));
             this.DefaultThesaurus = defaultThesaurus;
             this.indexModifiedActions = indexModifiedActions;
             this.idPool = new IdPool<TKey>();
-            this.FieldLookup = new IndexedFieldLookup(itemTokenizationOptions.GetAllConfiguredFields());
+            this.fieldLookup = new IndexedFieldLookup(itemTokenizationOptions.GetAllConfiguredStaticFields());
 
             this.Root = this.IndexNodeFactory.CreateRootNode();
         }
@@ -74,7 +74,7 @@ namespace Lifti
         internal IIdPool<TKey> IdPool => this.idPool;
 
         /// <inheritdoc />
-        public IIndexedFieldLookup FieldLookup { get; }
+        public IIndexedFieldLookup FieldLookup => this.fieldLookup;
 
         /// <inheritdoc />
         public int Count => this.currentSnapshot.Items.Count;
@@ -82,14 +82,14 @@ namespace Lifti
         internal IIndexNodeFactory IndexNodeFactory { get; }
 
         /// <inheritdoc />
-        public IQueryParser QueryParser => this.queryParser;
+        public IQueryParser QueryParser { get; }
 
         /// <inheritdoc />
         public IIndexSnapshot<TKey> Snapshot => this.currentSnapshot;
 
         /// <inheritdoc />
         public IIndexTokenizer DefaultTokenizer { get; }
-       
+
         /// <inheritdoc />
         public ITextExtractor DefaultTextExtractor { get; }
 
@@ -99,7 +99,10 @@ namespace Lifti
         internal ObjectTokenizationLookup<TKey> ItemTokenization { get; }
 
         /// <inheritdoc />
-        public IIndexTokenizer GetTokenizerForField(string fieldName) => this.FieldLookup.GetFieldInfo(fieldName).Tokenizer;
+        public IIndexTokenizer GetTokenizerForField(string fieldName)
+        {
+            return this.FieldLookup.GetFieldInfo(fieldName).Tokenizer;
+        }
 
         /// <inheritdoc />
         public IIndexNavigator CreateNavigator()
@@ -212,7 +215,7 @@ namespace Lifti
                 async () => await this.MutateAsync(
                     async m => await this.AddAsync(item, options, m, cancellationToken).ConfigureAwait(false),
                     cancellationToken
-                ).ConfigureAwait(false), 
+                ).ConfigureAwait(false),
                 cancellationToken).ConfigureAwait(false);
         }
 
@@ -230,12 +233,12 @@ namespace Lifti
                     }
 
                     await this.MutateAsync(
-                        m => this.RemoveKeyFromIndex(itemKey, m), 
+                        m => this.RemoveKeyFromIndex(itemKey, m),
                         cancellationToken)
                         .ConfigureAwait(false);
 
                     result = true;
-                }, 
+                },
                 cancellationToken)
                 .ConfigureAwait(false);
 
@@ -245,7 +248,7 @@ namespace Lifti
         /// <inheritdoc />
         public ISearchResults<TKey> Search(string searchText)
         {
-            var query = this.queryParser.Parse(this.FieldLookup, searchText, this);
+            var query = this.QueryParser.Parse(this.FieldLookup, searchText, this);
             return this.Search(query);
         }
 
@@ -272,8 +275,8 @@ namespace Lifti
         }
 
         private static List<Token> ExtractDocumentTokens(
-            IEnumerable<string> documentTextFragments, 
-            ITextExtractor textExtractor, 
+            IEnumerable<string> documentTextFragments,
+            ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus)
         {
@@ -289,8 +292,8 @@ namespace Lifti
         }
 
         private static List<Token> ExtractDocumentTokens(
-            string documentText, 
-            ITextExtractor textExtractor, 
+            string documentText,
+            ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus)
         {
@@ -413,9 +416,12 @@ namespace Lifti
             var itemKey = options.KeyReader(item);
 
             var fieldTokens = new List<(byte fieldId, IReadOnlyCollection<Token> tokens)>(options.FieldReaders.Count);
+
+            // First process any static field readers
             foreach (var field in options.FieldReaders.Values)
             {
                 var (fieldId, textExtractor, tokenizer, thesaurus) = this.FieldLookup.GetFieldInfo(field.Name);
+
                 var tokens = ExtractDocumentTokens(
                     await field.ReadAsync(item, cancellationToken).ConfigureAwait(false),
                     textExtractor,
@@ -423,6 +429,21 @@ namespace Lifti
                     thesaurus);
 
                 fieldTokens.Add((fieldId, tokens));
+            }
+
+            // Next process any dynamic field readers
+            foreach (var dynamicFieldReader in options.DynamicFieldReaders)
+            {
+                var dynamicFields = await dynamicFieldReader.ReadAsync(item, cancellationToken).ConfigureAwait(false);
+
+                foreach (var (name, rawText) in dynamicFields)
+                {
+                    var (fieldId, textExtractor, tokenizer, thesaurus) = this.fieldLookup.GetOrCreateDynamicFieldInfo(name, dynamicFieldReader);
+
+                    var tokens = ExtractDocumentTokens(rawText, textExtractor, tokenizer, thesaurus);
+
+                    fieldTokens.Add((fieldId, tokens));
+                }
             }
 
             var documentStatistics = new DocumentStatistics(
