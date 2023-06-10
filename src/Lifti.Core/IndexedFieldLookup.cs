@@ -2,30 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lifti
 {
     /// <inheritdoc />
-    public class IndexedFieldLookup : IIndexedFieldLookup
+    internal class IndexedFieldLookup : IIndexedFieldLookup
     {
         internal const string DefaultFieldName = "Unspecified";
-
         private readonly Dictionary<string, IndexedFieldDetails> fieldToDetailsLookup = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<byte, string> idToFieldLookup = new();
         private int nextId;
 
-        internal IndexedFieldLookup(IEnumerable<IStaticFieldReader> fieldReaders)
-        {
-            if (fieldReaders is null)
-            {
-                throw new ArgumentNullException(nameof(fieldReaders));
-            }
-
-            foreach (var field in fieldReaders)
-            {
-                this.RegisterField(field.Name, field);
-            }
-        }
 
         /// <inheritdoc />
         public IReadOnlyCollection<string> AllFieldNames => this.fieldToDetailsLookup.Keys;
@@ -59,20 +47,44 @@ namespace Lifti
             return details;
         }
 
-        internal IndexedFieldDetails GetOrCreateDynamicFieldInfo(string fieldName, IFieldConfig fieldConfig)
+        /// <inheritdoc/>
+
+        public bool IsKnownField(Type objectType, string fieldName)
+        {
+            return this.fieldToDetailsLookup.ContainsKey(fieldName);
+        }
+
+        internal void RegisterStaticField<TItem>(IStaticFieldReader<TItem> reader)
+        {
+            this.RegisterField<TItem>(reader.ReadAsync, true, reader.Name, reader);
+        }
+
+        internal IndexedFieldDetails GetOrCreateDynamicFieldInfo<TItem>(DynamicFieldReader<TItem> fieldReader, string fieldName)
         {
             if (!this.fieldToDetailsLookup.TryGetValue(fieldName, out var details))
             {
-                details = this.RegisterField(fieldName, fieldConfig);
+                details = this.RegisterField<TItem>(
+                    (item, cancellationToken) => fieldReader.ReadAsync(item, fieldName, cancellationToken),
+                    true,
+                    fieldName,
+                    fieldReader);
+            }
+            else
+            {
+                if (details.FieldKind != FieldKind.Dynamic)
+                {
+                    // We can't allow an index to have a static field registered, and then a dynamic field is registered with the same name.
+                    // TODO test
+                    throw new LiftiException(ExceptionMessages.CannotRegisterDynamicFieldWithSameNameAsStaticField, fieldName);
+                }
             }
 
             return details;
         }
 
-        private IndexedFieldDetails RegisterField(string name, IFieldConfig fieldConfig)
+        private IndexedFieldDetails<TItem> RegisterField<TItem>(Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader, bool isDynamicField, string fieldName, IFieldConfig fieldConfig)
         {
-            var fieldName = name;
-            if (this.fieldToDetailsLookup.ContainsKey(name))
+            if (this.fieldToDetailsLookup.ContainsKey(fieldName))
             {
                 throw new LiftiException(ExceptionMessages.FieldNameAlreadyUsed, fieldName);
             }
@@ -84,8 +96,10 @@ namespace Lifti
             }
 
             var id = (byte)newId;
-            var details = new IndexedFieldDetails(
+            var details = new IndexedFieldDetails<TItem>(
                 id,
+                fieldReader,
+                isDynamicField ? FieldKind.Dynamic : FieldKind.Static,
                 fieldConfig.TextExtractor,
                 fieldConfig.Tokenizer,
                 fieldConfig.Thesaurus);

@@ -1,17 +1,29 @@
 ﻿using Lifti.Tokenization;
 using Lifti.Tokenization.TextExtraction;
 using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lifti
 {
+
     /// <summary>
     /// Information about a field that has been configured for indexing.
     /// </summary>
-    public struct IndexedFieldDetails : IEquatable<IndexedFieldDetails>
+    public abstract class IndexedFieldDetails
     {
-        internal IndexedFieldDetails(byte id, ITextExtractor textExtractor, IIndexTokenizer tokenizer, IThesaurus thesaurus)
+        internal IndexedFieldDetails(
+            byte id,
+            Type objectType,
+            FieldKind fieldKind,
+            ITextExtractor textExtractor,
+            IIndexTokenizer tokenizer,
+            IThesaurus thesaurus)
         {
             this.Id = id;
+            this.ObjectType = objectType;
+            this.FieldKind = fieldKind;
             this.TextExtractor = textExtractor;
             this.Tokenizer = tokenizer;
             this.Thesaurus = thesaurus;
@@ -21,6 +33,16 @@ namespace Lifti
         /// The id of the field.
         /// </summary>
         public byte Id { get; }
+
+        /// <summary>
+        /// Gets the type of the object the field is registered for.
+        /// </summary>
+        public Type ObjectType { get; }
+
+        /// <summary>
+        /// Gets the kind of field this instance represents.
+        /// </summary>
+        public FieldKind FieldKind { get; }
 
         /// <summary>
         /// Gets the <see cref="ITextExtractor"/> used to extract sections of text from this field.
@@ -37,27 +59,10 @@ namespace Lifti
         /// </summary>
         public IThesaurus Thesaurus { get; }
 
-        /// <inheritdoc />
-        public override bool Equals(object? obj)
-        {
-            return obj is IndexedFieldDetails details &&
-                   this.Equals(details);
-        }
-
-        /// <inheritdoc />
-        public bool Equals(IndexedFieldDetails other)
-        {
-            return other.Id == this.Id &&
-                this.Tokenizer == other.Tokenizer &&
-                this.TextExtractor == other.TextExtractor &&
-                this.Thesaurus == other.Thesaurus;
-        }
-
-        /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(this.Id, this.Tokenizer, this.TextExtractor);
-        }
+        /// <summary>
+        /// Reads the text for the field from the specified item. The item must be of the type specified by the <see cref="ObjectType"/> property.
+        /// </summary>
+        public abstract ValueTask<IEnumerable<string>> ReadAsync(object item, CancellationToken cancellationToken);
 
         internal void Deconstruct(out byte fieldId, out ITextExtractor textExtractor, out IIndexTokenizer tokenizer, out IThesaurus thesaurus)
         {
@@ -66,17 +71,40 @@ namespace Lifti
             textExtractor = this.TextExtractor;
             thesaurus = this.Thesaurus;
         }
+    }
 
-        /// <inheritdoc />
-        public static bool operator ==(IndexedFieldDetails left, IndexedFieldDetails right)
+    /// <inheritdoc />
+    public class IndexedFieldDetails<TItem> : IndexedFieldDetails
+    {
+        private readonly Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader;
+
+        internal IndexedFieldDetails(
+            byte id,
+            Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
+            FieldKind fieldKind,
+            ITextExtractor textExtractor,
+            IIndexTokenizer tokenizer,
+            IThesaurus thesaurus)
+            : base(id, typeof(TItem), fieldKind, textExtractor, tokenizer, thesaurus)
         {
-            return left.Equals(right);
+            this.fieldReader = fieldReader;
         }
 
         /// <inheritdoc />
-        public static bool operator !=(IndexedFieldDetails left, IndexedFieldDetails right)
+        public override ValueTask<IEnumerable<string>> ReadAsync(object item, CancellationToken cancellationToken)
         {
-            return !(left == right);
+            if (item is null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+
+            if (item is TItem typedItem)
+            {
+                return this.fieldReader(typedItem, cancellationToken);
+            }
+
+            throw new ArgumentException($"Item type {item.GetType().Name} is not expected type {this.ObjectType.Name}");
+
         }
     }
 }

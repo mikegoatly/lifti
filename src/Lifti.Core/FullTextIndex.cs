@@ -34,6 +34,7 @@ namespace Lifti
         internal FullTextIndex(
             IndexOptions indexOptions,
             ObjectTokenizationLookup<TKey> itemTokenizationOptions,
+            IndexedFieldLookup fieldLookup,
             IIndexNodeFactory indexNodeFactory,
             IQueryParser queryParser,
             IIndexScorerFactory scorer,
@@ -52,7 +53,7 @@ namespace Lifti
             this.DefaultThesaurus = defaultThesaurus;
             this.indexModifiedActions = indexModifiedActions;
             this.idPool = new IdPool<TKey>();
-            this.fieldLookup = new IndexedFieldLookup(itemTokenizationOptions.GetAllConfiguredStaticFields());
+            this.fieldLookup = fieldLookup;
 
             this.Root = this.IndexNodeFactory.CreateRootNode();
         }
@@ -432,13 +433,14 @@ namespace Lifti
             }
 
             // Next process any dynamic field readers
+            var itemType = typeof(TItem);
             foreach (var dynamicFieldReader in options.DynamicFieldReaders)
             {
                 var dynamicFields = await dynamicFieldReader.ReadAsync(item, cancellationToken).ConfigureAwait(false);
 
                 foreach (var (name, rawText) in dynamicFields)
                 {
-                    var (fieldId, textExtractor, tokenizer, thesaurus) = this.fieldLookup.GetOrCreateDynamicFieldInfo(name, dynamicFieldReader);
+                    var (fieldId, textExtractor, tokenizer, thesaurus) = this.fieldLookup.GetOrCreateDynamicFieldInfo(dynamicFieldReader, name);
 
                     var tokens = ExtractDocumentTokens(rawText, textExtractor, tokenizer, thesaurus);
 

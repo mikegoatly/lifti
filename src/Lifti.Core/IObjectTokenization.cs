@@ -1,12 +1,10 @@
-﻿using Lifti.Tokenization.Objects;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace Lifti
 {
     /// <summary>
     /// Describes the configuration that should be used when indexing
-    /// an strongly typed item against an index.
+    /// a strongly typed item against an index.
     /// </summary>
     internal interface IObjectTokenization
     {
@@ -14,10 +12,5 @@ namespace Lifti
         /// Gets the type of the item this instance represents.
         /// </summary>
         Type ItemType { get; }
-
-        /// <summary>
-        /// Gets the configuration for the static fields associated to this instance.
-        /// </summary>
-        IEnumerable<IStaticFieldReader> GetStaticFields();
     }
 }

@@ -4,6 +4,10 @@ using System.Linq;
 
 namespace Lifti.Tokenization.Objects
 {
+    /// <summary>
+    /// Defines a lookup for all the field readers associated to a given object type.
+    /// </summary>
+    /// <typeparam name="TKey">The type of key in the index.</typeparam>
     internal class ObjectTokenizationLookup<TKey>
     {
         private readonly Dictionary<Type, IObjectTokenization> options;
@@ -21,11 +25,6 @@ namespace Lifti.Tokenization.Objects
             }
 
             throw new LiftiException(ExceptionMessages.NoTokenizationOptionsProvidedForType, typeof(TItem));
-        }
-
-        internal IEnumerable<IStaticFieldReader> GetAllConfiguredStaticFields()
-        {
-            return this.options.Values.SelectMany(o => o.GetStaticFields());
         }
     }
 }

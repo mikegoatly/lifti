@@ -18,12 +18,15 @@ namespace Lifti.Tokenization.Objects
         /// to use when one is not explicitly configured for a field.</param>
         /// <param name="defaultTextExtractor">The default <see cref="ITextExtractor"/> to use when one is not 
         /// explicitly configured for a field.</param>
+        /// <param name="fieldLookup">
+        /// The field lookup with which to register any static fields.
+        /// </param>
         /// <exception cref="LiftiException">
         /// Thrown if:
         /// * <see cref="ObjectTokenizationBuilder{T, TKey}.WithKey(Func{T, TKey})"/> has not been called.
         /// * No fields have been configured.
         /// </exception>
-        IObjectTokenization Build(IIndexTokenizer defaultTokenizer, ThesaurusBuilder defaultThesaurusBuilder, ITextExtractor defaultTextExtractor);
+        IObjectTokenization Build(IIndexTokenizer defaultTokenizer, ThesaurusBuilder defaultThesaurusBuilder, ITextExtractor defaultTextExtractor, IndexedFieldLookup fieldLookup);
     }
 
     /// <summary>
@@ -128,7 +131,7 @@ namespace Lifti.Tokenization.Objects
         /// text extractor for the index will be used.
         /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithDynamicFields(
-            Func<T, ICollection<KeyValuePair<string, string>>> dynamicFieldReader,
+            Func<T, IDictionary<string, string>> dynamicFieldReader,
             string? fieldNamePrefix = null,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null,
@@ -323,7 +326,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <inheritdoc />
-        IObjectTokenization IObjectTokenizationBuilder.Build(IIndexTokenizer defaultTokenizer, ThesaurusBuilder defaultThesaurusBuilder, ITextExtractor defaultTextExtractor)
+        IObjectTokenization IObjectTokenizationBuilder.Build(IIndexTokenizer defaultTokenizer, ThesaurusBuilder defaultThesaurusBuilder, ITextExtractor defaultTextExtractor, IndexedFieldLookup fieldLookup)
         {
             if (this.keyReader == null)
             {
@@ -335,9 +338,15 @@ namespace Lifti.Tokenization.Objects
                 throw new LiftiException(ExceptionMessages.AtLeastOneFieldMustBeIndexed);
             }
 
+            var staticFields = this.fieldReaderBuilders.Select(builder => builder(defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor)).ToList();
+            foreach (var staticField in staticFields)
+            {
+                fieldLookup.RegisterStaticField(staticField);
+            }
+
             return new ObjectTokenization<T, TKey>(
                 this.keyReader,
-                this.fieldReaderBuilders.Select(builder => builder(defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor)).ToList(),
+                staticFields,
                 this.dynamicFieldReaderBuilders.Select(builder => builder(defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor)).ToList());
         }
 

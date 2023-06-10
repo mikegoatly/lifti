@@ -36,11 +36,5 @@ namespace Lifti.Tokenization.Objects
         public IReadOnlyList<DynamicFieldReader<T>> DynamicFieldReaders { get; }
 
         Type IObjectTokenization.ItemType { get; } = typeof(T);
-
-        /// <inheritdoc />
-        IEnumerable<IStaticFieldReader> IObjectTokenization.GetStaticFields()
-        {
-            return this.FieldReaders.Values.Cast<IStaticFieldReader>();
-        }
     }
 }

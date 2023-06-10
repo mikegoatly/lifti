@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Lifti
 {
@@ -24,6 +25,12 @@ namespace Lifti
         /// and <see cref="Tokenization.IIndexTokenizer"/> instances to use when processing the field's text.
         /// </summary>
         IndexedFieldDetails GetFieldInfo(string fieldName);
+
+        /// <summary>
+        /// Returns <c>true</c> if the given field name is known to the index and associated to the given object type, whether statically defined at index creation, or dynamically registered
+        /// during indexing.
+        /// </summary>
+        bool IsKnownField(Type objectType, string fieldName);
 
         /// <summary>
         /// Gets the names of all fields configured in the index, including any dynamic fields that have been registered during the indexing

@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace Lifti.Tokenization.Objects
 {
+    // TODO Test
     internal class DictionaryDynamicFieldReader<TItem> : DynamicFieldReader<TItem>
     {
-        private readonly Func<TItem, IEnumerable<KeyValuePair<string, string>>> reader;
+        private readonly Func<TItem, IDictionary<string, string>> reader;
         private readonly string? fieldNamePrefix;
 
         public DictionaryDynamicFieldReader(
-            Func<TItem, ICollection<KeyValuePair<string, string>>> reader,
+            Func<TItem, IDictionary<string, string>> reader,
             string? fieldNamePrefix,
             IIndexTokenizer tokenizer,
             ITextExtractor textExtractor,
@@ -23,6 +24,7 @@ namespace Lifti.Tokenization.Objects
             this.fieldNamePrefix = fieldNamePrefix;
         }
 
+        /// <inheritdoc />
         public override ValueTask<IEnumerable<(string field, string rawText)>> ReadAsync(TItem item, CancellationToken cancellationToken)
         {
             var results = new List<(string field, string rawText)>();
@@ -34,6 +36,18 @@ namespace Lifti.Tokenization.Objects
             }
 
             return new ValueTask<IEnumerable<(string, string)>>(results);
+        }
+
+        /// <inheritdoc />
+        public override ValueTask<IEnumerable<string>> ReadAsync(TItem item, string fieldName, CancellationToken cancellationToken)
+        {
+            var fields = this.reader(item);
+            if (fields.TryGetValue(fieldName, out var field))
+            {
+                return new ValueTask<IEnumerable<string>>(new[] { field });
+            }
+
+            return new ValueTask<IEnumerable<string>>(Array.Empty<string>());
         }
     }
 }

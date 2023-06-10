@@ -97,6 +97,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot register a dynamic field with the same name as the statically registered field &quot;{0}&quot;. Consider registering the object&apos;s dynamic fields with a prefix..
+        /// </summary>
+        internal static string CannotRegisterDynamicFieldWithSameNameAsStaticField {
+            get {
+                return ResourceManager.GetString("CannotRegisterDynamicFieldWithSameNameAsStaticField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI..
         /// </summary>
         internal static string EarlierVersionSerializedIndexNotSupported {
@@ -336,6 +345,15 @@ namespace Lifti {
         internal static string NoDeserializerAvailableForIndexVersion {
             get {
                 return ResourceManager.GetString("NoDeserializerAvailableForIndexVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No item was returned from the load item delegate when generating match phrases for item {0}..
+        /// </summary>
+        internal static string NoItemReturnedWhenGeneratingMatchPhrases {
+            get {
+                return ResourceManager.GetString("NoItemReturnedWhenGeneratingMatchPhrases", resourceCulture);
             }
         }
         

@@ -129,6 +129,9 @@
   <data name="CannotCombineAnEmptySetOfQueryParts" xml:space="preserve">
     <value>Cannot combine an empty set of query parts</value>
   </data>
+  <data name="CannotRegisterDynamicFieldWithSameNameAsStaticField" xml:space="preserve">
+    <value>Cannot register a dynamic field with the same name as the statically registered field "{0}". Consider registering the object's dynamic fields with a prefix.</value>
+  </data>
   <data name="EarlierVersionSerializedIndexNotSupported" xml:space="preserve">
     <value>The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI.</value>
   </data>
@@ -209,6 +212,9 @@
   </data>
   <data name="NoDeserializerAvailableForIndexVersion" xml:space="preserve">
     <value>No deserializer available for binary serialized version {0}.</value>
+  </data>
+  <data name="NoItemReturnedWhenGeneratingMatchPhrases" xml:space="preserve">
+    <value>No item was returned from the load item delegate when generating match phrases for item {0}.</value>
   </data>
   <data name="NoReaderDelegatesConfigured" xml:space="preserve">
     <value>No reader delegates configured</value>
