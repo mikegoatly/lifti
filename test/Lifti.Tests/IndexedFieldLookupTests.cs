@@ -2,12 +2,16 @@
 using Lifti.Tokenization;
 using Lifti.Tokenization.Objects;
 using Lifti.Tokenization.TextExtraction;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Lifti.Tests
 {
     public class IndexedFieldLookupTests
     {
+        private static readonly DynamicFieldReader<TestObject> dynamicFieldReader = CreateDynamicFieldReader<TestObject>();
+
         private readonly IndexedFieldLookup sut;
 
         public IndexedFieldLookupTests()
@@ -23,6 +27,66 @@ namespace Lifti.Tests
             this.sut.GetFieldInfo("Field1").Id.Should().Be(1);
             this.sut.GetFieldInfo("Field2").Id.Should().Be(2);
             this.sut.GetFieldInfo("Field3").Id.Should().Be(3);
+        }
+
+        [Fact]
+        public async Task StaticFieldsShouldBeRegisteredCorrectly()
+        {
+            this.WithBasicConfig();
+
+            var fieldInfo = this.sut.GetFieldInfo("Field1");
+            fieldInfo.TextExtractor.Should().BeOfType<PlainTextExtractor>();
+            fieldInfo.Thesaurus.Should().NotBeNull();
+            fieldInfo.FieldKind.Should().Be(FieldKind.Static);
+            fieldInfo.Tokenizer.Should().NotBeNull();
+            var readField = await fieldInfo.ReadAsync("foo", default);
+            readField.Should().BeEquivalentTo(new[] { "foo" });
+        }
+
+        [Fact]
+        public async Task DynamicFieldsShouldBeRegisteredCorrectly()
+        {
+            var fieldInfo = this.sut.GetOrCreateDynamicFieldInfo(
+                dynamicFieldReader,
+                "foo");
+
+            fieldInfo.Name.Should().Be("foo");
+            fieldInfo.TextExtractor.Should().BeOfType<PlainTextExtractor>();
+            fieldInfo.Thesaurus.Should().NotBeNull();
+            fieldInfo.FieldKind.Should().Be(FieldKind.Dynamic);
+            fieldInfo.Tokenizer.Should().NotBeNull();
+            var readField = await fieldInfo.ReadAsync(new TestObject(), default);
+            readField.Should().BeEquivalentTo(new[] { "bar" });
+        }
+
+        [Fact]
+        public void ShouldThrowExceptionIfDynamicFieldRegisteredWithSameNameAsStaticField()
+        {
+            this.WithBasicConfig();
+
+            Assert.Throws<LiftiException>(() => this.sut.GetOrCreateDynamicFieldInfo(
+                dynamicFieldReader,
+                "Field1")).Message.Should().Be("Cannot register a dynamic field with the same name as the statically registered field \"Field1\". Consider using a field prefix when configuring the dynamic fields.");
+        }
+
+        [Fact]
+        public void ShouldGetTheSameFieldInfoInstanceWhenGettingOrCreatingDynamicFieldInfoMultipleTimesWithSameConfig()
+        {
+            var field1 = this.sut.GetOrCreateDynamicFieldInfo(dynamicFieldReader, "Field1");
+            var field2 = this.sut.GetOrCreateDynamicFieldInfo(dynamicFieldReader, "Field2");
+
+            this.sut.GetOrCreateDynamicFieldInfo(dynamicFieldReader, "Field1").Should().Be(field1);
+            this.sut.GetOrCreateDynamicFieldInfo(dynamicFieldReader, "Field2").Should().Be(field2);
+        }
+
+        [Fact]
+        public void ShouldThrowExceptionIfDynamicFieldRegisteredWithSameNameAgainstDifferentObjectType()
+        {
+            this.sut.GetOrCreateDynamicFieldInfo(dynamicFieldReader, "Field1");
+
+            Assert.Throws<LiftiException>(() => this.sut.GetOrCreateDynamicFieldInfo(
+                CreateDynamicFieldReader<TestObject2>(),
+                "Field1")).Message.Should().Be("Cannot register dynamic field with the same name \"Field1\" against different object types. Consider using a field prefix when configuring the dynamic fields.");
         }
 
         [Fact]
@@ -82,14 +146,15 @@ namespace Lifti.Tests
 
         private void WithBasicConfig()
         {
-            var itemConfig = (new ObjectTokenizationBuilder<string, string>()
-                .WithKey(i => i)
-                .WithField("Field1", r => r)
-                .WithField("Field2", r => r)
-                .WithField("Field3", r => r)
-                .WithField("FieldX", r => r, o => o.WithStemming())
-                .WithField("FieldY", r => r) as IObjectTokenizationBuilder)
-                .Build(IndexTokenizer.Default, new ThesaurusBuilder(), new PlainTextExtractor(), this.sut);
+            this.Build(
+                new ObjectTokenizationBuilder<string, string>()
+                    .WithKey(i => i)
+                    .WithField("Field1", r => r)
+                    .WithField("Field2", r => r)
+                    .WithField("Field3", r => r)
+                    .WithField("FieldX", r => r, o => o.WithStemming())
+                    .WithField("FieldY", r => r),
+                this.sut);
         }
 
         private IObjectTokenization Build(ObjectTokenizationBuilder<string, string> objectTokenizationBuilder, IndexedFieldLookup fieldLookup)
@@ -98,7 +163,21 @@ namespace Lifti.Tests
                 .Build(IndexTokenizer.Default, new ThesaurusBuilder(), new PlainTextExtractor(), fieldLookup);
         }
 
+        private static DynamicFieldReader<T> CreateDynamicFieldReader<T>()
+        {
+            return new DictionaryDynamicFieldReader<T>(
+                x => new Dictionary<string, string> { { "foo", "bar" } },
+                null,
+                IndexTokenizer.Default,
+                new PlainTextExtractor(),
+                new ThesaurusBuilder().Build(IndexTokenizer.Default));
+        }
+
         private class TestObject
+        {
+        }
+
+        private class TestObject2
         {
         }
     }

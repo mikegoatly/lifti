@@ -9,29 +9,45 @@ namespace TestConsole
     {
         public class TestObject
         {
-            public TestObject(int id, IDictionary<string, string> data)
+            public TestObject(int id, string details, IDictionary<string, string> data)
             {
                 this.Id = id;
+                this.Details = details;
                 this.Data = data;
             }
 
             public int Id { get; set; }
+            public string Details { get; }
             public IDictionary<string, string> Data { get; set; }
         }
 
         public override async Task RunAsync()
         {
-            Console.WriteLine("Creating an index for a Customer object, with two fields, Name and Profile");
+            Console.WriteLine("Creating an index that has dynamically registered fields for an object.");
+            Console.WriteLine("Only one field, Details, is statically registered when the index is created.");
 
             var objects = new Dictionary<int, TestObject>
             {
-                { 1, new TestObject(1, new Dictionary<string, string> { { "Name", "Joe Bloggs" }, { "Profile", "Just placeholder text here" } }) },
-                { 2, new TestObject(2, new Dictionary<string, string> { { "Name", "Just Bob" }, { "FavouriteExercise", "Jumping jacks" } }) }
+                {
+                    1,
+                    new TestObject(
+                        1,
+                        "Some details",
+                        new Dictionary<string, string> { { "Name", "Joe Bloggs" }, { "Profile", "Just placeholder text here" } })
+                },
+                {
+                    2,
+                    new TestObject(
+                        2,
+                        "Chillin with orange juice",
+                        new Dictionary<string, string> { { "Name", "Just Bob" }, { "FavouriteExercise", "Jumping jacks" } })
+                }
             };
 
             var index = new FullTextIndexBuilder<int>()
                 .WithObjectTokenization<TestObject>(o => o
                     .WithKey(c => c.Id)
+                    .WithField("Details", x => x.Details)
                     .WithDynamicFields(c => c.Data)
                 )
                 .Build();
@@ -42,12 +58,12 @@ namespace TestConsole
                 index,
                 "ju*",
                 i => objects[i],
-                @"Words beginning with 'ju' are contained in both documents across 3 unique fields");
+                @"Words beginning with 'ju' are contained across 4 fields, 3 of which will have been dynamically registered");
 
-            Console.WriteLine("Dynamically registered fields:");
+            Console.WriteLine("Fields known to the index:");
             foreach (var field in index.FieldLookup.AllFieldNames)
             {
-                Console.WriteLine(field);
+                Console.WriteLine($"{field} - Field kind:{index.FieldLookup.GetFieldInfo(field).FieldKind}");
             }
 
             WaitForEnterToReturnToMenu();

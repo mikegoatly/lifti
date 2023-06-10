@@ -15,6 +15,7 @@ namespace Lifti
     {
         internal IndexedFieldDetails(
             byte id,
+            string name,
             Type objectType,
             FieldKind fieldKind,
             ITextExtractor textExtractor,
@@ -22,6 +23,7 @@ namespace Lifti
             IThesaurus thesaurus)
         {
             this.Id = id;
+            this.Name = name;
             this.ObjectType = objectType;
             this.FieldKind = fieldKind;
             this.TextExtractor = textExtractor;
@@ -30,9 +32,14 @@ namespace Lifti
         }
 
         /// <summary>
-        /// The id of the field.
+        /// Gets the id of the field.
         /// </summary>
         public byte Id { get; }
+
+        /// <summary>
+        /// Gets the name of the field.
+        /// </summary>
+        public string Name { get; }
 
         /// <summary>
         /// Gets the type of the object the field is registered for.
@@ -50,12 +57,12 @@ namespace Lifti
         public ITextExtractor TextExtractor { get; }
 
         /// <summary>
-        /// The <see cref="IIndexTokenizer"/> that should be used when tokenizing text for the field.
+        /// Gets the <see cref="IIndexTokenizer"/> that should be used when tokenizing text for the field.
         /// </summary>
         public IIndexTokenizer Tokenizer { get; }
 
         /// <summary>
-        /// The <see cref="IThesaurus"/> that should be used to expand tokens when processing text for this field.
+        /// Gets the <see cref="IThesaurus"/> that should be used to expand tokens when processing text for this field.
         /// </summary>
         public IThesaurus Thesaurus { get; }
 
@@ -80,12 +87,13 @@ namespace Lifti
 
         internal IndexedFieldDetails(
             byte id,
+            string name,
             Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
             FieldKind fieldKind,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus)
-            : base(id, typeof(TItem), fieldKind, textExtractor, tokenizer, thesaurus)
+            : base(id, name, typeof(TItem), fieldKind, textExtractor, tokenizer, thesaurus)
         {
             this.fieldReader = fieldReader;
         }

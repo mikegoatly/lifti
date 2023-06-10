@@ -130,7 +130,10 @@
     <value>Cannot combine an empty set of query parts</value>
   </data>
   <data name="CannotRegisterDynamicFieldWithSameNameAsStaticField" xml:space="preserve">
-    <value>Cannot register a dynamic field with the same name as the statically registered field "{0}". Consider registering the object's dynamic fields with a prefix.</value>
+    <value>Cannot register a dynamic field with the same name as the statically registered field "{0}". Consider using a field prefix when configuring the dynamic fields.</value>
+  </data>
+  <data name="CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes" xml:space="preserve">
+    <value>Cannot register dynamic field with the same name "{0}" against different object types. Consider using a field prefix when configuring the dynamic fields.</value>
   </data>
   <data name="EarlierVersionSerializedIndexNotSupported" xml:space="preserve">
     <value>The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI.</value>

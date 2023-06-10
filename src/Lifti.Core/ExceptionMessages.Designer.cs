@@ -97,11 +97,20 @@ namespace Lifti {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot register a dynamic field with the same name as the statically registered field &quot;{0}&quot;. Consider registering the object&apos;s dynamic fields with a prefix..
+        ///   Looks up a localized string similar to Cannot register a dynamic field with the same name as the statically registered field &quot;{0}&quot;. Consider using a field prefix when configuring the dynamic fields..
         /// </summary>
         internal static string CannotRegisterDynamicFieldWithSameNameAsStaticField {
             get {
                 return ResourceManager.GetString("CannotRegisterDynamicFieldWithSameNameAsStaticField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot register dynamic field with the same name &quot;{0}&quot; against different object types. Consider using a field prefix when configuring the dynamic fields..
+        /// </summary>
+        internal static string CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes {
+            get {
+                return ResourceManager.GetString("CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes", resourceCulture);
             }
         }
         
