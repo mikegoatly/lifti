@@ -79,6 +79,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An attempt was made to read a dynamic field (&quot;{0}&quot;) from a provider that did not produce it..
+        /// </summary>
+        internal static string AttemptToReadFieldUnknownToDynamicFieldReader {
+            get {
+                return ResourceManager.GetString("AttemptToReadFieldUnknownToDynamicFieldReader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot start a new batch change while another is already in progress..
         /// </summary>
         internal static string BatchChangeAlreadyStarted {

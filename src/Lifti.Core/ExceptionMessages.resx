@@ -123,6 +123,9 @@
   <data name="AtLeastOneFieldMustBeIndexed" xml:space="preserve">
     <value>At least one field must be configured for an item</value>
   </data>
+  <data name="AttemptToReadFieldUnknownToDynamicFieldReader" xml:space="preserve">
+    <value>An attempt was made to read a dynamic field ("{0}") from a provider that did not produce it.</value>
+  </data>
   <data name="BatchChangeAlreadyStarted" xml:space="preserve">
     <value>Cannot start a new batch change while another is already in progress.</value>
   </data>
