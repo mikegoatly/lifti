@@ -164,13 +164,19 @@ namespace Lifti.Tests
         }
 
         private static DynamicFieldReader<T> CreateDynamicFieldReader<T>()
+            where T : new()
         {
-            return new DictionaryDynamicFieldReader<T>(
+            var reader = new DictionaryDynamicFieldReader<T>(
                 x => new Dictionary<string, string> { { "foo", "bar" } },
                 null,
                 IndexTokenizer.Default,
                 new PlainTextExtractor(),
                 new ThesaurusBuilder().Build(IndexTokenizer.Default));
+
+            // Force the reader to first produce (and cache) the field names
+            reader.ReadAsync(new T(), default);
+
+            return reader;
         }
 
         private class TestObject

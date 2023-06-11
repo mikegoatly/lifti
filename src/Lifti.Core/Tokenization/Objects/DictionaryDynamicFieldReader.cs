@@ -10,11 +10,11 @@ namespace Lifti.Tokenization.Objects
     {
         private readonly Dictionary<string, string> prefixedFields = new();
         private readonly Dictionary<string, string> prefixedFieldsReverseLookup = new();
-        private readonly Func<TItem, IDictionary<string, string>> reader;
+        private readonly Func<TItem, IDictionary<string, string>?> reader;
         private readonly string? fieldNamePrefix;
 
         public DictionaryDynamicFieldReader(
-            Func<TItem, IDictionary<string, string>> reader,
+            Func<TItem, IDictionary<string, string>?> reader,
             string? fieldNamePrefix,
             IIndexTokenizer tokenizer,
             ITextExtractor textExtractor,
@@ -28,9 +28,15 @@ namespace Lifti.Tokenization.Objects
         /// <inheritdoc />
         public override ValueTask<IEnumerable<(string field, string rawText)>> ReadAsync(TItem item, CancellationToken cancellationToken)
         {
+            var fields = this.reader(item);
+            if (fields == null)
+            {
+                return new ValueTask<IEnumerable<(string field, string rawText)>>(Array.Empty<(string, string)>());
+            }
+
             var results = new List<(string field, string rawText)>();
 
-            foreach (var field in this.reader(item))
+            foreach (var field in fields)
             {
                 if (!this.prefixedFields.TryGetValue(field.Key, out var fieldName))
                 {
@@ -57,7 +63,7 @@ namespace Lifti.Tokenization.Objects
             }
 
             var fields = this.reader(item);
-            if (fields.TryGetValue(unprefixedName, out var field))
+            if (fields != null && fields.TryGetValue(unprefixedName, out var field))
             {
                 return new ValueTask<IEnumerable<string>>(new[] { field });
             }

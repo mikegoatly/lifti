@@ -78,9 +78,9 @@ namespace Lifti.Tests
         [Fact]
         public async Task IndexedEmoji_ShouldBeRetrievableAsIndexedTokens()
         {
-            await index.AddAsync("A", "🎶");
+            await this.index.AddAsync("A", "🎶");
 
-            index.Snapshot.CreateNavigator().EnumerateIndexedTokens().Should().BeEquivalentTo("🎶");
+            this.index.Snapshot.CreateNavigator().EnumerateIndexedTokens().Should().BeEquivalentTo("🎶");
         }
 
         [Fact]
@@ -239,6 +239,100 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async void ObjectsWithMultipleDynamicFieldsShouldGenerateCorrectPrefixedFieldNames()
+        {
+            var index = new FullTextIndexBuilder<string>()
+                .WithObjectTokenization<DynamicObject>(
+                    o => o.WithKey(i => i.Id)
+                        .WithField("Details", i => i.Details)
+                        .WithDynamicFields(i => i.DynamicFields, "Dyn1")
+                        .WithDynamicFields(i => i.ExtraFields, "Dyn2"))
+                .Build();
+
+            await index.AddAsync(
+                new DynamicObject(
+                    "A",
+                    "Text One",
+                    new Dictionary<string, string> { { "Field1", "Text One" }, { "Field2", "Text Two" } },
+                    new Dictionary<string, string> { { "Field1", "Alternative Text One" }, { "Field2", "Alternative Text Two" } }));
+
+            await index.AddAsync(
+                new DynamicObject(
+                    "B",
+                    "Text Two",
+                    new Dictionary<string, string> { { "Field1", "Not One" }, { "Field2", "Not Two" }, { "Field3", "Not Three" } },
+                    null));
+
+            index.FieldLookup.AllFieldNames.Should().BeEquivalentTo(
+               new[]
+               {
+                    "Details",
+                    "Dyn1Field1",
+                    "Dyn1Field2",
+                    "Dyn2Field1",
+                    "Dyn2Field2",
+                    "Dyn1Field3"
+               });
+        }
+
+        [Fact]
+        public async void SearchesCanBePerformedForDynamicFieldsWithPrefixes()
+        {
+            var index = new FullTextIndexBuilder<string>()
+                .WithObjectTokenization<DynamicObject>(
+                    o => o.WithKey(i => i.Id)
+                        .WithField("Details", i => i.Details)
+                        .WithDynamicFields(i => i.DynamicFields, "Dyn1")
+                        .WithDynamicFields(i => i.ExtraFields, "Dyn2"))
+                .Build();
+
+            await index.AddAsync(
+                new DynamicObject(
+                    "A",
+                    "Text One",
+                    new Dictionary<string, string> { { "Field1", "Text One" }, { "Field2", "Text Two" } },
+                    new Dictionary<string, string> { { "Field1", "Alternative Text One" }, { "Field2", "Alternative Text Two" } }));
+
+            await index.AddAsync(
+                new DynamicObject(
+                    "B",
+                    "Text Two",
+                    new Dictionary<string, string> { { "Field1", "Not One" }, { "Field2", "Not Two" }, { "Field3", "Not Three" } },
+                    null));
+
+            var resultsWithoutFieldFilter = index.Search("Three").ToList();
+            var resultsWithFieldFilter = index.Search("Dyn1Field3=Three").ToList();
+
+            resultsWithoutFieldFilter.Should().HaveCount(1);
+
+            resultsWithFieldFilter.Should().BeEquivalentTo(resultsWithoutFieldFilter);
+        }
+
+        [Fact]
+        public async void ObjectsWithMultipleDynamicFieldsUsingTheSameFieldNamesShouldRaiseError()
+        {
+            var index = new FullTextIndexBuilder<string>()
+                .WithObjectTokenization<DynamicObject>(
+                    o => o.WithKey(i => i.Id)
+                        .WithField("Details", i => i.Details)
+                        .WithDynamicFields(i => i.DynamicFields)
+                        .WithDynamicFields(i => i.ExtraFields))
+                .Build();
+
+            var exception = await Assert.ThrowsAsync<LiftiException>(
+                async () => await index.AddAsync(
+                    new DynamicObject(
+                        "A",
+                        "Text One",
+                        new Dictionary<string, string> { { "Field1", "Text One" }, { "Field2", "Text Two" } },
+                        new Dictionary<string, string> { { "Field1", "Alternative Text One" }, { "Field2", "Alternative Text Two" } })));
+
+            exception.Message.Should().Be(
+                "A duplicate field \"Field1\" was encountered while indexing item A. Most likely multiple dynamic field providers have been configured " +
+                "and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields.");
+        }
+
+        [Fact]
         public async Task WordsRetrievedBySearchingForTextIndexedByObjectsShouldBeAssociatedToCorrectFields()
         {
             await this.WithIndexedSingleStringPropertyObjectsAsync();
@@ -323,7 +417,7 @@ namespace Lifti.Tests
         [Fact]
         public async Task QueringIndex_ShouldOrderResultsByScore()
         {
-            await PopulateIndexWithWikipediaData();
+            await this.PopulateIndexWithWikipediaData();
 
             var results = this.index.Search("data").ToList();
             results.Should().BeInDescendingOrder(r => r.Score);
@@ -334,7 +428,7 @@ namespace Lifti.Tests
         [Fact]
         public async Task QueringIndex_ShouldHandleWildcards()
         {
-            await PopulateIndexWithWikipediaData();
+            await this.PopulateIndexWithWikipediaData();
 
             var results = this.index.Search("*ta").ToList();
             results.Should().BeInDescendingOrder(r => r.Score);
@@ -343,7 +437,7 @@ namespace Lifti.Tests
         [Fact]
         public async Task WhenLoadingLotsOfDataShouldNotError()
         {
-            var wikipediaTests = await PopulateIndexWithWikipediaData();
+            var wikipediaTests = await this.PopulateIndexWithWikipediaData();
 
             await this.index.RemoveAsync(wikipediaTests[10].name);
             await this.index.RemoveAsync(wikipediaTests[9].name);
@@ -534,6 +628,22 @@ namespace Lifti.Tests
             public string Id { get; }
             public string Text { get; }
             public string[] MultiText { get; }
+        }
+
+        public class DynamicObject
+        {
+            public DynamicObject(string id, string details, Dictionary<string, string> dynamicFields, Dictionary<string, string>? extraFields)
+            {
+                this.Id = id;
+                this.Details = details;
+                this.DynamicFields = dynamicFields;
+                this.ExtraFields = extraFields;
+            }
+
+            public string Id { get; }
+            public string Details { get; }
+            public Dictionary<string, string> DynamicFields { get; }
+            public Dictionary<string, string>? ExtraFields { get; }
         }
     }
 }

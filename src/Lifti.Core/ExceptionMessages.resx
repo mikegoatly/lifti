@@ -138,6 +138,9 @@
   <data name="CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes" xml:space="preserve">
     <value>Cannot register dynamic field with the same name "{0}" against different object types. Consider using a field prefix when configuring the dynamic fields.</value>
   </data>
+  <data name="DuplicateFieldEncounteredOnObject" xml:space="preserve">
+    <value>A duplicate field "{0}" was encountered while indexing item {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields.</value>
+  </data>
   <data name="EarlierVersionSerializedIndexNotSupported" xml:space="preserve">
     <value>The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI.</value>
   </data>

@@ -131,7 +131,7 @@ namespace Lifti.Tokenization.Objects
         /// text extractor for the index will be used.
         /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithDynamicFields(
-            Func<T, IDictionary<string, string>> dynamicFieldReader,
+            Func<T, IDictionary<string, string>?> dynamicFieldReader,
             string? fieldNamePrefix = null,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null,

@@ -124,6 +124,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A duplicate field &quot;{0}&quot; was encountered while indexing item {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields..
+        /// </summary>
+        internal static string DuplicateFieldEncounteredOnObject {
+            get {
+                return ResourceManager.GetString("DuplicateFieldEncounteredOnObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI..
         /// </summary>
         internal static string EarlierVersionSerializedIndexNotSupported {

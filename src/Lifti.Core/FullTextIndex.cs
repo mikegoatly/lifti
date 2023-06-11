@@ -307,7 +307,7 @@ namespace Lifti
             return tokenizer.Process(fragments).SelectMany(x => thesaurus.Process(x)).ToList();
         }
 
-        private void AddForDefaultField(IndexMutation mutation, TKey itemKey, IReadOnlyCollection<Token> tokens)
+        private void AddForDefaultField(IndexMutation mutation, TKey itemKey, List<Token> tokens)
         {
             var fieldId = this.FieldLookup.DefaultField;
             var itemId = this.GetUniqueIdForItem(
@@ -401,9 +401,15 @@ namespace Lifti
             }
         }
 
-        private static int CalculateTotalTokenCount(IReadOnlyCollection<Token> tokens)
+        private static int CalculateTotalTokenCount(List<Token> tokens)
         {
-            return tokens.Aggregate(0, (current, token) => current + token.Locations.Count);
+            var totalCount = 0;
+            for (var i = 0; i < tokens.Count; i++)
+            {
+                totalCount += tokens[i].Locations.Count;
+            }
+            return totalCount;
+
         }
 
         private void RemoveKeyFromIndex(TKey itemKey, IndexMutation mutation)
@@ -412,11 +418,12 @@ namespace Lifti
             mutation.Remove(id);
         }
 
+        /// <remarks>This method is thread safe as we only allow one mutation operation at a time.</remarks>
         private async Task AddAsync<TItem>(TItem item, ObjectTokenization<TItem, TKey> options, IndexMutation indexMutation, CancellationToken cancellationToken)
         {
             var itemKey = options.KeyReader(item);
 
-            var fieldTokens = new List<(byte fieldId, IReadOnlyCollection<Token> tokens)>(options.FieldReaders.Count);
+            var fieldTokens = new Dictionary<byte, List<Token>>();
 
             // First process any static field readers
             foreach (var field in options.FieldReaders.Values)
@@ -429,7 +436,7 @@ namespace Lifti
                     tokenizer,
                     thesaurus);
 
-                fieldTokens.Add((fieldId, tokens));
+                MergeFieldTokens(fieldTokens, itemKey, field.Name, fieldId, tokens);
             }
 
             // Next process any dynamic field readers
@@ -444,21 +451,31 @@ namespace Lifti
 
                     var tokens = ExtractDocumentTokens(rawText, textExtractor, tokenizer, thesaurus);
 
-                    fieldTokens.Add((fieldId, tokens));
+                    MergeFieldTokens(fieldTokens, itemKey, name, fieldId, tokens);
                 }
             }
 
             var documentStatistics = new DocumentStatistics(
                 fieldTokens.ToDictionary(
-                    t => t.fieldId,
-                    t => CalculateTotalTokenCount(t.tokens)));
+                    t => t.Key,
+                    t => CalculateTotalTokenCount(t.Value)));
 
             var itemId = this.GetUniqueIdForItem(itemKey, documentStatistics, indexMutation);
 
-            foreach (var (fieldId, tokens) in fieldTokens)
+            foreach (var fieldTokenList in fieldTokens)
             {
-                IndexTokens(indexMutation, itemId, fieldId, tokens);
+                IndexTokens(indexMutation, itemId, fieldTokenList.Key, fieldTokenList.Value);
             }
+        }
+
+        private static void MergeFieldTokens(Dictionary<byte, List<Token>> fieldTokens, TKey key, string fieldName, byte fieldId, List<Token> tokens)
+        {
+            if (fieldTokens.ContainsKey(fieldId))
+            {
+                throw new LiftiException(ExceptionMessages.DuplicateFieldEncounteredOnObject, fieldName, key);
+            }
+
+            fieldTokens.Add(fieldId, tokens);
         }
 
         private int GetUniqueIdForItem(TKey itemKey, DocumentStatistics documentStatistics, IndexMutation mutation)
