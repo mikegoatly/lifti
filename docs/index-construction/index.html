@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.108.0">
+<meta name="generator" content="Hugo 0.113.0">
 <link rel="alternate" type="application/rss&#43;xml" href="https://mikegoatly.github.io/lifti/docs/index-construction/index.xml">
 <meta name="robots" content="index, follow">
 
@@ -25,7 +25,7 @@
 <meta property="og:description" content="Use a `FullTextIndexBuilder&lt;TKey&gt;` to configure the behavior of your index.
 " />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/index-construction/" /><meta property="og:site_name" content="LIFTI" />
+<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/index-construction/" />
 <meta itemprop="name" content="Index Construction">
 <meta itemprop="description" content="Use a `FullTextIndexBuilder&lt;TKey&gt;` to configure the behavior of your index.
 "><meta name="twitter:card" content="summary"/>
@@ -73,7 +73,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.6beafd3f5b32ff5c52ebd41b9f2ba7bb.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.73f1f54b0ddd603ad0f1cf1f9abe910a.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -98,7 +98,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.6beafd3f5b32ff5c52ebd41b9f2ba7bb.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.73f1f54b0ddd603ad0f1cf1f9abe910a.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -212,6 +212,7 @@
             <div class="td-toc">
         <nav id="TableOfContents">
   <ul>
+    <li><a href="#fulltextindexbuildertkey"><code>FullTextIndexBuilder&lt;TKey&gt;</code></a></li>
     <li><a href="#quick-examples">Quick examples</a></li>
   </ul>
 </nav>
@@ -271,7 +272,14 @@
 
 		
 	</header>
-	<h2 id="quick-examples">Quick examples</h2>
+	<h2 id="fulltextindexbuildertkey"><code>FullTextIndexBuilder&lt;TKey&gt;</code></h2>
+<p><code>FullTextIndexBuilder</code> requires a single generic type provided to it.
+This defines the type of the key that items will be indexed against.</p>
+<p>In simple cases this will just be a <code>string</code>, <code>Guid</code>, <code>Int32</code> or <code>UInt32</code>.
+Indexes can be built with other key types, including composite types, but special care needs
+to be made when using the binary serializer. See <a href="../serialization/key-serialization">Key Serialization</a>
+for more information.</p>
+<h2 id="quick-examples">Quick examples</h2>
 <p>Create an index with defaults:</p>
 <ul>
 <li>case insensitive</li>
@@ -376,7 +384,7 @@
 	
 	
 	<div class="text-muted mt-5 pt-3 border-top">
-  Last modified October 3, 2022: <a href="https://github.com/mikegoatly/lifti/commit/7171d2e2af0c2c3e5eba79409de02a744b0e4895">V3.3.0 (#50) (7171d2e)</a>
+  Last modified June 8, 2023: <a href="https://github.com/mikegoatly/lifti/commit/a908e8c19e7796d2f000eaf07720f03840c59062">Added info about key types (a908e8c)</a>
 </div>
 
 </div>
@@ -429,7 +437,7 @@
         
       </div>
       <div class="col-12 col-sm-4 text-center py-2 order-sm-2">
-        <small class="text-white">&copy; 2022 Mike Goatly All Rights Reserved</small>
+        <small class="text-white">&copy; 2023 Mike Goatly All Rights Reserved</small>
         
 	
 		<p class="mt-2"><a href="/lifti/about/">About LIFTI</a></p>
