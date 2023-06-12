@@ -144,8 +144,121 @@ namespace Lifti.Tokenization.Objects
 
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.dynamicFieldReaderBuilders.Add(
-                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new DictionaryDynamicFieldReader<T>(
+                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringDictionaryDynamicFieldReader<T>(
                     dynamicFieldReader,
+                    fieldNamePrefix,
+                    tokenizer ?? defaultTokenizer,
+                    textExtractor ?? defaultTextExtractor,
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+
+            return this;
+        }
+
+        /// <inheritdoc cref="WithDynamicFields(Func{T, IDictionary{string, string}?}, string?, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?)"/>
+        public ObjectTokenizationBuilder<T, TKey> WithDynamicFields(
+            Func<T, IDictionary<string, IEnumerable<string>>> dynamicFieldReader,
+            string? fieldNamePrefix = null,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+        {
+            if (dynamicFieldReader == null)
+            {
+                throw new ArgumentNullException(nameof(dynamicFieldReader));
+            }
+
+            var tokenizer = tokenizationOptions.CreateTokenizer();
+            this.dynamicFieldReaderBuilders.Add(
+                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringArrayDictionaryDynamicFieldReader<T>(
+                    dynamicFieldReader,
+                    fieldNamePrefix,
+                    tokenizer ?? defaultTokenizer,
+                    textExtractor ?? defaultTextExtractor,
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a property on the item that exposes a set of dynamic fields and the text to be indexed for each.
+        /// Dynamic fields are automatically registered with the index's <see cref="IndexedFieldLookup"/> as they are encountered
+        /// during indexing.
+        /// </summary>
+        /// <param name="dynamicFieldReader">
+        /// The delegate capable of reading the child objects.
+        /// </param>
+        /// <param name="getFieldName">
+        /// The delegate capable of reading the field name from a child object.
+        /// </param>
+        /// <param name="getFieldText">
+        /// The delegate capable of reading the text to be indexed from a child object.
+        /// </param>
+        /// <param name="fieldNamePrefix">
+        /// The optional prefix to apply to any field names read using the <paramref name="dynamicFieldReader"/>.
+        /// Use this if you need to register multiple sets of dynamic fields for the same item and there is a 
+        /// chance the field names will overlap.
+        /// </param>
+        /// <param name="tokenizationOptions">
+        /// An optional delegate capable of building the options that should be used with tokenizing text in this field. If this is 
+        /// null then default tokenizer configured for the index will be used.
+        /// </param>
+        /// <param name="thesaurusOptions">
+        /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
+        /// for the index will be used.
+        /// </param>
+        /// <param name="textExtractor">
+        /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
+        /// text extractor for the index will be used.
+        /// </param>
+        public ObjectTokenizationBuilder<T, TKey> WithDynamicFields<TChild>(
+            Func<T, ICollection<TChild>?> dynamicFieldReader,
+            Func<TChild, string> getFieldName,
+            Func<TChild, string> getFieldText,
+            string? fieldNamePrefix = null,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+        {
+            if (dynamicFieldReader == null)
+            {
+                throw new ArgumentNullException(nameof(dynamicFieldReader));
+            }
+
+            var tokenizer = tokenizationOptions.CreateTokenizer();
+            this.dynamicFieldReaderBuilders.Add(
+                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringChildItemDynamicFieldReader<T, TChild>(
+                    dynamicFieldReader,
+                    getFieldName,
+                    getFieldText,
+                    fieldNamePrefix,
+                    tokenizer ?? defaultTokenizer,
+                    textExtractor ?? defaultTextExtractor,
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+
+            return this;
+        }
+
+        /// <inheritdoc cref="WithDynamicFields{TChild}(Func{T, ICollection{TChild}}, Func{TChild, string}, Func{TChild, string}, string?, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?)"/>
+        public ObjectTokenizationBuilder<T, TKey> WithDynamicFields<TChild>(
+            Func<T, ICollection<TChild>?> dynamicFieldReader,
+            Func<TChild, string> getFieldName,
+            Func<TChild, IEnumerable<string>> getFieldText,
+            string? fieldNamePrefix = null,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+        {
+            if (dynamicFieldReader == null)
+            {
+                throw new ArgumentNullException(nameof(dynamicFieldReader));
+            }
+
+            var tokenizer = tokenizationOptions.CreateTokenizer();
+            this.dynamicFieldReaderBuilders.Add(
+                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringArrayChildItemDynamicFieldReader<T, TChild>(
+                    dynamicFieldReader,
+                    getFieldName,
+                    getFieldText,
                     fieldNamePrefix,
                     tokenizer ?? defaultTokenizer,
                     textExtractor ?? defaultTextExtractor,

@@ -166,7 +166,7 @@ namespace Lifti.Tests
         private static DynamicFieldReader<T> CreateDynamicFieldReader<T>()
             where T : new()
         {
-            var reader = new DictionaryDynamicFieldReader<T>(
+            var reader = new StringDictionaryDynamicFieldReader<T>(
                 x => new Dictionary<string, string> { { "foo", "bar" } },
                 null,
                 IndexTokenizer.Default,

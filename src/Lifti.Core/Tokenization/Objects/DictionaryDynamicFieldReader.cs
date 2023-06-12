@@ -1,4 +1,4 @@
-using Lifti.Tokenization.TextExtraction;
+﻿using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -6,70 +6,57 @@ using System.Threading.Tasks;
 
 namespace Lifti.Tokenization.Objects
 {
-    internal class DictionaryDynamicFieldReader<TItem> : DynamicFieldReader<TItem>
+    internal abstract class DictionaryDynamicFieldReader<TItem, TValue> : DynamicFieldReader<TItem>
     {
-        private readonly Dictionary<string, string> prefixedFields = new();
-        private readonly Dictionary<string, string> prefixedFieldsReverseLookup = new();
-        private readonly Func<TItem, IDictionary<string, string>?> reader;
-        private readonly string? fieldNamePrefix;
+        private readonly Func<TItem, IDictionary<string, TValue>?> reader;
 
         public DictionaryDynamicFieldReader(
-            Func<TItem, IDictionary<string, string>?> reader,
+            Func<TItem, IDictionary<string, TValue>?> reader,
             string? fieldNamePrefix,
             IIndexTokenizer tokenizer,
             ITextExtractor textExtractor,
             IThesaurus thesaurus)
-            : base(tokenizer, textExtractor, thesaurus)
+            : base(tokenizer, textExtractor, thesaurus, fieldNamePrefix)
         {
             this.reader = reader;
-            this.fieldNamePrefix = fieldNamePrefix;
         }
 
         /// <inheritdoc />
-        public override ValueTask<IEnumerable<(string field, string rawText)>> ReadAsync(TItem item, CancellationToken cancellationToken)
+        public override ValueTask<IEnumerable<(string field, IEnumerable<string> rawText)>> ReadAsync(TItem item, CancellationToken cancellationToken)
         {
             var fields = this.reader(item);
             if (fields == null)
             {
-                return new ValueTask<IEnumerable<(string field, string rawText)>>(Array.Empty<(string, string)>());
+                return EmptyFieldSet();
             }
 
-            var results = new List<(string field, string rawText)>();
+            var results = new List<(string field, IEnumerable<string> rawText)>();
 
             foreach (var field in fields)
             {
-                if (!this.prefixedFields.TryGetValue(field.Key, out var fieldName))
-                {
-                    fieldName = this.fieldNamePrefix == null ? field.Key : $"{this.fieldNamePrefix}{field.Key}";
+                var fieldName = this.GetPrefixedFieldName(field.Key);
 
-                    // Keying the fieldname against its prefixed version in both directions allows for quick lookups later on without string manipulation
-                    this.prefixedFields[field.Key] = fieldName;
-                    this.prefixedFieldsReverseLookup[fieldName] = field.Key;
-                }
-
-                results.Add((fieldName, field.Value));
+                results.Add((fieldName, this.ReadFieldValueAsEnumerable(field.Value)));
             }
 
-            return new ValueTask<IEnumerable<(string, string)>>(results);
+            return new ValueTask<IEnumerable<(string, IEnumerable<string>)>>(results);
         }
 
         /// <inheritdoc />
         public override ValueTask<IEnumerable<string>> ReadAsync(TItem item, string fieldName, CancellationToken cancellationToken)
         {
-            if (this.prefixedFieldsReverseLookup.TryGetValue(fieldName, out var unprefixedName) == false)
-            {
-                // Field is not known against this object.
-                throw new LiftiException(ExceptionMessages.AttemptToReadFieldUnknownToDynamicFieldReader, fieldName);
-            }
+            var unprefixedName = this.GetUnprefixedFieldName(fieldName);
 
             var fields = this.reader(item);
             if (fields != null && fields.TryGetValue(unprefixedName, out var field))
             {
-                return new ValueTask<IEnumerable<string>>(new[] { field });
+                return new ValueTask<IEnumerable<string>>(this.ReadFieldValueAsEnumerable(field));
             }
 
             // The field is known to this reader, but not present for the given item instance.
-            return new ValueTask<IEnumerable<string>>(Array.Empty<string>());
+            return DynamicFieldReader<TItem>.EmptyField();
         }
+
+        protected abstract IEnumerable<string> ReadFieldValueAsEnumerable(TValue field);
     }
 }

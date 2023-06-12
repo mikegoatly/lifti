@@ -26,8 +26,8 @@ namespace Lifti.Tests.Tokenization.Objects
 
             result.Should().BeEquivalentTo(new[]
             {
-                ("Foo", "Bar"),
-                ("Baz", "Bam")
+                ("Foo", new[] { "Bar" }),
+                ("Baz", new[] { "Bam" })
             });
         }
 
@@ -40,8 +40,8 @@ namespace Lifti.Tests.Tokenization.Objects
 
             result.Should().BeEquivalentTo(new[]
             {
-                ("Test_Foo", "Bar"),
-                ("Test_Baz", "Bam")
+                ("Test_Foo", new[] { "Bar" }),
+                ("Test_Baz", new[] { "Bam" })
             });
         }
 
@@ -79,9 +79,9 @@ namespace Lifti.Tests.Tokenization.Objects
             (await sut.ReadAsync(new TestObject(fieldValues), "Zod", default)).Should().BeEquivalentTo(Array.Empty<string>());
         }
 
-        private static DictionaryDynamicFieldReader<TestObject> CreateSut(string? fieldPrefix = null)
+        private static StringDictionaryDynamicFieldReader<TestObject> CreateSut(string? fieldPrefix = null)
         {
-            return new DictionaryDynamicFieldReader<TestObject>(
+            return new StringDictionaryDynamicFieldReader<TestObject>(
                 x => x.Fields,
                 fieldPrefix,
                 new FakeIndexTokenizer(),
