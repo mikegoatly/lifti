@@ -110,6 +110,10 @@ namespace Lifti.Tokenization.Objects
         /// Dynamic fields are automatically registered with the index's <see cref="IndexedFieldLookup"/> as they are encountered
         /// during indexing.
         /// </summary>
+        /// <param name="dynamicFieldReaderName">
+        /// The unique name for this dynamic field reader. This is used when deserializing an index and
+        /// restoring the relationship between the a dynamic field and its source provider.
+        /// </param>
         /// <param name="dynamicFieldReader">
         /// The delegate capable of reading the the field name/text pairs from the item.
         /// </param>
@@ -131,6 +135,7 @@ namespace Lifti.Tokenization.Objects
         /// text extractor for the index will be used.
         /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithDynamicFields(
+            string dynamicFieldReaderName,
             Func<T, IDictionary<string, string>?> dynamicFieldReader,
             string? fieldNamePrefix = null,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
@@ -146,6 +151,7 @@ namespace Lifti.Tokenization.Objects
             this.dynamicFieldReaderBuilders.Add(
                 (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringDictionaryDynamicFieldReader<T>(
                     dynamicFieldReader,
+                    dynamicFieldReaderName,
                     fieldNamePrefix,
                     tokenizer ?? defaultTokenizer,
                     textExtractor ?? defaultTextExtractor,
@@ -154,8 +160,9 @@ namespace Lifti.Tokenization.Objects
             return this;
         }
 
-        /// <inheritdoc cref="WithDynamicFields(Func{T, IDictionary{string, string}?}, string?, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?)"/>
+        /// <inheritdoc cref="WithDynamicFields(string, Func{T, IDictionary{string, string}?}, string?, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?)"/>
         public ObjectTokenizationBuilder<T, TKey> WithDynamicFields(
+            string dynamicFieldReaderName,
             Func<T, IDictionary<string, IEnumerable<string>>> dynamicFieldReader,
             string? fieldNamePrefix = null,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
@@ -170,6 +177,7 @@ namespace Lifti.Tokenization.Objects
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.dynamicFieldReaderBuilders.Add(
                 (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringArrayDictionaryDynamicFieldReader<T>(
+                    dynamicFieldReaderName,
                     dynamicFieldReader,
                     fieldNamePrefix,
                     tokenizer ?? defaultTokenizer,
@@ -184,6 +192,10 @@ namespace Lifti.Tokenization.Objects
         /// Dynamic fields are automatically registered with the index's <see cref="IndexedFieldLookup"/> as they are encountered
         /// during indexing.
         /// </summary>
+        /// <param name="dynamicFieldReaderName">
+        /// The unique name for this dynamic field reader. This is used when deserializing an index and
+        /// restoring the relationship between the a dynamic field and its source provider.
+        /// </param>
         /// <param name="dynamicFieldReader">
         /// The delegate capable of reading the child objects.
         /// </param>
@@ -211,6 +223,7 @@ namespace Lifti.Tokenization.Objects
         /// text extractor for the index will be used.
         /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithDynamicFields<TChild>(
+            string dynamicFieldReaderName,
             Func<T, ICollection<TChild>?> dynamicFieldReader,
             Func<TChild, string> getFieldName,
             Func<TChild, string> getFieldText,
@@ -230,6 +243,7 @@ namespace Lifti.Tokenization.Objects
                     dynamicFieldReader,
                     getFieldName,
                     getFieldText,
+                    dynamicFieldReaderName,
                     fieldNamePrefix,
                     tokenizer ?? defaultTokenizer,
                     textExtractor ?? defaultTextExtractor,
@@ -238,8 +252,9 @@ namespace Lifti.Tokenization.Objects
             return this;
         }
 
-        /// <inheritdoc cref="WithDynamicFields{TChild}(Func{T, ICollection{TChild}}, Func{TChild, string}, Func{TChild, string}, string?, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?)"/>
+        /// <inheritdoc cref="WithDynamicFields{TChild}(string, Func{T, ICollection{TChild}}, Func{TChild, string}, Func{TChild, string}, string?, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?)"/>
         public ObjectTokenizationBuilder<T, TKey> WithDynamicFields<TChild>(
+            string dynamicFieldReaderName,
             Func<T, ICollection<TChild>?> dynamicFieldReader,
             Func<TChild, string> getFieldName,
             Func<TChild, IEnumerable<string>> getFieldText,
@@ -259,6 +274,7 @@ namespace Lifti.Tokenization.Objects
                     dynamicFieldReader,
                     getFieldName,
                     getFieldText,
+                    dynamicFieldReaderName,
                     fieldNamePrefix,
                     tokenizer ?? defaultTokenizer,
                     textExtractor ?? defaultTextExtractor,
@@ -457,10 +473,16 @@ namespace Lifti.Tokenization.Objects
                 fieldLookup.RegisterStaticField(staticField);
             }
 
+            var dynamicFieldReaders = this.dynamicFieldReaderBuilders.Select(builder => builder(defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor)).ToList();
+            foreach (var dynamicFieldReader in dynamicFieldReaders)
+            {
+                fieldLookup.RegisterDynamicFieldReader(dynamicFieldReader);
+            }
+
             return new ObjectTokenization<T, TKey>(
                 this.keyReader,
                 staticFields,
-                this.dynamicFieldReaderBuilders.Select(builder => builder(defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor)).ToList());
+                dynamicFieldReaders);
         }
 
         private static void ValidateFieldParameters(string name, object fieldTextReader)

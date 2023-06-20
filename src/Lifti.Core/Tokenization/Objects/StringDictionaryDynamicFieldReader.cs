@@ -8,11 +8,12 @@ namespace Lifti.Tokenization.Objects
     {
         public StringDictionaryDynamicFieldReader(
             Func<TItem, IDictionary<string, string>?> reader,
+            string dynamicFieldReaderName,
             string? fieldNamePrefix,
             IIndexTokenizer tokenizer,
             ITextExtractor textExtractor,
             IThesaurus thesaurus)
-            : base(reader, fieldNamePrefix, tokenizer, textExtractor, thesaurus)
+            : base(reader, dynamicFieldReaderName, fieldNamePrefix, tokenizer, textExtractor, thesaurus)
         {
         }
 

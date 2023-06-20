@@ -9,7 +9,7 @@
         /// Initializes a new instance of the <see cref="UIntFormatterKeySerializer"/> class.
         /// </summary>
         public UIntFormatterKeySerializer()
-            : base((w, k) => w.Write(k), r => r.ReadUInt32())
+            : base((w, k) => w.WriteCompressedUInt32(k), r => r.ReadCompressedUInt32())
         {
 
         }

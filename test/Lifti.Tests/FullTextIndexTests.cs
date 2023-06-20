@@ -515,8 +515,8 @@ namespace Lifti.Tests
                 .WithObjectTokenization<DynamicObject>(
                     o => o.WithKey(i => i.Id)
                         .WithField("Details", i => i.Details)
-                        .WithDynamicFields(i => i.DynamicFields, usePrefixes ? "Dyn1" : null)
-                        .WithDynamicFields(i => i.ExtraFields, x => x.Name, x => x.Value, usePrefixes ? "Dyn2" : null))
+                        .WithDynamicFields("Dyn", i => i.DynamicFields, usePrefixes ? "Dyn1" : null)
+                        .WithDynamicFields("Extra", i => i.ExtraFields, x => x.Name, x => x.Value, usePrefixes ? "Dyn2" : null))
                 .Build();
 
             await index.AddAsync(

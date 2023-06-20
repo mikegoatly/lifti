@@ -20,7 +20,8 @@ namespace Lifti
             FieldKind fieldKind,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
-            IThesaurus thesaurus)
+            IThesaurus thesaurus,
+            string? dynamicFieldReaderName)
         {
             this.Id = id;
             this.Name = name;
@@ -29,6 +30,7 @@ namespace Lifti
             this.TextExtractor = textExtractor;
             this.Tokenizer = tokenizer;
             this.Thesaurus = thesaurus;
+            this.DynamicFieldReaderName = dynamicFieldReaderName;
         }
 
         /// <summary>
@@ -67,6 +69,11 @@ namespace Lifti
         public IThesaurus Thesaurus { get; }
 
         /// <summary>
+        /// Gets the name of the dynamic field reader that generated this field. If this field is not a dynamic field, this will be null.
+        /// </summary>
+        public string? DynamicFieldReaderName { get; }
+
+        /// <summary>
         /// Reads the text for the field from the specified item. The item must be of the type specified by the <see cref="ObjectType"/> property.
         /// </summary>
         public abstract ValueTask<IEnumerable<string>> ReadAsync(object item, CancellationToken cancellationToken);
@@ -85,17 +92,55 @@ namespace Lifti
     {
         private readonly Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader;
 
-        internal IndexedFieldDetails(
+        private IndexedFieldDetails(
             byte id,
             string name,
             Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
             FieldKind fieldKind,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
-            IThesaurus thesaurus)
-            : base(id, name, typeof(TItem), fieldKind, textExtractor, tokenizer, thesaurus)
+            IThesaurus thesaurus,
+            string? dynamicFieldReaderName)
+            : base(id, name, typeof(TItem), fieldKind, textExtractor, tokenizer, thesaurus, dynamicFieldReaderName)
         {
             this.fieldReader = fieldReader;
+        }
+
+        internal static IndexedFieldDetails<TItem> Static(byte id,
+            string name,
+            Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
+            ITextExtractor textExtractor,
+            IIndexTokenizer tokenizer,
+            IThesaurus thesaurus)
+        {
+            return new IndexedFieldDetails<TItem>(
+                id,
+                name,
+                fieldReader,
+                FieldKind.Static,
+                textExtractor,
+                tokenizer,
+                thesaurus,
+                null);
+        }
+
+        internal static IndexedFieldDetails<TItem> Dynamic(byte id,
+            string name,
+            string dynamicFieldReaderName,
+            Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
+            ITextExtractor textExtractor,
+            IIndexTokenizer tokenizer,
+            IThesaurus thesaurus)
+        {
+            return new IndexedFieldDetails<TItem>(
+                id,
+                name,
+                fieldReader,
+                FieldKind.Dynamic,
+                textExtractor,
+                tokenizer,
+                thesaurus,
+                dynamicFieldReaderName);
         }
 
         /// <inheritdoc />

@@ -88,6 +88,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Badly formatted variable length value encountered.
+        /// </summary>
+        internal static string BadlyFormattedVariableLengthValueEncountered {
+            get {
+                return ResourceManager.GetString("BadlyFormattedVariableLengthValueEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot start a new batch change while another is already in progress..
         /// </summary>
         internal static string BatchChangeAlreadyStarted {
@@ -120,6 +129,15 @@ namespace Lifti {
         internal static string CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes {
             get {
                 return ResourceManager.GetString("CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate dynamic field reader name encountered: {0}. Dynamic field readers must have unique names..
+        /// </summary>
+        internal static string DuplicateDynamicFieldReaderName {
+            get {
+                return ResourceManager.GetString("DuplicateDynamicFieldReaderName", resourceCulture);
             }
         }
         
@@ -376,6 +394,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internal error: A dynamic field was missing its dynamic field reader name.
+        /// </summary>
+        internal static string NoDynamicFieldReaderNameInDynamicField {
+            get {
+                return ResourceManager.GetString("NoDynamicFieldReaderNameInDynamicField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No item was returned from the load item delegate when generating match phrases for item {0}..
         /// </summary>
         internal static string NoItemReturnedWhenGeneratingMatchPhrases {
@@ -538,11 +565,29 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An unknown dynamic field reader name was encountered: {0} - this would likely indicate that an index was serialized with a differently configured set of dynamic field readers..
+        /// </summary>
+        internal static string UnknownDynamicFieldReaderNameEncountered {
+            get {
+                return ResourceManager.GetString("UnknownDynamicFieldReaderNameEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown field &apos;{0}&apos;.
         /// </summary>
         internal static string UnknownField {
             get {
                 return ResourceManager.GetString("UnknownField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown FieldKind {0}.
+        /// </summary>
+        internal static string UnknownFieldKind {
+            get {
+                return ResourceManager.GetString("UnknownFieldKind", resourceCulture);
             }
         }
         

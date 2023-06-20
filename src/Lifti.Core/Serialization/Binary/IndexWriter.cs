@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +7,7 @@ namespace Lifti.Serialization.Binary
 {
     internal class IndexWriter<TKey> : IIndexWriter<TKey>
     {
-        private const ushort Version = 4;
+        private const ushort Version = 5;
         private readonly Stream underlyingStream;
         private readonly bool disposeStream;
         private readonly IKeySerializer<TKey> keySerializer;
@@ -28,6 +27,8 @@ namespace Lifti.Serialization.Binary
         {
             await this.WriteHeaderAsync(snapshot).ConfigureAwait(false);
 
+            await this.WriteFieldsAsync(snapshot).ConfigureAwait(false);
+
             await this.WriteItemsAsync(snapshot).ConfigureAwait(false);
 
             await this.WriteNodeAsync(snapshot.Root).ConfigureAwait(false);
@@ -35,55 +36,56 @@ namespace Lifti.Serialization.Binary
             await this.WriteTerminatorAsync().ConfigureAwait(false);
         }
 
+        private async Task WriteFieldsAsync(IIndexSnapshot<TKey> snapshot)
+        {
+            // We need to write information for all the fields in the index so that when 
+            // we deserialize them to a new index we can ensure that the field ids are
+            // mapped correctly to a new index structure as new static fields may be registered
+            // in a new version of the index.
+            var fieldNames = snapshot.FieldLookup.AllFieldNames;
+
+            this.writer.WriteCompressedNonNegativeInt32(fieldNames.Count);
+
+            foreach (var fieldName in fieldNames)
+            {
+                var field = snapshot.FieldLookup.GetFieldInfo(fieldName);
+                this.writer.Write(field.Id);
+                this.writer.Write((byte)field.FieldKind);
+                this.writer.Write(field.Name);
+
+                if (field.FieldKind == FieldKind.Dynamic)
+                {
+                    if (field.DynamicFieldReaderName == null)
+                    {
+                        throw new LiftiException(ExceptionMessages.NoDynamicFieldReaderNameInDynamicField);
+                    }
+
+                    this.writer.Write(field.DynamicFieldReaderName);
+                }
+            }
+
+            await this.FlushAsync().ConfigureAwait(false);
+        }
+
         private async Task WriteNodeAsync(IndexNode node)
         {
             var matchCount = node.Matches.Count;
             var childNodeCount = node.ChildNodes.Count;
             var intraNodeTextLength = node.IntraNodeText.Length;
-            this.writer.Write(intraNodeTextLength);
-            this.writer.Write(matchCount);
-            this.writer.Write(childNodeCount);
+            this.writer.WriteCompressedNonNegativeInt32(intraNodeTextLength);
+            this.writer.WriteCompressedNonNegativeInt32(matchCount);
+            this.writer.WriteCompressedNonNegativeInt32(childNodeCount);
 
             if (intraNodeTextLength > 0)
             {
-                static void WriteIntraNodeText(BinaryWriter writer, ReadOnlySpan<char> span)
-                {
-                    var noSurrogateCharacters = true;
-                    for (var i = 0; i < span.Length && noSurrogateCharacters; i++)
-                    {
-                        if (char.IsSurrogate(span[i]))
-                        {
-                            noSurrogateCharacters = false;
-                        }
-                    }
-
-                    writer.Write(noSurrogateCharacters);
-                    if (noSurrogateCharacters)
-                    {
-                        // Write out as chars; no surrogates to worry about
-                        for (var i = 0; i < span.Length; i++)
-                        {
-                            writer.Write(span[i]);
-                        }
-                    }
-                    else
-                    {
-                        // Write out as shorts avoiding serialization errors
-                        for (var i = 0; i < span.Length; i++)
-                        {
-                            writer.Write((short)span[i]);
-                        }
-                    }
-                }
-
-                WriteIntraNodeText(this.writer, node.IntraNodeText.Span);
+                this.writer.WriteSpanCompressed(node.IntraNodeText.Span);
             }
 
             if (childNodeCount > 0)
             {
                 foreach (var childNode in node.ChildNodes)
                 {
-                    this.writer.Write((short)childNode.Key);
+                    this.writer.WriteCompressedUInt16(childNode.Key);
                     await this.WriteNodeAsync(childNode.Value).ConfigureAwait(false);
                 }
             }
@@ -103,13 +105,13 @@ namespace Lifti.Serialization.Binary
         {
             foreach (var match in node.Matches)
             {
-                this.writer.Write(match.Key);
-                this.writer.Write(match.Value.Count);
+                this.writer.WriteCompressedNonNegativeInt32(match.Key);
+                this.writer.WriteCompressedNonNegativeInt32(match.Value.Count);
 
                 foreach (var fieldMatch in match.Value)
                 {
                     this.writer.Write(fieldMatch.FieldId);
-                    this.writer.Write(fieldMatch.Locations.Count);
+                    this.writer.WriteCompressedNonNegativeInt32(fieldMatch.Locations.Count);
                     this.WriteTokenLocations(fieldMatch);
                 }
             }
@@ -188,7 +190,7 @@ namespace Lifti.Serialization.Binary
 
             if ((locationData.structure & LocationEntrySerializationOptimizations.LengthSameAsLast) != LocationEntrySerializationOptimizations.LengthSameAsLast)
             {
-                this.writer.Write(length);
+                this.writer.WriteCompressedUInt16(length);
             }
         }
 
@@ -211,9 +213,9 @@ namespace Lifti.Serialization.Binary
         private void WriteLocationInFull(TokenLocation location)
         {
             this.writer.Write((byte)LocationEntrySerializationOptimizations.Full);
-            this.writer.Write(location.TokenIndex);
-            this.writer.Write(location.Start);
-            this.writer.Write(location.Length);
+            this.writer.WriteCompressedNonNegativeInt32(location.TokenIndex);
+            this.writer.WriteCompressedNonNegativeInt32(location.Start);
+            this.writer.WriteCompressedUInt16(location.Length);
         }
 
         private async Task WriteTerminatorAsync()
@@ -224,15 +226,17 @@ namespace Lifti.Serialization.Binary
 
         private async Task WriteItemsAsync(IIndexSnapshot<TKey> index)
         {
+            this.writer.WriteCompressedNonNegativeInt32(index.Items.Count);
+
             foreach (var itemMetadata in index.Items.GetIndexedItems())
             {
-                this.writer.Write(itemMetadata.Id);
+                this.writer.WriteCompressedNonNegativeInt32(itemMetadata.Id);
                 this.keySerializer.Write(this.writer, itemMetadata.Item);
-                this.writer.Write(itemMetadata.DocumentStatistics.TokenCountByField.Count);
+                this.writer.WriteCompressedNonNegativeInt32(itemMetadata.DocumentStatistics.TokenCountByField.Count);
                 foreach (var fieldTokenCount in itemMetadata.DocumentStatistics.TokenCountByField)
                 {
                     this.writer.Write(fieldTokenCount.Key);
-                    this.writer.Write(fieldTokenCount.Value);
+                    this.writer.WriteCompressedNonNegativeInt32(fieldTokenCount.Value);
                 }
             }
 
@@ -243,7 +247,6 @@ namespace Lifti.Serialization.Binary
         {
             this.writer.Write(new byte[] { 0x4C, 0x49 });
             this.writer.Write(Version);
-            this.writer.Write(index.Items.Count);
 
             await this.FlushAsync().ConfigureAwait(false);
         }

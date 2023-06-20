@@ -48,7 +48,7 @@ namespace TestConsole
                 .WithObjectTokenization<TestObject>(o => o
                     .WithKey(c => c.Id)
                     .WithField("Details", x => x.Details)
-                    .WithDynamicFields(c => c.Data)
+                    .WithDynamicFields("Data", c => c.Data)
                 )
                 .Build();
 

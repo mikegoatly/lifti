@@ -168,6 +168,7 @@ namespace Lifti.Tests
         {
             var reader = new StringDictionaryDynamicFieldReader<T>(
                 x => new Dictionary<string, string> { { "foo", "bar" } },
+                "Test",
                 null,
                 IndexTokenizer.Default,
                 new PlainTextExtractor(),

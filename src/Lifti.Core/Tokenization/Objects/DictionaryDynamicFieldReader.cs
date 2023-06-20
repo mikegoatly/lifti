@@ -12,11 +12,12 @@ namespace Lifti.Tokenization.Objects
 
         public DictionaryDynamicFieldReader(
             Func<TItem, IDictionary<string, TValue>?> reader,
+            string dynamicFieldReaderName,
             string? fieldNamePrefix,
             IIndexTokenizer tokenizer,
             ITextExtractor textExtractor,
             IThesaurus thesaurus)
-            : base(tokenizer, textExtractor, thesaurus, fieldNamePrefix)
+            : base(tokenizer, textExtractor, thesaurus, dynamicFieldReaderName, fieldNamePrefix)
         {
             this.reader = reader;
         }

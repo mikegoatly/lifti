@@ -6,17 +6,36 @@ using System.Threading.Tasks;
 
 namespace Lifti.Tokenization.Objects
 {
+    internal abstract class DynamicFieldReader : FieldConfig
+    {
+        protected DynamicFieldReader(IIndexTokenizer tokenizer, ITextExtractor textExtractor, IThesaurus thesaurus, string dynamicFieldReaderName)
+            : base(tokenizer, textExtractor, thesaurus)
+        {
+            this.Name = dynamicFieldReaderName;
+        }
+
+        /// <summary>
+        /// Gets the unique name of the dynamic field reader.
+        /// </summary>
+        public string Name { get; }
+    }
+
     /// <summary>
     /// Implemented by classes that can read an object's fields dynamically during indexing.
     /// </summary>
-    internal abstract class DynamicFieldReader<TItem> : FieldConfig
+    internal abstract class DynamicFieldReader<TItem> : DynamicFieldReader
     {
         private readonly Dictionary<string, string> prefixedFields = new();
         private readonly Dictionary<string, string> prefixedFieldsReverseLookup = new();
         private readonly string? fieldNamePrefix;
 
-        protected DynamicFieldReader(IIndexTokenizer tokenizer, ITextExtractor textExtractor, IThesaurus thesaurus, string? fieldNamePrefix)
-            : base(tokenizer, textExtractor, thesaurus)
+        protected DynamicFieldReader(
+            IIndexTokenizer tokenizer,
+            ITextExtractor textExtractor,
+            IThesaurus thesaurus,
+            string dynamicFieldReaderName,
+            string? fieldNamePrefix)
+            : base(tokenizer, textExtractor, thesaurus, dynamicFieldReaderName)
         {
             this.fieldNamePrefix = fieldNamePrefix;
         }

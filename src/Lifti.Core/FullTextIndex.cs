@@ -516,5 +516,47 @@ namespace Lifti
             this.Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        /// <summary>
+        /// Rehydrates any dynamic fields to the index, and returns mapping between the fields ids as serialized in the index, 
+        /// and the ids in the new index. Assuming the index has been rebuilt with exactly the same configuration, the ids
+        /// will match on each side of the map.
+        /// </summary>
+        internal Dictionary<byte, byte> RehydrateSerializedFields(List<SerializedFieldInfo> serializedFields)
+        {
+            var fieldMap = new Dictionary<byte, byte>
+            {
+                // Always map the default field to itself
+                {  this.fieldLookup.DefaultField, this.fieldLookup.DefaultField }
+            };
+
+            foreach (var field in serializedFields)
+            {
+                byte newId;
+                switch (field.Kind)
+                {
+                    case FieldKind.Dynamic:
+                        if (field.DynamicFieldReaderName == null)
+                        {
+                            throw new LiftiException(ExceptionMessages.NoDynamicFieldReaderNameInDynamicField);
+                        }
+
+                        var newDynamicField = this.fieldLookup.GetOrCreateDynamicFieldInfo(field.DynamicFieldReaderName, field.Name);
+                        newId = newDynamicField.Id;
+                        break;
+                    case FieldKind.Static:
+                        var fieldInfo = this.fieldLookup.GetFieldInfo(field.Name);
+                        newId = fieldInfo.Id;
+                        break;
+                    default:
+                        throw new LiftiException(ExceptionMessages.UnknownFieldKind, field.Kind);
+
+                }
+
+                fieldMap[field.FieldId] = newId;
+            }
+
+            return fieldMap;
+        }
     }
 }

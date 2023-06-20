@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Lifti
 {
@@ -11,6 +10,13 @@ namespace Lifti
     {
         internal const string DefaultFieldName = "Unspecified";
         private readonly Dictionary<string, IndexedFieldDetails> fieldToDetailsLookup = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// This allows us to create a dynamic field at runtime while only knowing the name of the dynamic field reader.
+        /// In this situation we won't know the associated item type and we can avoid runtime reflection.
+        /// </summary>
+        private readonly Dictionary<string, Func<string, IndexedFieldDetails>> dynamicFieldFactoryLookup = new();
+
         private readonly Dictionary<byte, string> idToFieldLookup = new();
         private int nextId;
 
@@ -53,20 +59,53 @@ namespace Lifti
             return this.fieldToDetailsLookup.TryGetValue(fieldName, out var fieldDetails) && fieldDetails.ObjectType == objectType;
         }
 
+        internal void RegisterDynamicFieldReader<TItem>(DynamicFieldReader<TItem> reader)
+        {
+            if (this.dynamicFieldFactoryLookup.ContainsKey(reader.Name))
+            {
+                throw new LiftiException(ExceptionMessages.DuplicateDynamicFieldReaderName, reader.Name);
+            }
+
+            this.dynamicFieldFactoryLookup[reader.Name] = fieldName => this.GetOrCreateDynamicFieldInfo(reader, fieldName);
+        }
+
         internal void RegisterStaticField<TItem>(IStaticFieldReader<TItem> reader)
         {
-            this.RegisterField<TItem>(reader.ReadAsync, FieldKind.Static, reader.Name, reader);
+            this.RegisterField(
+                reader.Name,
+                (name, id) => IndexedFieldDetails<TItem>.Static(
+                    id,
+                    name,
+                    reader.ReadAsync,
+                    reader.TextExtractor,
+                    reader.Tokenizer,
+                    reader.Thesaurus));
+        }
+
+        internal IndexedFieldDetails GetOrCreateDynamicFieldInfo(string dynamicFieldReaderName, string fieldName)
+        {
+            if (this.dynamicFieldFactoryLookup.TryGetValue(dynamicFieldReaderName, out var factory))
+            {
+                return factory(fieldName);
+            }
+
+            throw new LiftiException(ExceptionMessages.UnknownDynamicFieldReaderNameEncountered, dynamicFieldReaderName);
         }
 
         internal IndexedFieldDetails GetOrCreateDynamicFieldInfo<TItem>(DynamicFieldReader<TItem> fieldReader, string fieldName)
         {
             if (!this.fieldToDetailsLookup.TryGetValue(fieldName, out var details))
             {
-                details = this.RegisterField<TItem>(
-                    (item, cancellationToken) => fieldReader.ReadAsync(item, fieldName, cancellationToken),
-                    FieldKind.Dynamic,
+                details = this.RegisterField(
                     fieldName,
-                    fieldReader);
+                    (name, id) => IndexedFieldDetails<TItem>.Dynamic(
+                        id,
+                        name,
+                        fieldReader.Name,
+                        (item, cancellationToken) => fieldReader.ReadAsync(item, fieldName, cancellationToken),
+                        fieldReader.TextExtractor,
+                        fieldReader.Tokenizer,
+                        fieldReader.Thesaurus));
             }
             else
             {
@@ -86,7 +125,9 @@ namespace Lifti
             return details;
         }
 
-        private IndexedFieldDetails<TItem> RegisterField<TItem>(Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader, FieldKind fieldKind, string fieldName, IFieldConfig fieldConfig)
+        private IndexedFieldDetails<TItem> RegisterField<TItem>(
+            string fieldName,
+            Func<string, byte, IndexedFieldDetails<TItem>> createFieldDetails)
         {
             if (this.fieldToDetailsLookup.ContainsKey(fieldName))
             {
@@ -100,14 +141,7 @@ namespace Lifti
             }
 
             var id = (byte)newId;
-            var details = new IndexedFieldDetails<TItem>(
-                id,
-                fieldName,
-                fieldReader,
-                fieldKind,
-                fieldConfig.TextExtractor,
-                fieldConfig.Tokenizer,
-                fieldConfig.Thesaurus);
+            var details = createFieldDetails(fieldName, id);
 
             this.fieldToDetailsLookup[fieldName] = details;
 

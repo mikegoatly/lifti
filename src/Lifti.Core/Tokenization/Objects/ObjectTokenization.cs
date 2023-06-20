@@ -35,6 +35,7 @@ namespace Lifti.Tokenization.Objects
         /// </summary>
         public IReadOnlyList<DynamicFieldReader<T>> DynamicFieldReaders { get; }
 
+        /// <inheritdoc />
         Type IObjectTokenization.ItemType { get; } = typeof(T);
     }
 }

@@ -32,8 +32,8 @@ namespace Lifti.Tests.Querying
             var textExtractor = new PlainTextExtractor();
 
             var nullFieldReader = (TestObject x, CancellationToken token) => new ValueTask<IEnumerable<string>>(Array.Empty<string>());
-            this.fieldLookupMock.Setup(l => l.GetFieldInfo("testfield")).Returns(new IndexedFieldDetails<TestObject>(testFieldId, "testfield", nullFieldReader, FieldKind.Static, textExtractor, this.field1Tokenizer, thesaurus));
-            this.fieldLookupMock.Setup(l => l.GetFieldInfo("otherfield")).Returns(new IndexedFieldDetails<TestObject>(otherFieldId, "otherfield", nullFieldReader, FieldKind.Static, textExtractor, this.field2Tokenizer, thesaurus));
+            this.fieldLookupMock.Setup(l => l.GetFieldInfo("testfield")).Returns(IndexedFieldDetails<TestObject>.Static(testFieldId, "testfield", nullFieldReader, textExtractor, this.field1Tokenizer, thesaurus));
+            this.fieldLookupMock.Setup(l => l.GetFieldInfo("otherfield")).Returns(IndexedFieldDetails<TestObject>.Static(otherFieldId, "otherfield", nullFieldReader, textExtractor, this.field2Tokenizer, thesaurus));
         }
 
         [Fact]

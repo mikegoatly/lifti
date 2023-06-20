@@ -83,6 +83,7 @@ namespace Lifti.Tests.Tokenization.Objects
         {
             return new StringDictionaryDynamicFieldReader<TestObject>(
                 x => x.Fields,
+                "Test",
                 fieldPrefix,
                 new FakeIndexTokenizer(),
                 new PlainTextExtractor(),

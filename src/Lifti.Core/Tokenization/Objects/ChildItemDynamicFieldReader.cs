@@ -17,11 +17,12 @@ namespace Lifti.Tokenization.Objects
             Func<TItem, ICollection<TChildItem>?> getChildObjects,
             Func<TChildItem, string> getFieldName,
             Func<TChildItem, TValue> getFieldText,
+            string dynamicFieldReaderName,
             string? fieldNamePrefix,
             IIndexTokenizer tokenizer,
             ITextExtractor textExtractor,
             Thesaurus thesaurus)
-            : base(tokenizer, textExtractor, thesaurus, fieldNamePrefix)
+            : base(tokenizer, textExtractor, thesaurus, dynamicFieldReaderName, fieldNamePrefix)
         {
             this.getChildObjects = getChildObjects;
             this.getFieldName = getFieldName;
