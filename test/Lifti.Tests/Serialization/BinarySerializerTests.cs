@@ -3,6 +3,7 @@ using Lifti.Serialization.Binary;
 using Lifti.Tokenization.TextExtraction;
 using PerformanceProfiling;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -45,15 +46,21 @@ namespace Lifti.Tests.Serialization
         [Fact]
         public async Task ShouldDeserializeV4Index()
         {
-            var index = new FullTextIndexBuilder<string>().Build();
-            var serializer = new BinarySerializer<string>();
+            var index = new FullTextIndexBuilder<int>()
+                 .WithObjectTokenization<DynamicFieldObject>(
+                      cfg => cfg
+                          .WithKey(x => x.Id)
+                          .WithField("Name", x => x.Name))
+                .Build();
+
+            var serializer = new BinarySerializer<int>();
             using (var stream = new MemoryStream(TestResources.v4Index))
             {
                 await serializer.DeserializeAsync(index, stream);
             }
 
-            index.Search("serialized").Should().HaveCount(1);
-            index.Search("亜").Should().HaveCount(1);
+            index.Search("blah").Should().HaveCount(1);
+            index.Search("cheese").Should().HaveCount(1);
         }
 
         [Fact]
@@ -93,7 +100,7 @@ namespace Lifti.Tests.Serialization
             using (var stream = File.Open(fileName, FileMode.CreateNew))
             {
                 var stopwatch = Stopwatch.StartNew();
-                var index = await CreateWikipediaIndexAsync();
+                var index = await this.CreateWikipediaIndexAsync();
                 await serializer.SerializeAsync(index, stream, false);
 
                 this.output.WriteLine($"Serialized in {stopwatch.ElapsedMilliseconds}ms");
@@ -131,7 +138,7 @@ namespace Lifti.Tests.Serialization
             var index1 = await CreateIndexAsync("Foo");
             var index2 = await CreateIndexAsync("Bar");
             var fileName = CreateRandomIndexFileName();
-            
+
             var serializer = new BinarySerializer<string>();
             using (var stream = File.Open(fileName, FileMode.CreateNew))
             {
@@ -152,18 +159,42 @@ namespace Lifti.Tests.Serialization
         }
 
         // Used to create test indexes when defining a new serialization version
-        //[Fact]
+        [Fact]
         //public async Task CreateTestIndex()
         //{
-        //    var index = new FullTextIndexBuilder<string>().Build();
-        //    await index.AddAsync("A", "Some serialized data");
-        //    await index.AddAsync("B", "亜");
+        //    var index = new FullTextIndexBuilder<int>()
+        //          .WithObjectTokenization<DynamicFieldObject>(
+        //              cfg => cfg
+        //                  .WithKey(x => x.Id)
+        //                  .WithField("Name", x => x.Name)
+        //          .WithDynamicFields("DynFields", x => x.Fields))
+        //          .Build();
 
-        //    var serializer = new BinarySerializer<string>();
-        //    using (var stream = File.Open("../../../V4.dat", FileMode.CreateNew))
+        //    await index.AddAsync(new DynamicFieldObject
         //    {
-        //        await serializer.SerializeAsync(index, stream, true);
-        //    }
+        //        Id = 1,
+        //        Name = "Blah",
+        //        Fields = new Dictionary<string, string>
+        //        {
+        //            { "Foo", "Some serialized data" },
+        //            { "Bar", "More text" }
+        //        }
+        //    });
+
+        //    await index.AddAsync(new DynamicFieldObject
+        //    {
+        //        Id = 2,
+        //        Name = "Cheese",
+        //        Fields = new Dictionary<string, string>
+        //        {
+        //            { "Foo", "Other data" },
+        //            { "Bar", "亜" }
+        //        }
+        //    });
+
+        //    var serializer = new BinarySerializer<int>();
+        //    using var stream = File.Open("../../../V4.dat", FileMode.CreateNew);
+        //    await serializer.SerializeAsync(index, stream, true);
         //}
 
         private static string CreateRandomIndexFileName()
@@ -210,6 +241,13 @@ namespace Lifti.Tests.Serialization
             await index.AddAsync("Emoji", "Emojis can cause problems 🤷‍♀️ 🤷🏾‍♂️");
 
             return index;
+        }
+
+        private class DynamicFieldObject
+        {
+            public int Id { get; set; }
+            public string? Name { get; set; }
+            public Dictionary<string, string>? Fields { get; set; }
         }
     }
 }

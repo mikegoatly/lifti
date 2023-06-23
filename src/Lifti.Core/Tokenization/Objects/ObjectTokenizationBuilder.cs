@@ -101,7 +101,7 @@ namespace Lifti.Tokenization.Objects
             return this;
         }
 
-        private static IThesaurus CreateFieldThesaurus(
+        private static Thesaurus CreateFieldThesaurus(
             IIndexTokenizer defaultTokenizer,
             IIndexTokenizer? fieldTokenizer,
             ThesaurusBuilder defaultThesaurusBuilder,
@@ -204,7 +204,7 @@ namespace Lifti.Tokenization.Objects
             string name,
             Func<T, Task<string>> fieldTextReader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
-            ITextExtractor? textExtractor = null, 
+            ITextExtractor? textExtractor = null,
             Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
         {
             return this.WithField(
