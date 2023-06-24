@@ -42,11 +42,17 @@ namespace Lifti.Serialization.Binary
         {
             await this.FillBufferAsync().ConfigureAwait(false);
 
+            // If the key serializer derives from KeySerializerBase, use the backwards compatible read method
+            // to allow for the old format to be read.
+            Func<BinaryReader, TKey> keyReader = this.keySerializer is KeySerializerBase<TKey> baseKeySerializer
+                ? baseKeySerializer.ReadV2BackwardsCompatible
+                : this.keySerializer.Read;
+
             var itemCount = this.reader.ReadInt32();
             for (var i = 0; i < itemCount; i++)
             {
                 var id = this.reader.ReadInt32();
-                var key = this.keySerializer.Read(this.reader);
+                var key = keyReader(this.reader);
                 var fieldStatCount = this.reader.ReadInt32();
                 var fieldTokenCounts = ImmutableDictionary.CreateBuilder<byte, int>();
                 var totalTokenCount = 0;
@@ -59,7 +65,7 @@ namespace Lifti.Serialization.Binary
                 }
 
                 index.IdPool.Add(
-                    id, 
+                    id,
                     key,
                     new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount));
             }
@@ -73,7 +79,7 @@ namespace Lifti.Serialization.Binary
 
             if (this.underlyingStream.CanSeek)
             {
-                this.underlyingStream.Position = this.buffer.Position + initialUnderlyingStreamOffset;
+                this.underlyingStream.Position = this.buffer.Position + this.initialUnderlyingStreamOffset;
             }
         }
 
@@ -82,7 +88,7 @@ namespace Lifti.Serialization.Binary
             var textLength = this.reader.ReadInt32();
             var matchCount = this.reader.ReadInt32();
             var childNodeCount = this.reader.ReadInt32();
-            var intraNodeText = textLength == 0 ? null : ReadIntraNodeText(textLength);
+            var intraNodeText = textLength == 0 ? null : this.ReadIntraNodeText(textLength);
             var childNodes = childNodeCount > 0 ? ImmutableDictionary.CreateBuilder<char, IndexNode>() : null;
             var matches = matchCount > 0 ? ImmutableDictionary.CreateBuilder<int, ImmutableList<IndexedToken>>() : null;
 
