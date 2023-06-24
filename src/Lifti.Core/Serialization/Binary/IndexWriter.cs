@@ -44,7 +44,7 @@ namespace Lifti.Serialization.Binary
             // in a new version of the index.
             var fieldNames = snapshot.FieldLookup.AllFieldNames;
 
-            this.writer.WriteCompressedNonNegativeInt32(fieldNames.Count);
+            this.writer.WriteNonNegativeVarInt32(fieldNames.Count);
 
             foreach (var fieldName in fieldNames)
             {
@@ -72,20 +72,20 @@ namespace Lifti.Serialization.Binary
             var matchCount = node.Matches.Count;
             var childNodeCount = node.ChildNodes.Count;
             var intraNodeTextLength = node.IntraNodeText.Length;
-            this.writer.WriteCompressedNonNegativeInt32(intraNodeTextLength);
-            this.writer.WriteCompressedNonNegativeInt32(matchCount);
-            this.writer.WriteCompressedNonNegativeInt32(childNodeCount);
+            this.writer.WriteNonNegativeVarInt32(intraNodeTextLength);
+            this.writer.WriteNonNegativeVarInt32(matchCount);
+            this.writer.WriteNonNegativeVarInt32(childNodeCount);
 
             if (intraNodeTextLength > 0)
             {
-                this.writer.WriteSpanCompressed(node.IntraNodeText.Span);
+                this.writer.WriteSpanAsVarInt16s(node.IntraNodeText.Span);
             }
 
             if (childNodeCount > 0)
             {
                 foreach (var childNode in node.ChildNodes)
                 {
-                    this.writer.WriteCompressedUInt16(childNode.Key);
+                    this.writer.WriteVarUInt16(childNode.Key);
                     await this.WriteNodeAsync(childNode.Value).ConfigureAwait(false);
                 }
             }
@@ -105,13 +105,13 @@ namespace Lifti.Serialization.Binary
         {
             foreach (var match in node.Matches)
             {
-                this.writer.WriteCompressedNonNegativeInt32(match.Key);
-                this.writer.WriteCompressedNonNegativeInt32(match.Value.Count);
+                this.writer.WriteNonNegativeVarInt32(match.Key);
+                this.writer.WriteNonNegativeVarInt32(match.Value.Count);
 
                 foreach (var fieldMatch in match.Value)
                 {
                     this.writer.Write(fieldMatch.FieldId);
-                    this.writer.WriteCompressedNonNegativeInt32(fieldMatch.Locations.Count);
+                    this.writer.WriteNonNegativeVarInt32(fieldMatch.Locations.Count);
                     this.WriteTokenLocations(fieldMatch);
                 }
             }
@@ -190,7 +190,7 @@ namespace Lifti.Serialization.Binary
 
             if ((locationData.structure & LocationEntrySerializationOptimizations.LengthSameAsLast) != LocationEntrySerializationOptimizations.LengthSameAsLast)
             {
-                this.writer.WriteCompressedUInt16(length);
+                this.writer.WriteVarUInt16(length);
             }
         }
 
@@ -213,9 +213,9 @@ namespace Lifti.Serialization.Binary
         private void WriteLocationInFull(TokenLocation location)
         {
             this.writer.Write((byte)LocationEntrySerializationOptimizations.Full);
-            this.writer.WriteCompressedNonNegativeInt32(location.TokenIndex);
-            this.writer.WriteCompressedNonNegativeInt32(location.Start);
-            this.writer.WriteCompressedUInt16(location.Length);
+            this.writer.WriteNonNegativeVarInt32(location.TokenIndex);
+            this.writer.WriteNonNegativeVarInt32(location.Start);
+            this.writer.WriteVarUInt16(location.Length);
         }
 
         private async Task WriteTerminatorAsync()
@@ -226,17 +226,17 @@ namespace Lifti.Serialization.Binary
 
         private async Task WriteItemsAsync(IIndexSnapshot<TKey> index)
         {
-            this.writer.WriteCompressedNonNegativeInt32(index.Items.Count);
+            this.writer.WriteNonNegativeVarInt32(index.Items.Count);
 
             foreach (var itemMetadata in index.Items.GetIndexedItems())
             {
-                this.writer.WriteCompressedNonNegativeInt32(itemMetadata.Id);
+                this.writer.WriteNonNegativeVarInt32(itemMetadata.Id);
                 this.keySerializer.Write(this.writer, itemMetadata.Item);
-                this.writer.WriteCompressedNonNegativeInt32(itemMetadata.DocumentStatistics.TokenCountByField.Count);
+                this.writer.WriteNonNegativeVarInt32(itemMetadata.DocumentStatistics.TokenCountByField.Count);
                 foreach (var fieldTokenCount in itemMetadata.DocumentStatistics.TokenCountByField)
                 {
                     this.writer.Write(fieldTokenCount.Key);
-                    this.writer.WriteCompressedNonNegativeInt32(fieldTokenCount.Value);
+                    this.writer.WriteNonNegativeVarInt32(fieldTokenCount.Value);
                 }
             }
 

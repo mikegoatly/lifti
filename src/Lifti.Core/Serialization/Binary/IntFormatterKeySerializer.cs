@@ -10,7 +10,7 @@
         /// Initializes a new instance of the <see cref="IntFormatterKeySerializer"/> class.
         /// </summary>
         public IntFormatterKeySerializer()
-            : base((w, k) => w.WriteCompressedInt32(k), r => r.ReadCompressedInt32())
+            : base((w, k) => w.WriteVarInt32(k), r => r.ReadVarInt32())
         {
 
         }

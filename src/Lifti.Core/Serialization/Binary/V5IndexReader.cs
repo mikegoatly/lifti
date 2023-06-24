@@ -59,7 +59,7 @@ namespace Lifti.Serialization.Binary
 
         private Dictionary<byte, byte> ReadFields(FullTextIndex<TKey> index)
         {
-            var fieldCount = this.reader.ReadCompressedNonNegativeInt32();
+            var fieldCount = this.reader.ReadNonNegativeVarInt32();
             var serializedFields = new List<SerializedFieldInfo>(fieldCount);
 
             for (var i = 0; i < fieldCount; i++)
@@ -76,18 +76,18 @@ namespace Lifti.Serialization.Binary
 
         private void ReadIndexedItems(FullTextIndex<TKey> index)
         {
-            var itemCount = this.reader.ReadCompressedNonNegativeInt32();
+            var itemCount = this.reader.ReadNonNegativeVarInt32();
             for (var i = 0; i < itemCount; i++)
             {
-                var id = this.reader.ReadCompressedNonNegativeInt32();
+                var id = this.reader.ReadNonNegativeVarInt32();
                 var key = this.keySerializer.Read(this.reader);
-                var fieldStatCount = this.reader.ReadCompressedNonNegativeInt32();
+                var fieldStatCount = this.reader.ReadNonNegativeVarInt32();
                 var fieldTokenCounts = ImmutableDictionary.CreateBuilder<byte, int>();
                 var totalTokenCount = 0;
                 for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
                 {
                     var fieldId = this.reader.ReadByte();
-                    var wordCount = this.reader.ReadCompressedNonNegativeInt32();
+                    var wordCount = this.reader.ReadNonNegativeVarInt32();
                     fieldTokenCounts.Add(fieldId, wordCount);
                     totalTokenCount += wordCount;
                 }
@@ -101,24 +101,24 @@ namespace Lifti.Serialization.Binary
 
         private IndexNode DeserializeNode(Dictionary<byte, byte> fieldIdMap, IIndexNodeFactory nodeFactory, int depth)
         {
-            var textLength = this.reader.ReadCompressedNonNegativeInt32();
-            var matchCount = this.reader.ReadCompressedNonNegativeInt32();
-            var childNodeCount = this.reader.ReadCompressedNonNegativeInt32();
+            var textLength = this.reader.ReadNonNegativeVarInt32();
+            var matchCount = this.reader.ReadNonNegativeVarInt32();
+            var childNodeCount = this.reader.ReadNonNegativeVarInt32();
             var intraNodeText = textLength == 0 ? null : this.ReadIntraNodeText(textLength);
             var childNodes = childNodeCount > 0 ? ImmutableDictionary.CreateBuilder<char, IndexNode>() : null;
             var matches = matchCount > 0 ? ImmutableDictionary.CreateBuilder<int, ImmutableList<IndexedToken>>() : null;
 
             for (var i = 0; i < childNodeCount; i++)
             {
-                var matchChar = (char)this.reader.ReadCompressedUInt16();
+                var matchChar = (char)this.reader.ReadVarUInt16();
                 childNodes!.Add(matchChar, this.DeserializeNode(fieldIdMap, nodeFactory, depth + 1));
             }
 
             var locationMatches = new List<TokenLocation>(50);
             for (var itemMatch = 0; itemMatch < matchCount; itemMatch++)
             {
-                var itemId = this.reader.ReadCompressedNonNegativeInt32();
-                var fieldCount = this.reader.ReadCompressedNonNegativeInt32();
+                var itemId = this.reader.ReadNonNegativeVarInt32();
+                var fieldCount = this.reader.ReadNonNegativeVarInt32();
 
                 var indexedTokens = ImmutableList.CreateBuilder<IndexedToken>();
 
@@ -128,7 +128,7 @@ namespace Lifti.Serialization.Binary
                     // map it to the field id in the new index.
                     var fieldId = fieldIdMap[this.reader.ReadByte()];
 
-                    var locationCount = this.reader.ReadCompressedNonNegativeInt32();
+                    var locationCount = this.reader.ReadNonNegativeVarInt32();
 
                     locationMatches.Clear();
 
@@ -167,7 +167,7 @@ namespace Lifti.Serialization.Binary
             var data = new char[textLength];
             for (var i = 0; i < textLength; i++)
             {
-                data[i] = (char)this.reader.ReadCompressedUInt16();
+                data[i] = (char)this.reader.ReadVarUInt16();
             }
 
             return data;
@@ -183,9 +183,9 @@ namespace Lifti.Serialization.Binary
                 if (structureType == LocationEntrySerializationOptimizations.Full)
                 {
                     location = new TokenLocation(
-                        this.reader.ReadCompressedNonNegativeInt32(),
-                        this.reader.ReadCompressedNonNegativeInt32(),
-                        this.reader.ReadCompressedUInt16());
+                        this.reader.ReadNonNegativeVarInt32(),
+                        this.reader.ReadNonNegativeVarInt32(),
+                        this.reader.ReadVarUInt16());
                 }
                 else
                 {
@@ -215,7 +215,7 @@ namespace Lifti.Serialization.Binary
                     LocationEntrySerializationOptimizations.TokenStartUInt16),
                 ((structureType & LocationEntrySerializationOptimizations.LengthSameAsLast) == LocationEntrySerializationOptimizations.LengthSameAsLast) ?
                     previous.Length :
-                    this.reader.ReadCompressedUInt16());
+                    this.reader.ReadVarUInt16());
         }
 
         private int DeserializeAbbreviatedData(LocationEntrySerializationOptimizations structureType, LocationEntrySerializationOptimizations byteSize, LocationEntrySerializationOptimizations uint16Size)

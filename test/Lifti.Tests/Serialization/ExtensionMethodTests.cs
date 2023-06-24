@@ -18,13 +18,13 @@ namespace Lifti.Tests.Serialization
         {
             using var memoryStream = new MemoryStream();
             using var writer = new BinaryWriter(memoryStream);
-            writer.WriteCompressedUInt16(value);
+            writer.WriteVarUInt16(value);
 
             memoryStream.Length.Should().Be(expectedLength);
 
             memoryStream.Position = 0;
             using var reader = new BinaryReader(memoryStream);
-            var readValue = reader.ReadCompressedUInt16();
+            var readValue = reader.ReadVarUInt16();
 
             readValue.Should().Be(value);
         }
@@ -42,13 +42,13 @@ namespace Lifti.Tests.Serialization
         {
             using var memoryStream = new MemoryStream();
             using var writer = new BinaryWriter(memoryStream);
-            writer.WriteCompressedNonNegativeInt32(value);
+            writer.WriteNonNegativeVarInt32(value);
 
             memoryStream.Length.Should().Be(expectedLength);
 
             memoryStream.Position = 0;
             using var reader = new BinaryReader(memoryStream);
-            var readValue = reader.ReadCompressedNonNegativeInt32();
+            var readValue = reader.ReadNonNegativeVarInt32();
 
             readValue.Should().Be(value);
         }
@@ -78,13 +78,13 @@ namespace Lifti.Tests.Serialization
         {
             using var memoryStream = new MemoryStream();
             using var writer = new BinaryWriter(memoryStream);
-            writer.WriteCompressedInt32(value);
+            writer.WriteVarInt32(value);
 
             memoryStream.Length.Should().Be(expectedLength);
 
             memoryStream.Position = 0;
             using var reader = new BinaryReader(memoryStream);
-            var readValue = reader.ReadCompressedInt32();
+            var readValue = reader.ReadVarInt32();
 
             readValue.Should().Be(value);
         }
@@ -104,13 +104,13 @@ namespace Lifti.Tests.Serialization
         {
             using var memoryStream = new MemoryStream();
             using var writer = new BinaryWriter(memoryStream);
-            writer.WriteCompressedUInt32(value);
+            writer.WriteVarUInt32(value);
 
             memoryStream.Length.Should().Be(expectedLength);
 
             memoryStream.Position = 0;
             using var reader = new BinaryReader(memoryStream);
-            var readValue = reader.ReadCompressedUInt32();
+            var readValue = reader.ReadVarUInt32();
 
             readValue.Should().Be(value);
         }
