@@ -592,6 +592,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Serialized index contains unknown field ids. Fields have most likely been removed from the FullTextIndexBuilder configuration..
+        /// </summary>
+        internal static string UnknownFieldsInSerializedIndex {
+            get {
+                return ResourceManager.GetString("UnknownFieldsInSerializedIndex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown operator encountered: {0}.
         /// </summary>
         internal static string UnknownOperatorEncountered {

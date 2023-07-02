@@ -191,6 +191,7 @@ namespace Lifti.Tests.Serialization
                       cfg => cfg
                           .WithKey(x => x.Id)
                           .WithField("Name", x => x.Name)
+                          .WithField("SomethingElse", x => x.SomethingElse)
                           .WithDynamicFields("DynFields", x => x.Fields))
                   .Build();
 
@@ -205,13 +206,31 @@ namespace Lifti.Tests.Serialization
         }
 
         [Fact]
-        public async Task ShouldDeserializeV4Index()
+        public async Task DeserializingV4IndexWithRemovedField_ShouldThrowException()
         {
             var index = new FullTextIndexBuilder<int>()
                  .WithObjectTokenization<DynamicFieldObject>(
                       cfg => cfg
                           .WithKey(x => x.Id)
                           .WithField("Name", x => x.Name))
+                .Build();
+
+            var serializer = new BinarySerializer<int>();
+            using var stream = new MemoryStream(TestResources.v4Index);
+            var exception = await Assert.ThrowsAsync<LiftiException>(async () => await serializer.DeserializeAsync(index, stream));
+
+            exception.Message.Should().Be("Serialized index contains unknown field ids. Fields have most likely been removed from the FullTextIndexBuilder configuration.");
+        }
+
+        [Fact]
+        public async Task ShouldDeserializeV4Index()
+        {
+            var index = new FullTextIndexBuilder<int>()
+                 .WithObjectTokenization<DynamicFieldObject>(
+                      cfg => cfg
+                          .WithKey(x => x.Id)
+                          .WithField("Name", x => x.Name)
+                          .WithField("SomethingElse", x => x.SomethingElse))
                 .Build();
 
             var serializer = new BinarySerializer<int>();
@@ -328,6 +347,7 @@ namespace Lifti.Tests.Serialization
         //              cfg => cfg
         //                  .WithKey(x => x.Id)
         //                  .WithField("Name", x => x.Name)
+        //                  .WithField("SomethingElse", x => x.SomethingElse)
         //                  .WithDynamicFields("DynFields", x => x.Fields))
         //          .Build();
 
@@ -335,6 +355,7 @@ namespace Lifti.Tests.Serialization
         //    {
         //        Id = 1,
         //        Name = "Blah",
+        //        SomethingElse = "Great",
         //        Fields = new Dictionary<string, string>
         //        {
         //            { "Foo", "Some serialized data" },
@@ -346,6 +367,7 @@ namespace Lifti.Tests.Serialization
         //    {
         //        Id = 2,
         //        Name = "Cheese",
+        //        SomethingElse = "Great",
         //        Fields = new Dictionary<string, string>
         //        {
         //            { "Foo", "Other data" },
@@ -354,7 +376,7 @@ namespace Lifti.Tests.Serialization
         //    });
 
         //    var serializer = new BinarySerializer<int>();
-        //    using var stream = File.Open("../../../V5.dat", FileMode.CreateNew);
+        //    using var stream = File.Open("../../../V5.dat", FileMode.Create);
         //    await serializer.SerializeAsync(index, stream, true);
         //}
 
@@ -416,7 +438,8 @@ namespace Lifti.Tests.Serialization
         private class DynamicFieldObject
         {
             public int Id { get; set; }
-            public string? Name { get; set; }
+            public string Name { get; set; } = null!;
+            public string SomethingElse { get; set; } = null!;
             public Dictionary<string, string>? Fields { get; set; }
         }
     }
