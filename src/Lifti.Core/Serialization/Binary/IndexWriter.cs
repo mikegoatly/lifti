@@ -44,7 +44,7 @@ namespace Lifti.Serialization.Binary
             // in a new version of the index.
             var fieldNames = snapshot.FieldLookup.AllFieldNames;
 
-            this.writer.WriteNonNegativeVarInt32(fieldNames.Count);
+            this.writer.Write((byte)fieldNames.Count);
 
             foreach (var fieldName in fieldNames)
             {

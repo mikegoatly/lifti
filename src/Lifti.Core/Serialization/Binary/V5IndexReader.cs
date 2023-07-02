@@ -81,7 +81,7 @@ namespace Lifti.Serialization.Binary
             {
                 var id = this.reader.ReadNonNegativeVarInt32();
                 var key = this.keySerializer.Read(this.reader);
-                var fieldStatCount = this.reader.ReadNonNegativeVarInt32();
+                var fieldStatCount = (int)this.reader.ReadByte();
                 var fieldTokenCounts = ImmutableDictionary.CreateBuilder<byte, int>();
                 var totalTokenCount = 0;
                 for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
