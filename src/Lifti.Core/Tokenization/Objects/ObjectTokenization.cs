@@ -12,10 +12,12 @@ namespace Lifti.Tokenization.Objects
     {
         internal ObjectTokenization(
             Func<T, TKey> keyReader,
-            IReadOnlyList<FieldReader<T>> fieldReaders)
+            IReadOnlyList<StaticFieldReader<T>> fieldReaders,
+            IReadOnlyList<DynamicFieldReader<T>> dynamicFieldReaders)
         {
             this.KeyReader = keyReader;
             this.FieldReaders = fieldReaders.ToDictionary(x => x.Name);
+            this.DynamicFieldReaders = dynamicFieldReaders;
         }
 
         /// <summary>
@@ -24,17 +26,16 @@ namespace Lifti.Tokenization.Objects
         public Func<T, TKey> KeyReader { get; }
 
         /// <summary>
-        /// Gets the set of configurations that determine how fields should be read from an object of 
-        /// type <typeparamref name="T"/>.
+        /// Gets the set of configurations for fields that can be defined statically at index creation.
         /// </summary>
-        public IDictionary<string, FieldReader<T>> FieldReaders { get; }
+        public IDictionary<string, StaticFieldReader<T>> FieldReaders { get; }
 
-        Type IObjectTokenization.ItemType { get; } = typeof(T);
+        /// <summary>
+        /// Gets the set of configurations that determine dynamic fields that can only be known during indexing.
+        /// </summary>
+        public IReadOnlyList<DynamicFieldReader<T>> DynamicFieldReaders { get; }
 
         /// <inheritdoc />
-        IEnumerable<IFieldReader> IObjectTokenization.GetConfiguredFields()
-        {
-            return this.FieldReaders.Values.Cast<IFieldReader>();
-        }
+        Type IObjectTokenization.ItemType { get; } = typeof(T);
     }
 }

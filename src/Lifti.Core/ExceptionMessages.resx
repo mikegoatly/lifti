@@ -123,11 +123,29 @@
   <data name="AtLeastOneFieldMustBeIndexed" xml:space="preserve">
     <value>At least one field must be configured for an item</value>
   </data>
+  <data name="AttemptToReadFieldUnknownToDynamicFieldReader" xml:space="preserve">
+    <value>An attempt was made to read a dynamic field ("{0}") from a provider that did not produce it.</value>
+  </data>
+  <data name="BadlyFormattedVariableLengthValueEncountered" xml:space="preserve">
+    <value>Badly formatted variable length value encountered</value>
+  </data>
   <data name="BatchChangeAlreadyStarted" xml:space="preserve">
     <value>Cannot start a new batch change while another is already in progress.</value>
   </data>
   <data name="CannotCombineAnEmptySetOfQueryParts" xml:space="preserve">
     <value>Cannot combine an empty set of query parts</value>
+  </data>
+  <data name="CannotRegisterDynamicFieldWithSameNameAsStaticField" xml:space="preserve">
+    <value>Cannot register a dynamic field with the same name as the statically registered field "{0}". Consider using a field prefix when configuring the dynamic fields.</value>
+  </data>
+  <data name="CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes" xml:space="preserve">
+    <value>Cannot register dynamic field with the same name "{0}" against different object types. Consider using a field prefix when configuring the dynamic fields.</value>
+  </data>
+  <data name="DuplicateDynamicFieldReaderName" xml:space="preserve">
+    <value>Duplicate dynamic field reader name encountered: {0}. Dynamic field readers must have unique names.</value>
+  </data>
+  <data name="DuplicateFieldEncounteredOnObject" xml:space="preserve">
+    <value>A duplicate field "{0}" was encountered while indexing item {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields.</value>
   </data>
   <data name="EarlierVersionSerializedIndexNotSupported" xml:space="preserve">
     <value>The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI.</value>
@@ -210,6 +228,12 @@
   <data name="NoDeserializerAvailableForIndexVersion" xml:space="preserve">
     <value>No deserializer available for binary serialized version {0}.</value>
   </data>
+  <data name="NoDynamicFieldReaderNameInDynamicField" xml:space="preserve">
+    <value>Internal error: A dynamic field was missing its dynamic field reader name</value>
+  </data>
+  <data name="NoItemReturnedWhenGeneratingMatchPhrases" xml:space="preserve">
+    <value>No item was returned from the load item delegate when generating match phrases for item {0}.</value>
+  </data>
   <data name="NoReaderDelegatesConfigured" xml:space="preserve">
     <value>No reader delegates configured</value>
   </data>
@@ -261,8 +285,17 @@
   <data name="UnexpectedTokenEncountered" xml:space="preserve">
     <value>Unexpected token encountered: {0}</value>
   </data>
+  <data name="UnknownDynamicFieldReaderNameEncountered" xml:space="preserve">
+    <value>An unknown dynamic field reader name was encountered: {0} - this would likely indicate that an index was serialized with a differently configured set of dynamic field readers.</value>
+  </data>
   <data name="UnknownField" xml:space="preserve">
     <value>Unknown field '{0}'</value>
+  </data>
+  <data name="UnknownFieldKind" xml:space="preserve">
+    <value>Unknown FieldKind {0}</value>
+  </data>
+  <data name="UnknownFieldsInSerializedIndex" xml:space="preserve">
+    <value>Serialized index contains unknown field ids. Fields have most likely been removed from the FullTextIndexBuilder configuration.</value>
   </data>
   <data name="UnknownOperatorEncountered" xml:space="preserve">
     <value>Unknown operator encountered: {0}</value>

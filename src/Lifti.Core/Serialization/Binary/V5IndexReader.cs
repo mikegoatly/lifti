@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
-
-    internal class V2IndexReader<TKey> : IIndexReader<TKey>
+    internal class V5IndexReader<TKey> : IIndexReader<TKey>, IDisposable
         where TKey : notnull
     {
         private readonly Stream underlyingStream;
@@ -18,10 +16,10 @@ namespace Lifti.Serialization.Binary
         private long initialUnderlyingStreamOffset;
         protected readonly BinaryReader reader;
 
-        public V2IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer)
+        public V5IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer)
         {
-            this.underlyingStream = stream;
             this.disposeStream = disposeStream;
+            this.underlyingStream = stream;
             this.keySerializer = keySerializer;
 
             this.buffer = new MemoryStream((int)(this.underlyingStream.Length - this.underlyingStream.Position));
@@ -43,50 +41,10 @@ namespace Lifti.Serialization.Binary
         {
             await this.FillBufferAsync().ConfigureAwait(false);
 
-            // If the key serializer derives from KeySerializerBase, use the backwards compatible read method
-            // to allow for the old format to be read.
-            Func<BinaryReader, TKey> keyReader = this.keySerializer is KeySerializerBase<TKey> baseKeySerializer
-                ? baseKeySerializer.ReadV2BackwardsCompatible
-                : this.keySerializer.Read;
+            var fieldIdMap = this.ReadFields(index);
+            this.ReadIndexedItems(index);
 
-            // Keep track of all the distinct fields ids encountered during deserialization
-            var distinctFieldIds = new HashSet<byte>();
-
-            var itemCount = this.reader.ReadInt32();
-            for (var i = 0; i < itemCount; i++)
-            {
-                var id = this.reader.ReadInt32();
-                var key = keyReader(this.reader);
-                var fieldStatCount = this.reader.ReadInt32();
-                var fieldTokenCounts = ImmutableDictionary.CreateBuilder<byte, int>();
-                var totalTokenCount = 0;
-                for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
-                {
-                    var fieldId = this.reader.ReadByte();
-                    distinctFieldIds.Add(fieldId);
-
-                    var wordCount = this.reader.ReadInt32();
-                    fieldTokenCounts.Add(fieldId, wordCount);
-                    totalTokenCount += wordCount;
-                }
-
-                index.IdPool.Add(
-                    id,
-                    key,
-                    new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount));
-            }
-
-            // Double check that the index structure is aware of all the fields that are being deserialized
-            // We remove field 0 because it's the default field that loose text is associated to, and does
-            // not contribute to the total number of named fields.
-            distinctFieldIds.Remove(0);
-            var indexFields = index.FieldLookup.AllFieldNames.Select(x => index.FieldLookup.GetFieldInfo(x).Id);
-            if (distinctFieldIds.Except(indexFields).Any())
-            {
-                throw new LiftiException(ExceptionMessages.UnknownFieldsInSerializedIndex);
-            }
-
-            index.SetRootWithLock(this.DeserializeNode(index.IndexNodeFactory, 0));
+            index.SetRootWithLock(this.DeserializeNode(fieldIdMap, index.IndexNodeFactory, 0));
 
             if (this.reader.ReadInt32() != -1)
             {
@@ -99,33 +57,78 @@ namespace Lifti.Serialization.Binary
             }
         }
 
-        private IndexNode DeserializeNode(IIndexNodeFactory nodeFactory, int depth)
+        private Dictionary<byte, byte> ReadFields(FullTextIndex<TKey> index)
         {
-            var textLength = this.reader.ReadInt32();
-            var matchCount = this.reader.ReadInt32();
-            var childNodeCount = this.reader.ReadInt32();
+            var fieldCount = this.reader.ReadNonNegativeVarInt32();
+            var serializedFields = new List<SerializedFieldInfo>(fieldCount);
+
+            for (var i = 0; i < fieldCount; i++)
+            {
+                var fieldId = this.reader.ReadByte();
+                var kind = (FieldKind)this.reader.ReadByte();
+                var name = this.reader.ReadString();
+                var dynamicFieldReaderName = kind == FieldKind.Dynamic ? this.reader.ReadString() : null;
+                serializedFields.Add(new(fieldId, name, kind, dynamicFieldReaderName));
+            }
+
+            return index.RehydrateSerializedFields(serializedFields);
+        }
+
+        private void ReadIndexedItems(FullTextIndex<TKey> index)
+        {
+            var itemCount = this.reader.ReadNonNegativeVarInt32();
+            for (var i = 0; i < itemCount; i++)
+            {
+                var id = this.reader.ReadNonNegativeVarInt32();
+                var key = this.keySerializer.Read(this.reader);
+                var fieldStatCount = (int)this.reader.ReadByte();
+                var fieldTokenCounts = ImmutableDictionary.CreateBuilder<byte, int>();
+                var totalTokenCount = 0;
+                for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
+                {
+                    var fieldId = this.reader.ReadByte();
+                    var wordCount = this.reader.ReadNonNegativeVarInt32();
+                    fieldTokenCounts.Add(fieldId, wordCount);
+                    totalTokenCount += wordCount;
+                }
+
+                index.IdPool.Add(
+                    id,
+                    key,
+                    new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount));
+            }
+        }
+
+        private IndexNode DeserializeNode(Dictionary<byte, byte> fieldIdMap, IIndexNodeFactory nodeFactory, int depth)
+        {
+            var textLength = this.reader.ReadNonNegativeVarInt32();
+            var matchCount = this.reader.ReadNonNegativeVarInt32();
+            var childNodeCount = this.reader.ReadNonNegativeVarInt32();
             var intraNodeText = textLength == 0 ? null : this.ReadIntraNodeText(textLength);
             var childNodes = childNodeCount > 0 ? ImmutableDictionary.CreateBuilder<char, IndexNode>() : null;
             var matches = matchCount > 0 ? ImmutableDictionary.CreateBuilder<int, ImmutableList<IndexedToken>>() : null;
 
             for (var i = 0; i < childNodeCount; i++)
             {
-                var matchChar = this.ReadMatchedCharacter();
-                childNodes!.Add(matchChar, this.DeserializeNode(nodeFactory, depth + 1));
+                var matchChar = (char)this.reader.ReadVarUInt16();
+                childNodes!.Add(matchChar, this.DeserializeNode(fieldIdMap, nodeFactory, depth + 1));
             }
 
             var locationMatches = new List<TokenLocation>(50);
             for (var itemMatch = 0; itemMatch < matchCount; itemMatch++)
             {
-                var itemId = this.reader.ReadInt32();
-                var fieldCount = this.reader.ReadInt32();
+                var itemId = this.reader.ReadNonNegativeVarInt32();
+                var fieldCount = this.reader.ReadNonNegativeVarInt32();
 
                 var indexedTokens = ImmutableList.CreateBuilder<IndexedToken>();
 
                 for (var fieldMatch = 0; fieldMatch < fieldCount; fieldMatch++)
                 {
-                    var fieldId = this.reader.ReadByte();
-                    var locationCount = this.reader.ReadInt32();
+                    // We read the serialized file id and use the mapping that the index has given us to
+                    // map it to the field id in the new index.
+                    var fieldId = fieldIdMap[this.reader.ReadByte()];
+
+                    var locationCount = this.reader.ReadNonNegativeVarInt32();
 
                     locationMatches.Clear();
 
@@ -160,15 +163,14 @@ namespace Lifti.Serialization.Binary
         /// </returns>
         protected virtual char[] ReadIntraNodeText(int textLength)
         {
-            return this.reader.ReadChars(textLength);
-        }
+            // Read characters serialized as Int16s
+            var data = new char[textLength];
+            for (var i = 0; i < textLength; i++)
+            {
+                data[i] = (char)this.reader.ReadVarUInt16();
+            }
 
-        /// <summary>
-        /// Reads a character matched at a node.
-        /// </summary>
-        protected virtual char ReadMatchedCharacter()
-        {
-            return this.reader.ReadChar();
+            return data;
         }
 
         private void ReadLocations(int locationCount, List<TokenLocation> locationMatches)
@@ -180,7 +182,10 @@ namespace Lifti.Serialization.Binary
                 TokenLocation location;
                 if (structureType == LocationEntrySerializationOptimizations.Full)
                 {
-                    location = new TokenLocation(this.reader.ReadInt32(), this.reader.ReadInt32(), this.reader.ReadUInt16());
+                    location = new TokenLocation(
+                        this.reader.ReadNonNegativeVarInt32(),
+                        this.reader.ReadNonNegativeVarInt32(),
+                        this.reader.ReadVarUInt16());
                 }
                 else
                 {
@@ -210,7 +215,7 @@ namespace Lifti.Serialization.Binary
                     LocationEntrySerializationOptimizations.TokenStartUInt16),
                 ((structureType & LocationEntrySerializationOptimizations.LengthSameAsLast) == LocationEntrySerializationOptimizations.LengthSameAsLast) ?
                     previous.Length :
-                    this.reader.ReadUInt16());
+                    this.reader.ReadVarUInt16());
         }
 
         private int DeserializeAbbreviatedData(LocationEntrySerializationOptimizations structureType, LocationEntrySerializationOptimizations byteSize, LocationEntrySerializationOptimizations uint16Size)

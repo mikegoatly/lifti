@@ -78,9 +78,9 @@ namespace Lifti.Tests
         [Fact]
         public async Task IndexedEmoji_ShouldBeRetrievableAsIndexedTokens()
         {
-            await index.AddAsync("A", "🎶");
+            await this.index.AddAsync("A", "🎶");
 
-            index.Snapshot.CreateNavigator().EnumerateIndexedTokens().Should().BeEquivalentTo("🎶");
+            this.index.Snapshot.CreateNavigator().EnumerateIndexedTokens().Should().BeEquivalentTo("🎶");
         }
 
         [Fact]
@@ -239,6 +239,47 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async void ObjectsWithMultipleDynamicFieldsShouldGenerateCorrectPrefixedFieldNames()
+        {
+            var index = await CreateDynamicObjectTestIndex(true);
+
+            index.FieldLookup.AllFieldNames.Should().BeEquivalentTo(
+               new[]
+               {
+                    "Details",
+                    "Dyn1Field1",
+                    "Dyn1Field2",
+                    "Dyn2Field1",
+                    "Dyn2Field2",
+                    "Dyn1Field3"
+               });
+        }
+
+        [Fact]
+        public async void SearchesCanBePerformedForDynamicFieldsWithPrefixes()
+        {
+            var index = await CreateDynamicObjectTestIndex(true);
+
+            var resultsWithoutFieldFilter = index.Search("Three").ToList();
+            var resultsWithFieldFilter = index.Search("Dyn1Field3=Three").ToList();
+
+            resultsWithoutFieldFilter.Should().HaveCount(1);
+
+            resultsWithFieldFilter.Should().BeEquivalentTo(resultsWithoutFieldFilter);
+        }
+
+        [Fact]
+        public async void ObjectsWithMultipleDynamicFieldsUsingTheSameFieldNamesShouldRaiseError()
+        {
+            var exception = await Assert.ThrowsAsync<LiftiException>(
+                async () => await CreateDynamicObjectTestIndex(false));
+
+            exception.Message.Should().Be(
+                "A duplicate field \"Field1\" was encountered while indexing item A. Most likely multiple dynamic field providers have been configured " +
+                "and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields.");
+        }
+
+        [Fact]
         public async Task WordsRetrievedBySearchingForTextIndexedByObjectsShouldBeAssociatedToCorrectFields()
         {
             await this.WithIndexedSingleStringPropertyObjectsAsync();
@@ -323,7 +364,7 @@ namespace Lifti.Tests
         [Fact]
         public async Task QueringIndex_ShouldOrderResultsByScore()
         {
-            await PopulateIndexWithWikipediaData();
+            await this.PopulateIndexWithWikipediaData();
 
             var results = this.index.Search("data").ToList();
             results.Should().BeInDescendingOrder(r => r.Score);
@@ -334,7 +375,7 @@ namespace Lifti.Tests
         [Fact]
         public async Task QueringIndex_ShouldHandleWildcards()
         {
-            await PopulateIndexWithWikipediaData();
+            await this.PopulateIndexWithWikipediaData();
 
             var results = this.index.Search("*ta").ToList();
             results.Should().BeInDescendingOrder(r => r.Score);
@@ -343,7 +384,7 @@ namespace Lifti.Tests
         [Fact]
         public async Task WhenLoadingLotsOfDataShouldNotError()
         {
-            var wikipediaTests = await PopulateIndexWithWikipediaData();
+            var wikipediaTests = await this.PopulateIndexWithWikipediaData();
 
             await this.index.RemoveAsync(wikipediaTests[10].name);
             await this.index.RemoveAsync(wikipediaTests[9].name);
@@ -468,6 +509,33 @@ namespace Lifti.Tests
             index.Search("olleh").Should().HaveCount(1);
         }
 
+        private static async Task<FullTextIndex<string>> CreateDynamicObjectTestIndex(bool usePrefixes = false)
+        {
+            var index = new FullTextIndexBuilder<string>()
+                .WithObjectTokenization<DynamicObject>(
+                    o => o.WithKey(i => i.Id)
+                        .WithField("Details", i => i.Details)
+                        .WithDynamicFields("Dyn", i => i.DynamicFields, usePrefixes ? "Dyn1" : null)
+                        .WithDynamicFields("Extra", i => i.ExtraFields, x => x.Name, x => x.Value, usePrefixes ? "Dyn2" : null))
+                .Build();
+
+            await index.AddAsync(
+                new DynamicObject(
+                    "A",
+                    "Text One",
+                    new Dictionary<string, string> { { "Field1", "Text One" }, { "Field2", "Text Two" } },
+                    new ExtraField("Field1", "Alternative Text One"),
+                    new ExtraField("Field2", "Alternative Text Two")));
+
+            await index.AddAsync(
+                new DynamicObject(
+                    "B",
+                    "Text Two",
+                    new Dictionary<string, string> { { "Field1", "Not One" }, { "Field2", "Not Two" }, { "Field3", "Not Three" } }));
+
+            return index;
+        }
+
         private async Task WithIndexedSingleStringPropertyObjectsAsync()
         {
             await this.index.AddAsync(new TestObject("A", "Text One", "Text Two", "Text Three Drumming"));
@@ -535,5 +603,23 @@ namespace Lifti.Tests
             public string Text { get; }
             public string[] MultiText { get; }
         }
+
+        public class DynamicObject
+        {
+            public DynamicObject(string id, string details, Dictionary<string, string> dynamicFields, params ExtraField[] extraFields)
+            {
+                this.Id = id;
+                this.Details = details;
+                this.DynamicFields = dynamicFields;
+                this.ExtraFields = extraFields.Length == 0 ? null : extraFields;
+            }
+
+            public string Id { get; }
+            public string Details { get; }
+            public Dictionary<string, string> DynamicFields { get; }
+            public ExtraField[]? ExtraFields { get; }
+        }
+
+        public record ExtraField(string Name, string Value);
     }
 }

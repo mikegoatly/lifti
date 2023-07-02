@@ -1,7 +1,11 @@
-﻿namespace Lifti
+﻿using System;
+using System.Collections.Generic;
+
+namespace Lifti
 {
     /// <summary>
-    /// Allows for looking up of information about fields configured in the index.
+    /// Allows for looking up of information about fields configured in the index. Dynamic fields are added to the index at runtime and 
+    /// will become available as they are encountered.
     /// </summary>
     public interface IIndexedFieldLookup
     {
@@ -21,5 +25,17 @@
         /// and <see cref="Tokenization.IIndexTokenizer"/> instances to use when processing the field's text.
         /// </summary>
         IndexedFieldDetails GetFieldInfo(string fieldName);
+
+        /// <summary>
+        /// Returns <c>true</c> if the given field name is known to the index and associated to the given object type, whether statically defined at index creation, or dynamically registered
+        /// during indexing.
+        /// </summary>
+        bool IsKnownField(Type objectType, string fieldName);
+
+        /// <summary>
+        /// Gets the names of all fields configured in the index, including any dynamic fields that have been registered during the indexing
+        /// of objects.
+        /// </summary>
+        IReadOnlyCollection<string> AllFieldNames { get; }
     }
 }

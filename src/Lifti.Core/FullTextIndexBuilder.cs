@@ -4,7 +4,6 @@ using Lifti.Tokenization.Objects;
 using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,7 +16,7 @@ namespace Lifti
     public class FullTextIndexBuilder<TKey>
         where TKey : notnull
     {
-        private readonly List<IObjectTokenizationBuilder> itemTokenizationOptions = new();
+        private readonly List<IObjectTokenizationBuilder> objectTokenizationBuilders = new();
         private readonly IndexOptions advancedOptions = new();
         private ThesaurusBuilder? defaultThesaurusBuilder;
         private IIndexScorerFactory? scorerFactory;
@@ -80,10 +79,7 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(asyncAction));
             }
 
-            if (this.indexModifiedActions == null)
-            {
-                this.indexModifiedActions = new List<Func<IIndexSnapshot<TKey>, CancellationToken, Task>>();
-            }
+            this.indexModifiedActions ??= new List<Func<IIndexSnapshot<TKey>, CancellationToken, Task>>();
 
             this.indexModifiedActions.Add(asyncAction);
 
@@ -141,7 +137,7 @@ namespace Lifti
             }
 
             var builder = new ObjectTokenizationBuilder<TItem, TKey>();
-            this.itemTokenizationOptions.Add(optionsBuilder(builder));
+            this.objectTokenizationBuilders.Add(optionsBuilder(builder));
 
             return this;
         }
@@ -257,10 +253,20 @@ namespace Lifti
             var thesaurusBuilder = this.defaultThesaurusBuilder ?? new ThesaurusBuilder();
             var textExtractor = this.defaultTextExtractor ?? new PlainTextExtractor();
 
+            // Building the object tokenizers also populates the index's field lookup with
+            // any static fields that have been defined.
+            var fieldLookup = new IndexedFieldLookup();
+            var objectTokenizers = new List<IObjectTokenization>();
+            foreach (var objectTokenizationBuilder in this.objectTokenizationBuilders)
+            {
+                var objectTokenizer = objectTokenizationBuilder.Build(this.defaultTokenizer, thesaurusBuilder, textExtractor, fieldLookup);
+                objectTokenizers.Add(objectTokenizer);
+            }
+
             return new FullTextIndex<TKey>(
                 this.advancedOptions,
-                new ObjectTokenizationLookup<TKey>(
-                    this.itemTokenizationOptions.Select(x => x.Build(this.defaultTokenizer, thesaurusBuilder, textExtractor))),
+                new ObjectTokenizationLookup<TKey>(objectTokenizers),
+                fieldLookup,
                 new IndexNodeFactory(this.advancedOptions),
                 this.queryParser ?? new QueryParser(new QueryParserOptions()),
                 this.scorerFactory ?? new OkapiBm25ScorerFactory(),

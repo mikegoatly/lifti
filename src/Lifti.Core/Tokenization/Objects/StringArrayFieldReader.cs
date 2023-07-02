@@ -1,5 +1,4 @@
-﻿using Lifti.Tokenization;
-using Lifti.Tokenization.TextExtraction;
+﻿using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -13,7 +12,7 @@ namespace Lifti.Tokenization.Objects
     /// <typeparam name="TItem">
     /// The type of item the field belongs to.
     /// </typeparam>
-    internal class StringArrayFieldReader<TItem> : FieldReader<TItem>
+    internal class StringArrayFieldReader<TItem> : StaticFieldReader<TItem>
     {
         private readonly Func<TItem, IEnumerable<string>> reader;
 

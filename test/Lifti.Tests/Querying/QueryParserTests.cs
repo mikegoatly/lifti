@@ -5,6 +5,9 @@ using Lifti.Tokenization;
 using Lifti.Tokenization.TextExtraction;
 using Moq;
 using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Lifti.Tests.Querying
@@ -27,8 +30,10 @@ namespace Lifti.Tests.Querying
             this.field1Tokenizer = new FakeIndexTokenizer();
             this.field2Tokenizer = new FakeIndexTokenizer();
             var textExtractor = new PlainTextExtractor();
-            this.fieldLookupMock.Setup(l => l.GetFieldInfo("testfield")).Returns(new IndexedFieldDetails(testFieldId, textExtractor, this.field1Tokenizer, thesaurus));
-            this.fieldLookupMock.Setup(l => l.GetFieldInfo("otherfield")).Returns(new IndexedFieldDetails(otherFieldId, textExtractor, this.field2Tokenizer, thesaurus));
+
+            var nullFieldReader = (TestObject x, CancellationToken token) => new ValueTask<IEnumerable<string>>(Array.Empty<string>());
+            this.fieldLookupMock.Setup(l => l.GetFieldInfo("testfield")).Returns(IndexedFieldDetails<TestObject>.Static(testFieldId, "testfield", nullFieldReader, textExtractor, this.field1Tokenizer, thesaurus));
+            this.fieldLookupMock.Setup(l => l.GetFieldInfo("otherfield")).Returns(IndexedFieldDetails<TestObject>.Static(otherFieldId, "otherfield", nullFieldReader, textExtractor, this.field2Tokenizer, thesaurus));
         }
 
         [Fact]
@@ -95,10 +100,10 @@ namespace Lifti.Tests.Querying
                 new AndQueryOperator(
                     new AndQueryOperator(
                         new AndQueryOperator(
-                            new FuzzyMatchQueryPart("wordone"), 
+                            new FuzzyMatchQueryPart("wordone"),
                             new ExactWordQueryPart("wordtwo")),
                         new WildcardQueryPart(WildcardQueryFragment.CreateText("wor"), WildcardQueryFragment.MultiCharacter)),
-                    new FuzzyMatchQueryPart("wordthree",3));
+                    new FuzzyMatchQueryPart("wordthree", 3));
             VerifyResult(result, expectedQuery);
         }
 
@@ -132,7 +137,7 @@ namespace Lifti.Tests.Querying
             var result = this.Parse("(wordone*)");
             var expectedQuery = new BracketedQueryPart(
                 new WildcardQueryPart(
-                    WildcardQueryFragment.CreateText("wordone"), 
+                    WildcardQueryFragment.CreateText("wordone"),
                     WildcardQueryFragment.MultiCharacter));
 
             VerifyResult(result, expectedQuery);
@@ -148,7 +153,7 @@ namespace Lifti.Tests.Querying
 
             VerifyResult(result, expectedQuery);
         }
-        
+
         [Fact]
         public void ParsingBracketedAndExpressions_ShouldReturnBracketedQueryPartContainer()
         {
@@ -338,12 +343,16 @@ namespace Lifti.Tests.Querying
 
             var parser = new QueryParser(options);
             return parser.Parse(
-                this.fieldLookupMock.Object, 
-                text, 
+                this.fieldLookupMock.Object,
+                text,
                 new FakeIndexTokenizerProvider(
                     new FakeIndexTokenizer(),
                     ("testfield", this.field1Tokenizer),
                     ("otherfield", this.field2Tokenizer)));
+        }
+
+        private class TestObject
+        {
         }
     }
 }

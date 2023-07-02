@@ -79,6 +79,24 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An attempt was made to read a dynamic field (&quot;{0}&quot;) from a provider that did not produce it..
+        /// </summary>
+        internal static string AttemptToReadFieldUnknownToDynamicFieldReader {
+            get {
+                return ResourceManager.GetString("AttemptToReadFieldUnknownToDynamicFieldReader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Badly formatted variable length value encountered.
+        /// </summary>
+        internal static string BadlyFormattedVariableLengthValueEncountered {
+            get {
+                return ResourceManager.GetString("BadlyFormattedVariableLengthValueEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot start a new batch change while another is already in progress..
         /// </summary>
         internal static string BatchChangeAlreadyStarted {
@@ -93,6 +111,42 @@ namespace Lifti {
         internal static string CannotCombineAnEmptySetOfQueryParts {
             get {
                 return ResourceManager.GetString("CannotCombineAnEmptySetOfQueryParts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot register a dynamic field with the same name as the statically registered field &quot;{0}&quot;. Consider using a field prefix when configuring the dynamic fields..
+        /// </summary>
+        internal static string CannotRegisterDynamicFieldWithSameNameAsStaticField {
+            get {
+                return ResourceManager.GetString("CannotRegisterDynamicFieldWithSameNameAsStaticField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot register dynamic field with the same name &quot;{0}&quot; against different object types. Consider using a field prefix when configuring the dynamic fields..
+        /// </summary>
+        internal static string CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes {
+            get {
+                return ResourceManager.GetString("CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate dynamic field reader name encountered: {0}. Dynamic field readers must have unique names..
+        /// </summary>
+        internal static string DuplicateDynamicFieldReaderName {
+            get {
+                return ResourceManager.GetString("DuplicateDynamicFieldReaderName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A duplicate field &quot;{0}&quot; was encountered while indexing item {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields..
+        /// </summary>
+        internal static string DuplicateFieldEncounteredOnObject {
+            get {
+                return ResourceManager.GetString("DuplicateFieldEncounteredOnObject", resourceCulture);
             }
         }
         
@@ -340,6 +394,24 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internal error: A dynamic field was missing its dynamic field reader name.
+        /// </summary>
+        internal static string NoDynamicFieldReaderNameInDynamicField {
+            get {
+                return ResourceManager.GetString("NoDynamicFieldReaderNameInDynamicField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No item was returned from the load item delegate when generating match phrases for item {0}..
+        /// </summary>
+        internal static string NoItemReturnedWhenGeneratingMatchPhrases {
+            get {
+                return ResourceManager.GetString("NoItemReturnedWhenGeneratingMatchPhrases", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No reader delegates configured.
         /// </summary>
         internal static string NoReaderDelegatesConfigured {
@@ -493,11 +565,38 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An unknown dynamic field reader name was encountered: {0} - this would likely indicate that an index was serialized with a differently configured set of dynamic field readers..
+        /// </summary>
+        internal static string UnknownDynamicFieldReaderNameEncountered {
+            get {
+                return ResourceManager.GetString("UnknownDynamicFieldReaderNameEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown field &apos;{0}&apos;.
         /// </summary>
         internal static string UnknownField {
             get {
                 return ResourceManager.GetString("UnknownField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown FieldKind {0}.
+        /// </summary>
+        internal static string UnknownFieldKind {
+            get {
+                return ResourceManager.GetString("UnknownFieldKind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Serialized index contains unknown field ids. Fields have most likely been removed from the FullTextIndexBuilder configuration..
+        /// </summary>
+        internal static string UnknownFieldsInSerializedIndex {
+            get {
+                return ResourceManager.GetString("UnknownFieldsInSerializedIndex", resourceCulture);
             }
         }
         

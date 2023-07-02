@@ -1,5 +1,4 @@
-﻿using Lifti.Tokenization.Objects;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,8 +53,9 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(loadItemsAsync));
             }
 
+            var itemType = typeof(TItem);
             var itemTokenization = this.index.ItemTokenization.Get<TItem>();
-            var itemResults = this.FilterFieldMatches(itemTokenization.FieldReaders.ContainsKey);
+            var itemResults = this.FilterFieldMatches<TItem>();
 
             var items = (await loadItemsAsync(itemResults.Select(x => x.searchResult.Key).ToList(), cancellationToken).ConfigureAwait(false))
                 .ToDictionary(x => itemTokenization.KeyReader(x));
@@ -64,10 +64,9 @@ namespace Lifti
             return missingIds.Count > 0
                 ? throw new LiftiException(ExceptionMessages.NotAllRequestedItemsReturned, string.Join(",", missingIds))
                 : await this.CreateMatchPhrasesAsync(
-                (x, ct) => new ValueTask<TItem>(items[x]),
-                itemTokenization,
-                itemResults,
-                cancellationToken).ConfigureAwait(false);
+                    (x, ct) => new ValueTask<TItem>(items[x]),
+                    itemResults,
+                    cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -94,12 +93,10 @@ namespace Lifti
             Func<TKey, CancellationToken, ValueTask<TItem>> loadItemAsync,
             CancellationToken cancellationToken = default)
         {
-            var itemTokenization = this.index.ItemTokenization.Get<TItem>();
-            var itemResults = this.FilterFieldMatches(itemTokenization.FieldReaders.ContainsKey);
+            var itemResults = this.FilterFieldMatches<TItem>();
 
             return await this.CreateMatchPhrasesAsync(
                 loadItemAsync,
-                itemTokenization,
                 itemResults,
                 cancellationToken).ConfigureAwait(false);
         }
@@ -169,7 +166,6 @@ namespace Lifti
 
         private async Task<IEnumerable<ItemPhrases<TKey, TItem>>> CreateMatchPhrasesAsync<TItem>(
             Func<TKey, CancellationToken, ValueTask<TItem>> loadItemAsync,
-            ObjectTokenization<TItem, TKey> itemTokenization,
             List<(SearchResult<TKey> searchResult, List<FieldSearchResult> fieldMatches)> itemResults,
             CancellationToken cancellationToken)
         {
@@ -178,21 +174,28 @@ namespace Lifti
             foreach (var (searchResult, fieldMatches) in itemResults)
             {
                 var item = await loadItemAsync(searchResult.Key, cancellationToken).ConfigureAwait(false);
+                if (item == null)
+                {
+                    throw new LiftiException(ExceptionMessages.NoItemReturnedWhenGeneratingMatchPhrases, searchResult.Key);
+                }
 
                 var fieldPhrases = new List<FieldPhrases<TKey>>(fieldMatches.Count);
                 foreach (var fieldMatch in fieldMatches)
                 {
-                    if (itemTokenization.FieldReaders.TryGetValue(fieldMatch.FoundIn, out var fieldReader))
-                    {
-                        var text = new VirtualString(await fieldReader.ReadAsync(item, cancellationToken).ConfigureAwait(false));
-                        fieldPhrases.Add(CreatePhrases(fieldMatch, text, phraseBuilder));
-                    }
+                    var fieldInfo = this.index.FieldLookup.GetFieldInfo(fieldMatch.FoundIn);
+                    var text = new VirtualString(await fieldInfo.ReadAsync(item, cancellationToken).ConfigureAwait(false));
+                    fieldPhrases.Add(CreatePhrases(fieldMatch, text, phraseBuilder));
                 }
 
                 matchedPhrases.Add(new ItemPhrases<TKey, TItem>(item, searchResult, fieldPhrases));
             }
 
             return matchedPhrases;
+        }
+
+        private List<(SearchResult<TKey> searchResult, List<FieldSearchResult> fieldMatches)> FilterFieldMatches<TItem>()
+        {
+            return this.FilterFieldMatches(fieldName => this.index.FieldLookup.IsKnownField(typeof(TItem), fieldName));
         }
 
         private List<(SearchResult<TKey> searchResult, List<FieldSearchResult> fieldMatches)> FilterFieldMatches(

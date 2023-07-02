@@ -25,22 +25,201 @@ namespace Lifti.Tests.Serialization
         [Fact]
         public async Task ShouldSerializeEmojiWithSurrogatePairs()
         {
-            var index = await SearializeAndDeserializeIndexWithTextAsync("🎶 🤷🏾‍♀️");
+            var index = await SerializeAndDeserializeIndexWithTextAsync("🎶 🤷🏾‍♀️");
             index.Search("🤷🏾‍♀️").Should().HaveCount(1);
         }
 
         [Fact]
         public async Task ShouldSerializeEmoji()
         {
-            var index = await SearializeAndDeserializeIndexWithTextAsync("🎶");
+            var index = await SerializeAndDeserializeIndexWithTextAsync("🎶");
             index.Search("🎶").Should().HaveCount(1);
         }
 
         [Fact]
         public async Task ShouldSerializeEmojiSequences()
         {
-            var index = await SearializeAndDeserializeIndexWithTextAsync("🎶🤷🏾‍♀️");
+            var index = await SerializeAndDeserializeIndexWithTextAsync("🎶🤷🏾‍♀️");
             index.Search("🎶🤷🏾‍♀️").Should().HaveCount(1);
+        }
+
+        [Fact]
+        public async Task SerializationShouldPreserveDynamicFieldInformation()
+        {
+            var indexBuilder = new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<DynamicFieldObject>(
+                    cfg => cfg
+                        .WithKey(x => x.Id)
+                        .WithDynamicFields("DynFields", x => x.Fields));
+
+            var index = indexBuilder.Build();
+
+            await index.AddAsync(new DynamicFieldObject
+            {
+                Id = 1,
+                Fields = new Dictionary<string, string>
+                {
+                    { "Foo", "Just some test text" },
+                    { "Bar", "More stuff to search" }
+                }
+            });
+
+            var deserializedIndex = indexBuilder.Build();
+            await SerializeAndDeserializeAsync(index, deserializedIndex);
+
+            deserializedIndex.Search("Foo=test").Should().HaveCount(1);
+        }
+
+        [Fact]
+        public async Task WhenNewStaticFieldsIntroduced_FieldIdsShouldBeMapped()
+        {
+            var index = new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<DynamicFieldObject>(
+                    cfg => cfg
+                        .WithKey(x => x.Id)
+                        .WithDynamicFields("DynFields", x => x.Fields))
+                .Build();
+
+            await index.AddAsync(new DynamicFieldObject
+            {
+                Id = 1,
+                Fields = new Dictionary<string, string>
+                {
+                    { "Foo", "Just some test text" },
+                    { "Bar", "More stuff to search" }
+                }
+            });
+
+            index.FieldLookup.GetFieldInfo("Foo").Id.Should().Be(1);
+
+            var deserializedIndex = new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<DynamicFieldObject>(
+                    cfg => cfg
+                        .WithKey(x => x.Id)
+                        .WithField("Name", x => x.Name)
+                        .WithDynamicFields("DynFields", x => x.Fields))
+                .Build();
+
+            await SerializeAndDeserializeAsync(index, deserializedIndex);
+
+            deserializedIndex.FieldLookup.AllFieldNames.Should().BeEquivalentTo(
+                new[]
+                {
+                    "Name",
+                    "Foo",
+                    "Bar"
+                });
+
+            deserializedIndex.FieldLookup.GetFieldInfo("Foo").Id.Should().Be(2);
+
+            deserializedIndex.Search("Foo=test").Should().HaveCount(1);
+        }
+
+        [Fact]
+        public async Task DeserializingIndexWhenStaticFieldRemoved_ShouldThrowException()
+        {
+            var index = new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<DynamicFieldObject>(
+                    cfg => cfg
+                        .WithKey(x => x.Id)
+                        .WithField("Name", x => x.Name)
+                        .WithDynamicFields("DynFields", x => x.Fields))
+                .Build();
+
+            await index.AddAsync(new DynamicFieldObject
+            {
+                Id = 1,
+                Name = "Blah",
+                Fields = new Dictionary<string, string>
+                {
+                    { "Foo", "Just some test text" },
+                    { "Bar", "More stuff to search" }
+                }
+            });
+
+            var deserializedIndex = new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<DynamicFieldObject>(
+                    cfg => cfg
+                        .WithKey(x => x.Id)
+                        .WithDynamicFields("DynFields", x => x.Fields))
+                .Build();
+
+            var exception = await Assert.ThrowsAsync<LiftiException>(async () => await SerializeAndDeserializeAsync(index, deserializedIndex));
+
+            exception.Message.Should().Be("Unknown field 'Name'");
+        }
+
+        [Fact]
+        public async Task DeserializingIndexWhenDynamicFieldReaderRemoved_ShouldThrowException()
+        {
+            var index = new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<DynamicFieldObject>(
+                    cfg => cfg
+                        .WithKey(x => x.Id)
+                        .WithField("Name", x => x.Name)
+                        .WithDynamicFields("DynFields", x => x.Fields))
+                .Build();
+
+            await index.AddAsync(new DynamicFieldObject
+            {
+                Id = 1,
+                Name = "Blah",
+                Fields = new Dictionary<string, string>
+                {
+                    { "Foo", "Just some test text" },
+                    { "Bar", "More stuff to search" }
+                }
+            });
+
+            var deserializedIndex = new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<DynamicFieldObject>(
+                    cfg => cfg
+                        .WithKey(x => x.Id)
+                        .WithField("Name", x => x.Name))
+                .Build();
+
+            var exception = await Assert.ThrowsAsync<LiftiException>(async () => await SerializeAndDeserializeAsync(index, deserializedIndex));
+
+            exception.Message.Should().Be("An unknown dynamic field reader name was encountered: DynFields - this would likely indicate that an index was serialized with a differently configured set of dynamic field readers.");
+        }
+
+        [Fact]
+        public async Task ShouldDeserializeV5Index()
+        {
+            var index = new FullTextIndexBuilder<int>()
+                  .WithObjectTokenization<DynamicFieldObject>(
+                      cfg => cfg
+                          .WithKey(x => x.Id)
+                          .WithField("Name", x => x.Name)
+                          .WithField("SomethingElse", x => x.SomethingElse)
+                          .WithDynamicFields("DynFields", x => x.Fields))
+                  .Build();
+
+            var serializer = new BinarySerializer<int>();
+            using (var stream = new MemoryStream(TestResources.v5Index))
+            {
+                await serializer.DeserializeAsync(index, stream);
+            }
+
+            index.Search("serialized").Should().HaveCount(1);
+            index.Search("亜").Should().HaveCount(1);
+        }
+
+        [Fact]
+        public async Task DeserializingV4IndexWithRemovedField_ShouldThrowException()
+        {
+            var index = new FullTextIndexBuilder<int>()
+                 .WithObjectTokenization<DynamicFieldObject>(
+                      cfg => cfg
+                          .WithKey(x => x.Id)
+                          .WithField("Name", x => x.Name))
+                .Build();
+
+            var serializer = new BinarySerializer<int>();
+            using var stream = new MemoryStream(TestResources.v4Index);
+            var exception = await Assert.ThrowsAsync<LiftiException>(async () => await serializer.DeserializeAsync(index, stream));
+
+            exception.Message.Should().Be("Serialized index contains unknown field ids. Fields have most likely been removed from the FullTextIndexBuilder configuration.");
         }
 
         [Fact]
@@ -50,7 +229,8 @@ namespace Lifti.Tests.Serialization
                  .WithObjectTokenization<DynamicFieldObject>(
                       cfg => cfg
                           .WithKey(x => x.Id)
-                          .WithField("Name", x => x.Name))
+                          .WithField("Name", x => x.Name)
+                          .WithField("SomethingElse", x => x.SomethingElse))
                 .Build();
 
             var serializer = new BinarySerializer<int>();
@@ -159,7 +339,7 @@ namespace Lifti.Tests.Serialization
         }
 
         // Used to create test indexes when defining a new serialization version
-        [Fact]
+        //[Fact]
         //public async Task CreateTestIndex()
         //{
         //    var index = new FullTextIndexBuilder<int>()
@@ -167,13 +347,15 @@ namespace Lifti.Tests.Serialization
         //              cfg => cfg
         //                  .WithKey(x => x.Id)
         //                  .WithField("Name", x => x.Name)
-        //          .WithDynamicFields("DynFields", x => x.Fields))
+        //                  .WithField("SomethingElse", x => x.SomethingElse)
+        //                  .WithDynamicFields("DynFields", x => x.Fields))
         //          .Build();
 
         //    await index.AddAsync(new DynamicFieldObject
         //    {
         //        Id = 1,
         //        Name = "Blah",
+        //        SomethingElse = "Great",
         //        Fields = new Dictionary<string, string>
         //        {
         //            { "Foo", "Some serialized data" },
@@ -185,6 +367,7 @@ namespace Lifti.Tests.Serialization
         //    {
         //        Id = 2,
         //        Name = "Cheese",
+        //        SomethingElse = "Great",
         //        Fields = new Dictionary<string, string>
         //        {
         //            { "Foo", "Other data" },
@@ -193,7 +376,7 @@ namespace Lifti.Tests.Serialization
         //    });
 
         //    var serializer = new BinarySerializer<int>();
-        //    using var stream = File.Open("../../../V4.dat", FileMode.CreateNew);
+        //    using var stream = File.Open("../../../V5.dat", FileMode.Create);
         //    await serializer.SerializeAsync(index, stream, true);
         //}
 
@@ -202,7 +385,7 @@ namespace Lifti.Tests.Serialization
             return Guid.NewGuid().ToString() + ".dat";
         }
 
-        private static async Task<FullTextIndex<string>> SearializeAndDeserializeIndexWithTextAsync(string text)
+        private static async Task<FullTextIndex<string>> SerializeAndDeserializeIndexWithTextAsync(string text)
         {
             var stream = new MemoryStream();
             var serializer = new BinarySerializer<string>();
@@ -243,10 +426,20 @@ namespace Lifti.Tests.Serialization
             return index;
         }
 
+        private static async Task SerializeAndDeserializeAsync(FullTextIndex<int> index, FullTextIndex<int> deserializedIndex)
+        {
+            var serializer = new BinarySerializer<int>();
+            using var stream = new MemoryStream();
+            await serializer.SerializeAsync(index, stream, false);
+            stream.Position = 0;
+            await serializer.DeserializeAsync(deserializedIndex, stream);
+        }
+
         private class DynamicFieldObject
         {
             public int Id { get; set; }
-            public string? Name { get; set; }
+            public string Name { get; set; } = null!;
+            public string SomethingElse { get; set; } = null!;
             public Dictionary<string, string>? Fields { get; set; }
         }
     }
