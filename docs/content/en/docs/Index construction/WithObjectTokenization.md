@@ -21,6 +21,13 @@ var index = new FullTextIndexBuilder<int>()
         .WithKey(c => c.Id)
         .WithField("Name", c => c.Name)
         .WithField("Profile", c => c.ProfileHtml, textExtractor: new XmlTextExtractor())
+        .WithDynamicFields("Tags", c => c.TagDictionary, "Tag_")
+        .WithDynamicFields(
+            "Questions", 
+            c => c.Questions, 
+            q => q.QuestionName, 
+            q => q.QuestionResponse, 
+            "Question_")
     )
     .Build();
 
@@ -33,7 +40,7 @@ Each object configured against the index must have a key of the same type as the
 
 ## WithField
 
-An object needs one or more named fields configured from which to read text, each of which is configured using `WithField`.
+An object can be configured with one *static* fields that are known at compile time. The `WithField` method overloads allow for static fields to be defined.
 
 ### `name`
 
@@ -65,6 +72,47 @@ Equivalent to [WithTextExtraction](./WithTextExtraction) but for use exclusively
 ### `thesaurusOptions`
 
 Equivalent to [WithDefaultThesaurus](./WithDefaultThesaurus) but for use exclusively with this field. Left null, the default thesaurus builder for the index will be used.
+
+## WithDynamicFields
+
+In addition to the static fields configured using `WithField`, it is possible to configure dynamic fields that are not known at compile time. The `WithDynamicFields`
+overloads allow for dynamic field readers to be defined, each of which will be invoked to retrieve the field names for the object being indexed.
+
+> **Important:** LIFTI only supports a maximum of 255 unique field names per index, whether they are dynamic or defined statically using `WithField`.
+Because dynamic fields are not known at compile time, it is possible to exceed this limit if you are not careful. If you do exceed this limit, an exception will be thrown 
+when you try to index an object.
+
+### `dynamicFieldReaderName`
+
+The unique name of the dynamic field reader. Dynamic fields are registered in the index against this name so that when the index is deserialized, the dynamic fields
+can be rehydrated against the correct configuration.
+
+### `dynamicFieldReader`
+
+A function capable of extracting the dynamic field information from the object type `T`.
+
+You can provide a function that returns a dictionary of name/value pairs, where the key becomes the field name
+and the value the text being indexed against it:
+
+* `Func<T, IDictionary<string, string>?>`
+* `Func<T, IDictionary<string, IEnumerable<string>>>`
+
+Or you can provice a function that returns a collection of *child objects*:
+
+* `Func<T, ICollection<TChild>?>`
+* `Func<T, ICollection<TChild>?>`
+
+These last two overloads also require you provide two more delegates via the `getFieldName` and `getFieldText` parameters.
+These delegates are used to extract the field name and text from each child object.
+
+### fieldNamePrefix
+
+The prefix to use when constructing the field name. This is useful when the dynamic fields can produce the same field name as a static field,
+or a dynamic field from another dynamic field reader.
+
+### Other `WithDynamicFields` parameters
+
+The `tokenizationOptions`, `textExtractor` and `thesaurusOptions` parameters are equivalent to their `WithField` counterparts.
 
 ## Indexing multiple object types
 
