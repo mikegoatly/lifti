@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.113.0">
+<meta name="generator" content="Hugo 0.115.0">
 <meta name="robots" content="index, follow">
 
 
@@ -25,10 +25,10 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/searching/manually-constructing-queries/" /><meta property="article:section" content="docs" />
 <meta property="article:published_time" content="2022-02-12T00:00:00+00:00" />
-<meta property="article:modified_time" content="2022-12-22T09:31:39+00:00" />
+<meta property="article:modified_time" content="2023-07-05T20:29:27+01:00" />
 <meta itemprop="name" content="Manually Constructing Query Objects">
 <meta itemprop="description" content="Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index."><meta itemprop="datePublished" content="2022-02-12T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2022-12-22T09:31:39+00:00" />
+<meta itemprop="dateModified" content="2023-07-05T20:29:27+01:00" />
 <meta itemprop="wordCount" content="582">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Manually Constructing Query Objects"/>
@@ -74,7 +74,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.73f1f54b0ddd603ad0f1cf1f9abe910a.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.2d1f2e22ff1999ea36d0513f5f1292c7.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -99,7 +99,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.73f1f54b0ddd603ad0f1cf1f9abe910a.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.2d1f2e22ff1999ea36d0513f5f1292c7.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -159,6 +159,8 @@
   <a href="/lifti/docs/searching/fuzzy-matching/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingfuzzy-matching"><span class="">Fuzzy Matching</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingsimple-queries-li">
   <a href="/lifti/docs/searching/simple-queries/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingsimple-queries"><span class="">Simple Queries</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingfield-information-li">
+  <a href="/lifti/docs/searching/field-information/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingfield-information"><span class="">Field Information</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-liftidocssearchingmanually-constructing-queries-li">
   <a href="/lifti/docs/searching/manually-constructing-queries/" class="align-left pl-0 active td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingmanually-constructing-queries"><span class="td-sidebar-nav-active-item">Manually Constructing Query Objects</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingusing-the-index-navigator-li">
@@ -186,8 +188,13 @@
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-liftidocsreference-li">
   <a href="/lifti/docs/reference/" class="align-left pl-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsreference"><span class="">Reference</span></a>
   <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsreferenceserialization-format-li">
-  <a href="/lifti/docs/reference/serialization-format/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsreferenceserialization-format"><span class="">Serialization File Format</span></a>
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child collapse" id="m-liftidocsreferenceserialization-format-li">
+  <a href="/lifti/docs/reference/serialization-format/" class="align-left pl-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsreferenceserialization-format"><span class="">Serialization File Format</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsreferenceserialization-formatpreversion5-li">
+  <a href="/lifti/docs/reference/serialization-format/preversion5/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsreferenceserialization-formatpreversion5"><span class="">V2-4 Serialization File Format</span></a>
+</li>
+  </ul>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocsfaq-li">
@@ -369,7 +376,7 @@
 	
 	
 	<div class="text-muted mt-5 pt-3 border-top">
-  Last modified December 22, 2022: <a href="https://github.com/mikegoatly/lifti/commit/66954604b0f740423bfef5b94b2c0d7367d10162">V4.0.0 (#64) (6695460)</a>
+  Last modified July 5, 2023: <a href="https://github.com/mikegoatly/lifti/commit/816f5ce696992165d2fe50e647946b26beb43020">Added documentation for new fields features (816f5ce)</a>
 </div>
 
 </div>

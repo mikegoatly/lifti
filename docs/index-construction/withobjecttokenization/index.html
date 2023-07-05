@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.113.0">
+<meta name="generator" content="Hugo 0.115.0">
 <meta name="robots" content="index, follow">
 
 
@@ -27,12 +27,12 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/index-construction/withobjecttokenization/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2022-12-22T09:31:39+00:00" />
+<meta property="article:modified_time" content="2023-07-04T20:40:33+01:00" />
 <meta itemprop="name" content="WithObjectTokenization">
 <meta itemprop="description" content="Configure the index to accept a strongly typed object when indexing content.
 ">
-<meta itemprop="dateModified" content="2022-12-22T09:31:39+00:00" />
-<meta itemprop="wordCount" content="425">
+<meta itemprop="dateModified" content="2023-07-04T20:40:33+01:00" />
+<meta itemprop="wordCount" content="744">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="WithObjectTokenization"/>
 <meta name="twitter:description" content="Configure the index to accept a strongly typed object when indexing content.
@@ -78,7 +78,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.73f1f54b0ddd603ad0f1cf1f9abe910a.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.2d1f2e22ff1999ea36d0513f5f1292c7.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -103,7 +103,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.73f1f54b0ddd603ad0f1cf1f9abe910a.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.2d1f2e22ff1999ea36d0513f5f1292c7.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -163,6 +163,8 @@
   <a href="/lifti/docs/searching/fuzzy-matching/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingfuzzy-matching"><span class="">Fuzzy Matching</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocssearchingsimple-queries-li">
   <a href="/lifti/docs/searching/simple-queries/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingsimple-queries"><span class="">Simple Queries</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocssearchingfield-information-li">
+  <a href="/lifti/docs/searching/field-information/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingfield-information"><span class="">Field Information</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocssearchingmanually-constructing-queries-li">
   <a href="/lifti/docs/searching/manually-constructing-queries/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingmanually-constructing-queries"><span class="">Manually Constructing Query Objects</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocssearchingusing-the-index-navigator-li">
@@ -190,8 +192,13 @@
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-liftidocsreference-li">
   <a href="/lifti/docs/reference/" class="align-left pl-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsreference"><span class="">Reference</span></a>
   <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsreferenceserialization-format-li">
-  <a href="/lifti/docs/reference/serialization-format/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsreferenceserialization-format"><span class="">Serialization File Format</span></a>
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child collapse" id="m-liftidocsreferenceserialization-format-li">
+  <a href="/lifti/docs/reference/serialization-format/" class="align-left pl-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsreferenceserialization-format"><span class="">Serialization File Format</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsreferenceserialization-formatpreversion5-li">
+  <a href="/lifti/docs/reference/serialization-format/preversion5/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsreferenceserialization-formatpreversion5"><span class="">V2-4 Serialization File Format</span></a>
+</li>
+  </ul>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocsfaq-li">
@@ -226,6 +233,14 @@
         <li><a href="#tokenizationoptions"><code>tokenizationOptions</code></a></li>
         <li><a href="#textextractor"><code>textExtractor</code></a></li>
         <li><a href="#thesaurusoptions"><code>thesaurusOptions</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#withdynamicfields">WithDynamicFields</a>
+      <ul>
+        <li><a href="#dynamicfieldreadername"><code>dynamicFieldReaderName</code></a></li>
+        <li><a href="#dynamicfieldreader"><code>dynamicFieldReader</code></a></li>
+        <li><a href="#fieldnameprefix">fieldNamePrefix</a></li>
+        <li><a href="#other-withdynamicfields-parameters">Other <code>WithDynamicFields</code> parameters</a></li>
       </ul>
     </li>
     <li><a href="#indexing-multiple-object-types">Indexing multiple object types</a>
@@ -308,6 +323,13 @@
 </span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithKey</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Id</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Name&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Name</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Profile&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ProfileHtml</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">textExtractor</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">XmlTextExtractor</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithDynamicFields</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Tags&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">TagDictionary</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Tag_&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithDynamicFields</span><span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#4e9a06">&#34;Questions&#34;</span><span style="color:#000;font-weight:bold">,</span> 
+</span></span><span style="display:flex;"><span>            <span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Questions</span><span style="color:#000;font-weight:bold">,</span> 
+</span></span><span style="display:flex;"><span>            <span style="color:#000">q</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">q</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">QuestionName</span><span style="color:#000;font-weight:bold">,</span> 
+</span></span><span style="display:flex;"><span>            <span style="color:#000">q</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">q</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">QuestionResponse</span><span style="color:#000;font-weight:bold">,</span> 
+</span></span><span style="display:flex;"><span>            <span style="color:#4e9a06">&#34;Question_&#34;</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
 </span></span><span style="display:flex;"><span>
@@ -315,7 +337,7 @@
 </span></span></code></pre></div><h2 id="withkey">WithKey</h2>
 <p>Each object configured against the index must have a key of the same type as the index&rsquo;s key. <code>WithKey</code> defines how this key is read from the object.</p>
 <h2 id="withfield">WithField</h2>
-<p>An object needs one or more named fields configured from which to read text, each of which is configured using <code>WithField</code>.</p>
+<p>An object can be configured with one <em>static</em> fields that are known at compile time. The <code>WithField</code> method overloads allow for static fields to be defined.</p>
 <h3 id="name"><code>name</code></h3>
 <p>The unique name of the field in the index. This has two main uses subsequently:</p>
 <ol>
@@ -339,6 +361,37 @@
 <p>Equivalent to <a href="./WithTextExtraction">WithTextExtraction</a> but for use exclusively use with this field. Left null, the default text extractor for the index will be used.</p>
 <h3 id="thesaurusoptions"><code>thesaurusOptions</code></h3>
 <p>Equivalent to <a href="./WithDefaultThesaurus">WithDefaultThesaurus</a> but for use exclusively with this field. Left null, the default thesaurus builder for the index will be used.</p>
+<h2 id="withdynamicfields">WithDynamicFields</h2>
+<p>In addition to the static fields configured using <code>WithField</code>, it is possible to configure dynamic fields that are not known at compile time. The <code>WithDynamicFields</code>
+overloads allow for dynamic field readers to be defined, each of which will be invoked to retrieve the field names for the object being indexed.</p>
+<blockquote>
+<p><strong>Important:</strong> LIFTI only supports a maximum of 255 unique field names per index, whether they are dynamic or defined statically using <code>WithField</code>.
+Because dynamic fields are not known at compile time, it is possible to exceed this limit if you are not careful. If you do exceed this limit, an exception will be thrown
+when you try to index an object.</p>
+</blockquote>
+<h3 id="dynamicfieldreadername"><code>dynamicFieldReaderName</code></h3>
+<p>The unique name of the dynamic field reader. Dynamic fields are registered in the index against this name so that when the index is deserialized, the dynamic fields
+can be rehydrated against the correct configuration.</p>
+<h3 id="dynamicfieldreader"><code>dynamicFieldReader</code></h3>
+<p>A function capable of extracting the dynamic field information from the object type <code>T</code>.</p>
+<p>You can provide a function that returns a dictionary of name/value pairs, where the key becomes the field name
+and the value the text being indexed against it:</p>
+<ul>
+<li><code>Func&lt;T, IDictionary&lt;string, string&gt;?&gt;</code></li>
+<li><code>Func&lt;T, IDictionary&lt;string, IEnumerable&lt;string&gt;&gt;&gt;</code></li>
+</ul>
+<p>Or you can provice a function that returns a collection of <em>child objects</em>:</p>
+<ul>
+<li><code>Func&lt;T, ICollection&lt;TChild&gt;?&gt;</code></li>
+<li><code>Func&lt;T, ICollection&lt;TChild&gt;?&gt;</code></li>
+</ul>
+<p>These last two overloads also require you provide two more delegates via the <code>getFieldName</code> and <code>getFieldText</code> parameters.
+These delegates are used to extract the field name and text from each child object.</p>
+<h3 id="fieldnameprefix">fieldNamePrefix</h3>
+<p>The prefix to use when constructing the field name. This is useful when the dynamic fields can produce the same field name as a static field,
+or a dynamic field from another dynamic field reader.</p>
+<h3 id="other-withdynamicfields-parameters">Other <code>WithDynamicFields</code> parameters</h3>
+<p>The <code>tokenizationOptions</code>, <code>textExtractor</code> and <code>thesaurusOptions</code> parameters are equivalent to their <code>WithField</code> counterparts.</p>
 <h2 id="indexing-multiple-object-types">Indexing multiple object types</h2>
 <p>It is possible to index multiple types against an index, however you need to consider a couple of constraints.</p>
 <h3 id="1-extracted-keys-need-to-be-unique-across-all-object-types">1. Extracted keys need to be unique across all object types.</h3>
@@ -368,7 +421,7 @@
 	
 	
 	<div class="text-muted mt-5 pt-3 border-top">
-  Last modified December 22, 2022: <a href="https://github.com/mikegoatly/lifti/commit/66954604b0f740423bfef5b94b2c0d7367d10162">V4.0.0 (#64) (6695460)</a>
+  Last modified July 4, 2023: <a href="https://github.com/mikegoatly/lifti/commit/d8d7d41ad1cfad4686d45fab36abea7c538ce04d">Added documentation for dynamic fields (d8d7d41)</a>
 </div>
 
 </div>

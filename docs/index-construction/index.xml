@@ -87,6 +87,13 @@ be treated as &lt;code&gt;ABANDON&lt;/code&gt;. Currently only English is suppor
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithKey&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;c&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;c&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithField&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;c&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;c&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithField&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Profile&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;c&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;c&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ProfileHtml&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;textExtractor&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;XmlTextExtractor&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithDynamicFields&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Tags&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;c&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;c&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;TagDictionary&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Tag_&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithDynamicFields&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Questions&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#000&#34;&gt;c&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;c&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Questions&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#000&#34;&gt;q&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;q&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;QuestionName&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#000&#34;&gt;q&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;q&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;QuestionResponse&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Question_&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Build&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
@@ -94,7 +101,7 @@ be treated as &lt;code&gt;ABANDON&lt;/code&gt;. Currently only English is suppor
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;withkey&#34;&gt;WithKey&lt;/h2&gt;
 &lt;p&gt;Each object configured against the index must have a key of the same type as the index&amp;rsquo;s key. &lt;code&gt;WithKey&lt;/code&gt; defines how this key is read from the object.&lt;/p&gt;
 &lt;h2 id=&#34;withfield&#34;&gt;WithField&lt;/h2&gt;
-&lt;p&gt;An object needs one or more named fields configured from which to read text, each of which is configured using &lt;code&gt;WithField&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;An object can be configured with one &lt;em&gt;static&lt;/em&gt; fields that are known at compile time. The &lt;code&gt;WithField&lt;/code&gt; method overloads allow for static fields to be defined.&lt;/p&gt;
 &lt;h3 id=&#34;name&#34;&gt;&lt;code&gt;name&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;The unique name of the field in the index. This has two main uses subsequently:&lt;/p&gt;
 &lt;ol&gt;
@@ -118,6 +125,37 @@ be treated as &lt;code&gt;ABANDON&lt;/code&gt;. Currently only English is suppor
 &lt;p&gt;Equivalent to &lt;a href=&#34;./WithTextExtraction&#34;&gt;WithTextExtraction&lt;/a&gt; but for use exclusively use with this field. Left null, the default text extractor for the index will be used.&lt;/p&gt;
 &lt;h3 id=&#34;thesaurusoptions&#34;&gt;&lt;code&gt;thesaurusOptions&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;Equivalent to &lt;a href=&#34;./WithDefaultThesaurus&#34;&gt;WithDefaultThesaurus&lt;/a&gt; but for use exclusively with this field. Left null, the default thesaurus builder for the index will be used.&lt;/p&gt;
+&lt;h2 id=&#34;withdynamicfields&#34;&gt;WithDynamicFields&lt;/h2&gt;
+&lt;p&gt;In addition to the static fields configured using &lt;code&gt;WithField&lt;/code&gt;, it is possible to configure dynamic fields that are not known at compile time. The &lt;code&gt;WithDynamicFields&lt;/code&gt;
+overloads allow for dynamic field readers to be defined, each of which will be invoked to retrieve the field names for the object being indexed.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Important:&lt;/strong&gt; LIFTI only supports a maximum of 255 unique field names per index, whether they are dynamic or defined statically using &lt;code&gt;WithField&lt;/code&gt;.
+Because dynamic fields are not known at compile time, it is possible to exceed this limit if you are not careful. If you do exceed this limit, an exception will be thrown
+when you try to index an object.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;dynamicfieldreadername&#34;&gt;&lt;code&gt;dynamicFieldReaderName&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;The unique name of the dynamic field reader. Dynamic fields are registered in the index against this name so that when the index is deserialized, the dynamic fields
+can be rehydrated against the correct configuration.&lt;/p&gt;
+&lt;h3 id=&#34;dynamicfieldreader&#34;&gt;&lt;code&gt;dynamicFieldReader&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;A function capable of extracting the dynamic field information from the object type &lt;code&gt;T&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;You can provide a function that returns a dictionary of name/value pairs, where the key becomes the field name
+and the value the text being indexed against it:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Func&amp;lt;T, IDictionary&amp;lt;string, string&amp;gt;?&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Func&amp;lt;T, IDictionary&amp;lt;string, IEnumerable&amp;lt;string&amp;gt;&amp;gt;&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Or you can provice a function that returns a collection of &lt;em&gt;child objects&lt;/em&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Func&amp;lt;T, ICollection&amp;lt;TChild&amp;gt;?&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Func&amp;lt;T, ICollection&amp;lt;TChild&amp;gt;?&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These last two overloads also require you provide two more delegates via the &lt;code&gt;getFieldName&lt;/code&gt; and &lt;code&gt;getFieldText&lt;/code&gt; parameters.
+These delegates are used to extract the field name and text from each child object.&lt;/p&gt;
+&lt;h3 id=&#34;fieldnameprefix&#34;&gt;fieldNamePrefix&lt;/h3&gt;
+&lt;p&gt;The prefix to use when constructing the field name. This is useful when the dynamic fields can produce the same field name as a static field,
+or a dynamic field from another dynamic field reader.&lt;/p&gt;
+&lt;h3 id=&#34;other-withdynamicfields-parameters&#34;&gt;Other &lt;code&gt;WithDynamicFields&lt;/code&gt; parameters&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;tokenizationOptions&lt;/code&gt;, &lt;code&gt;textExtractor&lt;/code&gt; and &lt;code&gt;thesaurusOptions&lt;/code&gt; parameters are equivalent to their &lt;code&gt;WithField&lt;/code&gt; counterparts.&lt;/p&gt;
 &lt;h2 id=&#34;indexing-multiple-object-types&#34;&gt;Indexing multiple object types&lt;/h2&gt;
 &lt;p&gt;It is possible to index multiple types against an index, however you need to consider a couple of constraints.&lt;/p&gt;
 &lt;h3 id=&#34;1-extracted-keys-need-to-be-unique-across-all-object-types&#34;&gt;1. Extracted keys need to be unique across all object types.&lt;/h3&gt;

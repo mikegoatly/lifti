@@ -30,7 +30,7 @@
     <lastmod>2022-12-22T09:31:39+00:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withobjecttokenization/</loc>
-    <lastmod>2022-12-22T09:31:39+00:00</lastmod>
+    <lastmod>2023-07-04T20:40:33+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/searching/fuzzy-matching/</loc>
     <lastmod>2022-10-08T11:52:02+01:00</lastmod>
@@ -44,6 +44,9 @@
     <loc>https://mikegoatly.github.io/lifti/docs/searching/simple-queries/</loc>
     <lastmod>2022-10-03T22:57:25+01:00</lastmod>
   </url><url>
+    <loc>https://mikegoatly.github.io/lifti/docs/searching/field-information/</loc>
+    <lastmod>2023-07-05T20:29:27+01:00</lastmod>
+  </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/searching/</loc>
     <lastmod>2022-12-22T09:31:39+00:00</lastmod>
   </url><url>
@@ -56,8 +59,14 @@
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withqueryparser/</loc>
     <lastmod>2022-12-22T09:31:39+00:00</lastmod>
   </url><url>
+    <loc>https://mikegoatly.github.io/lifti/docs/searching/manually-constructing-queries/</loc>
+    <lastmod>2023-07-05T20:29:27+01:00</lastmod>
+  </url><url>
+    <loc>https://mikegoatly.github.io/lifti/docs/searching/using-the-index-navigator/</loc>
+    <lastmod>2023-07-05T20:29:27+01:00</lastmod>
+  </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/serialization/</loc>
-    <lastmod>2020-07-17T19:29:39+01:00</lastmod>
+    <lastmod>2023-07-05T20:29:27+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withsimplequeryparser/</loc>
     <lastmod>2022-10-03T22:57:25+01:00</lastmod>
@@ -77,20 +86,17 @@
     <loc>https://mikegoatly.github.io/lifti/docs/</loc>
     <lastmod>2022-10-03T22:57:25+01:00</lastmod>
   </url><url>
-    <loc>https://mikegoatly.github.io/lifti/docs/searching/manually-constructing-queries/</loc>
-    <lastmod>2022-12-22T09:31:39+00:00</lastmod>
+    <loc>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/</loc>
+    <lastmod>2023-07-04T20:40:33+01:00</lastmod>
+  </url><url>
+    <loc>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/preversion5/</loc>
+    <lastmod>2023-07-02T08:22:47+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/getting-started/indexing-objects/</loc>
     <lastmod>2020-07-20T07:36:58+01:00</lastmod>
   </url><url>
-    <loc>https://mikegoatly.github.io/lifti/docs/searching/using-the-index-navigator/</loc>
-    <lastmod>2020-07-14T21:32:01+01:00</lastmod>
-  </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/searching/search-results/</loc>
     <lastmod>2022-12-22T09:31:39+00:00</lastmod>
-  </url><url>
-    <loc>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/</loc>
-    <lastmod>2020-07-16T07:52:33+01:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/about/</loc>
     <lastmod>2020-07-14T21:32:01+01:00</lastmod>

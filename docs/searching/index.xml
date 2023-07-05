@@ -251,6 +251,49 @@ index tokenization rules.&lt;/p&gt;
     </item>
     
     <item>
+      <title>Docs: Field Information</title>
+      <link>https://mikegoatly.github.io/lifti/docs/searching/field-information/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://mikegoatly.github.io/lifti/docs/searching/field-information/</guid>
+      <description>
+        
+        
+        &lt;p&gt;A &lt;code&gt;FullTextIndex&lt;/code&gt; class exposes a &lt;code&gt;FieldLookup&lt;/code&gt; property of type &lt;code&gt;IIndexedFieldLookup&lt;/code&gt; that can be used to query the index for
+information about the fields that have been indexed.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;IIndexedFieldLookup&lt;/code&gt; exposes the following methods:&lt;/p&gt;
+&lt;h2 id=&#34;defaultfield&#34;&gt;&lt;code&gt;DefaultField&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;The id of the default field used when an &lt;code&gt;IFullTextIndex{T}.AddAsync(T, string, System.Threading.CancellationToken)&lt;/code&gt; overload has been used, as opposed to indexing text read from properties of object.&lt;/p&gt;
+&lt;h2 id=&#34;getfieldforidbyte-id&#34;&gt;&lt;code&gt;GetFieldForId(byte id)&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;Gets the configured name for a field id.&lt;/p&gt;
+&lt;h2 id=&#34;getfieldinfostring-fieldname&#34;&gt;&lt;code&gt;GetFieldInfo(string fieldName)&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;Gets the configuration required for indexing a named field, including the &lt;code&gt;Tokenization.TextExtraction.ITextExtractor&lt;/code&gt; and &lt;code&gt;Tokenization.IIndexTokenizer&lt;/code&gt; instances to use when processing the field&amp;rsquo;s text.&lt;/p&gt;
+&lt;h3 id=&#34;indexedfielddetails&#34;&gt;&lt;code&gt;IndexedFieldDetails&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;This abstract class contains information about a field that has been configured for indexing.&lt;/p&gt;
+&lt;h4 id=&#34;properties&#34;&gt;Properties&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Id&lt;/strong&gt;: Gets the id of the field.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Name&lt;/strong&gt;: Gets the name of the field.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ObjectType&lt;/strong&gt;: Gets the type of the object the field is registered for.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;FieldKind&lt;/strong&gt;: Gets the kind of field this instance represents, either &lt;code&gt;FieldKind.Static&lt;/code&gt; or &lt;code&gt;FieldKind.Dynamic&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TextExtractor&lt;/strong&gt;: Gets the &lt;code&gt;ITextExtractor&lt;/code&gt; used to extract sections of text from this field.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Tokenizer&lt;/strong&gt;: Gets the &lt;code&gt;IIndexTokenizer&lt;/code&gt; that should be used when tokenizing text for the field.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Thesaurus&lt;/strong&gt;: Gets the &lt;code&gt;IThesaurus&lt;/code&gt; that should be used to expand tokens when processing text for this field.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DynamicFieldReaderName&lt;/strong&gt;: Gets the name of the dynamic field reader that generated this field. If this field is not a dynamic field, this will be &lt;code&gt;null&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;methods&#34;&gt;Methods&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ReadAsync(object item, CancellationToken cancellationToken)&lt;/strong&gt;: Reads the text for the field from the specified item. The item must be of the type specified by the &lt;code&gt;ObjectType&lt;/code&gt; property.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;isknownfieldtype-objecttype-string-fieldname&#34;&gt;&lt;code&gt;IsKnownField(Type objectType, string fieldName)&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;Returns &lt;code&gt;true&lt;/code&gt; if the given field name is known to the index and associated to the given object type, whether statically defined at index creation, or dynamically registered during indexing.&lt;/p&gt;
+&lt;h2 id=&#34;allfieldnames&#34;&gt;&lt;code&gt;AllFieldNames&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;Gets the names of all fields configured in the index, including any dynamic fields that have been registered during the indexing of objects.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Docs: Manually Constructing Query Objects</title>
       <link>https://mikegoatly.github.io/lifti/docs/searching/manually-constructing-queries/</link>
       <pubDate>Sat, 12 Feb 2022 00:00:00 +0000</pubDate>

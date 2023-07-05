@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.113.0">
+<meta name="generator" content="Hugo 0.115.0">
 <link rel="alternate" type="application/rss&#43;xml" href="https://mikegoatly.github.io/lifti/docs/serialization/index.xml">
 <meta name="robots" content="index, follow">
 
@@ -74,7 +74,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.73f1f54b0ddd603ad0f1cf1f9abe910a.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.2d1f2e22ff1999ea36d0513f5f1292c7.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -99,7 +99,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.73f1f54b0ddd603ad0f1cf1f9abe910a.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.2d1f2e22ff1999ea36d0513f5f1292c7.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -159,6 +159,8 @@
   <a href="/lifti/docs/searching/fuzzy-matching/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingfuzzy-matching"><span class="">Fuzzy Matching</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocssearchingsimple-queries-li">
   <a href="/lifti/docs/searching/simple-queries/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingsimple-queries"><span class="">Simple Queries</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocssearchingfield-information-li">
+  <a href="/lifti/docs/searching/field-information/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingfield-information"><span class="">Field Information</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocssearchingmanually-constructing-queries-li">
   <a href="/lifti/docs/searching/manually-constructing-queries/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingmanually-constructing-queries"><span class="">Manually Constructing Query Objects</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocssearchingusing-the-index-navigator-li">
@@ -186,8 +188,13 @@
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-liftidocsreference-li">
   <a href="/lifti/docs/reference/" class="align-left pl-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsreference"><span class="">Reference</span></a>
   <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsreferenceserialization-format-li">
-  <a href="/lifti/docs/reference/serialization-format/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsreferenceserialization-format"><span class="">Serialization File Format</span></a>
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child collapse" id="m-liftidocsreferenceserialization-format-li">
+  <a href="/lifti/docs/reference/serialization-format/" class="align-left pl-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsreferenceserialization-format"><span class="">Serialization File Format</span></a>
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsreferenceserialization-formatpreversion5-li">
+  <a href="/lifti/docs/reference/serialization-format/preversion5/" class="align-left pl-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsreferenceserialization-formatpreversion5"><span class="">V2-4 Serialization File Format</span></a>
+</li>
+  </ul>
 </li>
   </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocsfaq-li">
@@ -210,7 +217,19 @@
   
 </div>
 
-            
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#changing-index-definitions">Changing index definitions</a>
+      <ul>
+        <li><a href="#adding-fields">Adding fields</a></li>
+        <li><a href="#removing-and-renaming-fields">Removing and renaming fields</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+    
             
 
 	
@@ -292,6 +311,29 @@
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">matches</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">newIndex</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Search</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;text&#34;</span><span style="color:#000;font-weight:bold">);</span>
 </span></span><span style="display:flex;"><span><span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">$&#34;{matches.Count()} items contain text in the new index&#34;</span><span style="color:#000;font-weight:bold">);</span>
 </span></span></code></pre></div><p>If you want to understand how the binary data is laid out, you can have a look at the <a href="../reference/serialization-format">Serialization Format</a> reference page.</p>
+<h2 id="changing-index-definitions">Changing index definitions</h2>
+<h3 id="adding-fields">Adding fields</h3>
+<p><strong>Adding</strong> fields to an index definition is supported.</p>
+<p>Consider an index defined as:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithObjectTokenization</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Customer</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">o</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithKey</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Id</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Name&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Name</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
+</span></span></code></pre></div><p>A static field called <code>Name</code> is defined with the id <code>1</code>. If you serialize this index, and then change the index definition to:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">index</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">FullTextIndexBuilder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithObjectTokenization</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Customer</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#000">o</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">o</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithKey</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Id</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Name&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Name</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">WithField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Notes&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">c</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">c</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Notes</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
+</span></span></code></pre></div><p>A new field called <code>Notes</code> is defined with the id <code>2</code>. Deserializing the output from the first definition will work fine.</p>
+<p>Even if field <em>order</em> is changed, such that <code>Name</code> became field id 2, the deserialization will still work. The serialization process is
+smart enough to map the old field id to the new field id.</p>
+<h3 id="removing-and-renaming-fields">Removing and renaming fields</h3>
+<p>This is <em>not</em> supported. If you remove or rename a field, the deserialization process will fail.</p>
 
         <div class="section-index">
     
@@ -326,7 +368,7 @@
 	
 	
 	<div class="text-muted mt-5 pt-3 border-top">
-  Last modified July 17, 2020: <a href="https://github.com/mikegoatly/lifti/commit/474d7c0eab52510ba80209c939154f7cd7bf283f">Added simple serialization example (474d7c0)</a>
+  Last modified July 5, 2023: <a href="https://github.com/mikegoatly/lifti/commit/816f5ce696992165d2fe50e647946b26beb43020">Added documentation for new fields features (816f5ce)</a>
 </div>
 
 </div>

@@ -1,0 +1,34 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>LIFTI – Serialization File Format</title>
+    <link>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/</link>
+    <description>Recent content in Serialization File Format on LIFTI</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 04 Jul 2023 00:00:00 +0000</lastBuildDate>
+    
+	  <atom:link href="https://mikegoatly.github.io/lifti/docs/reference/serialization-format/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: V2-4 Serialization File Format</title>
+      <link>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/preversion5/</link>
+      <pubDate>Sun, 02 Jul 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/preversion5/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;version-4-v400&#34;&gt;Version 4 (v4.0.0)&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;../../../../images/v2-serialization.svg&#34; alt=&#34;LIFTI Serialization Format&#34;&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>
