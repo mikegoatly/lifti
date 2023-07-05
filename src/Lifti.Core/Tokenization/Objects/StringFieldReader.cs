@@ -12,7 +12,7 @@ namespace Lifti.Tokenization.Objects
     /// <typeparam name="TItem">
     /// The type of item the field belongs to.
     /// </typeparam>
-    internal class StringFieldReader<TItem> : FieldReader<TItem>
+    internal class StringFieldReader<TItem> : StaticFieldReader<TItem>
     {
         private readonly Func<TItem, string> reader;
 

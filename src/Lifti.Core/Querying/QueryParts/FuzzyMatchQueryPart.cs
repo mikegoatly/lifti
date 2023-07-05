@@ -44,7 +44,7 @@ namespace Lifti.Querying.QueryParts
             // It's very likely that we'll encounter the same point in the index multiple times while processing a fuzzy match.
             // There's no point in traversing the same part multiple times for a given point in the search term, so this hashset keeps track of each logical
             // location that has been reached at each index within the search term.
-            private readonly HashSet<(int wordIndex, IIndexNavigatorBookmark bookmark)> processedBookmarks = new HashSet<(int, IIndexNavigatorBookmark)>();
+            private readonly HashSet<(int wordIndex, IIndexNavigatorBookmark bookmark)> processedBookmarks = new();
 
             public FuzzyMatchStateStore(IIndexNavigator navigator, ushort maxEditDistance, ushort maxSequentialEdits)
             {
@@ -57,15 +57,15 @@ namespace Lifti.Querying.QueryParts
 
             public void Add(FuzzyMatchState state)
             {
-                if (state.TotalEditCount <= maxEditDistance &&
-                    state.SequentialEdits <= maxSequentialEdits &&
-                    processedBookmarks.Add((state.WordIndex, state.Bookmark)))
+                if (state.TotalEditCount <= this.maxEditDistance &&
+                    state.SequentialEdits <= this.maxSequentialEdits &&
+                    this.processedBookmarks.Add((state.WordIndex, state.Bookmark)))
                 {
                     this.state.Add(state);
                 }
             }
 
-            public IEnumerable<FuzzyMatchState> GetNextStateEntries()
+            public DoubleBufferedList<FuzzyMatchState> GetNextStateEntries()
             {
                 return this.state;
             }
@@ -76,7 +76,7 @@ namespace Lifti.Querying.QueryParts
             }
         }
 
-        private struct FuzzyMatchState
+        private readonly struct FuzzyMatchState
         {
             /// <summary>
             /// Creates a new <see cref="FuzzyMatchState"/> instance.
@@ -163,13 +163,13 @@ namespace Lifti.Querying.QueryParts
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                     this.MatchText + $"(-{substituted.Expected}+{substituted.ReplacedWith})",
 #endif
-                    isTransposition ? (SubstitutedCharacters?)null : substituted);
+                    isTransposition ? null : substituted);
             }
 
             public FuzzyMatchState ApplyDeletion(
                 IIndexNavigatorBookmark newBookmark
 #if DEBUG && TRACK_MATCH_STATE_TEXT
-                ,char omittedCharacter
+                , char omittedCharacter
 #endif
                 )
             {
@@ -287,7 +287,7 @@ namespace Lifti.Querying.QueryParts
                                 var weighting = (double)(lengthTotal - state.LevenshteinDistance) / lengthTotal;
                                 results = results.Union(navigator.GetExactMatches(weighting));
                             }
-                            
+
                             // Always assume there could be missing characters at the end
                             AddDeletionBookmarks(navigator, stateStore, state);
                         }
@@ -337,7 +337,7 @@ namespace Lifti.Querying.QueryParts
             var bookmark = currentState.Bookmark;
 
             bookmark.Apply();
-            foreach (char c in navigator.EnumerateNextCharacters())
+            foreach (var c in navigator.EnumerateNextCharacters())
             {
                 if (currentCharacter == c)
                 {
@@ -356,7 +356,7 @@ namespace Lifti.Querying.QueryParts
             var bookmark = currentState.Bookmark;
 
             bookmark.Apply();
-            foreach (char c in navigator.EnumerateNextCharacters())
+            foreach (var c in navigator.EnumerateNextCharacters())
             {
                 bookmark.Apply();
                 navigator.Process(c);

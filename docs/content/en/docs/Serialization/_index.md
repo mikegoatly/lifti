@@ -46,3 +46,41 @@ Console.WriteLine($"{matches.Count()} items contain text in the new index");
 ```
 
 If you want to understand how the binary data is laid out, you can have a look at the [Serialization Format](../reference/serialization-format) reference page.
+
+## Changing index definitions
+
+### Adding fields
+
+**Adding** fields to an index definition is supported.
+
+Consider an index defined as:
+
+``` csharp
+var index = new FullTextIndexBuilder<int>()
+    .WithObjectTokenization<Customer>(o => o
+        .WithKey(c => c.Id)
+        .WithField("Name", c => c.Name)
+    )
+    .Build();
+```
+
+A static field called `Name` is defined with the id `1`. If you serialize this index, and then change the index definition to:
+
+``` csharp
+var index = new FullTextIndexBuilder<int>()
+    .WithObjectTokenization<Customer>(o => o
+        .WithKey(c => c.Id)
+        .WithField("Name", c => c.Name)
+        .WithField("Notes", c => c.Notes)
+    )
+    .Build();
+```
+
+A new field called `Notes` is defined with the id `2`. Deserializing the output from the first definition will work fine.
+
+Even if field *order* is changed, such that `Name` became field id 2, the deserialization will still work. The serialization process is 
+smart enough to map the old field id to the new field id.
+
+### Removing and renaming fields
+
+This is *not* supported. If you remove or rename a field, the deserialization process will fail.

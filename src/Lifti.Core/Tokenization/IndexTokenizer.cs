@@ -14,10 +14,10 @@ namespace Lifti.Tokenization
     /// </summary>
     public class IndexTokenizer : IIndexTokenizer
     {
-        private readonly IInputPreprocessorPipeline inputPreprocessorPipeline;
+        private readonly InputPreprocessorPipeline inputPreprocessorPipeline;
         private readonly HashSet<char> additionalSplitChars;
         private readonly HashSet<char> ignoreChars;
-        private readonly IStemmer? stemmer;
+        private readonly PorterStemmer? stemmer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IndexTokenizer"/> class.

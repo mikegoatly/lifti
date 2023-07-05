@@ -60,7 +60,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The replacements that can be made in step 1B.
         /// </summary>
-        private static readonly IFullTextIndex<WordReplacement> step1bReplacements = CreateReplacementLookup(
+        private static readonly FullTextIndex<WordReplacement> step1bReplacements = CreateReplacementLookup(
             new[]
             {
                 new WordReplacement("EEDLY", 3),
@@ -74,7 +74,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The replacements that can be made in step 2.
         /// </summary>
-        private static readonly IFullTextIndex<WordReplacement> step2Replacements = CreateReplacementLookup(
+        private static readonly FullTextIndex<WordReplacement> step2Replacements = CreateReplacementLookup(
             new[]
             {
                 new WordReplacement("IZATION", "IZE"),
@@ -106,7 +106,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The replacements that can be made in step 3.
         /// </summary>
-        private static readonly IFullTextIndex<WordReplacement> step3Replacements = CreateReplacementLookup(
+        private static readonly FullTextIndex<WordReplacement> step3Replacements = CreateReplacementLookup(
             new[]
             {
                 new WordReplacement("ATIONAL", "ATE"),
@@ -123,7 +123,7 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The replacements that can be made in step 4.
         /// </summary>
-        private static readonly IFullTextIndex<WordReplacement> step4Replacements = CreateReplacementLookup(
+        private static readonly FullTextIndex<WordReplacement> step4Replacements = CreateReplacementLookup(
             new[]
             {
                 new WordReplacement("EMENT", 5),
@@ -193,7 +193,7 @@ namespace Lifti.Tokenization.Stemming
         /// </summary>
         /// <param name="replacements">The replacements to create the lookup for.</param>
         /// <returns>The lookup of replacements, keyed on the last character in the search text.</returns>
-        private static IFullTextIndex<WordReplacement> CreateReplacementLookup(
+        private static FullTextIndex<WordReplacement> CreateReplacementLookup(
             IEnumerable<WordReplacement> replacements)
         {
             var index = new FullTextIndexBuilder<WordReplacement>()
@@ -386,21 +386,11 @@ namespace Lifti.Tokenization.Stemming
         private static bool HasDoubleLetterEnding(StringBuilder word)
         {
             var last = word[word.Length - 1];
-            switch (last)
+            return last switch
             {
-                case 'B':
-                case 'D':
-                case 'F':
-                case 'G':
-                case 'M':
-                case 'N':
-                case 'P':
-                case 'R':
-                case 'T':
-                    return word[word.Length - 2] == last;
-            }
-
-            return false;
+                'B' or 'D' or 'F' or 'G' or 'M' or 'N' or 'P' or 'R' or 'T' => word[word.Length - 2] == last,
+                _ => false,
+            };
         }
 
         private static void Step2(StringBuilder word, StemRegion stemRegion)
@@ -436,22 +426,11 @@ namespace Lifti.Tokenization.Stemming
 
         private static bool IsRemovableLiEnding(char letter)
         {
-            switch (letter)
+            return letter switch
             {
-                case 'C':
-                case 'D':
-                case 'E':
-                case 'G':
-                case 'H':
-                case 'K':
-                case 'M':
-                case 'N':
-                case 'R':
-                case 'T':
-                    return true;
-                default:
-                    return false;
-            }
+                'C' or 'D' or 'E' or 'G' or 'H' or 'K' or 'M' or 'N' or 'R' or 'T' => true,
+                _ => false,
+            };
         }
 
         private static void Step3(StringBuilder word, StemRegion stemRegion)
@@ -494,14 +473,11 @@ namespace Lifti.Tokenization.Stemming
 
         private static bool IsRemovableIonEnding(char letter)
         {
-            switch (letter)
+            return letter switch
             {
-                case 'S':
-                case 'T':
-                    return true;
-                default:
-                    return false;
-            }
+                'S' or 'T' => true,
+                _ => false,
+            };
         }
     }
 }

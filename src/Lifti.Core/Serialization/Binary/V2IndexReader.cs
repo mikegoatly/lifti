@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
@@ -42,26 +43,47 @@ namespace Lifti.Serialization.Binary
         {
             await this.FillBufferAsync().ConfigureAwait(false);
 
+            // If the key serializer derives from KeySerializerBase, use the backwards compatible read method
+            // to allow for the old format to be read.
+            Func<BinaryReader, TKey> keyReader = this.keySerializer is KeySerializerBase<TKey> baseKeySerializer
+                ? baseKeySerializer.ReadV2BackwardsCompatible
+                : this.keySerializer.Read;
+
+            // Keep track of all the distinct fields ids encountered during deserialization
+            var distinctFieldIds = new HashSet<byte>();
+
             var itemCount = this.reader.ReadInt32();
             for (var i = 0; i < itemCount; i++)
             {
                 var id = this.reader.ReadInt32();
-                var key = this.keySerializer.Read(this.reader);
+                var key = keyReader(this.reader);
                 var fieldStatCount = this.reader.ReadInt32();
                 var fieldTokenCounts = ImmutableDictionary.CreateBuilder<byte, int>();
                 var totalTokenCount = 0;
                 for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
                 {
                     var fieldId = this.reader.ReadByte();
+                    distinctFieldIds.Add(fieldId);
+
                     var wordCount = this.reader.ReadInt32();
                     fieldTokenCounts.Add(fieldId, wordCount);
                     totalTokenCount += wordCount;
                 }
 
                 index.IdPool.Add(
-                    id, 
+                    id,
                     key,
                     new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount));
+            }
+
+            // Double check that the index structure is aware of all the fields that are being deserialized
+            // We remove field 0 because it's the default field that loose text is associated to, and does
+            // not contribute to the total number of named fields.
+            distinctFieldIds.Remove(0);
+            var indexFields = index.FieldLookup.AllFieldNames.Select(x => index.FieldLookup.GetFieldInfo(x).Id);
+            if (distinctFieldIds.Except(indexFields).Any())
+            {
+                throw new LiftiException(ExceptionMessages.UnknownFieldsInSerializedIndex);
             }
 
             index.SetRootWithLock(this.DeserializeNode(index.IndexNodeFactory, 0));
@@ -73,7 +95,7 @@ namespace Lifti.Serialization.Binary
 
             if (this.underlyingStream.CanSeek)
             {
-                this.underlyingStream.Position = this.buffer.Position + initialUnderlyingStreamOffset;
+                this.underlyingStream.Position = this.buffer.Position + this.initialUnderlyingStreamOffset;
             }
         }
 
@@ -82,7 +104,7 @@ namespace Lifti.Serialization.Binary
             var textLength = this.reader.ReadInt32();
             var matchCount = this.reader.ReadInt32();
             var childNodeCount = this.reader.ReadInt32();
-            var intraNodeText = textLength == 0 ? null : ReadIntraNodeText(textLength);
+            var intraNodeText = textLength == 0 ? null : this.ReadIntraNodeText(textLength);
             var childNodes = childNodeCount > 0 ? ImmutableDictionary.CreateBuilder<char, IndexNode>() : null;
             var matches = matchCount > 0 ? ImmutableDictionary.CreateBuilder<int, ImmutableList<IndexedToken>>() : null;
 

@@ -12,7 +12,7 @@ namespace Lifti.Tokenization.Objects
     /// <typeparam name="TItem">
     /// The type of item the field belongs to.
     /// </typeparam>
-    internal class AsyncStringFieldReader<TItem> : FieldReader<TItem>
+    internal class AsyncStringFieldReader<TItem> : StaticFieldReader<TItem>
     {
         private readonly Func<TItem, CancellationToken, Task<string>> reader;
 
