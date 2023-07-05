@@ -2,6 +2,7 @@
 title: "IndexNavigator"
 linkTitle: "IndexNavigator"
 date: 2020-07-14
+weight: 6
 description: >
     You can use an IndexNavigator to navigate the index character by character.
 ---

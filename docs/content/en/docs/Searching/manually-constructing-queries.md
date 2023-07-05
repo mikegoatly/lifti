@@ -2,6 +2,7 @@
 title: Manually Constructing Query Objects
 linkTitle: "Manually Constructing Query Objects"
 date: 2022-02-12
+weight: 6
 description:
     Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index.
 ---
