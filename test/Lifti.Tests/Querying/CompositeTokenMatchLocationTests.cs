@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
-using Moq;
+using Lifti.Tests.Fakes;
 using System.Linq;
 using Xunit;
 
@@ -8,8 +8,8 @@ namespace Lifti.Tests.Querying
 {
     public class CompositeTokenMatchLocationTests : QueryTestBase
     {
-        private readonly Mock<ITokenLocationMatch> match2;
-        private readonly Mock<ITokenLocationMatch> match1;
+        private readonly FakeTokenLocationMatch match2;
+        private readonly FakeTokenLocationMatch match1;
         private readonly CompositeTokenMatchLocation sut1;
         private readonly CompositeTokenMatchLocation sut2;
         private readonly TokenLocation[] match1Locations;
@@ -17,29 +17,25 @@ namespace Lifti.Tests.Querying
 
         public CompositeTokenMatchLocationTests()
         {
-            this.match1 = new Mock<ITokenLocationMatch>();
-            this.match1.SetupGet(t => t.MinTokenIndex).Returns(100);
-            this.match1.SetupGet(t => t.MaxTokenIndex).Returns(200);
-            this.match1Locations = new[] {
+            this.match1Locations = new[] 
+            {
                 new TokenLocation(100, 1, 2),
                 new TokenLocation(200, 1, 2)
             };
 
-            this.match1.Setup(m => m.GetLocations()).Returns(this.match1Locations);
+            this.match1 = new FakeTokenLocationMatch(100, 200, this.match1Locations);
 
-            this.match2 = new Mock<ITokenLocationMatch>();
-            this.match2.SetupGet(t => t.MinTokenIndex).Returns(110);
-            this.match2.SetupGet(t => t.MaxTokenIndex).Returns(180);
-            this.match2Locations = new[] {
+            this.match2Locations = new[] 
+            {
                 new TokenLocation(110, 1, 2),
                 new TokenLocation(150, 1, 2),
                 new TokenLocation(180, 1, 2)
             };
 
-            this.match2.Setup(m => m.GetLocations()).Returns(this.match2Locations);
+            this.match2 = new FakeTokenLocationMatch(110, 180, this.match2Locations);
 
-            this.sut1 = new CompositeTokenMatchLocation(this.match1.Object, this.match2.Object);
-            this.sut2 = new CompositeTokenMatchLocation(this.match2.Object, this.match1.Object);
+            this.sut1 = new CompositeTokenMatchLocation(this.match1, this.match2);
+            this.sut2 = new CompositeTokenMatchLocation(this.match2, this.match1);
         }
 
         [Fact]

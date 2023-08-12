@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
 using Lifti.Querying.QueryParts;
-using Moq;
+using Lifti.Tests.Fakes;
 using Xunit;
 
 namespace Lifti.Tests.Querying.QueryParts
@@ -28,9 +28,8 @@ namespace Lifti.Tests.Querying.QueryParts
             var navigator = FakeIndexNavigator.ReturningExactMatches(1, 2);
 
             var contextResults = new IntermediateQueryResult();
-            var queryContext = new Mock<IQueryContext>();
-            queryContext.Setup(c => c.ApplyTo(It.IsAny<IntermediateQueryResult>())).Returns(contextResults);
-            var result = part.Evaluate(() => new FakeIndexNavigator(), queryContext.Object);
+            var queryContext = new FakeQueryContext(contextResults);
+            var result = part.Evaluate(() => new FakeIndexNavigator(), queryContext);
 
             result.Should().Be(contextResults);
         }

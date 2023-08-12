@@ -1,10 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
-using Lifti.Querying.QueryParts;
-using Lifti.Tests.Querying;
+using Lifti.Tests.Fakes;
 using Lifti.Tokenization;
-using Lifti.Tokenization.TextExtraction;
-using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +10,7 @@ using Xunit;
 
 namespace Lifti.Tests
 {
-    public class FullTextIndexBuilderTests
+    public partial class FullTextIndexBuilderTests
     {
         private readonly FullTextIndexBuilder<int> sut;
 
@@ -158,13 +155,13 @@ namespace Lifti.Tests
         [Fact]
         public void WithCustomQueryParser_ShouldPassCustomImplementationToIndex()
         {
-            var parser = this.ConfigureQueryParserMock();
+            var parser = this.ConfigureQueryParser();
 
             var index = this.sut.Build();
 
             index.Search("test").Should().BeEmpty();
 
-            parser.Verify(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), "test", index), Times.Once);
+            parser.ParsedQueries.Should().BeEquivalentTo(new[] { "test" });
         }
 
         [Fact]
@@ -203,14 +200,10 @@ namespace Lifti.Tests
         public async Task WithScorer_ShouldPassImplementationToIndex()
         {
             var score = 999999999D;
-            var indexScorer = new Mock<IScorer>();
-            indexScorer.Setup(s => s.Score(It.IsAny<IReadOnlyList<QueryTokenMatch>>(), It.IsAny<double>()))
-                .Returns((IReadOnlyList<QueryTokenMatch> t, double weight) => t.Select(m => new ScoredToken(m.ItemId, m.FieldMatches.Select(fm => new ScoredFieldMatch(score, fm)).ToList())).ToList());
 
-            var scorer = new Mock<IIndexScorerFactory>();
-            scorer.Setup(s => s.CreateIndexScorer(It.IsAny<IIndexSnapshot>())).Returns(indexScorer.Object);
+            var scorerFactory = new FakeScorerFactory(new FakeScorer(score));
 
-            this.sut.WithScorerFactory(scorer.Object);
+            this.sut.WithScorerFactory(scorerFactory);
 
             var index = this.sut.Build();
 
@@ -309,13 +302,11 @@ namespace Lifti.Tests
             return passedOptions;
         }
 
-        private Mock<IQueryParser> ConfigureQueryParserMock()
+        private FakeQueryParser ConfigureQueryParser()
         {
-            var parser = new Mock<IQueryParser>();
-            parser.Setup(p => p.Parse(It.IsAny<IIndexedFieldLookup>(), It.IsAny<string>(), It.IsAny<IIndexTokenizerProvider>()))
-                .Returns(new Query(EmptyQueryPart.Instance));
+            var parser = new FakeQueryParser(Query.Empty);
 
-            this.sut.WithQueryParser(parser.Object);
+            this.sut.WithQueryParser(parser);
 
             return parser;
         }

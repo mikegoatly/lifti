@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
-using Moq;
+using Lifti.Tests.Fakes;
 using System.Collections.Immutable;
+using System.Linq;
 using Xunit;
 
 namespace Lifti.Tests.Querying
@@ -16,15 +17,14 @@ namespace Lifti.Tests.Querying
 
         public OkapiBm25ScorerTests()
         {
-            var snapshotMock = new Mock<IItemStore>();
-            snapshotMock.SetupGet(s => s.Count).Returns(10); // 10 items in the index
-            snapshotMock.SetupGet(s => s.IndexStatistics).Returns(
-                new IndexStatistics(ImmutableDictionary<byte, long>.Empty.Add(1, 100), 100)); // 100 total tokens in 1 field
+            var itemStore = new FakeItemStore<int>(
+                10,
+                new IndexStatistics(ImmutableDictionary<byte, long>.Empty.Add(1, 100), 100), // 100 total tokens in 1 field
+                Enumerable.Range(0, 10)
+                    .Select(id => (id, new ItemMetadata<int>(id, id, new DocumentStatistics(1, id * 3))))
+                    .ToArray()); // Each item will have (id * 3) tokens in it
 
-            snapshotMock.Setup(s => s.GetMetadata(It.IsAny<int>())).Returns(
-                (int id) => new ItemMetadata<int>(id, id, new DocumentStatistics(1, id * 3))); // Each item will have (id * 3) tokens in it
-
-            this.sut = new OkapiBm25Scorer(1.2D, 0.75D, snapshotMock.Object);
+            this.sut = new OkapiBm25Scorer(1.2D, 0.75D, itemStore);
 
             this.tokenMatches = new[]
 {

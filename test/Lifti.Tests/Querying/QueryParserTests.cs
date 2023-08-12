@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
 using Lifti.Querying.QueryParts;
+using Lifti.Tests.Fakes;
 using Lifti.Tokenization;
 using Lifti.Tokenization.TextExtraction;
-using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -16,13 +16,12 @@ namespace Lifti.Tests.Querying
     {
         private const byte TestFieldId = 9;
         private const byte OtherFieldId = 11;
-        private readonly Mock<IIndexedFieldLookup> fieldLookupMock;
+        private readonly FakeIndexedFieldLookup fieldLookup;
         private readonly FakeIndexTokenizer field1Tokenizer;
         private readonly FakeIndexTokenizer field2Tokenizer;
 
         public QueryParserTests()
         {
-            this.fieldLookupMock = new Mock<IIndexedFieldLookup>();
             var testFieldId = TestFieldId;
             var otherFieldId = OtherFieldId;
 
@@ -32,8 +31,11 @@ namespace Lifti.Tests.Querying
             var textExtractor = new PlainTextExtractor();
 
             var nullFieldReader = (TestObject x, CancellationToken token) => new ValueTask<IEnumerable<string>>(Array.Empty<string>());
-            this.fieldLookupMock.Setup(l => l.GetFieldInfo("testfield")).Returns(IndexedFieldDetails<TestObject>.Static(testFieldId, "testfield", nullFieldReader, textExtractor, this.field1Tokenizer, thesaurus));
-            this.fieldLookupMock.Setup(l => l.GetFieldInfo("otherfield")).Returns(IndexedFieldDetails<TestObject>.Static(otherFieldId, "otherfield", nullFieldReader, textExtractor, this.field2Tokenizer, thesaurus));
+
+            this.fieldLookup = new FakeIndexedFieldLookup(
+                ("testfield", IndexedFieldDetails<TestObject>.Static(testFieldId, "testfield", nullFieldReader, textExtractor, this.field1Tokenizer, thesaurus)),
+                ("otherfield", IndexedFieldDetails<TestObject>.Static(otherFieldId, "otherfield", nullFieldReader, textExtractor, this.field2Tokenizer, thesaurus))
+            );
         }
 
         [Fact]
@@ -343,7 +345,7 @@ namespace Lifti.Tests.Querying
 
             var parser = new QueryParser(options);
             return parser.Parse(
-                this.fieldLookupMock.Object,
+                this.fieldLookup,
                 text,
                 new FakeIndexTokenizerProvider(
                     new FakeIndexTokenizer(),

@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
+using Lifti.Tests.Fakes;
 using Lifti.Tokenization.TextExtraction;
-using Moq;
 using PerformanceProfiling;
 using System;
 using System.Collections.Generic;
@@ -477,16 +477,12 @@ namespace Lifti.Tests
         [Fact]
         public async Task AddingItemsToIndex_ShouldUseProvidedTextExtractor()
         {
-            var textExtractor = new Mock<ITextExtractor>();
-            textExtractor.SetReturnsDefault<IEnumerable<DocumentTextFragment>>(
-                new[]
-                {
-                    new DocumentTextFragment(0, "MOCKED".AsMemory())
-                });
+            var textExtractor = new FakeTextExtractor(
+                new DocumentTextFragment(0, "MOCKED".AsMemory()));
 
             var index = new FullTextIndexBuilder<int>()
                 .WithIntraNodeTextSupportedAfterIndexDepth(0)
-                .WithTextExtractor(textExtractor.Object)
+                .WithTextExtractor(textExtractor)
                 .Build();
 
             await index.AddAsync(1, "Hello");
