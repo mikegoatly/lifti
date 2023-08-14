@@ -12,6 +12,7 @@ namespace Lifti.Tests.Querying
         private readonly QueryTokenizer sut;
         private readonly IIndexTokenizer defaultIndexTokenizer;
         private readonly IIndexTokenizer fieldIndexTokenizer;
+        private readonly FakeIndexTokenizer alternativeFieldIndexTokenizer;
         private readonly IIndexTokenizerProvider tokenizerProvider;
 
         public QueryTokenizerTests()
@@ -20,7 +21,12 @@ namespace Lifti.Tests.Querying
 
             this.defaultIndexTokenizer = new FakeIndexTokenizer();
             this.fieldIndexTokenizer = new FakeIndexTokenizer(true);
-            this.tokenizerProvider = new FakeIndexTokenizerProvider(this.defaultIndexTokenizer, ("test", this.fieldIndexTokenizer));
+            this.alternativeFieldIndexTokenizer = new FakeIndexTokenizer(true);
+            this.tokenizerProvider = new FakeIndexTokenizerProvider(
+                this.defaultIndexTokenizer, 
+                ("test", this.fieldIndexTokenizer),
+                ("test field", this.fieldIndexTokenizer),
+                ("test []", this.alternativeFieldIndexTokenizer));
         }
 
         [Fact]
@@ -151,6 +157,59 @@ namespace Lifti.Tests.Querying
                     .Using<QueryToken>(
                     x => x.Subject.IndexTokenizer.Should().BeSameAs(x.Expectation.IndexTokenizer))
                 .WhenTypeIs<QueryToken>());
+        }
+
+        [Fact]
+        public void BracketedFieldNames_ShouldBeTreatedAsFieldNameWithoutSquareBrackets()
+        {
+            this.sut.ParseQueryTokens(@"[test]=foo [test field]=bar", this.tokenizerProvider).Should().BeEquivalentTo(new[]
+                {
+                    QueryToken.ForFieldFilter("test"),
+                    QueryToken.ForText("foo", this.fieldIndexTokenizer),
+                    QueryToken.ForFieldFilter("test field"),
+                    QueryToken.ForText("bar", this.fieldIndexTokenizer)
+                },
+                options => options
+                    .WithStrictOrdering()
+                    .Using<QueryToken>(
+                    x => x.Subject.IndexTokenizer.Should().BeSameAs(x.Expectation.IndexTokenizer))
+                .WhenTypeIs<QueryToken>());
+        }
+
+        [Fact]
+        public void BracketedFieldNamesWithEscapedCharacters_ShouldReturnUnescapedCharacters()
+        {
+            this.sut.ParseQueryTokens(@"[\t\e\s\t\ \[\]]=foo", this.tokenizerProvider).Should().BeEquivalentTo(new[]
+                {
+                    QueryToken.ForFieldFilter("test []"),
+                    QueryToken.ForText("foo", this.alternativeFieldIndexTokenizer)
+                },
+                options => options
+                    .WithStrictOrdering()
+                    .Using<QueryToken>(
+                    x => x.Subject.IndexTokenizer.Should().BeSameAs(x.Expectation.IndexTokenizer))
+                .WhenTypeIs<QueryToken>());
+        }
+
+        [Fact]
+        public void EmptyBracketedFieldName_ShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => this.sut.ParseQueryTokens("[]=foo", this.tokenizerProvider).ToList())
+                .Message.Should().Be("Empty field name encountered");
+        }
+
+        [Fact]
+        public void UnclosedFieldNameBracket_ShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => this.sut.ParseQueryTokens("[test=foo", this.tokenizerProvider).ToList())
+                .Message.Should().Be("Unclosed [ encountered");
+        }
+
+        [Fact]
+        public void BracketFieldNameWithoutFollowingQuery_ShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => this.sut.ParseQueryTokens("[test] foo", this.tokenizerProvider).ToList())
+                .Message.Should().Be("Expected = after bracketed field name");
         }
 
         [Fact]
