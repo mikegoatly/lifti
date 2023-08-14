@@ -178,6 +178,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Empty field name encountered.
+        /// </summary>
+        internal static string EmptyFieldNameEncountered {
+            get {
+                return ResourceManager.GetString("EmptyFieldNameEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Internal error - missing text value.
         /// </summary>
         internal static string EmptyOrMissingTextQueryFragmentValue {
@@ -192,6 +201,15 @@ namespace Lifti {
         internal static string ExpectedAtLeastOneQueryPartParsed {
             get {
                 return ResourceManager.GetString("ExpectedAtLeastOneQueryPartParsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected = after bracketed field name.
+        /// </summary>
+        internal static string ExpectedEqualsAfterFieldName {
+            get {
+                return ResourceManager.GetString("ExpectedEqualsAfterFieldName", resourceCulture);
             }
         }
         
@@ -507,6 +525,15 @@ namespace Lifti {
         internal static string UnableToReadHeaderInformation {
             get {
                 return ResourceManager.GetString("UnableToReadHeaderInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unclosed [ encountered.
+        /// </summary>
+        internal static string UnclosedSquareBracket {
+            get {
+                return ResourceManager.GetString("UnclosedSquareBracket", resourceCulture);
             }
         }
         

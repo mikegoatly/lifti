@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Text.RegularExpressions;
 
 namespace Lifti.Querying
 {
@@ -28,7 +29,9 @@ namespace Lifti.Querying
             '(',
             ')',
             '~',
-            '"'
+            '"',
+            '[',
+            ']'
         };
 
         // Punctuation characters that shouldn't cause a token to be automatically split when processing
@@ -42,7 +45,7 @@ namespace Lifti.Querying
         {
             None = 0,
             ProcessingString = 1,
-            ProcessingNearOperator = 2
+            ProcessingNearOperator = 2,
         }
 
         private enum TokenParseState
@@ -202,12 +205,45 @@ namespace Lifti.Querying
                                             state = state with { TokenState = TokenParseState.ProcessingFuzzyMatch };
                                             break;
                                         case TokenParseState.ProcessingFuzzyMatch:
-                                            // We're already procssing a fuzzy match, the second ? indicates the end of parameters and start of the search term
+                                            // We're already processing a fuzzy match, the second ? indicates the end of parameters and start of the search term
                                             state = state with { TokenState = TokenParseState.ProcessingFuzzyMatchTerm };
                                             break;
                                     }
 
                                     tokenStart ??= i;
+
+                                    break;
+                                case '[':
+                                    tokenStart = i;
+
+                                    // Keep processing characters until we reach a closing bracket. Characters escaped with a backslash are skipped
+                                    var foundCloseBracket = false;
+                                    for (i++; i < queryText.Length; i++)
+                                    {
+                                        current = queryText[i];
+                                        if (current == ']')
+                                        {
+                                            foundCloseBracket = true;
+                                            break;
+                                        }
+
+                                        if (current == '\\')
+                                        {
+                                            // Skip the next character
+                                            i++;
+                                        }
+                                    }
+
+                                    if (foundCloseBracket == false)
+                                    {
+                                        throw new QueryParserException(ExceptionMessages.UnclosedSquareBracket);
+                                    }
+
+                                    // Verify that the next character is an =
+                                    if (i + 1 == queryText.Length || queryText[i + 1] != '=')
+                                    {
+                                        throw new QueryParserException(ExceptionMessages.ExpectedEqualsAfterFieldName);
+                                    }
 
                                     break;
 
@@ -217,13 +253,28 @@ namespace Lifti.Querying
                                         throw new QueryParserException(ExceptionMessages.UnexpectedOperator, "=");
                                     }
 
-                                    var fieldName = queryText.Substring(tokenStart.Value, i - tokenStart.Value);
+                                    string fieldName = queryText.Substring(tokenStart.Value, i - tokenStart.Value);
+                                    if (fieldName.Length > 1 && fieldName[0] == '[')
+                                    {
+                                        // Strip the square brackets
+                                        fieldName = fieldName.Substring(1, fieldName.Length - 2);
+
+                                        // Replace any substituted characters
+                                        fieldName = Regex.Replace(fieldName, @"\\(.)", "$1");
+
+                                        if (fieldName.Length == 0)
+                                        {
+                                            throw new QueryParserException(ExceptionMessages.EmptyFieldNameEncountered);
+                                        }
+                                    }
+
                                     yield return QueryToken.ForFieldFilter(fieldName);
 
                                     state = state.PushTokenizer(tokenizerProvider.GetTokenizerForField(fieldName));
 
                                     tokenStart = null;
                                     break;
+
                                 case ')':
                                     state = state.CloseBracket();
                                     token = CreateTokenForYielding(i);

@@ -156,11 +156,17 @@
   <data name="EmptyBracketedExpressionsAreNotSupported" xml:space="preserve">
     <value>Bracketed query parts cannot be empty</value>
   </data>
+  <data name="EmptyFieldNameEncountered" xml:space="preserve">
+    <value>Empty field name encountered</value>
+  </data>
   <data name="EmptyOrMissingTextQueryFragmentValue" xml:space="preserve">
     <value>Internal error - missing text value</value>
   </data>
   <data name="ExpectedAtLeastOneQueryPartParsed" xml:space="preserve">
     <value>Expected at least one query part to be parsed</value>
+  </data>
+  <data name="ExpectedEqualsAfterFieldName" xml:space="preserve">
+    <value>Expected = after bracketed field name</value>
   </data>
   <data name="ExpectedFuzzyMatchToken" xml:space="preserve">
     <value>Expected a fuzzy match token - got {0}</value>
@@ -266,6 +272,9 @@
   </data>
   <data name="UnableToReadHeaderInformation" xml:space="preserve">
     <value>Unable to read header data from serialized index content.</value>
+  </data>
+  <data name="UnclosedSquareBracket" xml:space="preserve">
+    <value>Unclosed [ encountered</value>
   </data>
   <data name="UnexpectedCloseBracket" xml:space="preserve">
     <value>Unexpected close bracket encountered in query</value>
