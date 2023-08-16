@@ -505,6 +505,27 @@ namespace Lifti.Tests
             index.Search("olleh").Should().HaveCount(1);
         }
 
+        [Fact]
+        public async Task ScoreBoostingAField_ShouldResultInBoostedSearchResults()
+        {
+            var index = new FullTextIndexBuilder<string>()
+                .WithObjectTokenization<TestObject3>(
+                    o => o.WithKey(i => i.Id)
+                        .WithField("Text", i => i.Text, scoreBoost: 10D)
+                        .WithField("MultiText", i => i.MultiText))
+                .Build();
+
+
+            await index.AddAsync(new TestObject3("A", "Test Two", "Test One"));
+            await index.AddAsync(new TestObject3("B", "Test One", "Test Two"));
+
+            // "B" should be returned first, and have 10x the score of "A" because of the 10x boost on the Text field
+            var results = index.Search("One").ToList();
+            results.Select(x => x.Key).Should().BeEquivalentTo(new[] { "B", "A" });
+
+            results[0].Score.Should().Be(results[1].Score * 10);
+        }
+
         private static async Task<FullTextIndex<string>> CreateDynamicObjectTestIndex(bool usePrefixes = false)
         {
             var index = new FullTextIndexBuilder<string>()

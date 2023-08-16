@@ -15,6 +15,7 @@ namespace Lifti.Querying
         private readonly double k1PlusOne;
         private readonly double b;
         private readonly IItemStore snapshot;
+        private readonly IFieldScoreBoostProvider fieldScoreBoosts;
 
         /// <summary>
         /// Constructs a new instance of the <see cref="OkapiBm25Scorer"/>.
@@ -24,7 +25,10 @@ namespace Lifti.Querying
         /// <param name="snapshot">
         /// The <see cref="IItemStore"/> of the index snapshot being queried.
         /// </param>
-        internal OkapiBm25Scorer(double k1, double b, IItemStore snapshot)
+        /// <param name="fieldScoreBoosts">
+        /// The <see cref="IFieldScoreBoostProvider"/> to use to get the score boost for a field.
+        /// </param>
+        internal OkapiBm25Scorer(double k1, double b, IItemStore snapshot, IFieldScoreBoostProvider fieldScoreBoosts)
         {
             if (snapshot is null)
             {
@@ -38,6 +42,7 @@ namespace Lifti.Querying
             this.k1PlusOne = k1 + 1D;
             this.b = b;
             this.snapshot = snapshot;
+            this.fieldScoreBoosts = fieldScoreBoosts;
         }
 
         /// <inheritdoc />
@@ -66,7 +71,7 @@ namespace Lifti.Querying
 
                     var fieldScore = idf * (numerator / denominator);
 
-                    var weightedScore = fieldScore * weighting;
+                    var weightedScore = fieldScore * weighting * this.fieldScoreBoosts.GetScoreBoost(fieldMatch.FieldId);
 
                     scoredFieldMatches.Add(new ScoredFieldMatch(weightedScore, fieldMatch));
                 }

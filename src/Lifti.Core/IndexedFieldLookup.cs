@@ -79,7 +79,8 @@ namespace Lifti
                     reader.ReadAsync,
                     reader.TextExtractor,
                     reader.Tokenizer,
-                    reader.Thesaurus));
+                    reader.Thesaurus,
+                    reader.ScoreBoost));
         }
 
         internal IndexedFieldDetails GetOrCreateDynamicFieldInfo(string dynamicFieldReaderName, string fieldName)
@@ -105,7 +106,8 @@ namespace Lifti
                         (item, cancellationToken) => fieldReader.ReadAsync(item, fieldName, cancellationToken),
                         fieldReader.TextExtractor,
                         fieldReader.Tokenizer,
-                        fieldReader.Thesaurus));
+                        fieldReader.Thesaurus,
+                        fieldReader.ScoreBoost));
             }
             else
             {

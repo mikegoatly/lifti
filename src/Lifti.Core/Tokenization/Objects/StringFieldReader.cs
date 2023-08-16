@@ -21,8 +21,9 @@ namespace Lifti.Tokenization.Objects
             Func<TItem, string> reader,
             IIndexTokenizer tokenizer,
             ITextExtractor textExtractor,
-            IThesaurus thesaurus)
-            : base(name, tokenizer, textExtractor, thesaurus)
+            IThesaurus thesaurus,
+            double scoreBoost)
+            : base(name, tokenizer, textExtractor, thesaurus, scoreBoost)
         {
             this.reader = reader ?? throw new ArgumentNullException(nameof(reader));
         }

@@ -87,7 +87,8 @@ namespace Lifti.Tests.Tokenization.Objects
                 fieldPrefix,
                 new FakeIndexTokenizer(),
                 new PlainTextExtractor(),
-                new ThesaurusBuilder().Build(new FakeIndexTokenizer()));
+                new ThesaurusBuilder().Build(new FakeIndexTokenizer()),
+                1D);
         }
 
         private class TestObject

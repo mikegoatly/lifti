@@ -85,12 +85,16 @@ namespace Lifti.Tokenization.Objects
         /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
         /// text extractor for the index will be used.
         /// </param>
+        /// <param name="scoreBoost">
+        /// The multiplier to apply to the score of this field when ranking results. The default value of 1 is equivalent to no boosting.
+        /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
             Func<T, string> fieldTextReader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null,
-            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
         {
             ValidateFieldParameters(name, fieldTextReader);
             var tokenizer = tokenizationOptions.CreateTokenizer();
@@ -100,7 +104,8 @@ namespace Lifti.Tokenization.Objects
                     fieldTextReader,
                     tokenizer ?? defaultTokenizer,
                     textExtractor ?? defaultTextExtractor,
-                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions),
+                    scoreBoost));
 
             return this;
         }
@@ -134,13 +139,17 @@ namespace Lifti.Tokenization.Objects
         /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
         /// text extractor for the index will be used.
         /// </param>
+        /// <param name="scoreBoost">
+        /// The multiplier to apply to the score of this field when ranking results. The default value of 1 is equivalent to no boosting.
+        /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithDynamicFields(
             string dynamicFieldReaderName,
             Func<T, IDictionary<string, string>?> dynamicFieldReader,
             string? fieldNamePrefix = null,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null,
-            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
         {
             if (dynamicFieldReader == null)
             {
@@ -155,19 +164,21 @@ namespace Lifti.Tokenization.Objects
                     fieldNamePrefix,
                     tokenizer ?? defaultTokenizer,
                     textExtractor ?? defaultTextExtractor,
-                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions),
+                    scoreBoost));
 
             return this;
         }
 
-        /// <inheritdoc cref="WithDynamicFields(string, Func{T, IDictionary{string, string}?}, string?, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?)"/>
+        /// <inheritdoc cref="WithDynamicFields(string, Func{T, IDictionary{string, string}?}, string?, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?, double)"/>
         public ObjectTokenizationBuilder<T, TKey> WithDynamicFields(
             string dynamicFieldReaderName,
             Func<T, IDictionary<string, IEnumerable<string>>> dynamicFieldReader,
             string? fieldNamePrefix = null,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null,
-            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
         {
             if (dynamicFieldReader == null)
             {
@@ -182,7 +193,8 @@ namespace Lifti.Tokenization.Objects
                     fieldNamePrefix,
                     tokenizer ?? defaultTokenizer,
                     textExtractor ?? defaultTextExtractor,
-                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions),
+                    scoreBoost));
 
             return this;
         }
@@ -222,6 +234,9 @@ namespace Lifti.Tokenization.Objects
         /// The <see cref="ITextExtractor"/> to use when indexing text from the field. If this is not specified then the default
         /// text extractor for the index will be used.
         /// </param>
+        /// <param name="scoreBoost">
+        /// The multiplier to apply to the score of this field when ranking results. The default value of 1 is equivalent to no boosting.
+        /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithDynamicFields<TChild>(
             string dynamicFieldReaderName,
             Func<T, ICollection<TChild>?> dynamicFieldReader,
@@ -230,7 +245,8 @@ namespace Lifti.Tokenization.Objects
             string? fieldNamePrefix = null,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null,
-            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
         {
             if (dynamicFieldReader == null)
             {
@@ -247,12 +263,13 @@ namespace Lifti.Tokenization.Objects
                     fieldNamePrefix,
                     tokenizer ?? defaultTokenizer,
                     textExtractor ?? defaultTextExtractor,
-                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions),
+                    scoreBoost));
 
             return this;
         }
 
-        /// <inheritdoc cref="WithDynamicFields{TChild}(string, Func{T, ICollection{TChild}}, Func{TChild, string}, Func{TChild, string}, string?, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?)"/>
+        /// <inheritdoc cref="WithDynamicFields{TChild}(string, Func{T, ICollection{TChild}}, Func{TChild, string}, Func{TChild, string}, string?, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?, double)"/>
         public ObjectTokenizationBuilder<T, TKey> WithDynamicFields<TChild>(
             string dynamicFieldReaderName,
             Func<T, ICollection<TChild>?> dynamicFieldReader,
@@ -261,7 +278,8 @@ namespace Lifti.Tokenization.Objects
             string? fieldNamePrefix = null,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null,
-            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
         {
             if (dynamicFieldReader == null)
             {
@@ -278,7 +296,8 @@ namespace Lifti.Tokenization.Objects
                     fieldNamePrefix,
                     tokenizer ?? defaultTokenizer,
                     textExtractor ?? defaultTextExtractor,
-                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions),
+                    scoreBoost));
 
             return this;
         }
@@ -304,12 +323,16 @@ namespace Lifti.Tokenization.Objects
         /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
         /// for the index will be used.
         /// </param>
+        /// <param name="scoreBoost">
+        /// The multiplier to apply to the score of this field when ranking results. The default value of 1 is equivalent to no boosting.
+        /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
             Func<T, IEnumerable<string>> reader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null,
-            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
         {
             ValidateFieldParameters(name, reader);
             var tokenizer = tokenizationOptions.CreateTokenizer();
@@ -319,7 +342,8 @@ namespace Lifti.Tokenization.Objects
                     reader,
                     tokenizer ?? defaultTokenizer,
                     textExtractor ?? defaultTextExtractor,
-                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions),
+                    scoreBoost));
 
             return this;
         }
@@ -345,12 +369,16 @@ namespace Lifti.Tokenization.Objects
         /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
         /// for the index will be used.
         /// </param>
+        /// <param name="scoreBoost">
+        /// The multiplier to apply to the score of this field when ranking results. The default value of 1 is equivalent to no boosting.
+        /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
             Func<T, CancellationToken, Task<string>> fieldTextReader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null,
-            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
         {
             ValidateFieldParameters(name, fieldTextReader);
             var tokenizer = tokenizationOptions.CreateTokenizer();
@@ -360,25 +388,28 @@ namespace Lifti.Tokenization.Objects
                     fieldTextReader,
                     tokenizer ?? defaultTokenizer,
                     textExtractor ?? defaultTextExtractor,
-                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions),
+                    scoreBoost));
 
             return this;
         }
 
-        /// <inheritdoc cref="WithField(string, Func{T, CancellationToken, Task{string}}, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?)"/>
+        /// <inheritdoc cref="WithField(string, Func{T, CancellationToken, Task{string}}, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?, double)"/>
         public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
             Func<T, Task<string>> fieldTextReader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null,
-            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
         {
             return this.WithField(
                 name,
                 (item, ctx) => fieldTextReader(item),
                 tokenizationOptions,
                 textExtractor,
-                thesaurusOptions);
+                thesaurusOptions,
+                scoreBoost);
         }
 
         /// <summary>
@@ -402,12 +433,16 @@ namespace Lifti.Tokenization.Objects
         /// An optional delegate capable of building the thesaurus for this field. If this is unspecified then the default thesaurus
         /// for the index will be used.
         /// </param>
+        /// <param name="scoreBoost">
+        /// The multiplier to apply to the score of this field when ranking results. The default value of 1 is equivalent to no boosting.
+        /// </param>
         public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
             Func<T, CancellationToken, Task<IEnumerable<string>>> fieldTextReader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             ITextExtractor? textExtractor = null,
-            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null)
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
         {
             ValidateFieldParameters(name, fieldTextReader);
             var tokenizer = tokenizationOptions.CreateTokenizer();
@@ -417,25 +452,28 @@ namespace Lifti.Tokenization.Objects
                     fieldTextReader,
                     tokenizer ?? defaultTokenizer,
                     textExtractor ?? defaultTextExtractor,
-                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions)));
+                    CreateFieldThesaurus(defaultTokenizer, tokenizer, defaultThesaurusBuilder, thesaurusOptions),
+                    scoreBoost));
 
             return this;
         }
 
-        /// <inheritdoc cref="WithField(string, Func{T, CancellationToken, Task{IEnumerable{string}}}, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?)" />
+        /// <inheritdoc cref="WithField(string, Func{T, CancellationToken, Task{IEnumerable{string}}}, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?, double)" />
         public ObjectTokenizationBuilder<T, TKey> WithField(
             string name,
             Func<T, Task<IEnumerable<string>>> fieldTextReader,
             Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
             Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
-            ITextExtractor? textExtractor = null)
+            ITextExtractor? textExtractor = null,
+            double scoreBoost = 1D)
         {
             return this.WithField(
                 name,
                 (item, ctx) => fieldTextReader(item),
                 tokenizationOptions,
                 textExtractor,
-                thesaurusOptions);
+                thesaurusOptions,
+                scoreBoost);
         }
 
         private static Thesaurus CreateFieldThesaurus(
