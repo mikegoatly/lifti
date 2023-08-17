@@ -82,9 +82,7 @@ namespace Lifti.Querying
         {
             if (condition)
             {
-                var temp = left;
-                left = right;
-                right = temp;
+                (left, right) = (right, left);
             }
         }
     }
