@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -110,8 +111,8 @@ namespace Lifti
                     childNodes = childNodes.SetItems(mapNodeMutations());
                 }
 
-                matches = this.MutatedMatches == null 
-                    ? this.original.Matches 
+                matches = this.MutatedMatches == null
+                    ? this.original.Matches
                     : this.MutatedMatches.ToImmutableDictionary();
             }
 
@@ -446,7 +447,11 @@ namespace Lifti
 
             if (this.HasMatches)
             {
-                builder.Append($" [{this.original?.Matches.Count ?? 0} original matche(s) - {this.MutatedMatches?.Count ?? 0} mutated]");
+                builder.Append(
+#if !NETSTANDARD
+                    CultureInfo.InvariantCulture,
+#endif
+                    $" [{this.original?.Matches.Count ?? 0} original matche(s) - {this.MutatedMatches?.Count ?? 0} mutated]");
             }
         }
     }

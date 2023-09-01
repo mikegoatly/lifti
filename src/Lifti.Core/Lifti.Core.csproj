@@ -15,7 +15,7 @@
 		<PackageId>Lifti.Core</PackageId>
 		<Copyright>Mike Goatly</Copyright>
 		<AssemblyName>Lifti.Core</AssemblyName>
-		<LangVersion>9.0</LangVersion>
+		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<Title>LIFTI</Title>
 		<PackageIcon>favicon-256.png</PackageIcon>
