@@ -1,7 +1,7 @@
 ﻿namespace Lifti.Querying
 {
     /// <summary>
-    /// A class capable of providing the score boost for a given field.
+    /// Implemented by classes capable of providing the score boost for a given field.
     /// </summary>
     internal interface IFieldScoreBoostProvider
     {
