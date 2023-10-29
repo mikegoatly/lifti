@@ -1,10 +1,10 @@
 ﻿namespace Lifti.Querying
 {
     /// <summary>
-    /// An interface for a provider that can provide a score boost for a field.
+    /// A provider capable of providing the score boost for a given field.
     /// </summary>
     internal interface IFieldScoreBoostProvider
-    {   
+    {
         /// <summary>
         /// Gets the boost for the specified field.
         /// </summary>
