@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/mikegoatly/lifti#readme",
   "devDependencies": {
-    "autoprefixer": "^10.4.2",
-    "postcss-cli": "^9.1.0"
+    "autoprefixer": "^10.4.16",
+    "postcss-cli": "^10.1.0"
   }
 }
