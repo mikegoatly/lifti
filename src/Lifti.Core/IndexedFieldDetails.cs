@@ -21,7 +21,8 @@ namespace Lifti
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus,
-            string? dynamicFieldReaderName)
+            string? dynamicFieldReaderName,
+            double scoreBoost)
         {
             this.Id = id;
             this.Name = name;
@@ -31,6 +32,7 @@ namespace Lifti
             this.Tokenizer = tokenizer;
             this.Thesaurus = thesaurus;
             this.DynamicFieldReaderName = dynamicFieldReaderName;
+            this.ScoreBoost = scoreBoost;
         }
 
         /// <summary>
@@ -74,6 +76,11 @@ namespace Lifti
         public string? DynamicFieldReaderName { get; }
 
         /// <summary>
+        /// Gets the score boost to apply to this field.
+        /// </summary>
+        public double ScoreBoost { get; }
+
+        /// <summary>
         /// Reads the text for the field from the specified item. The item must be of the type specified by the <see cref="ObjectType"/> property.
         /// </summary>
         public abstract ValueTask<IEnumerable<string>> ReadAsync(object item, CancellationToken cancellationToken);
@@ -100,8 +107,9 @@ namespace Lifti
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus,
-            string? dynamicFieldReaderName)
-            : base(id, name, typeof(TItem), fieldKind, textExtractor, tokenizer, thesaurus, dynamicFieldReaderName)
+            string? dynamicFieldReaderName,
+            double scoreBoost)
+            : base(id, name, typeof(TItem), fieldKind, textExtractor, tokenizer, thesaurus, dynamicFieldReaderName, scoreBoost)
         {
             this.fieldReader = fieldReader;
         }
@@ -111,7 +119,8 @@ namespace Lifti
             Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
-            IThesaurus thesaurus)
+            IThesaurus thesaurus,
+            double scoreBoost)
         {
             return new IndexedFieldDetails<TItem>(
                 id,
@@ -121,7 +130,8 @@ namespace Lifti
                 textExtractor,
                 tokenizer,
                 thesaurus,
-                null);
+                null,
+                scoreBoost);
         }
 
         internal static IndexedFieldDetails<TItem> Dynamic(byte id,
@@ -130,7 +140,8 @@ namespace Lifti
             Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
-            IThesaurus thesaurus)
+            IThesaurus thesaurus,
+            double scoreBoost)
         {
             return new IndexedFieldDetails<TItem>(
                 id,
@@ -140,7 +151,8 @@ namespace Lifti
                 textExtractor,
                 tokenizer,
                 thesaurus,
-                dynamicFieldReaderName);
+                dynamicFieldReaderName, 
+                scoreBoost);
         }
 
         /// <inheritdoc />

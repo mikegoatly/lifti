@@ -17,7 +17,7 @@ namespace Lifti.Querying
         /// The weighting multiplier to apply to the score.
         /// </param>
         /// <returns>
-        /// The <see cref="ScoredToken"/> represenations of the input <paramref name="tokens"/>. There will be a 1:1
+        /// The <see cref="ScoredToken"/> representations of the input <paramref name="tokens"/>. There will be a 1:1
         /// mapping of input -> output and the order will be preserved.
         /// </returns>
         IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryTokenMatch> tokens, double weighting);

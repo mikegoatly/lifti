@@ -172,7 +172,8 @@ namespace Lifti.Tests
                 null,
                 IndexTokenizer.Default,
                 new PlainTextExtractor(),
-                new ThesaurusBuilder().Build(IndexTokenizer.Default));
+                new ThesaurusBuilder().Build(IndexTokenizer.Default),
+                1D);
 
             // Force the reader to first produce (and cache) the field names
             reader.ReadAsync(new T(), default);

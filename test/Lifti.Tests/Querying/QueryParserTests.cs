@@ -33,8 +33,8 @@ namespace Lifti.Tests.Querying
             var nullFieldReader = (TestObject x, CancellationToken token) => new ValueTask<IEnumerable<string>>(Array.Empty<string>());
 
             this.fieldLookup = new FakeIndexedFieldLookup(
-                ("testfield", IndexedFieldDetails<TestObject>.Static(testFieldId, "testfield", nullFieldReader, textExtractor, this.field1Tokenizer, thesaurus)),
-                ("otherfield", IndexedFieldDetails<TestObject>.Static(otherFieldId, "otherfield", nullFieldReader, textExtractor, this.field2Tokenizer, thesaurus))
+                ("testfield", IndexedFieldDetails<TestObject>.Static(testFieldId, "testfield", nullFieldReader, textExtractor, this.field1Tokenizer, thesaurus, 1D)),
+                ("otherfield", IndexedFieldDetails<TestObject>.Static(otherFieldId, "otherfield", nullFieldReader, textExtractor, this.field2Tokenizer, thesaurus, 1D))
             );
         }
 
