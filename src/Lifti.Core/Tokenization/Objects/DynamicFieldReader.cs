@@ -8,8 +8,13 @@ namespace Lifti.Tokenization.Objects
 {
     internal abstract class DynamicFieldReader : FieldConfig
     {
-        protected DynamicFieldReader(IIndexTokenizer tokenizer, ITextExtractor textExtractor, IThesaurus thesaurus, string dynamicFieldReaderName)
-            : base(tokenizer, textExtractor, thesaurus)
+        protected DynamicFieldReader(
+            IIndexTokenizer tokenizer,
+            ITextExtractor textExtractor,
+            IThesaurus thesaurus,
+            string dynamicFieldReaderName,
+            double scoreBoost)
+            : base(tokenizer, textExtractor, thesaurus, scoreBoost)
         {
             this.Name = dynamicFieldReaderName;
         }
@@ -34,8 +39,9 @@ namespace Lifti.Tokenization.Objects
             ITextExtractor textExtractor,
             IThesaurus thesaurus,
             string dynamicFieldReaderName,
-            string? fieldNamePrefix)
-            : base(tokenizer, textExtractor, thesaurus, dynamicFieldReaderName)
+            string? fieldNamePrefix,
+            double scoreBoost)
+            : base(tokenizer, textExtractor, thesaurus, dynamicFieldReaderName, scoreBoost)
         {
             this.fieldNamePrefix = fieldNamePrefix;
         }

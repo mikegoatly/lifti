@@ -16,8 +16,9 @@ namespace Lifti.Tokenization.Objects
             string? fieldNamePrefix,
             IIndexTokenizer tokenizer,
             ITextExtractor textExtractor,
-            IThesaurus thesaurus)
-            : base(tokenizer, textExtractor, thesaurus, dynamicFieldReaderName, fieldNamePrefix)
+            IThesaurus thesaurus,
+            double scoreBoost)
+            : base(tokenizer, textExtractor, thesaurus, dynamicFieldReaderName, fieldNamePrefix, scoreBoost)
         {
             this.reader = reader;
         }

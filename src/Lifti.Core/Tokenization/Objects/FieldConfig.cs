@@ -4,12 +4,12 @@ namespace Lifti.Tokenization.Objects
 {
     internal abstract class FieldConfig : IFieldConfig
     {
-        protected FieldConfig(IIndexTokenizer tokenizer, ITextExtractor textExtractor, IThesaurus thesaurus)
+        protected FieldConfig(IIndexTokenizer tokenizer, ITextExtractor textExtractor, IThesaurus thesaurus, double scoreBoost)
         {
             this.Tokenizer = tokenizer;
             this.TextExtractor = textExtractor;
             this.Thesaurus = thesaurus;
-
+            this.ScoreBoost = scoreBoost;
         }
         /// <inheritdoc />
         public IIndexTokenizer Tokenizer { get; }
@@ -19,5 +19,8 @@ namespace Lifti.Tokenization.Objects
 
         /// <inheritdoc />
         public IThesaurus Thesaurus { get; }
+        
+        /// <inheritdoc />
+        public double ScoreBoost { get; }
     }
 }
