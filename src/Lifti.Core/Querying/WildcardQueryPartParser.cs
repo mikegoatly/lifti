@@ -8,7 +8,11 @@ namespace Lifti.Querying
 {
     internal static class WildcardQueryPartParser
     {
-        public static bool TryParse(ReadOnlySpan<char> token, IIndexTokenizer tokenizer, [NotNullWhen(true)] out WildcardQueryPart? part)
+        public static bool TryParse(
+            ReadOnlySpan<char> token,
+            IIndexTokenizer tokenizer,
+            double? scoreBoost,
+            [NotNullWhen(true)] out WildcardQueryPart? part)
         {
             List<WildcardQueryFragment>? fragments = null;
             void AddFragment(WildcardQueryFragment fragment)
@@ -61,7 +65,7 @@ namespace Lifti.Querying
                 // wildcard fragment
                 AddPrecedingTextFragment(token, token.Length);
 
-                part = new WildcardQueryPart(fragments);
+                part = new WildcardQueryPart(fragments, scoreBoost);
                 return true;
             }
 

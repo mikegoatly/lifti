@@ -10,8 +10,8 @@ namespace Lifti.Querying.QueryParts
         /// <summary>
         /// Constructs a new instance of <see cref="ExactWordQueryPart"/>.
         /// </summary>
-        public ExactWordQueryPart(string word)
-            : base(word)
+        public ExactWordQueryPart(string word, double? scoreBoost = null)
+            : base(word, scoreBoost)
         {
         }
 
@@ -30,13 +30,13 @@ namespace Lifti.Querying.QueryParts
 
             using var navigator = navigatorCreator();
             navigator.Process(this.Word.AsSpan());
-            return queryContext.ApplyTo(navigator.GetExactMatches());
+            return queryContext.ApplyTo(navigator.GetExactMatches(this.ScoreBoost ?? 1D));
         }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return this.Word;
+            return base.ToString(this.Word);
         }
     }
 }

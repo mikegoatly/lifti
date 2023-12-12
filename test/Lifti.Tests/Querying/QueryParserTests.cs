@@ -55,6 +55,18 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
+        public void ParsingWordsWithScoreBoost_ShouldApplyScoreBoostToQueryParts()
+        {
+            var result = this.Parse("wordone^2 ?wordtwo^3 te*^5");
+            var expectedQuery = new AndQueryOperator(
+                new AndQueryOperator(
+                    new ExactWordQueryPart("wordone", 2),
+                    new FuzzyMatchQueryPart("wordtwo", scoreBoost: 3)),
+                new WildcardQueryPart(new[] { WildcardQueryFragment.CreateText("te"), WildcardQueryFragment.MultiCharacter }, 5));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
         public void ParsingTwoWordsWithNoOperator_ShouldComposeWithAndOperator()
         {
             var result = this.Parse("wordone wordtwo");

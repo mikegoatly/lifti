@@ -15,13 +15,22 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void TextOnly_ShouldReturnFalse()
         {
-            RunTest("Foo", null!, false);
+            RunTest("Foo", null!, expectedResult: false);
         }
 
         [Fact]
         public void TextWithWildcard_ShouldNormalizeText()
         {
             RunTest("Foo*", new WildcardQueryPart(CreateText("FOO"), MultiCharacter));
+        }
+
+        [Fact]
+        public void WithScoreBoost_ShouldReturnScoreBoostInQueryPart()
+        {
+            RunTest(
+                "Foo*", 
+                new WildcardQueryPart(new[] { CreateText("FOO"), MultiCharacter }, 23.3), 
+                23.3);
         }
 
         [Fact]
@@ -54,9 +63,13 @@ namespace Lifti.Tests.Querying
             RunTest("%%foo*bar", new WildcardQueryPart(SingleCharacter, SingleCharacter, CreateText("FOO"), MultiCharacter, CreateText("BAR")));
         }
 
-        private static void RunTest(string text, WildcardQueryPart? expectedQueryPart, bool expectedResult = true)
+        private static void RunTest(string text, WildcardQueryPart? expectedQueryPart, double? scoreBoost = null, bool expectedResult = true)
         {
-            var result = WildcardQueryPartParser.TryParse(text.AsSpan(), new FakeIndexTokenizer(normalizeToUppercase: true), out var part);
+            var result = WildcardQueryPartParser.TryParse(
+                text.AsSpan(), 
+                new FakeIndexTokenizer(normalizeToUppercase: true), 
+                scoreBoost,
+                out var part);
 
             result.Should().Be(expectedResult);
             if (expectedQueryPart != null)

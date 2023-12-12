@@ -313,6 +313,24 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid score boost number encountered: {0}.
+        /// </summary>
+        internal static string InvalidScoreBoost {
+            get {
+                return ResourceManager.GetString("InvalidScoreBoost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected a number to follow a score boost, e.g. &quot;Term^3&quot; would indicate that the search term &quot;Term&quot; should have a score boost of 3..
+        /// </summary>
+        internal static string InvalidScoreBoostExpectedNumber {
+            get {
+                return ResourceManager.GetString("InvalidScoreBoostExpectedNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Item already indexed.
         /// </summary>
         internal static string ItemAlreadyIndexed {

@@ -7,6 +7,11 @@ namespace Lifti.Tests.Fakes
     {
         private readonly IntermediateQueryResult result;
 
+        public FakeQueryContext()
+            : this(new IntermediateQueryResult())
+        {
+        }
+
         public FakeQueryContext(IntermediateQueryResult result)
         {
             this.result = result;

@@ -19,6 +19,21 @@ namespace Lifti.Tests.Querying.QueryParts
             actual.Should().BeEquivalentTo(navigator.ExpectedExactMatches);
             navigator.NavigatedStrings.Should().BeEquivalentTo(new[] { "test" });
             navigator.NavigatedCharacters.Should().BeEmpty();
+            navigator.ProvidedWeightings.Should().BeEquivalentTo(new[] { 1D });
+        }
+
+        [Fact]
+        public void Evaluating_ShouldPassThroughScoreBoostToNavigator()
+        {
+            var part = new ExactWordQueryPart("test", 5D);
+            var navigator = FakeIndexNavigator.ReturningExactMatches(1, 2);
+
+            var actual = part.Evaluate(() => navigator, QueryContext.Empty);
+
+            actual.Should().BeEquivalentTo(navigator.ExpectedExactMatches);
+            navigator.NavigatedStrings.Should().BeEquivalentTo(new[] { "test" });
+            navigator.NavigatedCharacters.Should().BeEmpty();
+            navigator.ProvidedWeightings.Should().BeEquivalentTo(new[] { 5D });
         }
 
         [Fact]
@@ -32,6 +47,20 @@ namespace Lifti.Tests.Querying.QueryParts
             var result = part.Evaluate(() => new FakeIndexNavigator(), queryContext);
 
             result.Should().Be(contextResults);
+        }
+
+        [Fact]
+        public void ToString_ShouldReturnCorrectRepresentation()
+        {
+            var part = new ExactWordQueryPart("test");
+            part.ToString().Should().Be("test");
+        }
+
+        [Fact]
+        public void ToString_WithScoreBoost_ShouldReturnCorrectRepresentation()
+        {
+            var part = new ExactWordQueryPart("test", 5.123);
+            part.ToString().Should().Be("test^5.123");
         }
     }
 }

@@ -108,16 +108,20 @@ namespace Lifti.Querying
             var indexTokenizer = queryToken.IndexTokenizer ?? throw new InvalidOperationException(ExceptionMessages.TextTokensMustHaveIndexTokenizers);
 
             var tokenText = queryToken.TokenText.AsSpan();
-
+            var scoreBoost = queryToken.ScoreBoost;
             var fuzzyMatchInfo = ExplicitFuzzySearchTerm.Parse(tokenText);
 
-            if (!fuzzyMatchInfo.IsFuzzyMatch && WildcardQueryPartParser.TryParse(tokenText, indexTokenizer, out var wildcardQueryPart))
+            if (!fuzzyMatchInfo.IsFuzzyMatch && WildcardQueryPartParser.TryParse(
+                tokenText, 
+                indexTokenizer,
+                scoreBoost,
+                out var wildcardQueryPart))
             {
                 return wildcardQueryPart;
             }
 
             // We hand off any matched text in the query to the tokenizer (either the index default,
-            // or the one associated to the specific field being queryied) because we need to ensure
+            // or the one associated to the specific field being queried) because we need to ensure
             // that it is:
             // a) Normalized in the same way as the tokens as they were added to the index
             // b) Any additional processing, e.g. stemming is applied to them
@@ -129,12 +133,13 @@ namespace Lifti.Querying
                     token => new FuzzyMatchQueryPart(
                         token.Value,
                         fuzzyMatchInfo.MaxEditDistance ?? this.options.FuzzySearchMaxEditDistance(token.Value.Length),
-                        fuzzyMatchInfo.MaxSequentialEdits ?? this.options.FuzzySearchMaxSequentialEdits(token.Value.Length)));
+                        fuzzyMatchInfo.MaxSequentialEdits ?? this.options.FuzzySearchMaxSequentialEdits(token.Value.Length),
+                        scoreBoost));
             }
             else
             {
                 result = indexTokenizer.Process(tokenText)
-                     .Select(token => new ExactWordQueryPart(token.Value));
+                     .Select(token => new ExactWordQueryPart(token.Value, scoreBoost));
             }
 
             return ComposeParts(result);

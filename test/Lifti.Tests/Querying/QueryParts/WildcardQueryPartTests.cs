@@ -41,6 +41,17 @@ namespace Lifti.Tests.Querying.QueryParts
         }
 
         [Fact]
+        public void Evaluating_WithSScoreBoost_ShouldApplyBoostToResultingScore()
+        {
+            var part = new WildcardQueryPart(new[] { WildcardQueryFragment.CreateText("ALSO") });
+            var unboostedScore = this.index.Search(new Query(part)).ToList()[0].Score;
+            part = new WildcardQueryPart(new[] { WildcardQueryFragment.CreateText("ALSO") }, 2D);
+            var boostedScore = this.index.Search(new Query(part)).ToList()[0].Score;
+
+            boostedScore.Should().Be(unboostedScore * 2D);
+        }
+
+        [Fact]
         public void Evaluating_WithSingleCharacterReplacement_ShouldReturnCorrectResults()
         {
             var part = new WildcardQueryPart(new[]
