@@ -241,7 +241,7 @@ namespace Lifti.Tests
         [Fact]
         public async void ObjectsWithMultipleDynamicFieldsShouldGenerateCorrectPrefixedFieldNames()
         {
-            var index = await CreateDynamicObjectTestIndex(true);
+            var index = await CreateDynamicObjectTestIndexAsync(true);
 
             index.FieldLookup.AllFieldNames.Should().BeEquivalentTo(
                new[]
@@ -258,7 +258,7 @@ namespace Lifti.Tests
         [Fact]
         public async void SearchesCanBePerformedForDynamicFieldsWithPrefixes()
         {
-            var index = await CreateDynamicObjectTestIndex(true);
+            var index = await CreateDynamicObjectTestIndexAsync(true);
 
             var resultsWithoutFieldFilter = index.Search("Three").ToList();
             var resultsWithFieldFilter = index.Search("Dyn1Field3=Three").ToList();
@@ -272,7 +272,7 @@ namespace Lifti.Tests
         public async void ObjectsWithMultipleDynamicFieldsUsingTheSameFieldNamesShouldRaiseError()
         {
             var exception = await Assert.ThrowsAsync<LiftiException>(
-                async () => await CreateDynamicObjectTestIndex(false));
+                async () => await CreateDynamicObjectTestIndexAsync(false));
 
             exception.Message.Should().Be(
                 "A duplicate field \"Field1\" was encountered while indexing item A. Most likely multiple dynamic field providers have been configured " +
@@ -521,19 +521,46 @@ namespace Lifti.Tests
 
             // "B" should be returned first, and have 10x the score of "A" because of the 10x boost on the Text field
             var results = index.Search("One").ToList();
-            results.Select(x => x.Key).Should().BeEquivalentTo(new[] { "B", "A" });
+            results.Select(x => x.Key).Should().BeEquivalentTo(new[] { "B", "A" }, o => o.WithStrictOrdering());
 
             results[0].Score.Should().Be(results[1].Score * 10);
         }
 
-        private static async Task<FullTextIndex<string>> CreateDynamicObjectTestIndex(bool usePrefixes = false)
+        [Fact]
+        public async Task ScoreBoostingADynamicField_ShouldResultInBoostedSearchResults()
+        {
+            var index = await CreateDynamicObjectTestIndexAsync(true, dynamicField1ScoreBoost: 10D);
+
+            await index.AddAsync(
+                new DynamicObject(
+                    "C",
+                    "Text One",
+                    new Dictionary<string, string> { { "Field1", "Angry" } },
+                    new ExtraField("Field1", "Happy")));
+
+            await index.AddAsync(
+                new DynamicObject(
+                    "D",
+                    "Text One",
+                    new Dictionary<string, string> { { "Field1", "Happy" } },
+                    new ExtraField("Field1", "Angry")));
+
+            // "D" should be returned first, and have 10x the score of "C" because of the 10x boost on the dynamic field
+            var results = index.Search("Happy").ToList();
+            results.Select(x => x.Key).Should().BeEquivalentTo(new[] { "D", "C" }, o => o.WithStrictOrdering());
+        }
+
+        private static async Task<FullTextIndex<string>> CreateDynamicObjectTestIndexAsync(
+            bool usePrefixes = false, 
+            double dynamicField1ScoreBoost = 1D, 
+            double dynamicField2ScoreBoost = 1D)
         {
             var index = new FullTextIndexBuilder<string>()
                 .WithObjectTokenization<DynamicObject>(
                     o => o.WithKey(i => i.Id)
                         .WithField("Details", i => i.Details)
-                        .WithDynamicFields("Dyn", i => i.DynamicFields, usePrefixes ? "Dyn1" : null)
-                        .WithDynamicFields("Extra", i => i.ExtraFields, x => x.Name, x => x.Value, usePrefixes ? "Dyn2" : null))
+                        .WithDynamicFields("Dyn", i => i.DynamicFields, usePrefixes ? "Dyn1" : null, scoreBoost: dynamicField1ScoreBoost)
+                        .WithDynamicFields("Extra", i => i.ExtraFields, x => x.Name, x => x.Value, usePrefixes ? "Dyn2" : null, scoreBoost: dynamicField2ScoreBoost))
                 .Build();
 
             await index.AddAsync(

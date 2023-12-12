@@ -231,11 +231,15 @@ namespace Lifti.Querying.QueryParts
         /// matches will be.</param>
         /// <param name="maxSequentialEdits">The maximum number of edits that are allowed to appear sequentially. By default this is 1,
         /// which forces matches to be more similar to the search criteria.</param>
+        /// <param name="scoreBoost">
+        /// The score boost to apply to any items matching the search term. This is multiplied with any score boosts
+        /// applied to matching fields. A null value indicates that no additional score boost should be applied.
+        /// </param>
         /// <remarks>
         /// A transposition of neighboring characters is considered as single edit, not two distinct substitutions.
         /// </remarks>
-        public FuzzyMatchQueryPart(string word, ushort maxEditDistance = DefaultMaxEditDistance, ushort maxSequentialEdits = DefaultMaxSequentialEdits)
-            : base(word)
+        public FuzzyMatchQueryPart(string word, ushort maxEditDistance = DefaultMaxEditDistance, ushort maxSequentialEdits = DefaultMaxSequentialEdits, double? scoreBoost = null)
+            : base(word, scoreBoost)
         {
             this.maxEditDistance = maxEditDistance;
             this.maxSequentialEdits = maxSequentialEdits;
@@ -260,6 +264,8 @@ namespace Lifti.Querying.QueryParts
 
             var characterCount = 0;
             var searchTermLength = this.Word.Length;
+            var scoreBoost = this.ScoreBoost ?? 1D;
+
             do
             {
                 foreach (var state in stateStore.GetNextStateEntries())
@@ -285,6 +291,8 @@ namespace Lifti.Querying.QueryParts
                                 // All other weightings will be less than 1, with more edits drawing the weighting towards zero
                                 var lengthTotal = searchTermLength + characterCount;
                                 var weighting = (double)(lengthTotal - state.LevenshteinDistance) / lengthTotal;
+                                weighting *= scoreBoost;
+
                                 results = results.Union(navigator.GetExactMatches(weighting));
                             }
 
@@ -373,12 +381,17 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public override string ToString()
         {
+            string searchTerm;
             if (this.maxEditDistance != DefaultMaxEditDistance || this.maxSequentialEdits != DefaultMaxSequentialEdits)
             {
-                return $"?{(this.maxEditDistance != DefaultMaxEditDistance ? this.maxEditDistance : "")},{(this.maxSequentialEdits != DefaultMaxSequentialEdits ? this.maxSequentialEdits : "")}?{this.Word}";
+                searchTerm = $"?{(this.maxEditDistance != DefaultMaxEditDistance ? this.maxEditDistance : "")},{(this.maxSequentialEdits != DefaultMaxSequentialEdits ? this.maxSequentialEdits : "")}?{this.Word}";
+            }
+            else
+            {
+                searchTerm = "?" + this.Word;
             }
 
-            return "?" + this.Word;
+            return base.ToString(searchTerm);
         }
     }
 }

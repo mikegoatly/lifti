@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 
 namespace Lifti.Querying.QueryParts
 {
@@ -11,9 +10,9 @@ namespace Lifti.Querying.QueryParts
     /// "*" matches any number of characters
     /// "%" matches a single character
     /// </summary>
-    public class WildcardQueryPart : IQueryPart
+    public class WildcardQueryPart : ScoreBoostedQueryPart
     {
-        private static readonly IIndexNavigatorBookmark[] QueryCompleted = Array.Empty<IIndexNavigatorBookmark>();
+        private static readonly IIndexNavigatorBookmark[] QueryCompleted = [];
         internal IReadOnlyList<WildcardQueryFragment> Fragments { get; }
 
         /// <summary>
@@ -28,7 +27,8 @@ namespace Lifti.Querying.QueryParts
         /// <summary>
         /// Creates a new instance of <see cref="WildcardQueryPart"/>.
         /// </summary>
-        public WildcardQueryPart(IEnumerable<WildcardQueryFragment> fragments)
+        public WildcardQueryPart(IEnumerable<WildcardQueryFragment> fragments, double? scoreBoost = null)
+            : base(scoreBoost)
         {
             if (fragments is null)
             {
@@ -39,7 +39,7 @@ namespace Lifti.Querying.QueryParts
         }
 
         /// <inheritdoc />
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
         {
             if (navigatorCreator is null)
             {
@@ -54,7 +54,7 @@ namespace Lifti.Querying.QueryParts
             using var navigator = navigatorCreator();
             var results = IntermediateQueryResult.Empty;
             var bookmarks = new DoubleBufferedList<IIndexNavigatorBookmark>(navigator.CreateBookmark());
-
+            var scoreBoost = this.ScoreBoost ?? 1D;
             for (var i = 0; i < Fragments.Count && bookmarks.Count > 0; i++)
             {
                 var nextFragment = i == Fragments.Count - 1 ? (WildcardQueryFragment?)null : Fragments[i + 1];
@@ -65,6 +65,7 @@ namespace Lifti.Querying.QueryParts
 
                     var nextBookmarks = ProcessFragment(
                         navigator,
+                        scoreBoost,
                         Fragments[i],
                         nextFragment,
                         ref results);
@@ -94,11 +95,12 @@ namespace Lifti.Querying.QueryParts
                 });
             }
 
-            return builder.ToString();
+            return base.ToString(builder.ToString());
         }
 
         private static IEnumerable<IIndexNavigatorBookmark> ProcessFragment(
             IIndexNavigator navigator,
+            double scoreBoost,
             WildcardQueryFragment fragment,
             WildcardQueryFragment? nextFragment,
             ref IntermediateQueryResult results)
@@ -115,7 +117,7 @@ namespace Lifti.Querying.QueryParts
                     if (nextFragment == null)
                     {
                         // This is the end of the query and we've ended up on some exact matches
-                        results = results.Union(navigator.GetExactMatches());
+                        results = results.Union(navigator.GetExactMatches(scoreBoost));
                         return QueryCompleted;
                     }
 
@@ -127,7 +129,7 @@ namespace Lifti.Querying.QueryParts
                     {
                         // This wildcard is the last in the pattern - just return any exact and child matches under the current position
                         // I.e. as per the classic "starts with" operator
-                        results = results.Union(navigator.GetExactAndChildMatches());
+                        results = results.Union(navigator.GetExactAndChildMatches(scoreBoost));
 
                         // No other work to process - no more bookmarks required.
                         return QueryCompleted;
@@ -160,7 +162,7 @@ namespace Lifti.Querying.QueryParts
                         foreach (var character in navigator.EnumerateNextCharacters())
                         {
                             navigator.Process(character);
-                            results = results.Union(navigator.GetExactMatches());
+                            results = results.Union(navigator.GetExactMatches(scoreBoost));
                             bookmark.Apply();
                         }
 

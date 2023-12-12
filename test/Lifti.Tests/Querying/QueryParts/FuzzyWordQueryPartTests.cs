@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
 using Lifti.Querying.QueryParts;
+using Lifti.Tests.Fakes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,12 +104,6 @@ namespace Lifti.Tests.Querying.QueryParts
         }
 
         [Fact]
-        public void ToString_WithDefaultParameters_ShouldReturnSimpleExpression()
-        {
-            new FuzzyMatchQueryPart("Test").ToString().Should().Be("?Test");
-        }
-
-        [Fact]
         public async Task WithFieldFilteredInContext_ShouldOnlyMatchOnRequestedField()
         {
             var index = new FullTextIndexBuilder<int>()
@@ -132,6 +127,12 @@ namespace Lifti.Tests.Querying.QueryParts
             results.Select(x => x.Key).Should().BeEquivalentTo(new[] { 1, 3 });
         }
 
+        [Fact]
+        public void ToString_WithDefaultParameters_ShouldReturnSimpleExpression()
+        {
+            new FuzzyMatchQueryPart("Test").ToString().Should().Be("?Test");
+        }
+
         [Theory]
         [InlineData(null, 4, "?,4?Test")]
         [InlineData(9, null, "?9,?Test")]
@@ -140,6 +141,12 @@ namespace Lifti.Tests.Querying.QueryParts
         {
             new FuzzyMatchQueryPart("Test", (ushort?)maxEditDistance ?? FuzzyMatchQueryPart.DefaultMaxEditDistance, (ushort?)maxSequentialEdits ?? FuzzyMatchQueryPart.DefaultMaxSequentialEdits)
                 .ToString().Should().Be(expectedOutput);
+        }
+
+        [Fact]
+        public void ToString_WithScoreBoost_ShouldReturnCorrectlyFormattedExpression()
+        {
+            new FuzzyMatchQueryPart("Test", 1, 3, 5.123).ToString().Should().Be("?1,3?Test^5.123");
         }
 
         [Fact]
@@ -155,9 +162,18 @@ namespace Lifti.Tests.Querying.QueryParts
             expectedScoreOrders.Should().BeInDescendingOrder();
         }
 
-        private double GetScore(string search, ushort maxDistance, ushort maxSequentialEdits)
+        [Fact]
+        public void WhenScoreBoosting_ShouldApplyBoostToScore()
         {
-            var part = new FuzzyMatchQueryPart(search, maxDistance, maxSequentialEdits);
+            var baseScore = this.GetScore("SAMPLE", 1, 1);
+            var boostedScore = this.GetScore("SAMPLE", 1, 1, 2D);
+
+            boostedScore.Should().Be(baseScore * 2D);
+        }
+
+        private double GetScore(string search, ushort maxDistance, ushort maxSequentialEdits, double? scoreBoost = null)
+        {
+            var part = new FuzzyMatchQueryPart(search, maxDistance, maxSequentialEdits, scoreBoost);
             var results = this.fixture.Index.Search(new Query(part)).ToList();
             return results.Where(r => r.FieldMatches.Any(m => m.Locations.Any(l => l.TokenIndex == 1)) && r.Key == 0)
                 .Select(s => s.Score)

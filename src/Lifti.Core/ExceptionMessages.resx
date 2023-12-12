@@ -201,6 +201,12 @@
   <data name="IndexMustBeEmptyForDeserialization" xml:space="preserve">
     <value>An index must be empty when attempting to deserialize its contents.</value>
   </data>
+  <data name="InvalidScoreBoost" xml:space="preserve">
+    <value>Invalid score boost number encountered: {0}</value>
+  </data>
+  <data name="InvalidScoreBoostExpectedNumber" xml:space="preserve">
+    <value>Expected a number to follow a score boost, e.g. "Term^3" would indicate that the search term "Term" should have a score boost of 3.</value>
+  </data>
   <data name="ItemAlreadyIndexed" xml:space="preserve">
     <value>Item already indexed</value>
   </data>

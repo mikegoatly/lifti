@@ -33,6 +33,7 @@ namespace Lifti.Tests.Querying
         public IntermediateQueryResult ExpectedExactAndChildMatches { get; set; }
         public List<char> NavigatedCharacters { get; } = new List<char>();
         public List<string> NavigatedStrings { get; } = new List<string>();
+        public List<double> ProvidedWeightings { get; } = new List<double>();
 
         public bool HasExactMatches => this.ExpectedExactMatches.Matches.Count > 0;
 
@@ -58,11 +59,13 @@ namespace Lifti.Tests.Querying
 
         public IntermediateQueryResult GetExactAndChildMatches(double weighting = 1D)
         {
+            this.ProvidedWeightings.Add(weighting);
             return this.ExpectedExactAndChildMatches;
         }
 
         public IntermediateQueryResult GetExactMatches(double weighting = 1D)
         {
+            this.ProvidedWeightings.Add(weighting);
             return this.ExpectedExactMatches;
         }
 

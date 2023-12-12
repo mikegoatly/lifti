@@ -31,7 +31,8 @@ namespace Lifti.Querying
             '~',
             '"',
             '[',
-            ']'
+            ']',
+            '^'
         };
 
         // Punctuation characters that shouldn't cause a token to be automatically split when processing
@@ -48,22 +49,24 @@ namespace Lifti.Querying
             ProcessingNearOperator = 2,
         }
 
-        private enum TokenParseState
+        private enum FuzzyMatchParseState
         {
             None = 0,
             ProcessingFuzzyMatch = 1,
             ProcessingFuzzyMatchTerm = 2,
         }
 
-        private record IndexTokenizerStackState(int BracketCaptureDepth, IIndexTokenizer IndexTokenizer);
+        private record QueryTokenizerStackState(int BracketCaptureDepth, IIndexTokenizer IndexTokenizer);
 
         private record QueryTokenizerState(IIndexTokenizer IndexTokenizer)
         {
             public OperatorParseState OperatorState { get; init; } = OperatorParseState.None;
-            public TokenParseState TokenState { get; init; } = TokenParseState.None;
+            public FuzzyMatchParseState FuzzyMatchState { get; init; } = FuzzyMatchParseState.None;
             public int BracketDepth { get; init; }
+            public int ScoreBoostStartIndex { get; init; }
+            public double? ScoreBoost { get; init; }
 
-            private ImmutableStack<IndexTokenizerStackState> TokenizerStack { get; init; } = ImmutableStack<IndexTokenizerStackState>.Empty;
+            private ImmutableStack<QueryTokenizerStackState> TokenizerStack { get; init; } = ImmutableStack<QueryTokenizerStackState>.Empty;
 
             public QueryTokenizerState OpenBracket()
             {
@@ -88,7 +91,7 @@ namespace Lifti.Querying
                 return this with
                 {
                     IndexTokenizer = tokenizer,
-                    TokenizerStack = this.TokenizerStack.Push(new IndexTokenizerStackState(this.BracketDepth, this.IndexTokenizer))
+                    TokenizerStack = this.TokenizerStack.Push(new QueryTokenizerStackState(this.BracketDepth, this.IndexTokenizer))
                 };
             }
 
@@ -106,15 +109,20 @@ namespace Lifti.Querying
                         return this with
                         {
                             IndexTokenizer = previousState.IndexTokenizer,
-                            TokenizerStack = poppedStack
+                            TokenizerStack = poppedStack,
+                            ScoreBoost = null
                         };
                     }
                 }
 
                 // Once token processing complete, reset any token state flags
-                if (this.TokenState != TokenParseState.None)
+                if (this.FuzzyMatchState != FuzzyMatchParseState.None || this.ScoreBoost != null)
                 {
-                    return this with { TokenState = TokenParseState.None };
+                    return this with
+                    {
+                        FuzzyMatchState = FuzzyMatchParseState.None,
+                        ScoreBoost = null
+                    };
                 }
 
                 // We're still deeper in brackets than when we first captured the tokenizer, so don't revert
@@ -138,8 +146,19 @@ namespace Lifti.Querying
             {
                 if (tokenStart != null)
                 {
-                    var tokenText = queryText.Substring(tokenStart.Value, endIndex - tokenStart.Value);
-                    var token = QueryToken.ForText(tokenText, state.IndexTokenizer);
+
+                    string tokenText;
+                    if (state.ScoreBoost == null)
+                    {
+                        tokenText = queryText.Substring(tokenStart.Value, endIndex - tokenStart.Value);
+                    }
+                    else
+                    {
+                        // Don't return the score boost information as part of the token text
+                        tokenText = queryText.Substring(tokenStart.Value, state.ScoreBoostStartIndex - tokenStart.Value);
+                    }
+
+                    var token = QueryToken.ForText(tokenText, state.IndexTokenizer, state.ScoreBoost);
                     tokenStart = null;
 
                     state = state.UpdateForYieldedToken();
@@ -162,14 +181,14 @@ namespace Lifti.Querying
             for (var i = 0; i < queryText.Length; i++)
             {
                 var current = queryText[i];
-                if (state.TokenState == TokenParseState.ProcessingFuzzyMatch
+                if (state.FuzzyMatchState == FuzzyMatchParseState.ProcessingFuzzyMatch
                                         && current != ','
                                         && char.IsDigit(current) == false)
                 {
                     // As soon as we encounter a non digit or comma when processing a fuzzy match,
                     // assume that we're not processing the fuzzy match parameters - this way a comma can
                     // subsequently be treated as a split character.
-                    state = state with { TokenState = TokenParseState.ProcessingFuzzyMatchTerm };
+                    state = state with { FuzzyMatchState = FuzzyMatchParseState.ProcessingFuzzyMatchTerm };
                 }
 
                 if (IsSplitChar(current, state))
@@ -187,6 +206,11 @@ namespace Lifti.Querying
                         case OperatorParseState.None:
                             switch (current)
                             {
+                                case '^':
+                                    var scoreBoostStart = i;
+                                    (var scoreBoost, i) = ConsumeNumber(i + 1, queryText);
+                                    state = state with { ScoreBoost = scoreBoost, ScoreBoostStartIndex = scoreBoostStart };
+                                    break;
                                 case '&':
                                     yield return QueryToken.ForOperator(QueryTokenType.AndOperator);
                                     break;
@@ -198,15 +222,15 @@ namespace Lifti.Querying
                                     break;
                                 case '?':
                                     // Possibly a wildcard token character, or part of a fuzzy match token
-                                    switch (state.TokenState)
+                                    switch (state.FuzzyMatchState)
                                     {
-                                        case TokenParseState.None when tokenStart is null:
+                                        case FuzzyMatchParseState.None when tokenStart is null:
                                             // Start processing a fuzzy match operator
-                                            state = state with { TokenState = TokenParseState.ProcessingFuzzyMatch };
+                                            state = state with { FuzzyMatchState = FuzzyMatchParseState.ProcessingFuzzyMatch };
                                             break;
-                                        case TokenParseState.ProcessingFuzzyMatch:
+                                        case FuzzyMatchParseState.ProcessingFuzzyMatch:
                                             // We're already processing a fuzzy match, the second ? indicates the end of parameters and start of the search term
-                                            state = state with { TokenState = TokenParseState.ProcessingFuzzyMatchTerm };
+                                            state = state with { FuzzyMatchState = FuzzyMatchParseState.ProcessingFuzzyMatchTerm };
                                             break;
                                     }
 
@@ -367,6 +391,32 @@ namespace Lifti.Querying
             }
         }
 
+        private static (double scoreBoost, int endIndex) ConsumeNumber(int index, string queryText)
+        {
+            var startIndex = index;
+            for (; index < queryText.Length; index++)
+            {
+                var current = queryText[index];
+                if (char.IsDigit(current) == false && current != '.')
+                {
+                    break;
+                }
+            }
+
+            if (index == startIndex)
+            {
+                throw new QueryParserException(ExceptionMessages.InvalidScoreBoostExpectedNumber);
+            }
+
+            var numberText = queryText.Substring(startIndex, index - startIndex);
+            if (double.TryParse(numberText, out var scoreBoost) == false)
+            {
+                throw new QueryParserException(ExceptionMessages.InvalidScoreBoost, numberText);
+            }
+
+            return (scoreBoost, index - 1);
+        }
+
         private static bool IsSplitChar(char current, QueryTokenizerState state)
         {
             var isWhitespace = char.IsWhiteSpace(current);
@@ -376,7 +426,7 @@ namespace Lifti.Querying
                     isWhitespace || // Whitespace is always a split character
                     (!generalNonSplitPunctuation.Contains(current)
                         && state.IndexTokenizer.IsSplitCharacter(current) // Defer to the tokenizer for the field as to whether this is a split character,
-                        && !(state.TokenState == TokenParseState.ProcessingFuzzyMatch && current == ',')), // ..unless it's a comma appearing in the first part of a fuzzy match
+                        && !(state.FuzzyMatchState == FuzzyMatchParseState.ProcessingFuzzyMatch && current == ',')), // ..unless it's a comma appearing in the first part of a fuzzy match
 
                 OperatorParseState.ProcessingString => isWhitespace ||
                     (!quotedSectionNonSplitPunctuation.Contains(current) && state.IndexTokenizer.IsSplitCharacter(current)),
