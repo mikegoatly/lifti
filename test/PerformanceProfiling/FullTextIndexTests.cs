@@ -1,17 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using Lifti;
-using Lifti.Serialization.Binary;
-using Lifti.Tokenization;
-using Lifti.Tokenization.TextExtraction;
-using System;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
     [MediumRunJob(RuntimeMoniker.Net481)]
+    [MediumRunJob(RuntimeMoniker.Net80)]
     [MediumRunJob(RuntimeMoniker.Net70)]
     [MediumRunJob(RuntimeMoniker.Net60)]
     [RankColumn, MemoryDiagnoser]
