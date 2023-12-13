@@ -13,11 +13,13 @@ namespace Lifti.Tokenization.Objects
         internal ObjectTokenization(
             Func<T, TKey> keyReader,
             IReadOnlyList<StaticFieldReader<T>> fieldReaders,
-            IReadOnlyList<DynamicFieldReader<T>> dynamicFieldReaders)
+            IReadOnlyList<DynamicFieldReader<T>> dynamicFieldReaders,
+            ObjectScoreBoostOptions<T> scoreBoostOptions)
         {
             this.KeyReader = keyReader;
             this.FieldReaders = fieldReaders.ToDictionary(x => x.Name);
             this.DynamicFieldReaders = dynamicFieldReaders;
+            this.ScoreBoostOptions = scoreBoostOptions;
         }
 
         /// <summary>
@@ -34,6 +36,11 @@ namespace Lifti.Tokenization.Objects
         /// Gets the set of configurations that determine dynamic fields that can only be known during indexing.
         /// </summary>
         public IReadOnlyList<DynamicFieldReader<T>> DynamicFieldReaders { get; }
+
+        /// <summary>
+        /// The score boost options for the object type.
+        /// </summary>
+        public ObjectScoreBoostOptions<T> ScoreBoostOptions { get; }
 
         /// <inheritdoc />
         Type IObjectTokenization.ItemType { get; } = typeof(T);

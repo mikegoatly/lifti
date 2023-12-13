@@ -680,5 +680,14 @@ namespace Lifti {
                 return ResourceManager.GetString("ValueMustNotBeLessThanZero", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WithScoreBoosting can only be called once per object builder.
+        /// </summary>
+        internal static string WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition {
+            get {
+                return ResourceManager.GetString("WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition", resourceCulture);
+            }
+        }
     }
 }

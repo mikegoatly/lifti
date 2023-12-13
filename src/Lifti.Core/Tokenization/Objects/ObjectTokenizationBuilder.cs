@@ -42,9 +42,10 @@ namespace Lifti.Tokenization.Objects
     /// </typeparam>
     public class ObjectTokenizationBuilder<T, TKey> : IObjectTokenizationBuilder
     {
-        private readonly List<Func<IIndexTokenizer, ThesaurusBuilder, ITextExtractor, StaticFieldReader<T>>> fieldReaderBuilders = new();
+        private readonly List<Func<IIndexTokenizer, ThesaurusBuilder, ITextExtractor, StaticFieldReader<T>>> fieldReaderBuilders = [];
         private Func<T, TKey>? keyReader;
-        private readonly List<Func<IIndexTokenizer, ThesaurusBuilder, ITextExtractor, DynamicFieldReader<T>>> dynamicFieldReaderBuilders = new();
+        private readonly List<Func<IIndexTokenizer, ThesaurusBuilder, ITextExtractor, DynamicFieldReader<T>>> dynamicFieldReaderBuilders = [];
+        private ObjectScoreBoostOptions<T>? objectScoreBoostBuilder;
 
         /// <summary>
         /// Indicates how the unique key of the item can be read.
@@ -476,6 +477,24 @@ namespace Lifti.Tokenization.Objects
                 scoreBoost);
         }
 
+        /// <inheritdoc />
+        public ObjectTokenizationBuilder<T, TKey> WithScoreBoosting(Action<ObjectScoreBoostOptions<T>> scoreBoostingOptions)
+        {
+            if (scoreBoostingOptions is null)
+            {
+                throw new ArgumentNullException(nameof(scoreBoostingOptions));
+            }
+
+            if (this.objectScoreBoostBuilder is not null)
+            {
+                throw new LiftiException(ExceptionMessages.WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition);
+            }
+
+            this.objectScoreBoostBuilder = new ObjectScoreBoostOptions<T>();
+            scoreBoostingOptions(this.objectScoreBoostBuilder);
+            return this;
+        }
+
         private static Thesaurus CreateFieldThesaurus(
             IIndexTokenizer defaultTokenizer,
             IIndexTokenizer? fieldTokenizer,
@@ -520,7 +539,8 @@ namespace Lifti.Tokenization.Objects
             return new ObjectTokenization<T, TKey>(
                 this.keyReader,
                 staticFields,
-                dynamicFieldReaders);
+                dynamicFieldReaders,
+                this.objectScoreBoostBuilder ?? new ObjectScoreBoostOptions<T>());
         }
 
         private static void ValidateFieldParameters(string name, object fieldTextReader)

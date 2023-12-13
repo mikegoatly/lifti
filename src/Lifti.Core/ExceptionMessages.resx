@@ -324,4 +324,7 @@
   <data name="ValueMustNotBeLessThanZero" xml:space="preserve">
     <value>Value must not be less than zero</value>
   </data>
+  <data name="WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition" xml:space="preserve">
+    <value>WithScoreBoosting can only be called once per object builder</value>
+  </data>
 </root>
