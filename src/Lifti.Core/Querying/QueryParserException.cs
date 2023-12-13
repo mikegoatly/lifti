@@ -17,13 +17,15 @@ namespace Lifti.Querying
 
         /// <inheritdoc />
         public QueryParserException(string message, params object[] args) : base(message, args) { }
-        
+
         /// <inheritdoc />
         public QueryParserException(string message, Exception inner) : base(message, inner) { }
 
+#if NETSTANDARD
         /// <inheritdoc />
         protected QueryParserException(
           SerializationInfo info,
           StreamingContext context) : base(info, context) { }
+#endif
     }
 }
