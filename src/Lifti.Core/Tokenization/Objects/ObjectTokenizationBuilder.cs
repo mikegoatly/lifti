@@ -45,7 +45,7 @@ namespace Lifti.Tokenization.Objects
         private readonly List<Func<IIndexTokenizer, ThesaurusBuilder, ITextExtractor, StaticFieldReader<T>>> fieldReaderBuilders = [];
         private Func<T, TKey>? keyReader;
         private readonly List<Func<IIndexTokenizer, ThesaurusBuilder, ITextExtractor, DynamicFieldReader<T>>> dynamicFieldReaderBuilders = [];
-        private ObjectScoreBoostOptions<T>? objectScoreBoostBuilder;
+        private ObjectScoreBoostBuilder<T>? objectScoreBoostBuilder;
 
         /// <summary>
         /// Indicates how the unique key of the item can be read.
@@ -478,7 +478,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <inheritdoc />
-        public ObjectTokenizationBuilder<T, TKey> WithScoreBoosting(Action<ObjectScoreBoostOptions<T>> scoreBoostingOptions)
+        public ObjectTokenizationBuilder<T, TKey> WithScoreBoosting(Action<ObjectScoreBoostBuilder<T>> scoreBoostingOptions)
         {
             if (scoreBoostingOptions is null)
             {
@@ -490,7 +490,7 @@ namespace Lifti.Tokenization.Objects
                 throw new LiftiException(ExceptionMessages.WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition);
             }
 
-            this.objectScoreBoostBuilder = new ObjectScoreBoostOptions<T>();
+            this.objectScoreBoostBuilder = new ObjectScoreBoostBuilder<T>();
             scoreBoostingOptions(this.objectScoreBoostBuilder);
             return this;
         }
@@ -540,7 +540,7 @@ namespace Lifti.Tokenization.Objects
                 this.keyReader,
                 staticFields,
                 dynamicFieldReaders,
-                this.objectScoreBoostBuilder ?? new ObjectScoreBoostOptions<T>());
+                this.objectScoreBoostBuilder?.Build() ?? ObjectScoreBoostOptions<T>.Empty());
         }
 
         private static void ValidateFieldParameters(string name, object fieldTextReader)

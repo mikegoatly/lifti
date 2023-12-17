@@ -234,6 +234,9 @@
   <data name="MissingLiftiHeaderIndicatorBytes" xml:space="preserve">
     <value>The expected header bytes could not be found in the stream - this is probably not a serialized index.</value>
   </data>
+  <data name="MultiplierValueMustBeGreaterThanOne" xml:space="preserve">
+    <value>Multiplier values must be greater than one</value>
+  </data>
   <data name="NoBatchChangeInProgress" xml:space="preserve">
     <value>No batch change in progress.</value>
   </data>
@@ -257,6 +260,9 @@
   </data>
   <data name="NoTokenizationOptionsProvidedForType" xml:space="preserve">
     <value>No tokenization options have been provided for type {0}</value>
+  </data>
+  <data name="ScoreBoostsNotCalculated" xml:space="preserve">
+    <value>Internal error - attempted to calculate an item score boost without initialized score boost stats</value>
   </data>
   <data name="SingleCharacterWildcardsFollowingMultiCharacterNotSupported" xml:space="preserve">
     <value>Single character wildcards (%) following a multi-character wildcard (*) are not currently supported.</value>
@@ -296,6 +302,9 @@
   </data>
   <data name="UnexpectedOperatorParseStateEncountered" xml:space="preserve">
     <value>Unexpected OperatorParseState {0} encountered while tokenizing a query</value>
+  </data>
+  <data name="UnexpectedScoreBoostValueRemoval" xml:space="preserve">
+    <value>Internal error - unexpected value removal from score boost metadata</value>
   </data>
   <data name="UnexpectedTokenEncountered" xml:space="preserve">
     <value>Unexpected token encountered: {0}</value>

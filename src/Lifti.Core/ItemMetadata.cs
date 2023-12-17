@@ -5,7 +5,7 @@ namespace Lifti
     /// <summary>
     /// Describes metadata for an indexed item.
     /// </summary>
-    public class ItemMetadata(
+    public abstract class ItemMetadata(
         int id,
         DocumentStatistics documentStatistics,
         DateTime? scoringFreshnessDate,

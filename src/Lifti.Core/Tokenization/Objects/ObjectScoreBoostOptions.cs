@@ -3,49 +3,63 @@
 namespace Lifti.Tokenization.Objects
 {
     /// <summary>
-    /// Allows for the properties of an indexed object to influence how it is scored relative to other objects.
+    /// Provides the configured options for boosting the score of an object based on its magnitude and freshness.
     /// </summary>
-    /// <typeparam name="TItem">The type of the item</typeparam>
-    public class ObjectScoreBoostOptions<TItem>
+    /// <param name="magnitudeMultiplier">
+    /// The multiplier to apply to the score of the item based on its magnitude.
+    /// </param>
+    /// <param name="freshnessMultiplier">
+    /// The multiplier to apply to the score of the item based on its freshness.
+    /// </param>
+    public abstract class ObjectScoreBoostOptions(double magnitudeMultiplier, double freshnessMultiplier)
     {
-        internal Func<TItem, double>? MagnitudeProvider { get; private set; }
-        internal double MagnitudeMultiplier { get; private set; }
-        internal Func<TItem, DateTime>? FreshnessProvider { get; private set; }
-        internal double FreshnessMultiplier { get; private set; }
+        /// <summary>
+        /// Gets the multiplier to apply to the score of the item based on its magnitude.
+        /// </summary>
+        public double MagnitudeMultiplier { get; } = magnitudeMultiplier;
 
         /// <summary>
-        /// Boosts results based on the freshness of the item. For example, if a multiplier of 3 is specified, then the score of 
-        /// the newest item will be 3 times higher than the oldest item.
+        /// Gets the multiplier to apply to the score of the item based on its freshness.
         /// </summary>
-        /// <param name="freshnessProvider">
-        /// The delegate capable of reading the freshness value from the item.
-        /// </param>
-        /// <param name="multiplier">
-        /// The multiplier to apply to the score of the item based on its freshness.
-        /// </param>
-        public ObjectScoreBoostOptions<TItem> Freshness(Func<TItem, DateTime> freshnessProvider, double multiplier)
-        {
-            this.FreshnessProvider = freshnessProvider;
-            this.FreshnessMultiplier = multiplier;
-            return this;
-        }
+        public double FreshnessMultiplier { get; } = freshnessMultiplier;
+    }
+
+    /// <summary>
+    /// Provides the configured options for boosting the score of an object based on its magnitude and freshness.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the object.</typeparam>
+    /// <param name="magnitudeMultiplier">
+    /// The multiplier to apply to the score of the item based on its magnitude.
+    /// </param>
+    /// <param name="magnitudeProvider">
+    /// The delegate capable of reading the magnitude value from the item.
+    /// </param>
+    /// <param name="freshnessMultiplier">
+    /// The multiplier to apply to the score of the item based on its freshness.
+    /// </param>
+    /// <param name="freshnessProvider">
+    /// The delegate capable of reading the freshness value from the item.
+    /// </param>
+    public class ObjectScoreBoostOptions<TItem>(
+        double magnitudeMultiplier,
+        Func<TItem, double>? magnitudeProvider,
+        double freshnessMultiplier,
+        Func<TItem, DateTime>? freshnessProvider)
+        : ObjectScoreBoostOptions(magnitudeMultiplier, freshnessMultiplier)
+    {
+        /// <summary>
+        /// Gets the delegate capable of reading the magnitude value from the item.
+        /// </summary>
+        public Func<TItem, double>? MagnitudeProvider { get; } = magnitudeProvider;
 
         /// <summary>
-        /// Boosts results based on the magnitude of the item. For example, if a multiplier of 3 is specified, then the score 
-        /// of the item with the highest magnitude will be 3 
-        /// times higher than the item with the lowest magnitude.
+        /// Gets the delegate capable of reading the freshness value from the item.
         /// </summary>
-        /// <param name="magnitudeProvider">
-        /// The delegate capable of reading the magnitude value from the item.
-        /// </param>
-        /// <param name="multiplier">
-        /// The multiplier to apply to the score of the item based on its magnitude.
-        /// </param>
-        public ObjectScoreBoostOptions<TItem> Magnitude(Func<TItem, double> magnitudeProvider, double multiplier)
+        public Func<TItem, DateTime>? FreshnessProvider { get; } = freshnessProvider;
+
+        internal static ObjectScoreBoostOptions<TItem> Empty()
         {
-            this.MagnitudeProvider = magnitudeProvider;
-            this.MagnitudeMultiplier = multiplier;
-            return this;
+            return new ObjectScoreBoostOptions<TItem>(0D, null, 0D, null);
         }
     }
 }

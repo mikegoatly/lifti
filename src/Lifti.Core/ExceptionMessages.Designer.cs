@@ -412,6 +412,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Multiplier values must be greater than one.
+        /// </summary>
+        internal static string MultiplierValueMustBeGreaterThanOne {
+            get {
+                return ResourceManager.GetString("MultiplierValueMustBeGreaterThanOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No batch change in progress..
         /// </summary>
         internal static string NoBatchChangeInProgress {
@@ -480,6 +489,15 @@ namespace Lifti {
         internal static string NoTokenizationOptionsProvidedForType {
             get {
                 return ResourceManager.GetString("NoTokenizationOptionsProvidedForType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal error - attempted to calculate an item score boost without initialized score boost stats.
+        /// </summary>
+        internal static string ScoreBoostsNotCalculated {
+            get {
+                return ResourceManager.GetString("ScoreBoostsNotCalculated", resourceCulture);
             }
         }
         
@@ -597,6 +615,15 @@ namespace Lifti {
         internal static string UnexpectedOperatorParseStateEncountered {
             get {
                 return ResourceManager.GetString("UnexpectedOperatorParseStateEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal error - unexpected value removal from score boost metadata.
+        /// </summary>
+        internal static string UnexpectedScoreBoostValueRemoval {
+            get {
+                return ResourceManager.GetString("UnexpectedScoreBoostValueRemoval", resourceCulture);
             }
         }
         

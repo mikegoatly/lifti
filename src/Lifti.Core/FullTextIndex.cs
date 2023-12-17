@@ -311,7 +311,7 @@ namespace Lifti
             var fieldId = this.FieldLookup.DefaultField;
             var itemId = this.GetUniqueIdForItem(
                 itemKey,
-                new DocumentStatistics(fieldId, CalculateTotalTokenCount(tokens)),
+                new DocumentStatistics(fieldId, tokens.CalculateTotalTokenCount()),
                 mutation);
 
             IndexTokens(mutation, itemId, fieldId, tokens);
@@ -400,17 +400,6 @@ namespace Lifti
             }
         }
 
-        private static int CalculateTotalTokenCount(List<Token> tokens)
-        {
-            var totalCount = 0;
-            for (var i = 0; i < tokens.Count; i++)
-            {
-                totalCount += tokens[i].Locations.Count;
-            }
-            return totalCount;
-
-        }
-
         private void RemoveKeyFromIndex(TKey itemKey, IndexMutation mutation)
         {
             var id = this.itemStore.Remove(itemKey);
@@ -458,7 +447,7 @@ namespace Lifti
             var documentStatistics = new DocumentStatistics(
                 fieldTokens.ToDictionary(
                     t => t.Key,
-                    t => CalculateTotalTokenCount(t.Value)));
+                    t => t.Value.CalculateTotalTokenCount()));
 
             var itemId = this.GetUniqueIdForItem(item, itemKey, documentStatistics, options, indexMutation);
 
