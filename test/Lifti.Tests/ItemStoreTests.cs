@@ -5,18 +5,18 @@ using Xunit;
 
 namespace Lifti.Tests
 {
-    public class IdPoolTests
+    public class ItemStoreTests
     {
         private static readonly DocumentStatistics item1DocumentStatistics = DocumentStatistics((1, 100));
         private static readonly DocumentStatistics item2DocumentStatistics = DocumentStatistics((1, 50), (2, 200));
 
-        private readonly IdPool<string> sut;
+        private readonly ItemStore<string> sut;
         private readonly int id1;
         private readonly int id2;
 
-        public IdPoolTests()
+        public ItemStoreTests()
         {
-            this.sut = new IdPool<string>();
+            this.sut = new ItemStore<string>();
             this.id1 = this.sut.Add("1", item1DocumentStatistics);
             this.id2 = this.sut.Add("2", item2DocumentStatistics);
         }
@@ -41,16 +41,16 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void Add_ItemWithId_ShouldThrowExceptionIfItemAlreadyIndexed()
+        public void Add_ItemWithMatchingKey_ShouldThrowExceptionIfItemAlreadyIndexed()
         {
-            Assert.Throws<LiftiException>(() => this.sut.Add(9, "1", DocumentStatistics()))
+            Assert.Throws<LiftiException>(() => this.sut.Add(ItemMetadata(0)))
                 .Message.Should().Be("Item already indexed");
         }
 
         [Fact]
-        public void Add_ItemWithId_ShouldThrowExceptionIfIdAlreadyUsedAlreadyIndexed()
+        public void Add_ItemWithMatchingId_ShouldThrowExceptionIfIdAlreadyUsedAlreadyIndexed()
         {
-            Assert.Throws<LiftiException>(() => this.sut.Add(1, "9", DocumentStatistics()))
+            Assert.Throws<LiftiException>(() => this.sut.Add(ItemMetadata(1, key: "DifferentKey")))
                 .Message.Should().Be("Id 1 is already registered in the index.");
         }
 
@@ -58,19 +58,17 @@ namespace Lifti.Tests
         public void Add_ItemWithId_ShouldAddItemToIndex()
         {
             var documentStatistics = DocumentStatistics((1, 20), (2, 50), (3, 10));
-            this.sut.Add(9, "9", documentStatistics);
+            var itemMetadata = new ItemMetadata<string>(9, "9", documentStatistics, new System.DateTime(2022, 11, 23), 12D);
+            this.sut.Add(itemMetadata);
             this.sut.GetMetadata(9).Should().BeEquivalentTo(
-                new ItemMetadata<string>(
-                    9,
-                    "9",
-                    documentStatistics));
+                itemMetadata);
         }
 
         [Fact]
         public void Add_ItemWithId_ShouldAdjustIndexStatistics()
         {
             var documentStatistics = DocumentStatistics((1, 20), (2, 50), (3, 10));
-            this.sut.Add(9, "9", documentStatistics);
+            this.sut.Add(ItemMetadata(9, documentStatistics));
             this.sut.IndexStatistics.Should().BeEquivalentTo(
                 IndexStatistics((1, 170), (2, 250), (3, 10)));
         }
@@ -78,19 +76,19 @@ namespace Lifti.Tests
         [Fact]
         public void Add_ItemWithId_ShouldResetTheNextIdBasedOnTheHighestIndexedId()
         {
-            this.sut.Add(10, "10", DocumentStatistics((10, 10)));
-            this.sut.Add(9, "9", DocumentStatistics((9, 9)));
+            this.sut.Add(ItemMetadata(10, DocumentStatistics((10, 10))));
+            this.sut.Add(ItemMetadata(9, DocumentStatistics((9, 9))));
 
             this.sut.Add("7", DocumentStatistics((7, 7)));
 
             this.sut.GetIndexedItems().Should().BeEquivalentTo(
                 new[]
                 {
-                    new ItemMetadata<string>(0, "1", item1DocumentStatistics),
-                    new ItemMetadata<string>(1, "2", item2DocumentStatistics),
-                    new ItemMetadata<string>(9, "9", DocumentStatistics((9, 9))),
-                    new ItemMetadata<string>(10, "10", DocumentStatistics((10, 10))),
-                    new ItemMetadata<string>(11, "7", DocumentStatistics((7, 7)))
+                    ItemMetadata(0, item1DocumentStatistics),
+                    ItemMetadata(1, item2DocumentStatistics),
+                    ItemMetadata(9, DocumentStatistics((9, 9))),
+                    ItemMetadata(10,DocumentStatistics((10, 10))),
+                    ItemMetadata(11, DocumentStatistics((7, 7)), key: "7"),
                 });
         }
 
@@ -106,16 +104,16 @@ namespace Lifti.Tests
             this.sut.GetIndexedItems().Should().BeEquivalentTo(
                 new[]
                 {
-                    new ItemMetadata<string>(0, "1", item1DocumentStatistics),
-                    new ItemMetadata<string>(1, "2", item2DocumentStatistics)
+                    ItemMetadata(0, item1DocumentStatistics),
+                    ItemMetadata(1, item2DocumentStatistics)
                 });
         }
 
         [Fact]
         public void GetMetadataById_ShouldReturnCorrectItemForId()
         {
-            this.sut.GetMetadata(this.id1).Should().BeEquivalentTo(new ItemMetadata<string>(this.id1, "1", item1DocumentStatistics));
-            this.sut.GetMetadata(this.id2).Should().BeEquivalentTo(new ItemMetadata<string>(this.id2, "2", item2DocumentStatistics));
+            this.sut.GetMetadata(this.id1).Should().BeEquivalentTo(ItemMetadata(this.id1, item1DocumentStatistics));
+            this.sut.GetMetadata(this.id2).Should().BeEquivalentTo(ItemMetadata(this.id2, item2DocumentStatistics));
         }
 
         [Fact]
@@ -128,15 +126,15 @@ namespace Lifti.Tests
         [Fact]
         public void ReleaseItem_ShouldReturnIdOfReleasedItem()
         {
-            this.sut.ReleaseItem("2").Should().Be(this.id2);
+            this.sut.Remove("2").Should().Be(this.id2);
             Assert.Throws<LiftiException>(() => this.sut.GetMetadata(this.id2));
         }
 
         [Fact]
         public void ReleasedItemId_ShouldBeReusedOnNextCreateId()
         {
-            this.sut.ReleaseItem("1").Should().Be(this.id1);
-            this.sut.ReleaseItem("2").Should().Be(this.id2);
+            this.sut.Remove("1").Should().Be(this.id1);
+            this.sut.Remove("2").Should().Be(this.id2);
             this.sut.Add("3", DocumentStatistics()).Should().Be(this.id1);
             this.sut.Add("4", DocumentStatistics()).Should().Be(this.id2);
             this.sut.Add("5", DocumentStatistics()).Should().Be(this.id2 + 1);
@@ -152,6 +150,11 @@ namespace Lifti.Tests
         public void Contains_WhenItemDoesntExist_ShouldReturnFalse()
         {
             this.sut.Contains("9").Should().BeFalse();
+        }
+
+        private static ItemMetadata<string> ItemMetadata(int id, DocumentStatistics? documentStatistics = null, string? key = null)
+        {
+            return new ItemMetadata<string>(id, key ?? (id + 1).ToString(), documentStatistics ?? DocumentStatistics(), null, null);
         }
 
         private static DocumentStatistics DocumentStatistics(params (byte fieldId, int tokenCount)[] fieldWordCounts)

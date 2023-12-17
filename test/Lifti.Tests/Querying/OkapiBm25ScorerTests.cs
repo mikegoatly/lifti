@@ -22,10 +22,10 @@ namespace Lifti.Tests.Querying
                 10,
                 new IndexStatistics(ImmutableDictionary<byte, long>.Empty.Add(1, 100), 100), // 100 total tokens in 1 field
                 Enumerable.Range(0, 10)
-                    .Select(id => (id, new ItemMetadata<int>(id, id, new DocumentStatistics(1, id * 3))))
+                    .Select(id => (id, new ItemMetadata<int>(id, id, new DocumentStatistics(1, id * 3), null, null)))
                     .ToArray()); // Each item will have (id * 3) tokens in it
 
-            this.sut = new OkapiBm25Scorer(1.2D, 0.75D, itemStore, new FakeFieldScoreBoostProvider((2, 10D)));
+            this.sut = new OkapiBm25Scorer(1.2D, 0.75D, this.itemStore, new FakeFieldScoreBoostProvider((2, 10D)));
 
             this.tokenMatches = new[]
 {
@@ -37,7 +37,7 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void VerifyScoreWithoutWeighting()
         {
-            var results = this.sut.Score(tokenMatches, 1D);
+            var results = this.sut.Score(this.tokenMatches, 1D);
 
             results.Should().BeEquivalentTo(
                 new[]
@@ -51,7 +51,7 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void VerifyScoreWithWeighting()
         {
-            var results = this.sut.Score(tokenMatches, 0.5D);
+            var results = this.sut.Score(this.tokenMatches, 0.5D);
 
             results.Should().BeEquivalentTo(
                 new[]
@@ -67,7 +67,7 @@ namespace Lifti.Tests.Querying
         {
             this.sut = new OkapiBm25Scorer(1.2D, 0.75D, this.itemStore, new FakeFieldScoreBoostProvider((1, 10D)));
 
-            var results = this.sut.Score(tokenMatches, 0.5D);
+            var results = this.sut.Score(this.tokenMatches, 0.5D);
 
             // Results are calculated with a field score boost of 10, but a multiplier of 0.5D, so the resulting boost is 5
             results.Should().BeEquivalentTo(

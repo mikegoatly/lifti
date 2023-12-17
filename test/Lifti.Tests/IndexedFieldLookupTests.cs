@@ -157,7 +157,7 @@ namespace Lifti.Tests
                 this.sut);
         }
 
-        private IObjectTokenization Build(ObjectTokenizationBuilder<string, string> objectTokenizationBuilder, IndexedFieldLookup fieldLookup)
+        private IIndexedObjectConfiguration Build(ObjectTokenizationBuilder<string, string> objectTokenizationBuilder, IndexedFieldLookup fieldLookup)
         {
             return (objectTokenizationBuilder as IObjectTokenizationBuilder)
                 .Build(IndexTokenizer.Default, new ThesaurusBuilder(), new PlainTextExtractor(), fieldLookup);

@@ -26,7 +26,7 @@ namespace Lifti.Tokenization.Objects
         /// * <see cref="ObjectTokenizationBuilder{T, TKey}.WithKey(Func{T, TKey})"/> has not been called.
         /// * No fields have been configured.
         /// </exception>
-        IObjectTokenization Build(IIndexTokenizer defaultTokenizer, ThesaurusBuilder defaultThesaurusBuilder, ITextExtractor defaultTextExtractor, IndexedFieldLookup fieldLookup);
+        IIndexedObjectConfiguration Build(IIndexTokenizer defaultTokenizer, ThesaurusBuilder defaultThesaurusBuilder, ITextExtractor defaultTextExtractor, IndexedFieldLookup fieldLookup);
     }
 
     /// <summary>
@@ -512,7 +512,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <inheritdoc />
-        IObjectTokenization IObjectTokenizationBuilder.Build(IIndexTokenizer defaultTokenizer, ThesaurusBuilder defaultThesaurusBuilder, ITextExtractor defaultTextExtractor, IndexedFieldLookup fieldLookup)
+        IIndexedObjectConfiguration IObjectTokenizationBuilder.Build(IIndexTokenizer defaultTokenizer, ThesaurusBuilder defaultThesaurusBuilder, ITextExtractor defaultTextExtractor, IndexedFieldLookup fieldLookup)
         {
             if (this.keyReader == null)
             {
@@ -536,7 +536,7 @@ namespace Lifti.Tokenization.Objects
                 fieldLookup.RegisterDynamicFieldReader(dynamicFieldReader);
             }
 
-            return new ObjectTokenization<T, TKey>(
+            return new IndexedObjectConfiguration<T, TKey>(
                 this.keyReader,
                 staticFields,
                 dynamicFieldReaders,

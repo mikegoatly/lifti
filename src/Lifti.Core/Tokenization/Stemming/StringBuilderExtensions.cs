@@ -1,10 +1,9 @@
-﻿namespace Lifti.Tokenization.Stemming
-{
-    using Lifti.Querying;
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
+﻿using Lifti.Querying;
+using System.Collections.Generic;
+using System.Text;
 
+namespace Lifti.Tokenization.Stemming
+{
     /// <summary>
     /// Extensions for the StringBuilder class to help with the Porter stemming code.
     /// </summary>
@@ -20,18 +19,11 @@
         /// </returns>
         public static bool IsVowel(this StringBuilder builder, int index)
         {
-            switch (builder[index])
+            return builder[index] switch
             {
-                case 'A':
-                case 'I':
-                case 'E':
-                case 'O':
-                case 'U':
-                case 'Y':
-                    return true;
-                default:
-                    return false;
-            }
+                'A' or 'I' or 'E' or 'O' or 'U' or 'Y' => true,
+                _ => false,
+            };
         }
 
         /// <summary>
@@ -156,28 +148,26 @@
             var length = builder.Length;
             if (length > 3)
             {
-                using (var navigator = replacementSetLookup.Snapshot.CreateNavigator())
+                using var navigator = replacementSetLookup.Snapshot.CreateNavigator();
+                if (navigator.Process(builder[builder.Length - 1]))
                 {
-                    if (navigator.Process(builder[builder.Length - 1]))
+                    var bestMatch = IntermediateQueryResult.Empty;
+                    for (var i = builder.Length - 2; i >= 0; i--)
                     {
-                        var bestMatch = IntermediateQueryResult.Empty;
-                        for (var i = builder.Length - 2; i >= 0; i--)
+                        if (!navigator.Process(builder[i]))
                         {
-                            if (!navigator.Process(builder[i]))
-                            {
-                                break;
-                            }
-
-                            if (navigator.HasExactMatches)
-                            {
-                                bestMatch = navigator.GetExactMatches();
-                            }
+                            break;
                         }
 
-                        if (bestMatch.Matches.Count > 0)
+                        if (navigator.HasExactMatches)
                         {
-                            return replacementSetLookup.Items.GetMetadata(bestMatch.Matches[0].ItemId).Item;
+                            bestMatch = navigator.GetExactMatches();
                         }
+                    }
+
+                    if (bestMatch.Matches.Count > 0)
+                    {
+                        return replacementSetLookup.Items.GetMetadata(bestMatch.Matches[0].ItemId).Key;
                     }
                 }
             }

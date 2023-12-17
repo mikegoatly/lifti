@@ -8,9 +8,9 @@ namespace Lifti.Tokenization.Objects
     /// <inheritdoc />
     /// <typeparam name="T">The type of object this tokenization is capable of indexing.</typeparam>
     /// <typeparam name="TKey">The type of the key.</typeparam>
-    internal class ObjectTokenization<T, TKey> : IObjectTokenization
+    internal class IndexedObjectConfiguration<T, TKey> : IIndexedObjectConfiguration
     {
-        internal ObjectTokenization(
+        internal IndexedObjectConfiguration(
             Func<T, TKey> keyReader,
             IReadOnlyList<StaticFieldReader<T>> fieldReaders,
             IReadOnlyList<DynamicFieldReader<T>> dynamicFieldReaders,
@@ -43,6 +43,6 @@ namespace Lifti.Tokenization.Objects
         public ObjectScoreBoostOptions<T> ScoreBoostOptions { get; }
 
         /// <inheritdoc />
-        Type IObjectTokenization.ItemType { get; } = typeof(T);
+        Type IIndexedObjectConfiguration.ItemType { get; } = typeof(T);
     }
 }

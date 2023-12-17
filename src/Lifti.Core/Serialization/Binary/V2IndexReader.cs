@@ -70,10 +70,9 @@ namespace Lifti.Serialization.Binary
                     totalTokenCount += wordCount;
                 }
 
-                index.IdPool.Add(
-                    id,
-                    key,
-                    new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount));
+                var documentStatistics = new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount);
+
+                index.Items.Add(new ItemMetadata<TKey>(id, key, documentStatistics, null, null));
             }
 
             // Double check that the index structure is aware of all the fields that are being deserialized

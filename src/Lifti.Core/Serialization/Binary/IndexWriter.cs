@@ -231,7 +231,7 @@ namespace Lifti.Serialization.Binary
             foreach (var itemMetadata in index.Items.GetIndexedItems())
             {
                 this.writer.WriteNonNegativeVarInt32(itemMetadata.Id);
-                this.keySerializer.Write(this.writer, itemMetadata.Item);
+                this.keySerializer.Write(this.writer, itemMetadata.Key);
                 this.writer.WriteNonNegativeVarInt32(itemMetadata.DocumentStatistics.TokenCountByField.Count);
                 foreach (var fieldTokenCount in itemMetadata.DocumentStatistics.TokenCountByField)
                 {

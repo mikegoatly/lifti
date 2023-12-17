@@ -6,7 +6,7 @@ namespace Lifti
     /// Describes the configuration that should be used when indexing
     /// a strongly typed item against an index.
     /// </summary>
-    internal interface IObjectTokenization
+    internal interface IIndexedObjectConfiguration
     {
         /// <summary>
         /// Gets the type of the item this instance represents.
