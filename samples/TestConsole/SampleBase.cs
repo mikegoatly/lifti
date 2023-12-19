@@ -10,7 +10,11 @@ namespace TestConsole
     {
         public abstract Task RunAsync();
 
-        protected static ISearchResults<TKey> RunSearch<TKey>(FullTextIndex<TKey> index, string query, string message = null)
+        protected static ISearchResults<TKey> RunSearch<TKey>(
+            FullTextIndex<TKey> index, 
+            string query, 
+            string message = null,
+            Func<TKey, string>? objectResultText = null)
         {
             if (message != null)
             {
@@ -23,11 +27,13 @@ namespace TestConsole
             Console.ResetColor();
 
             var results = index.Search(query);
-            PrintSearchResults(results);
+            PrintSearchResults(results, objectResultText);
             return results;
         }
 
-        protected static void PrintSearchResults<TObject>(IEnumerable<SearchResult<TObject>> results)
+        protected static void PrintSearchResults<TKey>(
+            IEnumerable<SearchResult<TKey>> results,
+            Func<TKey, string>? objectResultText = null)
         {
             Console.WriteLine("Matched items total score:");
             foreach (var result in results)
@@ -35,7 +41,15 @@ namespace TestConsole
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.Write($"{result.Key} ");
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"({result.Score})");
+                Console.Write($"({result.Score})");
+
+                if (objectResultText != null)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write($" - {objectResultText(result.Key)}");
+                }
+
+                Console.WriteLine();
             }
 
             Console.ResetColor();
