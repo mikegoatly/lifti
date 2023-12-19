@@ -14,7 +14,7 @@ namespace Lifti.Tokenization
         /// </summary>
         public Token(string token, TokenLocation location)
         {
-            this.locations = new List<TokenLocation> { location };
+            this.locations = [location];
             this.Value = token;
         }
 

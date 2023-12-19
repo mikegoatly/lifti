@@ -95,34 +95,34 @@ namespace Lifti
     }
 
     /// <inheritdoc />
-    public class IndexedFieldDetails<TItem> : IndexedFieldDetails
+    public class IndexedFieldDetails<TObject> : IndexedFieldDetails
     {
-        private readonly Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader;
+        private readonly Func<TObject, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader;
 
         private IndexedFieldDetails(
             byte id,
             string name,
-            Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
+            Func<TObject, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
             FieldKind fieldKind,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus,
             string? dynamicFieldReaderName,
             double scoreBoost)
-            : base(id, name, typeof(TItem), fieldKind, textExtractor, tokenizer, thesaurus, dynamicFieldReaderName, scoreBoost)
+            : base(id, name, typeof(TObject), fieldKind, textExtractor, tokenizer, thesaurus, dynamicFieldReaderName, scoreBoost)
         {
             this.fieldReader = fieldReader;
         }
 
-        internal static IndexedFieldDetails<TItem> Static(byte id,
+        internal static IndexedFieldDetails<TObject> Static(byte id,
             string name,
-            Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
+            Func<TObject, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus,
             double scoreBoost)
         {
-            return new IndexedFieldDetails<TItem>(
+            return new IndexedFieldDetails<TObject>(
                 id,
                 name,
                 fieldReader,
@@ -134,16 +134,16 @@ namespace Lifti
                 scoreBoost);
         }
 
-        internal static IndexedFieldDetails<TItem> Dynamic(byte id,
+        internal static IndexedFieldDetails<TObject> Dynamic(byte id,
             string name,
             string dynamicFieldReaderName,
-            Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
+            Func<TObject, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus,
             double scoreBoost)
         {
-            return new IndexedFieldDetails<TItem>(
+            return new IndexedFieldDetails<TObject>(
                 id,
                 name,
                 fieldReader,
@@ -151,7 +151,7 @@ namespace Lifti
                 textExtractor,
                 tokenizer,
                 thesaurus,
-                dynamicFieldReaderName, 
+                dynamicFieldReaderName,
                 scoreBoost);
         }
 
@@ -163,7 +163,7 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(item));
             }
 
-            if (item is TItem typedItem)
+            if (item is TObject typedItem)
             {
                 return this.fieldReader(typedItem, cancellationToken);
             }
