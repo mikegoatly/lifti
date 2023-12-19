@@ -4,7 +4,6 @@ using Lifti.Tokenization.Stemming;
 using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 
 namespace Lifti.Tokenization
@@ -159,7 +158,7 @@ namespace Lifti.Tokenization
 
             if (length > ushort.MaxValue)
             {
-                throw new LiftiException(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.MaxTokenLengthExceeded, ushort.MaxValue));
+                throw new LiftiException(ExceptionMessages.MaxTokenLengthExceeded, ushort.MaxValue);
             }
 
             this.stemmer?.Stem(tokenBuilder);

@@ -51,7 +51,7 @@ namespace Lifti.Querying
             {
                 if (!results.TryGetValue(match.ItemId, out var itemResults))
                 {
-                    itemResults = new List<ScoredFieldMatch>();
+                    itemResults = [];
                     results[match.ItemId] = itemResults;
                 }
 
@@ -65,7 +65,7 @@ namespace Lifti.Querying
 
                 searchResults.Add(
                     new SearchResult<TKey>(
-                        item.Item,
+                        item.Key,
                         itemResults.FieldMatches.Select(m => new FieldSearchResult(
                             fieldLookup.GetFieldForId(m.FieldId),
                             m.Score,

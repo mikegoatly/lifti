@@ -184,16 +184,33 @@ namespace Lifti.Tests.Serialization
         }
 
         [Fact]
+        public async Task ShouldDeserializeV6Index()
+        {
+            var index = CreateObjectIndex();
+
+            var serializer = new BinarySerializer<int>();
+            using (var stream = new MemoryStream(TestResources.v6Index))
+            {
+                await serializer.DeserializeAsync(index, stream);
+            }
+
+            index.Search("serialized").Should().HaveCount(1);
+            index.Search("亜").Should().HaveCount(1);
+
+            var objectScoreBoostMetadata = index.Items.GetObjectTypeScoreBoostMetadata(1);
+            // The first item in the index wins for both score boosts, each with a weighting of 10.
+            objectScoreBoostMetadata.CalculateScoreBoost(index.Items.GetMetadata(0))
+                .Should().Be(20D);
+
+            // The first item in the index is at the bottom end of both scales, so should return 2.
+            objectScoreBoostMetadata.CalculateScoreBoost(index.Items.GetMetadata(1))
+                .Should().Be(2D);
+        }
+
+        [Fact]
         public async Task ShouldDeserializeV5Index()
         {
-            var index = new FullTextIndexBuilder<int>()
-                  .WithObjectTokenization<DynamicFieldObject>(
-                      cfg => cfg
-                          .WithKey(x => x.Id)
-                          .WithField("Name", x => x.Name)
-                          .WithField("SomethingElse", x => x.SomethingElse)
-                          .WithDynamicFields("DynFields", x => x.Fields))
-                  .Build();
+            var index = CreateObjectIndex();
 
             var serializer = new BinarySerializer<int>();
             using (var stream = new MemoryStream(TestResources.v5Index))
@@ -203,6 +220,10 @@ namespace Lifti.Tests.Serialization
 
             index.Search("serialized").Should().HaveCount(1);
             index.Search("亜").Should().HaveCount(1);
+
+            // The old index won't have any scoring data associated to the documents, so should return 1
+            index.Items.GetObjectTypeScoreBoostMetadata(1).CalculateScoreBoost(index.Items.GetMetadata(0))
+                .Should().Be(1D);
         }
 
         [Fact]
@@ -338,22 +359,69 @@ namespace Lifti.Tests.Serialization
             }
         }
 
+        [Fact]
+        public async Task ShouldRoundTripMixedScoringMetadata()
+        {
+            var index = CreateObjectIndex();
+
+            // One object with score boost info
+            await index.AddAsync(new DynamicFieldObject
+            {
+                Id = 1,
+                CreatedDate = new DateTime(2022, 10, 1),
+                Importance = 5D,
+                Name = "Blah",
+                SomethingElse = "Great",
+                Fields = new Dictionary<string, string>
+                {
+                    { "Foo", "Some serialized data" },
+                    { "Bar", "More text" }
+                }
+            });
+
+            // One object without score boost info
+            await index.AddAsync(new DynamicFieldObject
+            {
+                Id = 2,
+                Name = "Cheese",
+                SomethingElse = "Great",
+                Fields = new Dictionary<string, string>
+                {
+                        { "Foo", "Other data" },
+                        { "Bar", "亜" }
+                    }
+            });
+
+            // One piece of loose text
+            await index.AddAsync(3, "Loose text");
+
+            var deserialized = CreateObjectIndex();
+            await SerializeAndDeserializeAsync(index, deserialized);
+
+            var metadata = deserialized.Items.GetMetadata(0);
+            metadata.ScoringFreshnessDate.Should().Be(new DateTime(2022, 10, 1));
+            metadata.ScoringMagnitude.Should().Be(5D);
+
+            metadata = deserialized.Items.GetMetadata(1);
+            metadata.ScoringFreshnessDate.Should().BeNull();
+            metadata.ScoringMagnitude.Should().BeNull();
+
+            metadata = deserialized.Items.GetMetadata(2);
+            metadata.ScoringFreshnessDate.Should().BeNull();
+            metadata.ScoringMagnitude.Should().BeNull();
+        }
+
         // Used to create test indexes when defining a new serialization version
         //[Fact]
         //public async Task CreateTestIndex()
         //{
-        //    var index = new FullTextIndexBuilder<int>()
-        //          .WithObjectTokenization<DynamicFieldObject>(
-        //              cfg => cfg
-        //                  .WithKey(x => x.Id)
-        //                  .WithField("Name", x => x.Name)
-        //                  .WithField("SomethingElse", x => x.SomethingElse)
-        //                  .WithDynamicFields("DynFields", x => x.Fields))
-        //          .Build();
+        //    var index = CreateObjectIndex();
 
         //    await index.AddAsync(new DynamicFieldObject
         //    {
         //        Id = 1,
+        //        CreatedDate = new DateTime(2022, 10, 1),
+        //        Importance = 5D,
         //        Name = "Blah",
         //        SomethingElse = "Great",
         //        Fields = new Dictionary<string, string>
@@ -366,6 +434,8 @@ namespace Lifti.Tests.Serialization
         //    await index.AddAsync(new DynamicFieldObject
         //    {
         //        Id = 2,
+        //        CreatedDate = new DateTime(2021, 10, 1),
+        //        Importance = 2D,
         //        Name = "Cheese",
         //        SomethingElse = "Great",
         //        Fields = new Dictionary<string, string>
@@ -376,9 +446,24 @@ namespace Lifti.Tests.Serialization
         //    });
 
         //    var serializer = new BinarySerializer<int>();
-        //    using var stream = File.Open("../../../V5.dat", FileMode.Create);
+        //    using var stream = File.Open("../../../V6.dat", FileMode.Create);
         //    await serializer.SerializeAsync(index, stream, true);
         //}
+
+        private static FullTextIndex<int> CreateObjectIndex()
+        {
+            return new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<DynamicFieldObject>(
+                    cfg => cfg
+                        .WithKey(x => x.Id)
+                        .WithField("Name", x => x.Name)
+                        .WithField("SomethingElse", x => x.SomethingElse)
+                        .WithDynamicFields("DynFields", x => x.Fields)
+                        .WithScoreBoosting(x => x
+                            .Freshness(o => o.CreatedDate, 10)
+                            .Magnitude(o => o.Importance, 10)))
+                .Build();
+        }
 
         private static string CreateRandomIndexFileName()
         {
@@ -441,6 +526,8 @@ namespace Lifti.Tests.Serialization
             public string Name { get; set; } = null!;
             public string SomethingElse { get; set; } = null!;
             public Dictionary<string, string>? Fields { get; set; }
+            public DateTime? CreatedDate { get; internal set; }
+            public double? Importance { get; internal set; }
         }
     }
 }

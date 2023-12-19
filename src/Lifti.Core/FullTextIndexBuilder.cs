@@ -16,7 +16,7 @@ namespace Lifti
     public class FullTextIndexBuilder<TKey>
         where TKey : notnull
     {
-        private readonly List<IObjectTokenizationBuilder> objectTokenizationBuilders = new();
+        private readonly List<IObjectTokenizationBuilder> objectTokenizationBuilders = [];
         private readonly IndexOptions advancedOptions = new();
         private ThesaurusBuilder? defaultThesaurusBuilder;
         private IIndexScorerFactory? scorerFactory;
@@ -79,7 +79,7 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(asyncAction));
             }
 
-            this.indexModifiedActions ??= new List<Func<IIndexSnapshot<TKey>, CancellationToken, Task>>();
+            this.indexModifiedActions ??= [];
 
             this.indexModifiedActions.Add(asyncAction);
 
@@ -123,20 +123,20 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Creates an <see cref="ObjectTokenization{TItem, TKey}"/> configuration entry for an item of type <typeparamref name="TItem"/>
+        /// Configures the index to support tokenizing an item of type <typeparamref name="TObject"/>
         /// in the index.
         /// </summary>
         /// <param name="optionsBuilder">
         /// A delegate capable of specifying all the required options for the item tokenization options.
         /// </param>
-        public FullTextIndexBuilder<TKey> WithObjectTokenization<TItem>(Func<ObjectTokenizationBuilder<TItem, TKey>, ObjectTokenizationBuilder<TItem, TKey>> optionsBuilder)
+        public FullTextIndexBuilder<TKey> WithObjectTokenization<TObject>(Func<ObjectTokenizationBuilder<TObject, TKey>, ObjectTokenizationBuilder<TObject, TKey>> optionsBuilder)
         {
             if (optionsBuilder is null)
             {
                 throw new ArgumentNullException(nameof(optionsBuilder));
             }
 
-            var builder = new ObjectTokenizationBuilder<TItem, TKey>();
+            var builder = new ObjectTokenizationBuilder<TObject, TKey>();
             this.objectTokenizationBuilders.Add(optionsBuilder(builder));
 
             return this;
@@ -256,16 +256,36 @@ namespace Lifti
             // Building the object tokenizers also populates the index's field lookup with
             // any static fields that have been defined.
             var fieldLookup = new IndexedFieldLookup();
-            var objectTokenizers = new List<IObjectTokenization>();
+            var objectTokenizers = new List<IIndexedObjectConfiguration>();
+
+            // Start object type IDs at 1 - 0 is reserved for special use where the indexed document is
+            // not associated with a specific object.
+            byte objectTypeId = 1;
             foreach (var objectTokenizationBuilder in this.objectTokenizationBuilders)
             {
-                var objectTokenizer = objectTokenizationBuilder.Build(this.defaultTokenizer, thesaurusBuilder, textExtractor, fieldLookup);
+                // This is a limitation of the current binary serialization implementation. We are reserving
+                // 3 bits of the object type ID for whether the object has various scoring metadata associated
+                // to it. That leaves us with 5 bits for the object type ID.
+                // Having more that 31 different *object types* (not fields) seems a bit of a stretch, so this
+                // feels ok as a design constraint for now.
+                if (objectTypeId > 31)
+                {
+                    throw new LiftiException(ExceptionMessages.MaximumNumberOfConfiguredObjectTypesReached);
+                }
+
+                var objectTokenizer = objectTokenizationBuilder.Build(
+                    objectTypeId++,
+                    this.defaultTokenizer,
+                    thesaurusBuilder,
+                    textExtractor,
+                    fieldLookup);
+
                 objectTokenizers.Add(objectTokenizer);
             }
 
             return new FullTextIndex<TKey>(
                 this.advancedOptions,
-                new ObjectTokenizationLookup<TKey>(objectTokenizers),
+                new ObjectTypeConfigurationLookup<TKey>(objectTokenizers),
                 fieldLookup,
                 new IndexNodeFactory(this.advancedOptions),
                 this.queryParser ?? new QueryParser(new QueryParserOptions()),

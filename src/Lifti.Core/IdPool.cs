@@ -4,64 +4,38 @@ using System.Collections.Generic;
 namespace Lifti
 {
     /// <summary>
-    /// Extends <see cref="ItemStore{T}"/> by adding additional methods for controlling
-    /// the addition and removal of items, caching and reusing the item ids.
+    /// Provides methods for generating unique internal ids for items based on the key of the item.
     /// </summary>
-    public class IdPool<T> : ItemStore<T>, IIdPool<T>
-        where T : notnull
+    /// <typeparam name="TKey">The type of key in the index.</typeparam>
+    internal class IdPool<TKey>
+        where TKey : notnull
     {
-        private readonly Queue<int> reusableIds = new Queue<int>();
+        private readonly Queue<int> reusableIds = new();
         private int nextId;
 
-        /// <inheritdoc />
-        public int Add(T item, DocumentStatistics documentStatistics)
+        /// <summary>
+        /// Gets the next available id from the pool.
+        /// </summary>
+        public int Next()
         {
-            if (this.ItemLookup.ContainsKey(item))
-            {
-                throw new LiftiException(ExceptionMessages.ItemAlreadyIndexed);
-            }
-
-            var id = this.reusableIds.Count == 0 ? this.nextId++ : this.reusableIds.Dequeue();
-            this.Add(id, item, new ItemMetadata<T>(id, item, documentStatistics));
-            return id;
+            return this.reusableIds.Count == 0 ? this.nextId++ : this.reusableIds.Dequeue();
         }
 
-        /// <inheritdoc />
-        public int ReleaseItem(T item)
+        /// <summary>
+        /// Returns the given id to the pool.
+        /// </summary>
+        public void Return(int id)
         {
-            var itemMetadata = this.ItemLookup[item];
-            var id = itemMetadata.Id;
-
-            this.ItemLookup = this.ItemLookup.Remove(item);
-            this.ItemIdLookup = this.ItemIdLookup.Remove(id);
-            this.IndexStatistics = this.IndexStatistics.Remove(itemMetadata.DocumentStatistics);
-
             this.reusableIds.Enqueue(id);
-            return id;
         }
 
-        /// <inheritdoc />
-        public void Add(int id, T item, DocumentStatistics documentStatistics)
+        /// <summary>
+        /// Used during index deserialization to ensure that the next id generated is greater than any id used in 
+        /// the index.
+        /// </summary>
+        internal void RegisterUsedId(int id)
         {
-            if (this.ItemLookup.ContainsKey(item))
-            {
-                throw new LiftiException(ExceptionMessages.ItemAlreadyIndexed);
-            }
-
-            if (this.ItemIdLookup.ContainsKey(id))
-            {
-                throw new LiftiException(ExceptionMessages.IdAlreadyUsed, id);
-            }
-
-            this.Add(id, item, new ItemMetadata<T>(id, item, documentStatistics));
             this.nextId = Math.Max(this.nextId, id + 1);
-        }
-
-        private void Add(int id, T item, ItemMetadata<T> itemMetadata)
-        {
-            this.ItemLookup = this.ItemLookup.Add(item, itemMetadata);
-            this.ItemIdLookup = this.ItemIdLookup.Add(id, itemMetadata);
-            this.IndexStatistics = this.IndexStatistics.Add(itemMetadata.DocumentStatistics);
         }
     }
 }

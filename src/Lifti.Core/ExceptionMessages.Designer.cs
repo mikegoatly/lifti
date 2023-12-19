@@ -385,6 +385,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An index can only have a maximum of 31 unique object types configured against it.
+        /// </summary>
+        internal static string MaximumNumberOfConfiguredObjectTypesReached {
+            get {
+                return ResourceManager.GetString("MaximumNumberOfConfiguredObjectTypesReached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Only tokens up to {0} characters long can be indexed..
         /// </summary>
         internal static string MaxTokenLengthExceeded {
@@ -408,6 +417,15 @@ namespace Lifti {
         internal static string MissingLiftiHeaderIndicatorBytes {
             get {
                 return ResourceManager.GetString("MissingLiftiHeaderIndicatorBytes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiplier values must be greater than one.
+        /// </summary>
+        internal static string MultiplierValueMustBeGreaterThanOne {
+            get {
+                return ResourceManager.GetString("MultiplierValueMustBeGreaterThanOne", resourceCulture);
             }
         }
         
@@ -480,6 +498,15 @@ namespace Lifti {
         internal static string NoTokenizationOptionsProvidedForType {
             get {
                 return ResourceManager.GetString("NoTokenizationOptionsProvidedForType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal error - attempted to calculate an item score boost without initialized score boost stats.
+        /// </summary>
+        internal static string ScoreBoostsNotCalculated {
+            get {
+                return ResourceManager.GetString("ScoreBoostsNotCalculated", resourceCulture);
             }
         }
         
@@ -601,6 +628,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internal error - unexpected value removal from score boost metadata.
+        /// </summary>
+        internal static string UnexpectedScoreBoostValueRemoval {
+            get {
+                return ResourceManager.GetString("UnexpectedScoreBoostValueRemoval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unexpected token encountered: {0}.
         /// </summary>
         internal static string UnexpectedTokenEncountered {
@@ -646,6 +682,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown object type id {0}.
+        /// </summary>
+        internal static string UnknownObjectTypeId {
+            get {
+                return ResourceManager.GetString("UnknownObjectTypeId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown operator encountered: {0}.
         /// </summary>
         internal static string UnknownOperatorEncountered {
@@ -678,6 +723,15 @@ namespace Lifti {
         internal static string ValueMustNotBeLessThanZero {
             get {
                 return ResourceManager.GetString("ValueMustNotBeLessThanZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WithScoreBoosting can only be called once per object builder.
+        /// </summary>
+        internal static string WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition {
+            get {
+                return ResourceManager.GetString("WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition", resourceCulture);
             }
         }
     }

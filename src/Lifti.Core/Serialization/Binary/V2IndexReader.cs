@@ -70,10 +70,11 @@ namespace Lifti.Serialization.Binary
                     totalTokenCount += wordCount;
                 }
 
-                index.IdPool.Add(
-                    id,
-                    key,
-                    new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount));
+                var documentStatistics = new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount);
+
+                // Using ForLooseText here because we don't know any of the new information associated to an object
+                // type, e.g. its id or score boost options. This is the closest we can get to the old format.
+                index.Items.Add(ItemMetadata<TKey>.ForLooseText(id, key, documentStatistics));
             }
 
             // Double check that the index structure is aware of all the fields that are being deserialized
@@ -137,7 +138,7 @@ namespace Lifti.Serialization.Binary
 
                     this.ReadLocations(locationCount, locationMatches);
 
-                    indexedTokens.Add(new IndexedToken(fieldId, locationMatches.ToArray()));
+                    indexedTokens.Add(new IndexedToken(fieldId, [.. locationMatches]));
                 }
 
                 matches!.Add(itemId, indexedTokens.ToImmutable());

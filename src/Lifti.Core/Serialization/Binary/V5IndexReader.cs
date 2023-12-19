@@ -11,7 +11,7 @@ namespace Lifti.Serialization.Binary
     {
         private readonly Stream underlyingStream;
         private readonly bool disposeStream;
-        private readonly IKeySerializer<TKey> keySerializer;
+        protected readonly IKeySerializer<TKey> keySerializer;
         private readonly MemoryStream buffer;
         private long initialUnderlyingStreamOffset;
         protected readonly BinaryReader reader;
@@ -42,7 +42,7 @@ namespace Lifti.Serialization.Binary
             await this.FillBufferAsync().ConfigureAwait(false);
 
             var fieldIdMap = this.ReadFields(index);
-            this.ReadIndexedItems(index);
+            this.ReadIndexedDocuments(index);
 
             index.SetRootWithLock(this.DeserializeNode(fieldIdMap, index.IndexNodeFactory, 0));
 
@@ -74,7 +74,7 @@ namespace Lifti.Serialization.Binary
             return index.RehydrateSerializedFields(serializedFields);
         }
 
-        private void ReadIndexedItems(FullTextIndex<TKey> index)
+        protected virtual void ReadIndexedDocuments(FullTextIndex<TKey> index)
         {
             var itemCount = this.reader.ReadNonNegativeVarInt32();
             for (var i = 0; i < itemCount; i++)
@@ -92,10 +92,11 @@ namespace Lifti.Serialization.Binary
                     totalTokenCount += wordCount;
                 }
 
-                index.IdPool.Add(
-                    id,
-                    key,
-                    new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount));
+                var documentStatistics = new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount);
+
+                // Using ForLooseText here because we don't know any of the new information associated to an object
+                // type, e.g. its id or score boost options. This is the closest we can get to the old format.
+                index.Items.Add(ItemMetadata<TKey>.ForLooseText(id, key, documentStatistics));
             }
         }
 
