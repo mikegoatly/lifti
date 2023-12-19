@@ -5,22 +5,17 @@ namespace TestConsole
 {
     public class MagnitudeBoosting : SampleBase
     {
-        public class Document
-        {
-            public int Id { get; set; }
-            public string Content { get; set; }
-            public int Rating { get; set; }
-        }
+        public record Document(int Id, string Content, int Rating);
 
         public override async Task RunAsync()
         {
             var documents = new[]
             {
-                new Document { Id = 1, Content = "This is a document with a rating of 1", Rating = 1 },
-                new Document { Id = 2, Content = "This is a document with a rating of 2", Rating = 2 },
-                new Document { Id = 3, Content = "This is a document with a rating of 3", Rating = 3 },
-                new Document { Id = 4, Content = "This is a document with a rating of 4", Rating = 4 },
-                new Document { Id = 5, Content = "This is a document with a rating of 5", Rating = 5 }
+                new Document(1, "This is a document with a rating of 1", 1),
+                new Document(2, "This is a document with a rating of 2", 2),
+                new Document(3, "This is a document with a rating of 3", 3),
+                new Document(4, "This is a document with a rating of 4", 4),
+                new Document(5, "This is a document with a rating of 5", 5)
             };
 
             var index = new FullTextIndexBuilder<int>()

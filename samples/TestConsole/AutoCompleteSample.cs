@@ -1,6 +1,5 @@
 ﻿using Lifti;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -12,7 +11,7 @@ namespace TestConsole
 {
     public class AutoCompleteHelper
     {
-        private FullTextIndex<int> index;
+        private FullTextIndex<int>? index;
 
         public async Task InitializeAsync()
         {
@@ -21,7 +20,7 @@ namespace TestConsole
 
         public IEnumerable<string> GetSuggestions(string input)
         {
-            using var navigator = index.CreateNavigator();
+            using var navigator = this.index!.CreateNavigator();
             navigator.Process(input.AsSpan());
             return navigator.EnumerateIndexedTokens().ToList();
         }

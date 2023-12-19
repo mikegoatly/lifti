@@ -11,10 +11,11 @@ namespace TestConsole
         public abstract Task RunAsync();
 
         protected static ISearchResults<TKey> RunSearch<TKey>(
-            FullTextIndex<TKey> index, 
-            string query, 
-            string message = null,
+            FullTextIndex<TKey> index,
+            string query,
+            string? message = null,
             Func<TKey, string>? objectResultText = null)
+            where TKey : notnull
         {
             if (message != null)
             {
@@ -56,7 +57,9 @@ namespace TestConsole
             Console.WriteLine();
         }
 
-        protected static async Task<ISearchResults<TKey>> RunSearchAsync<TKey, TObject>(FullTextIndex<TKey> index, string query, Func<TKey, TObject> readItem, string message = null)
+        protected static async Task<ISearchResults<TKey>> RunSearchAsync<TKey, TObject>(FullTextIndex<TKey> index, string query, Func<TKey, TObject> readItem, string? message = null)
+            where TObject : class
+            where TKey : notnull
         {
             if (message != null)
             {

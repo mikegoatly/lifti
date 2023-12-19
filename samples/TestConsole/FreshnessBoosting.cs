@@ -6,23 +6,17 @@ namespace TestConsole
 {
     public class FreshnessBoosting : SampleBase
     {
-        public class Document
-        {
-            public int Id { get; set; }
-            public string Content { get; set; }
-
-            public DateTime UpdatedDate { get; set; }
-        }
+        public record Document(int Id, string Content, DateTime UpdatedDate);
 
         public override async Task RunAsync()
         {
             var documents = new[]
             {
-                new Document { Id = 1, Content = "This is a document that was updated 5 day ago", UpdatedDate = DateTime.UtcNow.AddDays(-5) },
-                new Document { Id = 2, Content = "This is a document that was updated 4 days ago", UpdatedDate = DateTime.UtcNow.AddDays(-4) },
-                new Document { Id = 3, Content = "This is a document that was updated 3 days ago", UpdatedDate = DateTime.UtcNow.AddDays(-3) },
-                new Document { Id = 4, Content = "This is a document that was updated 2 days ago", UpdatedDate = DateTime.UtcNow.AddDays(-2) },
-                new Document { Id = 5, Content = "This is a document that was updated 1 days ago", UpdatedDate = DateTime.UtcNow.AddDays(-1) }
+                new Document(1, "This is a document that was updated 5 day ago", DateTime.UtcNow.AddDays(-5)),
+                new Document(2, "This is a document that was updated 4 days ago", DateTime.UtcNow.AddDays(-4)),
+                new Document(3, "This is a document that was updated 3 days ago", DateTime.UtcNow.AddDays(-3)),
+                new Document(4, "This is a document that was updated 2 days ago", DateTime.UtcNow.AddDays(-2)),
+                new Document(5, "This is a document that was updated 1 days ago", DateTime.UtcNow.AddDays(-1))
             };
 
             var index = new FullTextIndexBuilder<int>()
