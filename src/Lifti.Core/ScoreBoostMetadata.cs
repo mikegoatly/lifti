@@ -21,7 +21,10 @@ namespace Lifti
         /// <summary>
         /// Calculates the score boost for the given item.
         /// </summary>
-        public double CalculateScoreBoost(ItemMetadata itemMetadata)
+        /// <remarks>
+        /// This is virtual to allow for unit tests to override its behavior.
+        /// </remarks>
+        public virtual double CalculateScoreBoost(ItemMetadata itemMetadata)
         {
             if (itemMetadata is null)
             {
