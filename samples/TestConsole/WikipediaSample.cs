@@ -33,7 +33,7 @@ namespace TestConsole
             do
             {
                 var query = Console.ReadLine();
-                if (query.Length == 0)
+                if (string.IsNullOrWhiteSpace(query))
                 {
                     return;
                 }

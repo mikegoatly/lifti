@@ -49,7 +49,7 @@ namespace TestConsole
                         Console.Write(' ');
                         Console.CursorLeft -= 1;
                     }
-                } while (key < firstLetter|| key > lastLetter);
+                } while (key < firstLetter || key > lastLetter);
 
                 var selectedSample = samples[key - 'a'];
 
@@ -57,7 +57,14 @@ namespace TestConsole
                 Console.WriteLine($"Running {selectedSample.Name}");
                 Console.WriteLine();
 
-                await ((ISample)Activator.CreateInstance(selectedSample)).RunAsync();
+                if (Activator.CreateInstance(selectedSample) is ISample sampleInstance)
+                {
+                    await sampleInstance.RunAsync();
+                }
+                else
+                {
+                    throw new Exception($"Unable to create sample {selectedSample.Name}!");
+                }
             } while (true);
         }
     }
