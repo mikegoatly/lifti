@@ -40,6 +40,25 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public void WithObjectConfiguration_ShouldAllocateUniqueObjectTypeIds()
+        {
+            this.sut.WithObjectTokenization<TestObject1>(
+                o => o
+                    .WithKey(i => i.Id)
+                    .WithField("TextField", i => i.Text))
+                .WithObjectTokenization<TestObject2>(
+                o => o
+                    .WithKey(i => i.Id)
+                    .WithField("Content", i => i.Content)
+                    .WithField("Title", i => i.Title));
+
+            var index = this.sut.Build();
+
+            index.ObjectTypeConfiguration.AllConfigurations.Select(x => x.Id)
+                .Should().BeEquivalentTo(new[] { 0, 1 });
+        }
+
+        [Fact]
         public void WithObjectConfiguration_ShouldUseDefaultTokenizationOptionsIfNotProvided()
         {
             this.sut.WithDefaultTokenization(o => o.CaseInsensitive(false))
@@ -102,7 +121,7 @@ namespace Lifti.Tests
         [Fact]
         public void WithConfiguredExplicitFuzzyMatchParameters_ShouldPassParametersToConstructedQueryParsers()
         {
-            var passedOptions = BuildSutAndGetPassedOptions(o => o.WithFuzzySearchDefaults(10, 4));
+            var passedOptions = this.BuildSutAndGetPassedOptions(o => o.WithFuzzySearchDefaults(10, 4));
 
             passedOptions.Should().NotBeNull();
             passedOptions!.FuzzySearchMaxEditDistance(1000).Should().Be(10);
@@ -112,7 +131,7 @@ namespace Lifti.Tests
         [Fact]
         public void WithNoDefaultJoiningOperatorConfigured_ShouldPassAndOperatorToIndex()
         {
-            var passedOptions = BuildSutAndGetPassedOptions(o => o);
+            var passedOptions = this.BuildSutAndGetPassedOptions(o => o);
             passedOptions.Should().NotBeNull();
             passedOptions!.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.And);
         }
@@ -120,7 +139,7 @@ namespace Lifti.Tests
         [Fact]
         public void WithDefaultJoiningOperatorConfigured_ShouldPassDefaultOperatorToIndex()
         {
-            var passedOptions = BuildSutAndGetPassedOptions(o => o.WithDefaultJoiningOperator(QueryTermJoinOperatorKind.Or));
+            var passedOptions = this.BuildSutAndGetPassedOptions(o => o.WithDefaultJoiningOperator(QueryTermJoinOperatorKind.Or));
             passedOptions.Should().NotBeNull();
             passedOptions!.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.Or);
         }

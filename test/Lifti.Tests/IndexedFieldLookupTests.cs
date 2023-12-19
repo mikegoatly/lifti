@@ -160,13 +160,18 @@ namespace Lifti.Tests
         private IIndexedObjectConfiguration Build(ObjectTokenizationBuilder<string, string> objectTokenizationBuilder, IndexedFieldLookup fieldLookup)
         {
             return (objectTokenizationBuilder as IObjectTokenizationBuilder)
-                .Build(IndexTokenizer.Default, new ThesaurusBuilder(), new PlainTextExtractor(), fieldLookup);
+                .Build(
+                    1,
+                    IndexTokenizer.Default,
+                    new ThesaurusBuilder(),
+                    new PlainTextExtractor(),
+                    fieldLookup);
         }
 
-        private static DynamicFieldReader<T> CreateDynamicFieldReader<T>()
-            where T : new()
+        private static DynamicFieldReader<TObject> CreateDynamicFieldReader<TObject>()
+            where TObject : new()
         {
-            var reader = new StringDictionaryDynamicFieldReader<T>(
+            var reader = new StringDictionaryDynamicFieldReader<TObject>(
                 x => new Dictionary<string, string> { { "foo", "bar" } },
                 "Test",
                 null,
@@ -176,7 +181,7 @@ namespace Lifti.Tests
                 1D);
 
             // Force the reader to first produce (and cache) the field names
-            reader.ReadAsync(new T(), default);
+            reader.ReadAsync(new TObject(), default);
 
             return reader;
         }

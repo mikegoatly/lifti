@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lifti.Tokenization.Objects;
+using System;
 
 namespace Lifti
 {
@@ -12,5 +13,15 @@ namespace Lifti
         /// Gets the type of the item this instance represents.
         /// </summary>
         Type ItemType { get; }
+
+        /// <summary>
+        /// Gets the unique id for the object type.
+        /// </summary>
+        byte Id { get; }
+
+        /// <summary>
+        /// Gets the non-type specific score boost options.
+        /// </summary>
+        ObjectScoreBoostOptions ScoreBoostOptions { get; }
     }
 }

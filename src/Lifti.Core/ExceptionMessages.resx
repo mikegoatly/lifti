@@ -321,6 +321,9 @@
   <data name="UnknownFieldsInSerializedIndex" xml:space="preserve">
     <value>Serialized index contains unknown field ids. Fields have most likely been removed from the FullTextIndexBuilder configuration.</value>
   </data>
+  <data name="UnknownObjectTypeId" xml:space="preserve">
+    <value>Unknown object type id {0}</value>
+  </data>
   <data name="UnknownOperatorEncountered" xml:space="preserve">
     <value>Unknown operator encountered: {0}</value>
   </data>

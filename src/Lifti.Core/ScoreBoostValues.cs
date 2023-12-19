@@ -21,7 +21,7 @@ namespace Lifti
     }
 
     /// <summary>
-    /// Maintains the set of values that have been encountered for a given object type, allowing for
+    /// Maintains the set of values that have been encountered for a score boost property of a given object type, allowing for
     /// a normalized score to be calculated for any given value.
     /// </summary>
     internal abstract class ScoreBoostValues<T>

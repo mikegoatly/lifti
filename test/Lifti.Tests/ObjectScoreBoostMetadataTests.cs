@@ -10,11 +10,11 @@ namespace Lifti.Tests
         private const double FreshnessMultiplier = 10D;
         private const double MagnitudeMultiplier = 20D;
 
-        private readonly ObjectScoreBoostMetadata sut;
+        private readonly ScoreBoostMetadata sut;
 
         public ObjectScoreBoostMetadataTests()
         {
-            this.sut = new ObjectScoreBoostMetadata(new ObjectScoreBoostOptions<object>(MagnitudeMultiplier, null, FreshnessMultiplier, null));
+            this.sut = new ScoreBoostMetadata(new ObjectScoreBoostOptions<object>(MagnitudeMultiplier, null, FreshnessMultiplier, null));
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace Lifti.Tests
 
         private static ItemMetadata<string> ItemMetadata(DateTime? scoringFreshnessDate, double? scoringMagnitude)
         {
-            return new ItemMetadata<string>(1, "A", new DocumentStatistics(1, 2), scoringFreshnessDate, scoringMagnitude);
+            return ItemMetadata<string>.ForObject(1, 1, "A", new DocumentStatistics(1, 2), scoringFreshnessDate, scoringMagnitude);
         }
     }
 }

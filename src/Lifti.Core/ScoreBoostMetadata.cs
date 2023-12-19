@@ -4,16 +4,16 @@ using System;
 namespace Lifti
 {
     /// <summary>
-    /// Information about the range of scoring data, e.g. freshness date, magnitude values, encountered
+    /// Maintains information about all the scoring metadata, e.g. freshness date, magnitude values, encountered
     /// for a single object type.
     /// </summary>
-    public class ObjectScoreBoostMetadata
+    public class ScoreBoostMetadata
     {
         private readonly DateTimeScoreBoostValues freshnessBoost = new();
         private readonly DoubleScoreBoostValues magnitudeBoost = new();
         private readonly ObjectScoreBoostOptions scoreBoostOptions;
 
-        internal ObjectScoreBoostMetadata(ObjectScoreBoostOptions scoreBoostOptions)
+        internal ScoreBoostMetadata(ObjectScoreBoostOptions scoreBoostOptions)
         {
             this.scoreBoostOptions = scoreBoostOptions;
         }

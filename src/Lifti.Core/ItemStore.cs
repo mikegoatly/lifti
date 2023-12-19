@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Lifti
 {
@@ -9,27 +10,25 @@ namespace Lifti
     internal class ItemStore<TKey> : IItemStore<TKey>
         where TKey : notnull
     {
+        private readonly Dictionary<byte, ScoreBoostMetadata> scoreBoostMetadata;
         private readonly IdPool<TKey> idPool;
 
-        internal ItemStore()
-            : this(
-                new IdPool<TKey>(),
-                ImmutableDictionary<TKey, ItemMetadata<TKey>>.Empty,
-                ImmutableDictionary<int, ItemMetadata<TKey>>.Empty,
-                IndexStatistics.Empty)
+        internal ItemStore(IEnumerable<IIndexedObjectConfiguration> configureObjectTypes)
         {
+            this.idPool = new IdPool<TKey>();
+            this.ItemLookup = ImmutableDictionary<TKey, ItemMetadata<TKey>>.Empty;
+            this.ItemIdLookup = ImmutableDictionary<int, ItemMetadata<TKey>>.Empty;
+            this.IndexStatistics = IndexStatistics.Empty;
+            this.scoreBoostMetadata = configureObjectTypes.ToDictionary(o => o.Id, o => new ScoreBoostMetadata(o.ScoreBoostOptions));
         }
 
-        private ItemStore(
-            IdPool<TKey> idPool,
-            ImmutableDictionary<TKey, ItemMetadata<TKey>> itemLookup,
-            ImmutableDictionary<int, ItemMetadata<TKey>> itemIdLookup,
-            IndexStatistics indexStatistics)
+        private ItemStore(ItemStore<TKey> original)
         {
-            this.idPool = idPool;
-            this.ItemLookup = itemLookup;
-            this.ItemIdLookup = itemIdLookup;
-            this.IndexStatistics = indexStatistics;
+            this.idPool = original.idPool;
+            this.ItemLookup = original.ItemLookup;
+            this.ItemIdLookup = original.ItemIdLookup;
+            this.IndexStatistics = original.IndexStatistics;
+            this.scoreBoostMetadata = original.scoreBoostMetadata;
         }
 
         /// <inheritdoc />
@@ -69,7 +68,7 @@ namespace Lifti
         public int Add(TKey key, DocumentStatistics documentStatistics)
         {
             return this.Add(
-                id => new ItemMetadata<TKey>(id, key, documentStatistics, null, null));
+                id => ItemMetadata<TKey>.ForLooseText(id, key, documentStatistics));
         }
 
         /// <summary>
@@ -84,7 +83,21 @@ namespace Lifti
             var scoringMagnitude = scoreBoostOptions.MagnitudeProvider?.Invoke(item);
 
             return this.Add(
-                id => new ItemMetadata<TKey>(id, key, documentStatistics, freshnessDate, scoringMagnitude));
+                itemId =>
+                {
+                    var itemMetadata = ItemMetadata<TKey>.ForObject(
+                        objectTypeId: objectConfiguration.Id,
+                        itemId: itemId,
+                        key,
+                        documentStatistics,
+                        freshnessDate,
+                        scoringMagnitude);
+
+                    this.GetObjectTypeScoreBoostMetadata(objectConfiguration.Id)
+                        .Add(itemMetadata);
+
+                    return itemMetadata;
+                });
         }
 
         /// <inheritdoc />
@@ -92,6 +105,13 @@ namespace Lifti
         {
             // Make the ID pool aware of the ID we are using
             this.idPool.RegisterUsedId(itemMetadata.Id);
+
+            if (itemMetadata.ObjectTypeId is byte objectTypeId)
+            {
+                // Add the item to the score boost metadata
+                this.GetObjectTypeScoreBoostMetadata(objectTypeId)
+                    .Add(itemMetadata);
+            }
 
             this.UpdateLookups(itemMetadata);
         }
@@ -109,6 +129,13 @@ namespace Lifti
             this.ItemLookup = this.ItemLookup.Remove(key);
             this.ItemIdLookup = this.ItemIdLookup.Remove(id);
             this.IndexStatistics = this.IndexStatistics.Remove(itemInfo.DocumentStatistics);
+
+            if (itemInfo.ObjectTypeId is byte objectTypeId)
+            {
+                // Remove the item from the score boost metadata
+                this.GetObjectTypeScoreBoostMetadata(objectTypeId)
+                    .Remove(itemInfo);
+            }
 
             this.idPool.Return(id);
 
@@ -146,14 +173,21 @@ namespace Lifti
         /// <inheritdoc />
         public IItemStore<TKey> Snapshot()
         {
-            return new ItemStore<TKey>(
-                this.idPool,
-                this.ItemLookup,
-                this.ItemIdLookup,
-                this.IndexStatistics
-            );
+            return new ItemStore<TKey>(this);
         }
 
+        /// <inheritdoc />
+        public ScoreBoostMetadata GetObjectTypeScoreBoostMetadata(byte objectTypeId)
+        {
+            if (!this.scoreBoostMetadata.TryGetValue(objectTypeId, out var scoreBoostMetadata))
+            {
+                throw new LiftiException(ExceptionMessages.UnknownObjectTypeId, objectTypeId);
+            }
+
+            return scoreBoostMetadata;
+        }
+
+        /// <inheritdoc />
         ItemMetadata IItemStore.GetMetadata(int id)
         {
             return this.GetMetadata(id);

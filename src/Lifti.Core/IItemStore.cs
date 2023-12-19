@@ -21,6 +21,12 @@ namespace Lifti
         ItemMetadata GetMetadata(int id);
 
         /// <summary>
+        /// Gets the calculated <see cref="ScoreBoostMetadata"/> for the given object type. This can be used
+        /// to determine the score boost for an instance of <see cref="ItemMetadata"/>.
+        /// </summary>
+        ScoreBoostMetadata GetObjectTypeScoreBoostMetadata(byte objectTypeId);
+
+        /// <summary>
         /// Gets the aggregated statistics for all the indexed documents, including total token count.
         /// </summary>
         IndexStatistics IndexStatistics { get; }

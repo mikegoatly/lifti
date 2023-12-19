@@ -44,7 +44,7 @@ namespace Lifti
             Func<IIndexSnapshot<TKey>, CancellationToken, Task>[]? indexModifiedActions)
         {
             this.indexNavigatorPool = new IndexNavigatorPool(scorer);
-            this.itemStore = new ItemStore<TKey>();
+            this.itemStore = new ItemStore<TKey>(objectTypeConfiguration.AllConfigurations);
 
             this.indexOptions = indexOptions;
             this.ObjectTypeConfiguration = objectTypeConfiguration ?? throw new ArgumentNullException(nameof(objectTypeConfiguration));
@@ -182,14 +182,14 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public async Task AddRangeAsync<TItem>(IEnumerable<TItem> items, CancellationToken cancellationToken = default)
+        public async Task AddRangeAsync<TObject>(IEnumerable<TObject> items, CancellationToken cancellationToken = default)
         {
             if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
             }
 
-            var options = this.ObjectTypeConfiguration.Get<TItem>();
+            var options = this.ObjectTypeConfiguration.Get<TObject>();
             await this.PerformWriteLockedActionAsync(
                 async () =>
                 {
@@ -208,9 +208,9 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public async Task AddAsync<TItem>(TItem item, CancellationToken cancellationToken = default)
+        public async Task AddAsync<TObject>(TObject item, CancellationToken cancellationToken = default)
         {
-            var options = this.ObjectTypeConfiguration.Get<TItem>();
+            var options = this.ObjectTypeConfiguration.Get<TObject>();
             await this.PerformWriteLockedActionAsync(
                 async () => await this.MutateAsync(
                     async m => await this.AddAsync(item, options, m, cancellationToken).ConfigureAwait(false),
@@ -408,7 +408,7 @@ namespace Lifti
         }
 
         /// <remarks>This method is thread safe as we only allow one mutation operation at a time.</remarks>
-        private async Task AddAsync<TItem>(TItem item, IndexedObjectConfiguration<TItem, TKey> options, IndexMutation indexMutation, CancellationToken cancellationToken)
+        private async Task AddAsync<TObject>(TObject item, IndexedObjectConfiguration<TObject, TKey> options, IndexMutation indexMutation, CancellationToken cancellationToken)
         {
             var itemKey = options.KeyReader(item);
 
@@ -429,7 +429,7 @@ namespace Lifti
             }
 
             // Next process any dynamic field readers
-            var itemType = typeof(TItem);
+            var itemType = typeof(TObject);
             foreach (var dynamicFieldReader in options.DynamicFieldReaders)
             {
                 var dynamicFields = await dynamicFieldReader.ReadAsync(item, cancellationToken).ConfigureAwait(false);
@@ -480,7 +480,7 @@ namespace Lifti
             return this.itemStore.Add(itemKey, documentStatistics);
         }
 
-        private int GetUniqueIdForItem<TItem>(TItem item, TKey itemKey, DocumentStatistics documentStatistics, IndexedObjectConfiguration<TItem, TKey> options, IndexMutation mutation)
+        private int GetUniqueIdForItem<TObject>(TObject item, TKey itemKey, DocumentStatistics documentStatistics, IndexedObjectConfiguration<TObject, TKey> options, IndexMutation mutation)
         {
             if (this.indexOptions.DuplicateItemBehavior == DuplicateItemBehavior.ReplaceItem)
             {

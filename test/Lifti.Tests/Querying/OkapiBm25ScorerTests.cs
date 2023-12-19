@@ -22,7 +22,7 @@ namespace Lifti.Tests.Querying
                 10,
                 new IndexStatistics(ImmutableDictionary<byte, long>.Empty.Add(1, 100), 100), // 100 total tokens in 1 field
                 Enumerable.Range(0, 10)
-                    .Select(id => (id, new ItemMetadata<int>(id, id, new DocumentStatistics(1, id * 3), null, null)))
+                    .Select(id => (id, ItemMetadata<int>.ForLooseText(id, id, new DocumentStatistics(1, id * 3))))
                     .ToArray()); // Each item will have (id * 3) tokens in it
 
             this.sut = new OkapiBm25Scorer(1.2D, 0.75D, this.itemStore, new FakeFieldScoreBoostProvider((2, 10D)));

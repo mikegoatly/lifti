@@ -673,6 +673,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown object type id {0}.
+        /// </summary>
+        internal static string UnknownObjectTypeId {
+            get {
+                return ResourceManager.GetString("UnknownObjectTypeId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown operator encountered: {0}.
         /// </summary>
         internal static string UnknownOperatorEncountered {

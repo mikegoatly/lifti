@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using Lifti.Tokenization.Objects;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using Xunit;
@@ -16,7 +18,17 @@ namespace Lifti.Tests
 
         public ItemStoreTests()
         {
-            this.sut = new ItemStore<string>();
+            this.sut = new ItemStore<string>(
+                new[]
+                {
+                    new IndexedObjectConfiguration<string, string>(
+                        1,
+                        x => x,
+                        Array.Empty<StaticFieldReader<string>>(),
+                        Array.Empty<DynamicFieldReader<string>>(),
+                        new ObjectScoreBoostOptions<string>(10D, null, 10D, null))
+                });
+
             this.id1 = this.sut.Add("1", item1DocumentStatistics);
             this.id2 = this.sut.Add("2", item2DocumentStatistics);
         }
@@ -58,7 +70,7 @@ namespace Lifti.Tests
         public void Add_ItemWithId_ShouldAddItemToIndex()
         {
             var documentStatistics = DocumentStatistics((1, 20), (2, 50), (3, 10));
-            var itemMetadata = new ItemMetadata<string>(9, "9", documentStatistics, new System.DateTime(2022, 11, 23), 12D);
+            var itemMetadata = ItemMetadata<string>.ForObject(1, 9, "9", documentStatistics, new System.DateTime(2022, 11, 23), 12D);
             this.sut.Add(itemMetadata);
             this.sut.GetMetadata(9).Should().BeEquivalentTo(
                 itemMetadata);
@@ -152,9 +164,23 @@ namespace Lifti.Tests
             this.sut.Contains("9").Should().BeFalse();
         }
 
+        [Fact]
+        public void GetObjectTypeScoreBoostMetadata_WhenObjectIdExists_ShouldReturnMetadata()
+        {
+            this.sut.GetObjectTypeScoreBoostMetadata(1)
+                .Should().NotBeNull();
+        }
+
+        [Fact]
+        public void GetObjectTypeScoreBoostMetadata_WhenObjectIdDoesntExist_ShouldThrowException()
+        {
+            Assert.Throws<LiftiException>(() => this.sut.GetObjectTypeScoreBoostMetadata(2))
+                .Message.Should().Be("Unknown object type id 2");
+        }
+
         private static ItemMetadata<string> ItemMetadata(int id, DocumentStatistics? documentStatistics = null, string? key = null)
         {
-            return new ItemMetadata<string>(id, key ?? (id + 1).ToString(), documentStatistics ?? DocumentStatistics(), null, null);
+            return ItemMetadata<string>.ForLooseText(id, key ?? (id + 1).ToString(), documentStatistics ?? DocumentStatistics());
         }
 
         private static DocumentStatistics DocumentStatistics(params (byte fieldId, int tokenCount)[] fieldWordCounts)

@@ -17,6 +17,8 @@ namespace Lifti.Tokenization.Objects
             this.options = objectTokenizers.ToDictionary(x => x.ItemType);
         }
 
+        public IEnumerable<IIndexedObjectConfiguration> AllConfigurations => this.options.Values;
+
         public IndexedObjectConfiguration<TItem, TKey> Get<TItem>()
         {
             if (this.options.TryGetValue(typeof(TItem), out var itemTokenizationOptions))

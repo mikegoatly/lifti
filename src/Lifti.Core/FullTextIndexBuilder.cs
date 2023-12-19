@@ -123,20 +123,20 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Configures the index to support tokenizing an item of type <typeparamref name="TItem"/>
+        /// Configures the index to support tokenizing an item of type <typeparamref name="TObject"/>
         /// in the index.
         /// </summary>
         /// <param name="optionsBuilder">
         /// A delegate capable of specifying all the required options for the item tokenization options.
         /// </param>
-        public FullTextIndexBuilder<TKey> WithObjectTokenization<TItem>(Func<ObjectTokenizationBuilder<TItem, TKey>, ObjectTokenizationBuilder<TItem, TKey>> optionsBuilder)
+        public FullTextIndexBuilder<TKey> WithObjectTokenization<TObject>(Func<ObjectTokenizationBuilder<TObject, TKey>, ObjectTokenizationBuilder<TObject, TKey>> optionsBuilder)
         {
             if (optionsBuilder is null)
             {
                 throw new ArgumentNullException(nameof(optionsBuilder));
             }
 
-            var builder = new ObjectTokenizationBuilder<TItem, TKey>();
+            var builder = new ObjectTokenizationBuilder<TObject, TKey>();
             this.objectTokenizationBuilders.Add(optionsBuilder(builder));
 
             return this;
@@ -257,9 +257,17 @@ namespace Lifti
             // any static fields that have been defined.
             var fieldLookup = new IndexedFieldLookup();
             var objectTokenizers = new List<IIndexedObjectConfiguration>();
+
+            byte objectTypeId = 0;
             foreach (var objectTokenizationBuilder in this.objectTokenizationBuilders)
             {
-                var objectTokenizer = objectTokenizationBuilder.Build(this.defaultTokenizer, thesaurusBuilder, textExtractor, fieldLookup);
+                var objectTokenizer = objectTokenizationBuilder.Build(
+                    objectTypeId++,
+                    this.defaultTokenizer,
+                    thesaurusBuilder,
+                    textExtractor,
+                    fieldLookup);
+
                 objectTokenizers.Add(objectTokenizer);
             }
 
