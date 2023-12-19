@@ -85,6 +85,7 @@ namespace Lifti.Serialization.Binary
                 3 => new V3IndexReader<TKey>(stream, disposeStream, this.keySerializer),
                 4 => new V4IndexReader<TKey>(stream, disposeStream, this.keySerializer),
                 5 => new V5IndexReader<TKey>(stream, disposeStream, this.keySerializer),
+                6 => new V6IndexReader<TKey>(stream, disposeStream, this.keySerializer),
                 _ => throw new DeserializationException(ExceptionMessages.NoDeserializerAvailableForIndexVersion, version),
             };
         }

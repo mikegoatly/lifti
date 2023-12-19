@@ -16,7 +16,7 @@ namespace Lifti
     {
         private readonly Func<IIndexSnapshot<TKey>, CancellationToken, Task>[]? indexModifiedActions;
         private readonly IndexOptions indexOptions;
-        private readonly IdPool<TKey> idPool;
+        private readonly ItemStore<TKey> itemStore;
         private readonly IIndexNavigatorPool indexNavigatorPool;
         private readonly SemaphoreSlim writeLock = new(1);
         private readonly TimeSpan writeLockTimeout = TimeSpan.FromSeconds(10);
@@ -33,7 +33,7 @@ namespace Lifti
 
         internal FullTextIndex(
             IndexOptions indexOptions,
-            ObjectTokenizationLookup<TKey> itemTokenizationOptions,
+            ObjectTypeConfigurationLookup<TKey> objectTypeConfiguration,
             IndexedFieldLookup fieldLookup,
             IIndexNodeFactory indexNodeFactory,
             IQueryParser queryParser,
@@ -44,15 +44,16 @@ namespace Lifti
             Func<IIndexSnapshot<TKey>, CancellationToken, Task>[]? indexModifiedActions)
         {
             this.indexNavigatorPool = new IndexNavigatorPool(scorer);
+            this.itemStore = new ItemStore<TKey>(objectTypeConfiguration.AllConfigurations);
+
             this.indexOptions = indexOptions;
-            this.ItemTokenization = itemTokenizationOptions ?? throw new ArgumentNullException(nameof(itemTokenizationOptions));
+            this.ObjectTypeConfiguration = objectTypeConfiguration ?? throw new ArgumentNullException(nameof(objectTypeConfiguration));
             this.IndexNodeFactory = indexNodeFactory ?? throw new ArgumentNullException(nameof(indexNodeFactory));
             this.QueryParser = queryParser ?? throw new ArgumentNullException(nameof(queryParser));
             this.DefaultTextExtractor = defaultTextExtractor;
             this.DefaultTokenizer = defaultTokenizer ?? throw new ArgumentNullException(nameof(defaultTokenizer));
             this.DefaultThesaurus = defaultThesaurus;
             this.indexModifiedActions = indexModifiedActions;
-            this.idPool = new IdPool<TKey>();
             this.fieldLookup = fieldLookup;
 
             this.Root = this.IndexNodeFactory.CreateRootNode();
@@ -70,9 +71,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public IItemStore<TKey> Items => this.idPool;
-
-        internal IIdPool<TKey> IdPool => this.idPool;
+        public IItemStore<TKey> Items => this.itemStore;
 
         /// <inheritdoc />
         public IIndexedFieldLookup FieldLookup => this.fieldLookup;
@@ -97,7 +96,7 @@ namespace Lifti
         /// <inheritdoc />
         public IThesaurus DefaultThesaurus { get; }
 
-        internal ObjectTokenizationLookup<TKey> ItemTokenization { get; }
+        internal ObjectTypeConfigurationLookup<TKey> ObjectTypeConfiguration { get; }
 
         /// <inheritdoc />
         public IIndexTokenizer GetTokenizerForField(string fieldName)
@@ -183,14 +182,14 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public async Task AddRangeAsync<TItem>(IEnumerable<TItem> items, CancellationToken cancellationToken = default)
+        public async Task AddRangeAsync<TObject>(IEnumerable<TObject> items, CancellationToken cancellationToken = default)
         {
             if (items is null)
             {
                 throw new ArgumentNullException(nameof(items));
             }
 
-            var options = this.ItemTokenization.Get<TItem>();
+            var options = this.ObjectTypeConfiguration.Get<TObject>();
             await this.PerformWriteLockedActionAsync(
                 async () =>
                 {
@@ -209,9 +208,9 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public async Task AddAsync<TItem>(TItem item, CancellationToken cancellationToken = default)
+        public async Task AddAsync<TObject>(TObject item, CancellationToken cancellationToken = default)
         {
-            var options = this.ItemTokenization.Get<TItem>();
+            var options = this.ObjectTypeConfiguration.Get<TObject>();
             await this.PerformWriteLockedActionAsync(
                 async () => await this.MutateAsync(
                     async m => await this.AddAsync(item, options, m, cancellationToken).ConfigureAwait(false),
@@ -227,7 +226,7 @@ namespace Lifti
             await this.PerformWriteLockedActionAsync(
                 async () =>
                 {
-                    if (!this.idPool.Contains(itemKey))
+                    if (!this.Items.Contains(itemKey))
                     {
                         result = false;
                         return;
@@ -304,7 +303,7 @@ namespace Lifti
 
         private static List<Token> TokenizeFragments(IIndexTokenizer tokenizer, IThesaurus thesaurus, IEnumerable<DocumentTextFragment> fragments)
         {
-            return tokenizer.Process(fragments).SelectMany(x => thesaurus.Process(x)).ToList();
+            return tokenizer.Process(fragments).SelectMany(thesaurus.Process).ToList();
         }
 
         private void AddForDefaultField(IndexMutation mutation, TKey itemKey, List<Token> tokens)
@@ -312,7 +311,7 @@ namespace Lifti
             var fieldId = this.FieldLookup.DefaultField;
             var itemId = this.GetUniqueIdForItem(
                 itemKey,
-                new DocumentStatistics(fieldId, CalculateTotalTokenCount(tokens)),
+                new DocumentStatistics(fieldId, tokens.CalculateTotalTokenCount()),
                 mutation);
 
             IndexTokens(mutation, itemId, fieldId, tokens);
@@ -401,25 +400,15 @@ namespace Lifti
             }
         }
 
-        private static int CalculateTotalTokenCount(List<Token> tokens)
-        {
-            var totalCount = 0;
-            for (var i = 0; i < tokens.Count; i++)
-            {
-                totalCount += tokens[i].Locations.Count;
-            }
-            return totalCount;
-
-        }
-
         private void RemoveKeyFromIndex(TKey itemKey, IndexMutation mutation)
         {
-            var id = this.idPool.ReleaseItem(itemKey);
+            var id = this.itemStore.Remove(itemKey);
+
             mutation.Remove(id);
         }
 
         /// <remarks>This method is thread safe as we only allow one mutation operation at a time.</remarks>
-        private async Task AddAsync<TItem>(TItem item, ObjectTokenization<TItem, TKey> options, IndexMutation indexMutation, CancellationToken cancellationToken)
+        private async Task AddAsync<TObject>(TObject item, IndexedObjectConfiguration<TObject, TKey> options, IndexMutation indexMutation, CancellationToken cancellationToken)
         {
             var itemKey = options.KeyReader(item);
 
@@ -440,7 +429,7 @@ namespace Lifti
             }
 
             // Next process any dynamic field readers
-            var itemType = typeof(TItem);
+            var itemType = typeof(TObject);
             foreach (var dynamicFieldReader in options.DynamicFieldReaders)
             {
                 var dynamicFields = await dynamicFieldReader.ReadAsync(item, cancellationToken).ConfigureAwait(false);
@@ -458,9 +447,9 @@ namespace Lifti
             var documentStatistics = new DocumentStatistics(
                 fieldTokens.ToDictionary(
                     t => t.Key,
-                    t => CalculateTotalTokenCount(t.Value)));
+                    t => t.Value.CalculateTotalTokenCount()));
 
-            var itemId = this.GetUniqueIdForItem(itemKey, documentStatistics, indexMutation);
+            var itemId = this.GetUniqueIdForItem(item, itemKey, documentStatistics, options, indexMutation);
 
             foreach (var fieldTokenList in fieldTokens)
             {
@@ -482,13 +471,26 @@ namespace Lifti
         {
             if (this.indexOptions.DuplicateItemBehavior == DuplicateItemBehavior.ReplaceItem)
             {
-                if (this.idPool.Contains(itemKey))
+                if (this.itemStore.Contains(itemKey))
                 {
                     this.RemoveKeyFromIndex(itemKey, mutation);
                 }
             }
 
-            return this.idPool.Add(itemKey, documentStatistics);
+            return this.itemStore.Add(itemKey, documentStatistics);
+        }
+
+        private int GetUniqueIdForItem<TObject>(TObject item, TKey itemKey, DocumentStatistics documentStatistics, IndexedObjectConfiguration<TObject, TKey> options, IndexMutation mutation)
+        {
+            if (this.indexOptions.DuplicateItemBehavior == DuplicateItemBehavior.ReplaceItem)
+            {
+                if (this.itemStore.Contains(itemKey))
+                {
+                    this.RemoveKeyFromIndex(itemKey, mutation);
+                }
+            }
+
+            return this.itemStore.Add(itemKey, item, documentStatistics, options);
         }
 
         /// <summary>

@@ -4,9 +4,9 @@ using System.Collections.Concurrent;
 namespace Lifti
 {
     internal class SharedPool<T>
-        where T: notnull
+        where T : notnull
     {
-        private readonly ConcurrentBag<T> pool = new ConcurrentBag<T>();
+        private readonly ConcurrentBag<T> pool = [];
         private readonly Func<T> createNew;
         private readonly Action<T> resetForReuse;
 

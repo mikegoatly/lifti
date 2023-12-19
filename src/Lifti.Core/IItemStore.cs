@@ -18,7 +18,13 @@ namespace Lifti
         /// <exception cref="LiftiException">
         /// Thrown when the id is not known.
         /// </exception>
-        IItemMetadata GetMetadata(int id);
+        ItemMetadata GetMetadata(int id);
+
+        /// <summary>
+        /// Gets the calculated <see cref="ScoreBoostMetadata"/> for the given object type. This can be used
+        /// to determine the score boost for an instance of <see cref="ItemMetadata"/>.
+        /// </summary>
+        ScoreBoostMetadata GetObjectTypeScoreBoostMetadata(byte objectTypeId);
 
         /// <summary>
         /// Gets the aggregated statistics for all the indexed documents, including total token count.
@@ -42,7 +48,7 @@ namespace Lifti
         /// <summary>
         /// Gets a value indicating whether the given item is managed by this instance.
         /// </summary>
-        bool Contains(TKey item);
+        bool Contains(TKey key);
 
         /// <summary>
         /// Gets the item metadata for the given id.
@@ -51,7 +57,7 @@ namespace Lifti
         /// Thrown when the id is not known.
         /// </exception>
 #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-        IItemMetadata<TKey> GetMetadata(int id);
+        ItemMetadata<TKey> GetMetadata(int id);
 #pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
         /// <summary>
@@ -60,11 +66,18 @@ namespace Lifti
         /// <exception cref="LiftiException">
         /// Thrown when the item is not known.
         /// </exception>
-        IItemMetadata<TKey> GetMetadata(TKey item);
+        ItemMetadata<TKey> GetMetadata(TKey key);
 
         /// <summary>
         /// Creates a snapshot of this instance that can be used even if the index is subsequently mutated.
         /// </summary>
         IItemStore<TKey> Snapshot();
+
+        /// <summary>
+        /// Adds the given item metadata to the item store. This should only be used by deserializers as they 
+        /// rebuild the index.
+        /// </summary>
+        /// <param name="itemMetadata"></param>
+        void Add(ItemMetadata<TKey> itemMetadata);
     }
 }

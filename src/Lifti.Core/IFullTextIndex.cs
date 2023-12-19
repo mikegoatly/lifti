@@ -77,30 +77,30 @@ namespace Lifti
         Task AddAsync(TKey itemKey, IEnumerable<string> text, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Indexes a single item of type <typeparamref name="TItem"/>. This type must have been
+        /// Indexes a single item of type <typeparamref name="TObject"/>. This type must have been
         /// configured when the index was built.
         /// </summary>
-        /// <typeparam name="TItem">
+        /// <typeparam name="TObject">
         /// The type of the item being indexed.
         /// </typeparam>
         /// <param name="item">
         /// The item to index.
         /// </param>
         /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
-        Task AddAsync<TItem>(TItem item, CancellationToken cancellationToken = default);
+        Task AddAsync<TObject>(TObject item, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Indexes a set of items of type <typeparamref name="TItem"/>. This type must have been
+        /// Indexes a set of items of type <typeparamref name="TObject"/>. This type must have been
         /// configured when the index was built.
         /// </summary>
-        /// <typeparam name="TItem">
+        /// <typeparam name="TObject">
         /// The type of the item being indexed.
         /// </typeparam>
         /// <param name="items">
         /// The items to index.
         /// </param>
         /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
-        Task AddRangeAsync<TItem>(IEnumerable<TItem> items, CancellationToken cancellationToken = default);
+        Task AddRangeAsync<TObject>(IEnumerable<TObject> items, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Removes the item with the given key from this index. If the key is not indexed then

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Lifti.Tokenization.Objects
 {
     /// <inheritdoc />
-    internal abstract class StaticFieldReader<TItem> : FieldConfig, IStaticFieldReader<TItem>
+    internal abstract class StaticFieldReader<TObject> : FieldConfig, IStaticFieldReader<TObject>
     {
         internal StaticFieldReader(string name, IIndexTokenizer tokenizer, ITextExtractor textExtractor, IThesaurus thesaurus, double scoreBoost)
             : base(tokenizer, textExtractor, thesaurus, scoreBoost)
@@ -19,6 +19,6 @@ namespace Lifti.Tokenization.Objects
         public string Name { get; }
 
         /// <inheritdoc />
-        public abstract ValueTask<IEnumerable<string>> ReadAsync(TItem item, CancellationToken cancellationToken);
+        public abstract ValueTask<IEnumerable<string>> ReadAsync(TObject item, CancellationToken cancellationToken);
     }
 }

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 
 namespace Lifti.Querying.QueryParts
 {
     internal class DoubleBufferedList<T> : IEnumerable<T>
     {
-        private List<T> current = new List<T>();
-        private List<T> swap = new List<T>();
+        private List<T> current = [];
+        private List<T> swap = [];
 
         public DoubleBufferedList()
         {

@@ -54,7 +54,7 @@ namespace Lifti
             }
 
             var itemType = typeof(TItem);
-            var itemTokenization = this.index.ItemTokenization.Get<TItem>();
+            var itemTokenization = this.index.ObjectTypeConfiguration.Get<TItem>();
             var itemResults = this.FilterFieldMatches<TItem>();
 
             var items = (await loadItemsAsync(itemResults.Select(x => x.searchResult.Key).ToList(), cancellationToken).ConfigureAwait(false))
