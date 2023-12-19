@@ -42,20 +42,20 @@ namespace Lifti.Tokenization.Objects
     /// </param>
     public class ObjectScoreBoostOptions<TItem>(
         double magnitudeMultiplier,
-        Func<TItem, double>? magnitudeProvider,
+        Func<TItem, double?>? magnitudeProvider,
         double freshnessMultiplier,
-        Func<TItem, DateTime>? freshnessProvider)
+        Func<TItem, DateTime?>? freshnessProvider)
         : ObjectScoreBoostOptions(magnitudeMultiplier, freshnessMultiplier)
     {
         /// <summary>
         /// Gets the delegate capable of reading the magnitude value from the item.
         /// </summary>
-        public Func<TItem, double>? MagnitudeProvider { get; } = magnitudeProvider;
+        public Func<TItem, double?>? MagnitudeProvider { get; } = magnitudeProvider;
 
         /// <summary>
         /// Gets the delegate capable of reading the freshness value from the item.
         /// </summary>
-        public Func<TItem, DateTime>? FreshnessProvider { get; } = freshnessProvider;
+        public Func<TItem, DateTime?>? FreshnessProvider { get; } = freshnessProvider;
 
         internal static ObjectScoreBoostOptions<TItem> Empty()
         {

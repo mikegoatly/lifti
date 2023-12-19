@@ -225,6 +225,9 @@
   <data name="MaximumDistinctFieldsIndexReached" xml:space="preserve">
     <value>Only 255 distinct fields can currently be indexed</value>
   </data>
+  <data name="MaximumNumberOfConfiguredObjectTypesReached" xml:space="preserve">
+    <value>An index can only have a maximum of 31 unique object types configured against it</value>
+  </data>
   <data name="MaxTokenLengthExceeded" xml:space="preserve">
     <value>Only tokens up to {0} characters long can be indexed.</value>
   </data>

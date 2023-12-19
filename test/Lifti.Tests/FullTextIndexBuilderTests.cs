@@ -55,7 +55,7 @@ namespace Lifti.Tests
             var index = this.sut.Build();
 
             index.ObjectTypeConfiguration.AllConfigurations.Select(x => x.Id)
-                .Should().BeEquivalentTo(new[] { 0, 1 });
+                .Should().BeEquivalentTo(new[] { 1, 2 });
         }
 
         [Fact]

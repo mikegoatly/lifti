@@ -258,9 +258,21 @@ namespace Lifti
             var fieldLookup = new IndexedFieldLookup();
             var objectTokenizers = new List<IIndexedObjectConfiguration>();
 
-            byte objectTypeId = 0;
+            // Start object type IDs at 1 - 0 is reserved for special use where the indexed document is
+            // not associated with a specific object.
+            byte objectTypeId = 1;
             foreach (var objectTokenizationBuilder in this.objectTokenizationBuilders)
             {
+                // This is a limitation of the current binary serialization implementation. We are reserving
+                // 3 bits of the object type ID for whether the object has various scoring metadata associated
+                // to it. That leaves us with 5 bits for the object type ID.
+                // Having more that 31 different *object types* (not fields) seems a bit of a stretch, so this
+                // feels ok as a design constraint for now.
+                if (objectTypeId > 31)
+                {
+                    throw new LiftiException(ExceptionMessages.MaximumNumberOfConfiguredObjectTypesReached);
+                }
+
                 var objectTokenizer = objectTokenizationBuilder.Build(
                     objectTypeId++,
                     this.defaultTokenizer,

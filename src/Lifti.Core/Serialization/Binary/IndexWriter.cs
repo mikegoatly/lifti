@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ namespace Lifti.Serialization.Binary
 {
     internal class IndexWriter<TKey> : IIndexWriter<TKey>
     {
-        private const ushort Version = 5;
+        private const ushort Version = 6;
         private readonly Stream underlyingStream;
         private readonly bool disposeStream;
         private readonly IKeySerializer<TKey> keySerializer;
@@ -29,7 +30,7 @@ namespace Lifti.Serialization.Binary
 
             await this.WriteFieldsAsync(snapshot).ConfigureAwait(false);
 
-            await this.WriteItemsAsync(snapshot).ConfigureAwait(false);
+            await this.WriteDocumentsAsync(snapshot).ConfigureAwait(false);
 
             await this.WriteNodeAsync(snapshot.Root).ConfigureAwait(false);
 
@@ -224,12 +225,14 @@ namespace Lifti.Serialization.Binary
             await this.FlushAsync().ConfigureAwait(false);
         }
 
-        private async Task WriteItemsAsync(IIndexSnapshot<TKey> index)
+        private async Task WriteDocumentsAsync(IIndexSnapshot<TKey> index)
         {
             this.writer.WriteNonNegativeVarInt32(index.Items.Count);
 
             foreach (var itemMetadata in index.Items.GetIndexedItems())
             {
+                // Write the standard information for the document, regardless of whether is was
+                // read from an object
                 this.writer.WriteNonNegativeVarInt32(itemMetadata.Id);
                 this.keySerializer.Write(this.writer, itemMetadata.Key);
                 this.writer.WriteNonNegativeVarInt32(itemMetadata.DocumentStatistics.TokenCountByField.Count);
@@ -238,9 +241,54 @@ namespace Lifti.Serialization.Binary
                     this.writer.Write(fieldTokenCount.Key);
                     this.writer.WriteNonNegativeVarInt32(fieldTokenCount.Value);
                 }
+
+                // If the object is associated to an object type, write the object type id and any
+                // associated freshness info
+                if (itemMetadata.ObjectTypeId is byte objectTypeId)
+                {
+                    this.WriteDocumentObjectMetadata(objectTypeId, itemMetadata);
+                }
+                else
+                {
+                    // Write a zero byte to indicate that there is no object type id or metadata
+                    this.writer.Write((byte)0);
+                }
             }
 
             await this.FlushAsync().ConfigureAwait(false);
+        }
+
+        private void WriteDocumentObjectMetadata(byte objectTypeId, ItemMetadata<TKey> itemMetadata)
+        {
+            // Write the object info data byte
+            // 0-4: The object type id
+            // 5: 1 - the object has a scoring freshness date
+            // 6: 1 - the object has a scoring magnitude
+            // 7: RESERVED for now
+            var objectInfoData = objectTypeId;
+            Debug.Assert(objectTypeId < 32, "The object type id should be less than 32");
+
+            if (itemMetadata.ScoringFreshnessDate != null)
+            {
+                objectInfoData |= 0x20;
+            }
+
+            if (itemMetadata.ScoringMagnitude != null)
+            {
+                objectInfoData |= 0x40;
+            }
+
+            this.writer.Write(objectInfoData);
+
+            if (itemMetadata.ScoringFreshnessDate is DateTime scoringFreshnessDate)
+            {
+                this.writer.Write(scoringFreshnessDate.Ticks);
+            }
+
+            if (itemMetadata.ScoringMagnitude is double scoringMagnitude)
+            {
+                this.writer.Write(scoringMagnitude);
+            }
         }
 
         private async Task WriteHeaderAsync(IIndexSnapshot<TKey> index)

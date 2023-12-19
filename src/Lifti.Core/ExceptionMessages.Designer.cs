@@ -385,6 +385,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An index can only have a maximum of 31 unique object types configured against it.
+        /// </summary>
+        internal static string MaximumNumberOfConfiguredObjectTypesReached {
+            get {
+                return ResourceManager.GetString("MaximumNumberOfConfiguredObjectTypesReached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Only tokens up to {0} characters long can be indexed..
         /// </summary>
         internal static string MaxTokenLengthExceeded {
