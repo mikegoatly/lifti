@@ -10,8 +10,8 @@ namespace Lifti.Tests.Fakes
         private readonly Dictionary<byte, Func<ItemMetadata, double>> objectTypeMetadata;
 
         public FakeItemStore(
-            int count, 
-            IndexStatistics statistics, 
+            int count,
+            IndexStatistics statistics,
             (int documentId, ItemMetadata<TKey> statistics)[] documentMetadata,
             (byte objectTypeId, Func<ItemMetadata, double> scoreProvider)[] objectTypeMetadata)
         {
@@ -37,7 +37,7 @@ namespace Lifti.Tests.Fakes
 
         private class FakeScoreBoostMetadata : ScoreBoostMetadata
         {
-            private Func<ItemMetadata, double> scoreBoostCalculator;
+            private readonly Func<ItemMetadata, double> scoreBoostCalculator;
 
             public FakeScoreBoostMetadata(Func<ItemMetadata, double> func)
                 : base(null!)

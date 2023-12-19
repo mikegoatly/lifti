@@ -11,28 +11,31 @@ namespace Lifti.Querying
     /// </summary>
     internal class QueryTokenizer : IQueryTokenizer
     {
-        private static readonly HashSet<char> wildcardPunctuation = new()
-        {
+        private static readonly Regex escapeCharacterReplacer = new(@"\\(.)", RegexOptions.Compiled);
+
+        private static readonly HashSet<char> wildcardPunctuation =
+        [
             '*',
             '?',
             '%'
-        };
+        ];
 
         // Punctuation characters that shouldn't cause a token to be automatically split - these
         // are part of the LIFTI query syntax and processed on a case by case basis.
         private static readonly HashSet<char> generalNonSplitPunctuation = new(wildcardPunctuation)
         {
-            '&',
-            '|',
-            '>',
-            '=',
-            '(',
-            ')',
-            '~',
-            '"',
-            '[',
-            ']',
-            '^'
+            '&', // And operator
+            '|', // Or operator
+            '>', // Preceding operator
+            '=', // Field filter
+            '(', // Open expression group
+            ')', // Close expression group
+            '~', // Near operator
+            '"', // Quoted sections
+            '[', // Field filter open
+            ']', // Field filter close
+            '^', // Score boost
+            '\\' // Escaped characters 
         };
 
         // Punctuation characters that shouldn't cause a token to be automatically split when processing
@@ -47,6 +50,7 @@ namespace Lifti.Querying
             None = 0,
             ProcessingString = 1,
             ProcessingNearOperator = 2,
+            ProcessingEscapedCharacter = 3,
         }
 
         private enum FuzzyMatchParseState
@@ -158,6 +162,8 @@ namespace Lifti.Querying
                         tokenText = queryText.Substring(tokenStart.Value, state.ScoreBoostStartIndex - tokenStart.Value);
                     }
 
+                    tokenText = StripEscapeIndicators(tokenText);
+
                     var token = QueryToken.ForText(tokenText, state.IndexTokenizer, state.ScoreBoost);
                     tokenStart = null;
 
@@ -206,6 +212,10 @@ namespace Lifti.Querying
                         case OperatorParseState.None:
                             switch (current)
                             {
+                                case '\\':
+                                    tokenStart ??= i;
+                                    state = state with { OperatorState = OperatorParseState.ProcessingEscapedCharacter };
+                                    break;
                                 case '^':
                                     var scoreBoostStart = i;
                                     (var scoreBoost, i) = ConsumeNumber(i + 1, queryText);
@@ -277,7 +287,7 @@ namespace Lifti.Querying
                                         throw new QueryParserException(ExceptionMessages.UnexpectedOperator, "=");
                                     }
 
-                                    string fieldName = queryText.Substring(tokenStart.Value, i - tokenStart.Value);
+                                    var fieldName = queryText.Substring(tokenStart.Value, i - tokenStart.Value);
                                     if (fieldName.Length > 1 && fieldName[0] == '[')
                                     {
                                         // Strip the square brackets
@@ -326,6 +336,10 @@ namespace Lifti.Querying
                                     break;
                             }
 
+                            break;
+
+                        case OperatorParseState.ProcessingEscapedCharacter:
+                            state = state with { OperatorState = OperatorParseState.None };
                             break;
 
                         case OperatorParseState.ProcessingString:
@@ -391,6 +405,20 @@ namespace Lifti.Querying
             }
         }
 
+        private static string StripEscapeIndicators(string tokenText)
+        {
+#if NETSTANDARD
+            if (tokenText.IndexOf('\\') >= 0)
+#else
+            if (tokenText.Contains('\\', StringComparison.Ordinal))
+#endif
+            {
+                return escapeCharacterReplacer.Replace(tokenText, "$1");
+            }
+
+            return tokenText;
+        }
+
         private static (double scoreBoost, int endIndex) ConsumeNumber(int index, string queryText)
         {
             var startIndex = index;
@@ -431,8 +459,8 @@ namespace Lifti.Querying
                 OperatorParseState.ProcessingString => isWhitespace ||
                     (!quotedSectionNonSplitPunctuation.Contains(current) && state.IndexTokenizer.IsSplitCharacter(current)),
 
-                // When processing a near operator, no splitting is possible until the operator processing is complete
-                OperatorParseState.ProcessingNearOperator => false,
+                // When processing a near operator or escaped character, no splitting is possible until the operator processing is complete
+                OperatorParseState.ProcessingNearOperator or OperatorParseState.ProcessingEscapedCharacter => false,
                 _ => throw new QueryParserException(ExceptionMessages.UnexpectedOperatorParseStateEncountered, state.OperatorState)
             };
         }

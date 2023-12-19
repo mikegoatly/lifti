@@ -23,7 +23,7 @@ namespace Lifti.Tests.Querying
             this.fieldIndexTokenizer = new FakeIndexTokenizer(true);
             this.alternativeFieldIndexTokenizer = new FakeIndexTokenizer(true);
             this.tokenizerProvider = new FakeIndexTokenizerProvider(
-                this.defaultIndexTokenizer, 
+                this.defaultIndexTokenizer,
                 ("test", this.fieldIndexTokenizer),
                 ("test field", this.fieldIndexTokenizer),
                 ("test []", this.alternativeFieldIndexTokenizer));
@@ -100,9 +100,21 @@ namespace Lifti.Tests.Querying
         public void FuzzySearchTermsSeparatedByCommasYieldedCorrectly()
         {
             this.sut.ParseQueryTokens("?Testing,?Test2", this.tokenizerProvider).Should().BeEquivalentTo(
-                new[] {
-                QueryToken.ForText("?Testing", this.defaultIndexTokenizer, null),
-                QueryToken.ForText("?Test2", this.defaultIndexTokenizer, null)
+                new[]
+                {
+                    QueryToken.ForText("?Testing", this.defaultIndexTokenizer, null),
+                    QueryToken.ForText("?Test2", this.defaultIndexTokenizer, null)
+                });
+        }
+
+        [Fact]
+        public void EscapedCharacters_ShouldBeReturnedAsTokenText()
+        {
+            this.sut.ParseQueryTokens(@"\\hello\=\"" \&\|", this.tokenizerProvider).Should().BeEquivalentTo(
+                new[]
+                {
+                    QueryToken.ForText(@"\hello=""", this.defaultIndexTokenizer, null),
+                    QueryToken.ForText("&|", this.defaultIndexTokenizer, null)
                 });
         }
 
