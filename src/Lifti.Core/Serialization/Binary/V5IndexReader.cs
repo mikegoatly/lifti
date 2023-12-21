@@ -105,13 +105,13 @@ namespace Lifti.Serialization.Binary
             var matchCount = this.reader.ReadNonNegativeVarInt32();
             var childNodeCount = this.reader.ReadNonNegativeVarInt32();
             var intraNodeText = textLength == 0 ? null : this.ReadIntraNodeText(textLength);
-            var childNodes = childNodeCount > 0 ? new List<(char childChar, IndexNode childNode)>() : null;
+            var childNodes = childNodeCount > 0 ? new ChildNodeMapEntry[childNodeCount] : null;
             var matches = matchCount > 0 ? new Dictionary<int, IReadOnlyList<IndexedToken>>() : null;
 
             for (var i = 0; i < childNodeCount; i++)
             {
                 var matchChar = (char)this.reader.ReadVarUInt16();
-                childNodes!.Add((matchChar, this.DeserializeNode(fieldIdMap, nodeFactory, depth + 1)));
+                childNodes![i] = new(matchChar, this.DeserializeNode(fieldIdMap, nodeFactory, depth + 1));
             }
 
             for (var itemMatch = 0; itemMatch < matchCount; itemMatch++)

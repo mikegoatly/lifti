@@ -47,8 +47,6 @@ namespace Lifti
 
         public DocumentTokenMatchMapMutation? DocumentTokenMatchMapMutation { get; private set; }
 
-        public bool IsNewNode => this.original == null;
-
         internal void Index(
             int itemId,
             byte fieldId,
@@ -112,7 +110,7 @@ namespace Lifti
                 else if (this.original != null)
                 {
                     // Then any unmutated children
-                    foreach (var (childChar, childNode) in this.original.ChildNodes.Enumerate())
+                    foreach (var (childChar, childNode) in this.original.ChildNodes.CharacterMap)
                     {
                         if (this.TryRemove(childNode, documentId, this.depth + 1, out var mutatedChild))
                         {
@@ -149,7 +147,7 @@ namespace Lifti
             {
                 // Work through the child nodes and recursively determine whether removals are needed from 
                 // them. If they are, then this instance will also become mutated.
-                foreach (var (character, childNode) in node.ChildNodes.Enumerate())
+                foreach (var (character, childNode) in node.ChildNodes.CharacterMap)
                 {
                     if (this.TryRemove(childNode, documentId, nodeDepth + 1, out var mutatedChild))
                     {

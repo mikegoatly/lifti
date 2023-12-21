@@ -46,7 +46,7 @@ namespace Lifti.Tests
             node.HasChildNodes.Should().Be(expectedChildNodes.Length > 0);
             node.HasMatches.Should().Be(expectedMatches.Length > 0);
             node.IntraNodeText.ToArray().Should().BeEquivalentTo(intraNodeText?.ToCharArray() ?? []);
-            node.ChildNodes.Characters.ToArray().Should().BeEquivalentTo(expectedChildNodes, o => o.WithStrictOrdering());
+            node.ChildNodes.CharacterMap.ToArray().Select(x => x.ChildChar).Should().BeEquivalentTo(expectedChildNodes, o => o.WithStrictOrdering());
             node.Matches.Enumerate().SelectMany(x => x.indexedTokens.Select(token => (x.documentId, token))).ToList().Should().BeEquivalentTo(expectedMatches);
         }
 

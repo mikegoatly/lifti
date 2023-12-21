@@ -84,7 +84,7 @@ namespace Lifti.Serialization.Binary
 
             if (childNodeCount > 0)
             {
-                foreach (var (character, childNode) in node.ChildNodes.Enumerate())
+                foreach (var (character, childNode) in node.ChildNodes.CharacterMap)
                 {
                     this.writer.WriteVarUInt16(character);
                     await this.WriteNodeAsync(childNode).ConfigureAwait(false);

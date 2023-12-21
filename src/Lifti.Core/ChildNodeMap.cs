@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text;
 
 namespace Lifti
@@ -11,6 +10,7 @@ namespace Lifti
     {
         private readonly ChildNodeMap? original;
         private readonly Dictionary<char, IndexNodeMutation> mutated;
+        private int newChildNodeCount;
 
         public ChildNodeMapMutation(char splitChar, IndexNodeMutation splitChildNode)
         {
@@ -18,6 +18,8 @@ namespace Lifti
             {
                 { splitChar, splitChildNode }
             };
+
+            this.newChildNodeCount = 1;
         }
 
         internal ChildNodeMapMutation(ChildNodeMap original)
@@ -38,7 +40,7 @@ namespace Lifti
         {
             if (this.original is { } originalChildNodeMap)
             {
-                foreach (var (childCharacter, childNode) in originalChildNodeMap.Enumerate())
+                foreach (var (childCharacter, childNode) in originalChildNodeMap.CharacterMap)
                 {
                     if (!this.mutated.ContainsKey(childCharacter))
                     {
@@ -55,34 +57,40 @@ namespace Lifti
             // 1. mutated children in the original list are replaced with the mutated version
             // 2. mutated children not in the original list are added to the list
             // 3. the resulting list is sorted in ascending order
-            var newCount = this.mutated.Values.Where(x => x.IsNewNode).Count();
-            List<(char childChar, IndexNode childNode)> newChildNodes;
+            ChildNodeMapEntry[] newChildNodes;
 
+            // TODO - this could be parallelised now we're setting elements into a fixed array (using Interlocked.Increment for i)
+            var i = 0;
             if (this.original is { } originalChildNodeMap)
             {
-                newChildNodes = new(newCount + originalChildNodeMap.Count);
-                foreach (var (childChar, childNode) in originalChildNodeMap.Enumerate())
+                newChildNodes = new ChildNodeMapEntry[this.newChildNodeCount + originalChildNodeMap.Count];
+
+                foreach (var (childChar, childNode) in originalChildNodeMap.CharacterMap)
                 {
                     if (this.mutated.ContainsKey(childChar) == false)
                     {
                         // This child node is not mutated, so add it to the list
-                        newChildNodes.Add((childChar, childNode));
+                        newChildNodes[i++] = new(childChar, childNode);
                     }
                 }
             }
             else
             {
-                newChildNodes = new(newCount);
+                Debug.Assert(this.newChildNodeCount == this.mutated.Count);
+                newChildNodes = new ChildNodeMapEntry[this.mutated.Count];
             }
 
             // Add the mutated children to the list
             foreach (var mutation in this.mutated)
             {
-                newChildNodes.Add((mutation.Key, mutation.Value.Apply()));
+                Debug.Assert(i < newChildNodes.Length);
+                newChildNodes[i++] = new(mutation.Key, mutation.Value.Apply());
             }
 
+            Debug.Assert(i == newChildNodes.Length, "Expected all elements to have been populated");
+
             // Sort the list in-place
-            newChildNodes.Sort((x, y) => x.childChar.CompareTo(y.childChar));
+            Array.Sort(newChildNodes, (x, y) => x.ChildChar.CompareTo(y.ChildChar));
 
             return new ChildNodeMap(newChildNodes);
         }
@@ -93,6 +101,11 @@ namespace Lifti
             {
                 mutation = createMutatedNode();
                 this.Mutate(indexChar, mutation);
+
+                if (this.original?.TryGetValue(indexChar, out var _) != true)
+                {
+                    this.newChildNodeCount++;
+                }
             }
 
             return mutation;
@@ -120,53 +133,52 @@ namespace Lifti
     }
 
     /// <summary>
+    /// An entry in <see cref="ChildNodeMap"/>.
+    /// </summary>
+    public record struct ChildNodeMapEntry(char ChildChar, IndexNode ChildNode);
+
+    /// <summary>
     /// An immutable map of child nodes.
     /// </summary>
     public readonly struct ChildNodeMap : IEquatable<ChildNodeMap>
     {
-        private readonly char[] childChars;
-        private readonly IndexNode[] childNodes;
+        private readonly ChildNodeMapEntry[] childNodes;
 
-        internal ChildNodeMap(List<(char childChar, IndexNode childNode)> map)
+        /// <summary>
+        /// Initializes a new empty instance of <see cref="ChildNodeMap"/>
+        /// </summary>
+        public ChildNodeMap()
+        {
+            this.childNodes = [];
+        }
+
+        internal ChildNodeMap(ChildNodeMapEntry[] map)
         {
             // Verify that the map is sorted
 #if DEBUG
-            for (var i = 1; i < map.Count; i++)
+            for (var i = 1; i < map.Length; i++)
             {
-                Debug.Assert(map[i - 1].childChar < map[i].childChar);
+                Debug.Assert(map[i - 1].ChildChar < map[i].ChildChar);
             }
 #endif
 
-            this.childChars = new char[map.Count];
-            this.childNodes = new IndexNode[map.Count];
-
-            for (var i = 0; i < map.Count; i++)
-            {
-                this.childChars[i] = map[i].childChar;
-                this.childNodes[i] = map[i].childNode;
-            }
-        }
-
-        private ChildNodeMap(char[] childChars, IndexNode[] childNodes)
-        {
-            this.childNodes = childNodes;
-            this.childChars = childChars;
+            this.childNodes = map;
         }
 
         /// <summary>
         /// Gets an empty instance of <see cref="ChildNodeMap"/>.
         /// </summary>
-        public static ChildNodeMap Empty { get; } = new ChildNodeMap([], []);
+        public static ChildNodeMap Empty { get; } = new ChildNodeMap();
 
         /// <summary>
         /// Gets the number of child nodes in the map.
         /// </summary>
-        public int Count => this.childChars.Length;
+        public int Count => this.childNodes.Length;
 
         /// <summary>
         /// Gets the set of characters that link from this instance to the child nodes.
         /// </summary>
-        public ReadOnlyMemory<char> Characters => this.childChars;
+        internal IReadOnlyList<ChildNodeMapEntry> CharacterMap => this.childNodes;
 
         internal ChildNodeMapMutation StartMutation()
         {
@@ -174,37 +186,75 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Enumerates all the child nodes in the map.
-        /// </summary>
-        public IEnumerable<(char character, IndexNode childNode)> Enumerate()
-        {
-            for (var i = 0; i < this.childChars.Length; i++)
-            {
-                yield return (this.childChars[i], this.childNodes[i]);
-            }
-        }
-
-        /// <summary>
         /// Tries to get the child node for the specified character.
         /// </summary>
         public bool TryGetValue(char value, [NotNullWhen(true)] out IndexNode? nextNode)
         {
-            if (this.childChars.Length == 0)
+            char character;
+            var length = this.childNodes.Length;
+            switch (length)
             {
-                nextNode = null;
-                return false;
-            }
+                case 0:
+                    nextNode = null;
+                    return false;
 
-            // TODO: Is this faster if we check for the value being outside the range of the array first?
-            var index = Array.BinarySearch(this.childChars, value);
-            if (index < 0)
+                case 1:
+                    (character, nextNode) = this.childNodes[0];
+                    if (character == value)
+                    {
+                        return true;
+                    }
+
+                    return false;
+
+                case 2:
+                    (character, nextNode) = this.childNodes[0];
+                    if (character == value)
+                    {
+                        return true;
+                    }
+
+                    (character, nextNode) = this.childNodes[1];
+                    if (character == value)
+                    {
+                        return true;
+                    }
+
+                    return false;
+
+                default:
+                    // General case - check bounds, then do a binary search if we're in range
+                    if (value < this.childNodes[0].ChildChar || value > this.childNodes[length - 1].ChildChar)
+                    {
+                        nextNode = null;
+                        return false;
+                    }
+
+                    var index = Array.BinarySearch(this.childNodes, value, ChildCharComparer.Instance);
+                    if (index < 0)
+                    {
+                        nextNode = null;
+                        return false;
+                    }
+
+                    nextNode = this.childNodes[index].ChildNode;
+                    return true;
+            }
+        }
+
+        private class ChildCharComparer : System.Collections.IComparer
+        {
+            public static ChildCharComparer Instance { get; } = new ChildCharComparer();
+
+            public int Compare(object? x, object? y)
             {
-                nextNode = null;
-                return false;
-            }
+                if (x is ChildNodeMapEntry entry && y is char character)
+                {
+                    return entry.ChildChar.CompareTo(character);
+                }
 
-            nextNode = this.childNodes[index];
-            return true;
+                throw new ArgumentException("Cannot compare the specified objects");
+            }
         }
 
         /// <inheritdoc />
@@ -218,14 +268,13 @@ namespace Lifti
         /// <inheritdoc />
         public bool Equals(ChildNodeMap other)
         {
-            return other.childNodes == this.childNodes
-                && other.childChars == this.childChars;
+            return other.childNodes == this.childNodes;
         }
 
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.childChars, this.childNodes);
+            return HashCode.Combine(this.childNodes);
         }
 
         /// <inheritdoc />

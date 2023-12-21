@@ -85,7 +85,7 @@ namespace Lifti.Querying
 
                 if (node.HasChildNodes)
                 {
-                    foreach (var (_, childNode) in node.ChildNodes.Enumerate())
+                    foreach (var (_, childNode) in node.ChildNodes.CharacterMap)
                     {
                         childNodeStack.Enqueue(childNode);
                     }
@@ -193,10 +193,10 @@ namespace Lifti.Querying
                 }
                 else if (this.currentNode.HasChildNodes)
                 {
-                    var childChars = this.currentNode.ChildNodes.Characters;
-                    for (var i = 0; i < childChars.Length; i++)
+                    var childChars = this.currentNode.ChildNodes.CharacterMap;
+                    for (var i = 0; i < childChars.Count; i++)
                     {
-                        yield return childChars.Span[i];
+                        yield return childChars[i].ChildChar;
                     }
                 }
             }
@@ -244,7 +244,7 @@ namespace Lifti.Querying
 
             if (node.HasChildNodes)
             {
-                foreach (var (character, childNode) in node.ChildNodes.Enumerate())
+                foreach (var (character, childNode) in node.ChildNodes.CharacterMap)
                 {
                     this.navigatedWith.Append(character);
                     foreach (var result in this.EnumerateIndexedTokens(childNode))

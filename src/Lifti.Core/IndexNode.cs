@@ -91,7 +91,7 @@ namespace Lifti
         /// <param name="nextDepth"></param>
         internal void ToString(StringBuilder builder, int nextDepth)
         {
-            foreach (var (character, childNode) in this.ChildNodes.Enumerate())
+            foreach (var (character, childNode) in this.ChildNodes.CharacterMap)
             {
                 builder.AppendLine();
                 childNode.ToString(builder, character, nextDepth);
@@ -104,7 +104,7 @@ namespace Lifti
             {
                 var nextDepth = currentDepth + 1;
 
-                foreach (var (character, childNode) in this.ChildNodes.Enumerate())
+                foreach (var (character, childNode) in this.ChildNodes.CharacterMap)
                 {
                     builder.AppendLine();
                     childNode.ToString(builder, character, nextDepth);
