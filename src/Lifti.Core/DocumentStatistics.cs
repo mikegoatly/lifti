@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace Lifti
@@ -12,7 +11,7 @@ namespace Lifti
     {
         internal DocumentStatistics(byte fieldId, int tokenCount)
         {
-            this.TokenCountByField = ImmutableDictionary<byte, int>.Empty.Add(fieldId, tokenCount);
+            this.TokenCountByField = new Dictionary<byte, int>() { { fieldId, tokenCount } };
             this.TotalTokenCount = tokenCount;
         }
 

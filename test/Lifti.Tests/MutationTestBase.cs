@@ -1,6 +1,4 @@
 ﻿using FluentAssertions;
-using System;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace Lifti.Tests
@@ -29,9 +27,11 @@ namespace Lifti.Tests
         protected IndexNode RootNode { get; }
         internal IndexMutation Sut { get; set; }
 
-        protected void ApplyMutationsToNewSut()
+        protected IndexNode ApplyMutationsToNewSut()
         {
-            this.Sut = new IndexMutation(this.Sut.Apply(), this.indexNodeFactory);
+            var applied = this.Sut.Apply();
+            this.Sut = new IndexMutation(applied, this.indexNodeFactory);
+            return applied;
         }
 
         protected static void VerifyResult(
@@ -40,14 +40,14 @@ namespace Lifti.Tests
             (int, IndexedToken)[]? expectedMatches = null,
             char[]? expectedChildNodes = null)
         {
-            expectedChildNodes ??= Array.Empty<char>();
-            expectedMatches ??= Array.Empty<(int, IndexedToken)>();
+            expectedChildNodes ??= [];
+            expectedMatches ??= [];
 
             node.HasChildNodes.Should().Be(expectedChildNodes.Length > 0);
             node.HasMatches.Should().Be(expectedMatches.Length > 0);
-            node.IntraNodeText.ToArray().Should().BeEquivalentTo(intraNodeText?.ToCharArray() ?? Array.Empty<char>());
-            node.ChildNodes.Keys.Should().BeEquivalentTo(expectedChildNodes, o => o.WithoutStrictOrdering());
-            node.Matches.Should().BeEquivalentTo(expectedMatches.ToImmutableDictionary(x => x.Item1, x => new[] { x.Item2 }));
+            node.IntraNodeText.ToArray().Should().BeEquivalentTo(intraNodeText?.ToCharArray() ?? []);
+            node.ChildNodes.Characters.ToArray().Should().BeEquivalentTo(expectedChildNodes, o => o.WithStrictOrdering());
+            node.Matches.Enumerate().SelectMany(x => x.indexedTokens.Select(token => (x.documentId, token))).ToList().Should().BeEquivalentTo(expectedMatches);
         }
 
         protected static void VerifyResult(
@@ -59,7 +59,7 @@ namespace Lifti.Tests
         {
             foreach (var navigationChar in navigationChars)
             {
-                node = node.ChildNodes[navigationChar];
+                node.ChildNodes.TryGetValue(navigationChar, out node!).Should().BeTrue();
             }
 
             VerifyResult(node, intraNodeText, expectedMatches, expectedChildNodes);

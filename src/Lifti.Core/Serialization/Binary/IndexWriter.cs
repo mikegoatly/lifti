@@ -84,10 +84,10 @@ namespace Lifti.Serialization.Binary
 
             if (childNodeCount > 0)
             {
-                foreach (var childNode in node.ChildNodes)
+                foreach (var (character, childNode) in node.ChildNodes.Enumerate())
                 {
-                    this.writer.WriteVarUInt16(childNode.Key);
-                    await this.WriteNodeAsync(childNode.Value).ConfigureAwait(false);
+                    this.writer.WriteVarUInt16(character);
+                    await this.WriteNodeAsync(childNode).ConfigureAwait(false);
                 }
             }
 
@@ -104,12 +104,12 @@ namespace Lifti.Serialization.Binary
 
         private void WriteMatchLocations(IndexNode node)
         {
-            foreach (var match in node.Matches)
+            foreach (var (documentId, matches) in node.Matches.Enumerate())
             {
-                this.writer.WriteNonNegativeVarInt32(match.Key);
-                this.writer.WriteNonNegativeVarInt32(match.Value.Count);
+                this.writer.WriteNonNegativeVarInt32(documentId);
+                this.writer.WriteNonNegativeVarInt32(matches.Count);
 
-                foreach (var fieldMatch in match.Value)
+                foreach (var fieldMatch in matches)
                 {
                     this.writer.Write(fieldMatch.FieldId);
                     this.writer.WriteNonNegativeVarInt32(fieldMatch.Locations.Count);

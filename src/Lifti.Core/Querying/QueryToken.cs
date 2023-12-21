@@ -65,8 +65,10 @@ namespace Lifti.Querying
         /// The score boost to apply to any items matching the search term. This is multiplied with any score boosts
         /// applied to matching fields. A null value indicates that no additional score boost should be applied.
         /// </param>
-        public static QueryToken ForText(string text, IIndexTokenizer indexTokenizer, double? scoreBoost) 
-            => new QueryToken(text, QueryTokenType.Text, 0, indexTokenizer, scoreBoost);
+        public static QueryToken ForText(string text, IIndexTokenizer indexTokenizer, double? scoreBoost)
+        {
+            return new(text, QueryTokenType.Text, 0, indexTokenizer, scoreBoost);
+        }
 
         /// <summary>
         /// Creates a new <see cref="QueryToken"/> instance representing a field filter.
@@ -74,8 +76,10 @@ namespace Lifti.Querying
         /// <param name="fieldName">
         /// The name of the field to match.
         /// </param>
-        public static QueryToken ForFieldFilter(string fieldName) 
-            => new QueryToken(fieldName, QueryTokenType.FieldFilter, 0, null);
+        public static QueryToken ForFieldFilter(string fieldName)
+        {
+            return new(fieldName, QueryTokenType.FieldFilter, 0, null);
+        }
 
         /// <summary>
         /// Creates a new <see cref="QueryToken"/> instance representing a query operator.
@@ -83,8 +87,10 @@ namespace Lifti.Querying
         /// <param name="operatorType">
         /// The type of operator the token should represent.
         /// </param>
-        public static QueryToken ForOperator(QueryTokenType operatorType) 
-            => new QueryToken(string.Empty, operatorType, 0, null);
+        public static QueryToken ForOperator(QueryTokenType operatorType)
+        {
+            return new(string.Empty, operatorType, 0, null);
+        }
 
         /// <summary>
         /// Creates a new <see cref="QueryToken"/> instance representing a query operator that has additional positional constraints.
@@ -95,8 +101,10 @@ namespace Lifti.Querying
         /// <param name="tolerance">
         /// The number of tokens to use as the tolerance for the operator.
         /// </param>
-        public static QueryToken ForOperatorWithTolerance(QueryTokenType operatorType, int tolerance) => 
-            new QueryToken(string.Empty, operatorType, tolerance == 0 ? 5 : tolerance, null, null);
+        public static QueryToken ForOperatorWithTolerance(QueryTokenType operatorType, int tolerance)
+        {
+            return new(string.Empty, operatorType, tolerance == 0 ? 5 : tolerance, null, null);
+        }
 
         /// <inheritdoc />
         public override bool Equals(object? obj)

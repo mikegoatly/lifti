@@ -471,7 +471,7 @@ namespace Lifti.Tests
 
             await this.index.CommitBatchChangeAsync();
 
-            this.index.Root.Should().BeEquivalentTo(previousRoot);
+            this.index.Root.ToString().Should().BeEquivalentTo(previousRoot.ToString());
         }
 
         [Fact]
@@ -551,8 +551,8 @@ namespace Lifti.Tests
         }
 
         private static async Task<FullTextIndex<string>> CreateDynamicObjectTestIndexAsync(
-            bool usePrefixes = false, 
-            double dynamicField1ScoreBoost = 1D, 
+            bool usePrefixes = false,
+            double dynamicField1ScoreBoost = 1D,
             double dynamicField2ScoreBoost = 1D)
         {
             var index = new FullTextIndexBuilder<string>()

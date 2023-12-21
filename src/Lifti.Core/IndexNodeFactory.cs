@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Immutable;
 
 namespace Lifti
 {
@@ -31,8 +30,8 @@ namespace Lifti
         {
             return new IndexNode(
                 null,
-                ImmutableDictionary<char, IndexNode>.Empty,
-                ImmutableDictionary<int, ImmutableList<IndexedToken>>.Empty);
+                ChildNodeMap.Empty,
+                DocumentTokenMatchMap.Empty);
         }
 
         /// <inheritdoc/>
@@ -46,8 +45,8 @@ namespace Lifti
         /// <inheritdoc/>
         public IndexNode CreateNode(
             ReadOnlyMemory<char> intraNodeText,
-            ImmutableDictionary<char, IndexNode> childNodes,
-            ImmutableDictionary<int, ImmutableList<IndexedToken>> matches)
+            ChildNodeMap childNodes,
+            DocumentTokenMatchMap matches)
         {
             return new IndexNode(intraNodeText, childNodes, matches);
         }

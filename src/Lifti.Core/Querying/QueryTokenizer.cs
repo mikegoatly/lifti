@@ -1,7 +1,6 @@
 ﻿using Lifti.Tokenization;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 
 namespace Lifti.Querying
@@ -70,7 +69,7 @@ namespace Lifti.Querying
             public int ScoreBoostStartIndex { get; init; }
             public double? ScoreBoost { get; init; }
 
-            private ImmutableStack<QueryTokenizerStackState> TokenizerStack { get; init; } = ImmutableStack<QueryTokenizerStackState>.Empty;
+            private Stack<QueryTokenizerStackState>? SharedTokenizerStack { get; set; }
 
             public QueryTokenizerState OpenBracket()
             {
@@ -92,28 +91,29 @@ namespace Lifti.Querying
 
             public QueryTokenizerState PushTokenizer(IIndexTokenizer tokenizer)
             {
+                this.SharedTokenizerStack ??= new();
+                this.SharedTokenizerStack.Push(new QueryTokenizerStackState(this.BracketDepth, this.IndexTokenizer));
+
                 return this with
                 {
-                    IndexTokenizer = tokenizer,
-                    TokenizerStack = this.TokenizerStack.Push(new QueryTokenizerStackState(this.BracketDepth, this.IndexTokenizer))
+                    IndexTokenizer = tokenizer
                 };
             }
 
             public QueryTokenizerState UpdateForYieldedToken()
             {
-                if (this.OperatorState != OperatorParseState.ProcessingString && this.TokenizerStack.IsEmpty == false)
+                if (this.OperatorState != OperatorParseState.ProcessingString && this.SharedTokenizerStack?.Count > 0)
                 {
-                    var peeked = this.TokenizerStack.Peek();
+                    var peeked = this.SharedTokenizerStack.Peek();
                     if (peeked.BracketCaptureDepth >= this.BracketDepth)
                     {
                         // We've reached the same bracket depth now that the tokenizer was captured at, so revert to the
                         // previous one on the stack.
-                        var poppedStack = this.TokenizerStack.Pop(out var previousState);
+                        var previousState = this.SharedTokenizerStack.Pop();
 
                         return this with
                         {
                             IndexTokenizer = previousState.IndexTokenizer,
-                            TokenizerStack = poppedStack,
                             ScoreBoost = null
                         };
                     }

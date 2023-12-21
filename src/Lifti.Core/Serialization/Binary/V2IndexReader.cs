@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
-
     internal class V2IndexReader<TKey> : IIndexReader<TKey>
         where TKey : notnull
     {
@@ -58,7 +56,7 @@ namespace Lifti.Serialization.Binary
                 var id = this.reader.ReadInt32();
                 var key = keyReader(this.reader);
                 var fieldStatCount = this.reader.ReadInt32();
-                var fieldTokenCounts = ImmutableDictionary.CreateBuilder<byte, int>();
+                var fieldTokenCounts = new Dictionary<byte, int>(fieldStatCount);
                 var totalTokenCount = 0;
                 for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
                 {
@@ -70,7 +68,7 @@ namespace Lifti.Serialization.Binary
                     totalTokenCount += wordCount;
                 }
 
-                var documentStatistics = new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount);
+                var documentStatistics = new DocumentStatistics(fieldTokenCounts, totalTokenCount);
 
                 // Using ForLooseText here because we don't know any of the new information associated to an object
                 // type, e.g. its id or score boost options. This is the closest we can get to the old format.
@@ -106,48 +104,38 @@ namespace Lifti.Serialization.Binary
             var matchCount = this.reader.ReadInt32();
             var childNodeCount = this.reader.ReadInt32();
             var intraNodeText = textLength == 0 ? null : this.ReadIntraNodeText(textLength);
-            var childNodes = childNodeCount > 0 ? ImmutableDictionary.CreateBuilder<char, IndexNode>() : null;
-            var matches = matchCount > 0 ? ImmutableDictionary.CreateBuilder<int, ImmutableList<IndexedToken>>() : null;
+            var childNodes = childNodeCount > 0 ? new List<(char childChar, IndexNode childNode)>() : null;
+            var matches = matchCount > 0 ? new Dictionary<int, IReadOnlyList<IndexedToken>>() : null;
 
             for (var i = 0; i < childNodeCount; i++)
             {
                 var matchChar = this.ReadMatchedCharacter();
-                childNodes!.Add(matchChar, this.DeserializeNode(nodeFactory, depth + 1));
+                childNodes!.Add((matchChar, this.DeserializeNode(nodeFactory, depth + 1)));
             }
 
-            var locationMatches = new List<TokenLocation>(50);
             for (var itemMatch = 0; itemMatch < matchCount; itemMatch++)
             {
                 var itemId = this.reader.ReadInt32();
                 var fieldCount = this.reader.ReadInt32();
-
-                var indexedTokens = ImmutableList.CreateBuilder<IndexedToken>();
+                var indexedTokens = new IndexedToken[fieldCount];
 
                 for (var fieldMatch = 0; fieldMatch < fieldCount; fieldMatch++)
                 {
                     var fieldId = this.reader.ReadByte();
                     var locationCount = this.reader.ReadInt32();
-
-                    locationMatches.Clear();
-
-                    // Resize the collection immediately if required to prevent multiple resizes during deserialization
-                    if (locationMatches.Capacity < locationCount)
-                    {
-                        locationMatches.Capacity = locationCount;
-                    }
-
+                    var locationMatches = new List<TokenLocation>(locationCount);
                     this.ReadLocations(locationCount, locationMatches);
 
-                    indexedTokens.Add(new IndexedToken(fieldId, [.. locationMatches]));
+                    indexedTokens[fieldMatch] = new IndexedToken(fieldId, locationMatches);
                 }
 
-                matches!.Add(itemId, indexedTokens.ToImmutable());
+                matches!.Add(itemId, indexedTokens);
             }
 
             return nodeFactory.CreateNode(
                 intraNodeText,
-                childNodes?.ToImmutable() ?? ImmutableDictionary<char, IndexNode>.Empty,
-                matches?.ToImmutable() ?? ImmutableDictionary<int, ImmutableList<IndexedToken>>.Empty);
+                childNodes == null ? ChildNodeMap.Empty : new ChildNodeMap(childNodes),
+                matches == null ? DocumentTokenMatchMap.Empty : new DocumentTokenMatchMap(matches));
         }
 
         /// <summary>

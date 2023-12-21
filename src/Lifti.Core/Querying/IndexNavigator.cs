@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Buffers;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -10,7 +8,7 @@ namespace Lifti.Querying
 {
     internal sealed class IndexNavigator : IIndexNavigator
     {
-        private readonly StringBuilder navigatedWith = new StringBuilder(16);
+        private readonly StringBuilder navigatedWith = new(16);
         private IIndexNavigatorPool? pool;
         private IScorer? scorer;
         private IndexNode? currentNode;
@@ -49,9 +47,9 @@ namespace Lifti.Querying
                 return IntermediateQueryResult.Empty;
             }
 
-            var matches = this.currentNode.Matches.Select(CreateQueryTokenMatch);
+            var matches = this.currentNode.Matches.Enumerate().Select(CreateQueryTokenMatch);
 
-            return CreateIntermediateQueryResult(matches, weighting);
+            return this.CreateIntermediateQueryResult(matches, weighting);
         }
 
         public IntermediateQueryResult GetExactAndChildMatches(double weighting = 1D)
@@ -70,13 +68,13 @@ namespace Lifti.Querying
                 var node = childNodeStack.Dequeue();
                 if (node.HasMatches)
                 {
-                    foreach (var match in node.Matches)
+                    foreach (var (documentId, indexedTokens) in node.Matches.Enumerate())
                     {
-                        var fieldMatches = match.Value.Select(v => new FieldMatch(v));
-                        if (!matches.TryGetValue(match.Key, out var mergedItemResults))
+                        var fieldMatches = indexedTokens.Select(v => new FieldMatch(v));
+                        if (!matches.TryGetValue(documentId, out var mergedItemResults))
                         {
                             mergedItemResults = new List<FieldMatch>(fieldMatches);
-                            matches[match.Key] = mergedItemResults;
+                            matches[documentId] = mergedItemResults;
                         }
                         else
                         {
@@ -87,7 +85,7 @@ namespace Lifti.Querying
 
                 if (node.HasChildNodes)
                 {
-                    foreach (var childNode in node.ChildNodes.Values)
+                    foreach (var (_, childNode) in node.ChildNodes.Enumerate())
                     {
                         childNodeStack.Enqueue(childNode);
                     }
@@ -98,7 +96,7 @@ namespace Lifti.Querying
                     m.Key,
                     MergeItemMatches(m.Value).ToList()));
 
-            return CreateIntermediateQueryResult(queryTokenMatches, weighting);
+            return this.CreateIntermediateQueryResult(queryTokenMatches, weighting);
         }
 
         public bool Process(string text)
@@ -195,9 +193,10 @@ namespace Lifti.Querying
                 }
                 else if (this.currentNode.HasChildNodes)
                 {
-                    foreach (var character in this.currentNode.ChildNodes.Keys)
+                    var childChars = this.currentNode.ChildNodes.Characters;
+                    for (var i = 0; i < childChars.Length; i++)
                     {
-                        yield return character;
+                        yield return childChars.Span[i];
                     }
                 }
             }
@@ -245,10 +244,10 @@ namespace Lifti.Querying
 
             if (node.HasChildNodes)
             {
-                foreach (var childNode in node.ChildNodes)
+                foreach (var (character, childNode) in node.ChildNodes.Enumerate())
                 {
-                    this.navigatedWith.Append(childNode.Key);
-                    foreach (var result in this.EnumerateIndexedTokens(childNode.Value))
+                    this.navigatedWith.Append(character);
+                    foreach (var result in this.EnumerateIndexedTokens(childNode))
                     {
                         yield return result;
                     }
@@ -272,11 +271,11 @@ namespace Lifti.Querying
         }
 
         private static QueryTokenMatch CreateQueryTokenMatch(
-            KeyValuePair<int, ImmutableList<IndexedToken>> match)
+            (int documentId, IReadOnlyList<IndexedToken> indexedTokens) match)
         {
             return new QueryTokenMatch(
-                match.Key,
-                match.Value.Select(v => new FieldMatch(v)).ToList());
+                match.documentId,
+                match.indexedTokens.Select(v => new FieldMatch(v)).ToList());
         }
 
         internal readonly struct IndexNavigatorBookmark : IIndexNavigatorBookmark, IEquatable<IndexNavigatorBookmark>
