@@ -1,25 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0;net7.0;net8.0;netframework4.8.1</TargetFrameworks>
-	  <LangVersion>9.0</LangVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFrameworks>net6.0;net7.0;net8.0;netframework4.8.1</TargetFrameworks>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="WikipediaPages.dat" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="WikipediaPages.dat" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="WikipediaPages.dat" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="WikipediaPages.dat" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
-    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.5" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
+		<PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.5" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Lifti.Core\Lifti.Core.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\Lifti.Core\Lifti.Core.csproj" />
+	</ItemGroup>
 </Project>

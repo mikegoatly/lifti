@@ -5,21 +5,9 @@ using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
-    //public class AntiVirusFriendlyConfig : ManualConfig
-    //{
-    //    public AntiVirusFriendlyConfig()
-    //    {
-    //        this.
-
-    //        AddJob(Job.ShortRun
-    //        .With
-    //            .WithToolchain(InProcessNoEmitToolchain.Instance));
-    //    }
-    //}
-
     [ShortRunJob(RuntimeMoniker.Net481)]
     [ShortRunJob(RuntimeMoniker.Net70)]
-    [MediumRunJob(RuntimeMoniker.Net80)]
+    [ShortRunJob(RuntimeMoniker.Net80)]
     [ShortRunJob(RuntimeMoniker.Net60)]
     [RankColumn, MemoryDiagnoser]
     public class IndexSearchingBenchmarks : IndexBenchmarkBase
