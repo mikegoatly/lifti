@@ -178,7 +178,7 @@ namespace Lifti
         /// <summary>
         /// Gets the set of characters that link from this instance to the child nodes.
         /// </summary>
-        internal IReadOnlyList<ChildNodeMapEntry> CharacterMap => this.childNodes;
+        public IReadOnlyList<ChildNodeMapEntry> CharacterMap => this.childNodes;
 
         internal ChildNodeMapMutation StartMutation()
         {
