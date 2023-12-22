@@ -3,14 +3,21 @@ using System;
 
 namespace Lifti
 {
-    internal class IndexMutation
+    internal class IndexMutation<TKey>
+        where TKey : notnull
     {
         private readonly IndexNodeMutation root;
 
-        public IndexMutation(IndexNode root, IIndexNodeFactory indexNodeFactory)
+        public IndexMutation(
+            IndexNode root,
+            ItemStore<TKey> originalItemStore,
+            IIndexNodeFactory indexNodeFactory)
         {
             this.root = new IndexNodeMutation(0, root, indexNodeFactory);
+            this.ItemStore = new(originalItemStore);
         }
+
+        public ItemStore<TKey> ItemStore { get; }
 
         internal void Add(int itemId, byte fieldId, Token token)
         {

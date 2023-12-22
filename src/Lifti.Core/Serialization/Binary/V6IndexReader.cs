@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Lifti.Serialization.Binary
@@ -26,7 +26,7 @@ namespace Lifti.Serialization.Binary
                 var id = this.reader.ReadNonNegativeVarInt32();
                 var key = this.keySerializer.Read(this.reader);
                 var fieldStatCount = (int)this.reader.ReadByte();
-                var fieldTokenCounts = ImmutableDictionary.CreateBuilder<byte, int>();
+                var fieldTokenCounts = new Dictionary<byte, int>(fieldStatCount);
                 var totalTokenCount = 0;
                 for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
                 {
@@ -36,7 +36,7 @@ namespace Lifti.Serialization.Binary
                     totalTokenCount += wordCount;
                 }
 
-                var documentStatistics = new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount);
+                var documentStatistics = new DocumentStatistics(fieldTokenCounts, totalTokenCount);
 
                 // Now read the object type information, if any
                 var objectBitMaskInfo = this.reader.ReadByte();

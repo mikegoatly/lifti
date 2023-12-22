@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Immutable;
 
 namespace Lifti
 {
@@ -30,8 +29,8 @@ namespace Lifti
         /// </param>
         IndexNode CreateNode(
             ReadOnlyMemory<char> intraNodeText,
-            ImmutableDictionary<char, IndexNode> childNodes,
-            ImmutableDictionary<int, ImmutableList<IndexedToken>> matches);
+            ChildNodeMap childNodes,
+            DocumentTokenMatchMap matches);
 
         /// <summary>
         /// Gets the <see cref="IndexSupportLevelKind"/> for the given <paramref name="depth"/> into the index.

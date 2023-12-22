@@ -471,7 +471,7 @@ namespace Lifti.Tests
 
             await this.index.CommitBatchChangeAsync();
 
-            this.index.Root.Should().BeEquivalentTo(previousRoot);
+            this.index.Root.ToString().Should().BeEquivalentTo(previousRoot.ToString());
         }
 
         [Fact]
@@ -551,8 +551,8 @@ namespace Lifti.Tests
         }
 
         private static async Task<FullTextIndex<string>> CreateDynamicObjectTestIndexAsync(
-            bool usePrefixes = false, 
-            double dynamicField1ScoreBoost = 1D, 
+            bool usePrefixes = false,
+            double dynamicField1ScoreBoost = 1D,
             double dynamicField2ScoreBoost = 1D)
         {
             var index = new FullTextIndexBuilder<string>()
@@ -622,46 +622,16 @@ namespace Lifti.Tests
             public string Text3 { get; }
         }
 
-        public class TestObject2
+        public record TestObject2(string Id, params string[] Text);
+
+        public record TestObject3(string Id, string Text, params string[] MultiText);
+
+        public class DynamicObject(string id, string details, Dictionary<string, string> dynamicFields, params FullTextIndexTests.ExtraField[] extraFields)
         {
-            public TestObject2(string id, params string[] text)
-            {
-                this.Id = id;
-                this.Text = text;
-            }
-
-            public string Id { get; }
-            public string[] Text { get; }
-        }
-
-        public class TestObject3
-        {
-            public TestObject3(string id, string text, params string[] multiText)
-            {
-                this.Id = id;
-                this.Text = text;
-                this.MultiText = multiText;
-            }
-
-            public string Id { get; }
-            public string Text { get; }
-            public string[] MultiText { get; }
-        }
-
-        public class DynamicObject
-        {
-            public DynamicObject(string id, string details, Dictionary<string, string> dynamicFields, params ExtraField[] extraFields)
-            {
-                this.Id = id;
-                this.Details = details;
-                this.DynamicFields = dynamicFields;
-                this.ExtraFields = extraFields.Length == 0 ? null : extraFields;
-            }
-
-            public string Id { get; }
-            public string Details { get; }
-            public Dictionary<string, string> DynamicFields { get; }
-            public ExtraField[]? ExtraFields { get; }
+            public string Id { get; } = id;
+            public string Details { get; } = details;
+            public Dictionary<string, string> DynamicFields { get; } = dynamicFields;
+            public ExtraField[]? ExtraFields { get; } = extraFields.Length == 0 ? null : extraFields;
         }
 
         public record ExtraField(string Name, string Value);
