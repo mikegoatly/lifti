@@ -8,14 +8,16 @@ namespace Lifti
     {
         private readonly IIndexNavigatorPool indexNavigatorPool;
 
-        internal IndexSnapshot(IIndexNavigatorPool indexNavigatorPool, FullTextIndex<TKey> index)
+        internal IndexSnapshot(
+            IIndexNavigatorPool indexNavigatorPool,
+            IIndexedFieldLookup fieldLookup,
+            IndexNode rootNode,
+            IItemStore<TKey> itemStore)
         {
-            this.Items = index.Items.Snapshot();
-            this.Root = index.Root;
+            this.Items = itemStore;
+            this.Root = rootNode;
             this.indexNavigatorPool = indexNavigatorPool;
-
-            // Field lookup is read-only once the index is constructed
-            this.FieldLookup = index.FieldLookup;
+            this.FieldLookup = fieldLookup;
         }
 
         /// <inheritdoc />

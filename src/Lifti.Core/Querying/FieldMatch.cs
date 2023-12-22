@@ -82,7 +82,7 @@ namespace Lifti.Querying
 
         private static List<ITokenLocationMatch> CreateLocationsList(IEnumerable<ITokenLocationMatch> matches)
         {
-            return matches.OrderBy(x => x.MinTokenIndex).ToList();
+            return [.. matches.OrderBy(x => x.MinTokenIndex)];
         }
     }
 }

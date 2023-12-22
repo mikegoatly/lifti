@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization.Objects;
 using System;
-using System.Collections.Immutable;
 using System.Linq;
 using Xunit;
 
@@ -191,7 +190,7 @@ namespace Lifti.Tests
         private static IndexStatistics IndexStatistics(params (byte fieldId, int wordCount)[] fieldTokenCounts)
         {
             return new IndexStatistics(
-                fieldTokenCounts.ToImmutableDictionary(f => f.fieldId, f => (long)f.wordCount),
+                fieldTokenCounts.ToDictionary(f => f.fieldId, f => (long)f.wordCount),
                 fieldTokenCounts.Sum(c => c.wordCount));
         }
     }

@@ -14,8 +14,8 @@ namespace Lifti.Tests
 
             var result = this.Sut.Apply();
 
-            VerifyResult(result, "www", expectedChildNodes: new[] { 'w' });
-            VerifyResult(result, new[] { 'w' }, "w");
+            VerifyResult(result, "www", expectedChildNodes: ['w']);
+            VerifyResult(result, ['w'], "w");
         }
 
         [Fact]
@@ -30,8 +30,8 @@ namespace Lifti.Tests
 
             var result = this.Sut.Apply();
 
-            VerifyResult(result, "www", expectedChildNodes: new[] { 'w' });
-            VerifyResult(result, new[] { 'w' }, "w");
+            VerifyResult(result, "www", expectedChildNodes: ['w']);
+            VerifyResult(result, ['w'], "w");
         }
 
         [Fact]
@@ -40,14 +40,20 @@ namespace Lifti.Tests
             this.Sut.Add(Item1, FieldId1, new Token("www", this.Locations1.Locations));
             this.Sut.Add(Item2, FieldId1, new Token("wwwww", this.Locations2.Locations));
 
-            this.ApplyMutationsToNewSut();
+            var result = this.ApplyMutationsToNewSut();
+
+            VerifyResult(result, "www", expectedChildNodes: ['w'], expectedMatches: new[] { (Item1, this.Locations1) });
+            VerifyResult(result, ['w'], "w", new[] { (Item2, this.Locations2) });
 
             this.Sut.Remove(Item1);
 
-            var result = this.Sut.Apply();
+            result = this.Sut.Apply();
 
-            VerifyResult(result, "www", expectedChildNodes: new[] { 'w' });
-            VerifyResult(result, new[] { 'w' }, "w", new[] { (Item2, this.Locations2) });
+            // Item1 should be gone
+            VerifyResult(result, "www", expectedChildNodes: ['w']);
+
+            // But because we only removed Item1, Item2 should still be present
+            VerifyResult(result, ['w'], "w", new[] { (Item2, this.Locations2) });
         }
     }
 }

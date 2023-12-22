@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
 using System.Text;
 
@@ -12,8 +11,8 @@ namespace Lifti
     {
         internal IndexNode(
             ReadOnlyMemory<char> intraNodeText,
-            ImmutableDictionary<char, IndexNode> childNodes,
-            ImmutableDictionary<int, ImmutableList<IndexedToken>> matches)
+            ChildNodeMap childNodes,
+            DocumentTokenMatchMap matches)
         {
             this.IntraNodeText = intraNodeText;
             this.ChildNodes = childNodes;
@@ -26,18 +25,18 @@ namespace Lifti
         /// text has been completely processed.
         /// </summary>
         public ReadOnlyMemory<char> IntraNodeText { get; }
-        
+
         /// <summary>
         /// Gets any child nodes that can be navigated to from this instance, once the intra-node text has 
         /// been processed.
         /// </summary>
-        public ImmutableDictionary<char, IndexNode> ChildNodes { get; }
+        public ChildNodeMap ChildNodes { get; }
 
         /// <summary>
         /// Gets the set of matches that are found at this location in the index (once all the <see cref="IntraNodeText"/>
         /// has been processed.)
         /// </summary>
-        public ImmutableDictionary<int, ImmutableList<IndexedToken>> Matches { get; }
+        public DocumentTokenMatchMap Matches { get; }
 
         /// <summary>
         /// Gets a value indicating whether this node is empty. A node is considered empty if it doesn't have 
@@ -71,6 +70,9 @@ namespace Lifti
             return builder.ToString();
         }
 
+        /// <summary>
+        /// Formats a single child node linked from this instance to the given <paramref name="builder"/>.
+        /// </summary>
         internal void ToString(StringBuilder builder, char linkChar, int currentDepth)
         {
             builder.Append(' ', currentDepth * 2)
@@ -82,15 +84,30 @@ namespace Lifti
             this.FormatChildNodeText(builder, currentDepth);
         }
 
+        /// <summary>
+        /// Formats all the child nodes of this instance to the given <paramref name="builder"/>.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="nextDepth"></param>
+        internal void ToString(StringBuilder builder, int nextDepth)
+        {
+            foreach (var (character, childNode) in this.ChildNodes.CharacterMap)
+            {
+                builder.AppendLine();
+                childNode.ToString(builder, character, nextDepth);
+            }
+        }
+
         private void FormatChildNodeText(StringBuilder builder, int currentDepth)
         {
             if (this.HasChildNodes)
             {
                 var nextDepth = currentDepth + 1;
-                foreach (var item in this.ChildNodes)
+
+                foreach (var (character, childNode) in this.ChildNodes.CharacterMap)
                 {
                     builder.AppendLine();
-                    item.Value.ToString(builder, item.Key, nextDepth);
+                    childNode.ToString(builder, character, nextDepth);
                 }
             }
         }
