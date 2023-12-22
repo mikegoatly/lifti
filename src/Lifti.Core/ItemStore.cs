@@ -1,13 +1,12 @@
 ﻿using Lifti.Tokenization.Objects;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace Lifti
 {
     /// <inheritdoc />
-    internal class ItemStore<TKey> : IItemStore<TKey>
+    internal sealed class ItemStore<TKey> : IItemStore<TKey>
         where TKey : notnull
     {
         private readonly Dictionary<byte, ScoreBoostMetadata> scoreBoostMetadata;
@@ -16,18 +15,22 @@ namespace Lifti
         internal ItemStore(IEnumerable<IIndexedObjectConfiguration> configureObjectTypes)
         {
             this.idPool = new IdPool<TKey>();
-            this.ItemLookup = ImmutableDictionary<TKey, ItemMetadata<TKey>>.Empty;
-            this.ItemIdLookup = ImmutableDictionary<int, ItemMetadata<TKey>>.Empty;
-            this.IndexStatistics = IndexStatistics.Empty;
+            this.ItemLookup = [];
+            this.ItemIdLookup = [];
+            this.IndexStatistics = new();
             this.scoreBoostMetadata = configureObjectTypes.ToDictionary(o => o.Id, o => new ScoreBoostMetadata(o.ScoreBoostOptions));
         }
 
-        private ItemStore(ItemStore<TKey> original)
+        /// <summary>
+        /// Creates a new <see cref="ItemStore{TKey}"/> instance that is a copy of the given instance and is safe to mutate.
+        /// </summary>
+        /// <param name="original"></param>
+        internal ItemStore(ItemStore<TKey> original)
         {
             this.idPool = original.idPool;
-            this.ItemLookup = original.ItemLookup;
-            this.ItemIdLookup = original.ItemIdLookup;
-            this.IndexStatistics = original.IndexStatistics;
+            this.ItemLookup = new(original.ItemLookup);
+            this.ItemIdLookup = new(original.ItemIdLookup);
+            this.IndexStatistics = new(original.IndexStatistics);
             this.scoreBoostMetadata = original.scoreBoostMetadata;
         }
 
@@ -35,17 +38,17 @@ namespace Lifti
         public int Count => this.ItemLookup.Count;
 
         /// <inheritdoc />
-        public IndexStatistics IndexStatistics { get; protected set; } = IndexStatistics.Empty;
+        public IndexStatistics IndexStatistics { get; }
 
         /// <summary>
         /// Gets or sets the lookup of item key to <see cref="ItemMetadata{T}"/> information.
         /// </summary>
-        protected ImmutableDictionary<TKey, ItemMetadata<TKey>> ItemLookup { get; set; }
+        private Dictionary<TKey, ItemMetadata<TKey>> ItemLookup { get; set; }
 
         /// <summary>
         /// Gets or sets the lookup of internal item id to <see cref="ItemMetadata{T}"/> information.
         /// </summary>
-        protected ImmutableDictionary<int, ItemMetadata<TKey>> ItemIdLookup { get; set; }
+        private Dictionary<int, ItemMetadata<TKey>> ItemIdLookup { get; set; }
 
         /// <inheritdoc />\
         public IEnumerable<ItemMetadata<TKey>> GetIndexedItems()
@@ -117,6 +120,21 @@ namespace Lifti
         }
 
         /// <summary>
+        /// Tries to get the internal id for the given key.
+        /// </summary>
+        public bool TryGetDocumentId(TKey key, out int documentId)
+        {
+            if (this.ItemLookup.TryGetValue(key, out var itemMetadata))
+            {
+                documentId = itemMetadata.Id;
+                return true;
+            }
+
+            documentId = -1;
+            return false;
+        }
+
+        /// <summary>
         /// Removes the given item from the item store.
         /// </summary>
         /// <returns>
@@ -124,22 +142,22 @@ namespace Lifti
         /// </returns>
         public int Remove(TKey key)
         {
-            var itemInfo = this.ItemLookup[key];
-            var id = itemInfo.Id;
-            this.ItemLookup = this.ItemLookup.Remove(key);
-            this.ItemIdLookup = this.ItemIdLookup.Remove(id);
-            this.IndexStatistics = this.IndexStatistics.Remove(itemInfo.DocumentStatistics);
+            var documentInfo = this.ItemLookup[key];
+            var documentId = documentInfo.Id;
+            this.ItemLookup.Remove(key);
+            this.ItemIdLookup.Remove(documentId);
+            this.IndexStatistics.Remove(documentInfo.DocumentStatistics);
 
-            if (itemInfo.ObjectTypeId is byte objectTypeId)
+            if (documentInfo.ObjectTypeId is byte objectTypeId)
             {
                 // Remove the item from the score boost metadata
                 this.GetObjectTypeScoreBoostMetadata(objectTypeId)
-                    .Remove(itemInfo);
+                    .Remove(documentInfo);
             }
 
-            this.idPool.Return(id);
+            this.idPool.Return(documentId);
 
-            return id;
+            return documentId;
         }
 
         /// <inheritdoc />
@@ -168,12 +186,6 @@ namespace Lifti
         public bool Contains(TKey key)
         {
             return this.ItemLookup.ContainsKey(key);
-        }
-
-        /// <inheritdoc />
-        public IItemStore<TKey> Snapshot()
-        {
-            return new ItemStore<TKey>(this);
         }
 
         /// <inheritdoc />
@@ -217,9 +229,9 @@ namespace Lifti
                 throw new LiftiException(ExceptionMessages.IdAlreadyUsed, id);
             }
 
-            this.ItemLookup = this.ItemLookup.Add(key, itemMetadata);
-            this.ItemIdLookup = this.ItemIdLookup.Add(id, itemMetadata);
-            this.IndexStatistics = this.IndexStatistics.Add(itemMetadata.DocumentStatistics);
+            this.ItemLookup.Add(key, itemMetadata);
+            this.ItemIdLookup.Add(id, itemMetadata);
+            this.IndexStatistics.Add(itemMetadata.DocumentStatistics);
         }
     }
 }

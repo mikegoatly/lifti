@@ -16,11 +16,11 @@ namespace Lifti
     {
         private readonly Func<IIndexSnapshot<TKey>, CancellationToken, Task>[]? indexModifiedActions;
         private readonly IndexOptions indexOptions;
-        private readonly ItemStore<TKey> itemStore;
         private readonly IIndexNavigatorPool indexNavigatorPool;
         private readonly SemaphoreSlim writeLock = new(1);
         private readonly TimeSpan writeLockTimeout = TimeSpan.FromSeconds(10);
         private readonly IndexedFieldLookup fieldLookup;
+        private ItemStore<TKey> itemStore;
         private bool isDisposed;
 
         /// <remarks>
@@ -29,7 +29,7 @@ namespace Lifti
         private IndexSnapshot<TKey> currentSnapshot = null!;
         private IndexNode root = null!;
 
-        private IndexMutation? batchMutation;
+        private IndexMutation<TKey>? batchMutation;
 
         internal FullTextIndex(
             IndexOptions indexOptions,
@@ -66,7 +66,11 @@ namespace Lifti
             private set
             {
                 this.root = value;
-                this.currentSnapshot = new IndexSnapshot<TKey>(this.indexNavigatorPool, this);
+                this.currentSnapshot = new IndexSnapshot<TKey>(
+                    this.indexNavigatorPool,
+                    this.fieldLookup,
+                    value,
+                    this.itemStore);
             }
         }
 
@@ -120,7 +124,7 @@ namespace Lifti
                     throw new LiftiException(ExceptionMessages.BatchChangeAlreadyStarted);
                 }
 
-                this.batchMutation = new IndexMutation(this.Root, this.IndexNodeFactory);
+                this.batchMutation = new IndexMutation<TKey>(this.Root, this.itemStore, this.IndexNodeFactory);
             });
         }
 
@@ -222,27 +226,26 @@ namespace Lifti
         /// <inheritdoc />
         public async Task<bool> RemoveAsync(TKey itemKey, CancellationToken cancellationToken = default)
         {
-            var result = false;
+            var itemRemoved = false;
             await this.PerformWriteLockedActionAsync(
                 async () =>
                 {
-                    if (!this.Items.Contains(itemKey))
-                    {
-                        result = false;
-                        return;
-                    }
-
                     await this.MutateAsync(
-                        m => this.RemoveKeyFromIndex(itemKey, m),
+                        m =>
+                        {
+                            itemRemoved = m.ItemStore.Contains(itemKey);
+                            if (itemRemoved)
+                            {
+                                RemoveKeyFromIndex(itemKey, m);
+                            }
+                        },
                         cancellationToken)
                         .ConfigureAwait(false);
-
-                    result = true;
                 },
                 cancellationToken)
                 .ConfigureAwait(false);
 
-            return result;
+            return itemRemoved;
         }
 
         /// <inheritdoc />
@@ -306,7 +309,7 @@ namespace Lifti
             return tokenizer.Process(fragments).SelectMany(thesaurus.Process).ToList();
         }
 
-        private void AddForDefaultField(IndexMutation mutation, TKey itemKey, List<Token> tokens)
+        private void AddForDefaultField(IndexMutation<TKey> mutation, TKey itemKey, List<Token> tokens)
         {
             var fieldId = this.FieldLookup.DefaultField;
             var itemId = this.GetUniqueIdForItem(
@@ -351,7 +354,7 @@ namespace Lifti
             }
         }
 
-        private async Task MutateAsync(Action<IndexMutation> mutationAction, CancellationToken cancellationToken)
+        private async Task MutateAsync(Action<IndexMutation<TKey>> mutationAction, CancellationToken cancellationToken)
         {
             var indexMutation = this.GetCurrentMutationOrCreateTransient();
 
@@ -363,8 +366,9 @@ namespace Lifti
             }
         }
 
-        private async Task ApplyMutationsAsync(IndexMutation indexMutation, CancellationToken cancellationToken)
+        private async Task ApplyMutationsAsync(IndexMutation<TKey> indexMutation, CancellationToken cancellationToken)
         {
+            this.itemStore = indexMutation.ItemStore;
             this.Root = indexMutation.Apply();
             if (this.indexModifiedActions != null)
             {
@@ -375,12 +379,12 @@ namespace Lifti
             }
         }
 
-        private IndexMutation GetCurrentMutationOrCreateTransient()
+        private IndexMutation<TKey> GetCurrentMutationOrCreateTransient()
         {
-            return this.batchMutation ?? new IndexMutation(this.Root, this.IndexNodeFactory);
+            return this.batchMutation ?? new IndexMutation<TKey>(this.Root, this.itemStore, this.IndexNodeFactory);
         }
 
-        private async Task MutateAsync(Func<IndexMutation, Task> asyncMutationAction, CancellationToken cancellationToken)
+        private async Task MutateAsync(Func<IndexMutation<TKey>, Task> asyncMutationAction, CancellationToken cancellationToken)
         {
             var indexMutation = this.GetCurrentMutationOrCreateTransient();
 
@@ -392,7 +396,7 @@ namespace Lifti
             }
         }
 
-        private static void IndexTokens(IndexMutation indexMutation, int itemId, byte fieldId, IEnumerable<Token> tokens)
+        private static void IndexTokens(IndexMutation<TKey> indexMutation, int itemId, byte fieldId, IEnumerable<Token> tokens)
         {
             foreach (var token in tokens)
             {
@@ -400,15 +404,15 @@ namespace Lifti
             }
         }
 
-        private void RemoveKeyFromIndex(TKey itemKey, IndexMutation mutation)
+        private static void RemoveKeyFromIndex(TKey itemKey, IndexMutation<TKey> mutation)
         {
-            var id = this.itemStore.Remove(itemKey);
+            var id = mutation.ItemStore.Remove(itemKey);
 
             mutation.Remove(id);
         }
 
         /// <remarks>This method is thread safe as we only allow one mutation operation at a time.</remarks>
-        private async Task AddAsync<TObject>(TObject item, IndexedObjectConfiguration<TObject, TKey> options, IndexMutation indexMutation, CancellationToken cancellationToken)
+        private async Task AddAsync<TObject>(TObject item, IndexedObjectConfiguration<TObject, TKey> options, IndexMutation<TKey> indexMutation, CancellationToken cancellationToken)
         {
             var itemKey = options.KeyReader(item);
 
@@ -467,30 +471,29 @@ namespace Lifti
             fieldTokens.Add(fieldId, tokens);
         }
 
-        private int GetUniqueIdForItem(TKey itemKey, DocumentStatistics documentStatistics, IndexMutation mutation)
+        private int GetUniqueIdForItem(TKey itemKey, DocumentStatistics documentStatistics, IndexMutation<TKey> mutation)
         {
-            if (this.indexOptions.DuplicateItemBehavior == DuplicateItemBehavior.ReplaceItem)
-            {
-                if (this.itemStore.Contains(itemKey))
-                {
-                    this.RemoveKeyFromIndex(itemKey, mutation);
-                }
-            }
+            this.EnforceDuplicateItemBehavior(itemKey, mutation);
 
-            return this.itemStore.Add(itemKey, documentStatistics);
+            return mutation.ItemStore.Add(itemKey, documentStatistics);
         }
 
-        private int GetUniqueIdForItem<TObject>(TObject item, TKey itemKey, DocumentStatistics documentStatistics, IndexedObjectConfiguration<TObject, TKey> options, IndexMutation mutation)
+        private int GetUniqueIdForItem<TObject>(TObject item, TKey itemKey, DocumentStatistics documentStatistics, IndexedObjectConfiguration<TObject, TKey> options, IndexMutation<TKey> mutation)
+        {
+            this.EnforceDuplicateItemBehavior(itemKey, mutation);
+
+            return mutation.ItemStore.Add(itemKey, item, documentStatistics, options);
+        }
+
+        private void EnforceDuplicateItemBehavior(TKey itemKey, IndexMutation<TKey> mutation)
         {
             if (this.indexOptions.DuplicateItemBehavior == DuplicateItemBehavior.ReplaceItem)
             {
-                if (this.itemStore.Contains(itemKey))
+                if (mutation.ItemStore.Contains(itemKey))
                 {
-                    this.RemoveKeyFromIndex(itemKey, mutation);
+                    RemoveKeyFromIndex(itemKey, mutation);
                 }
             }
-
-            return this.itemStore.Add(itemKey, item, documentStatistics, options);
         }
 
         /// <summary>

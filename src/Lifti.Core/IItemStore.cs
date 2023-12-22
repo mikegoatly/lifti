@@ -69,11 +69,6 @@ namespace Lifti
         ItemMetadata<TKey> GetMetadata(TKey key);
 
         /// <summary>
-        /// Creates a snapshot of this instance that can be used even if the index is subsequently mutated.
-        /// </summary>
-        IItemStore<TKey> Snapshot();
-
-        /// <summary>
         /// Adds the given item metadata to the item store. This should only be used by deserializers as they 
         /// rebuild the index.
         /// </summary>

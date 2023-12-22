@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using System;
 using System.Linq;
 
 namespace Lifti.Tests
@@ -21,16 +22,16 @@ namespace Lifti.Tests
         {
             this.indexNodeFactory = new IndexNodeFactory(new IndexOptions { SupportIntraNodeTextAfterIndexDepth = 0 });
             this.RootNode = this.indexNodeFactory.CreateRootNode();
-            this.Sut = new IndexMutation(this.RootNode, this.indexNodeFactory);
+            this.Sut = new IndexMutation<int>(this.RootNode, new ItemStore<int>(Array.Empty<IIndexedObjectConfiguration>()), this.indexNodeFactory);
         }
 
         protected IndexNode RootNode { get; }
-        internal IndexMutation Sut { get; set; }
+        internal IndexMutation<int> Sut { get; set; }
 
         protected IndexNode ApplyMutationsToNewSut()
         {
             var applied = this.Sut.Apply();
-            this.Sut = new IndexMutation(applied, this.indexNodeFactory);
+            this.Sut = new IndexMutation<int>(applied, new ItemStore<int>(Array.Empty<IIndexedObjectConfiguration>()), this.indexNodeFactory);
             return applied;
         }
 

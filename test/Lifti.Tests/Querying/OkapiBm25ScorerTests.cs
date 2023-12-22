@@ -2,7 +2,7 @@
 using Lifti.Querying;
 using Lifti.Tests.Fakes;
 using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -16,7 +16,7 @@ namespace Lifti.Tests.Querying
         private readonly QueryTokenMatch[] tokenMatches;
         private static readonly FakeItemStore<int> looseTextItemStore = new(
                 10,
-                new IndexStatistics(ImmutableDictionary<byte, long>.Empty.Add(1, 100), 100), // 100 total tokens in 1 field
+                new IndexStatistics(new Dictionary<byte, long>() { { 1, 100 } }, 100), // 100 total tokens in 1 field
                 Enumerable.Range(0, 10)
                     .Select(id => (id, ItemMetadata<int>.ForLooseText(id, id, new DocumentStatistics(1, id * 3))))
                     .ToArray(), // Each item will have (id * 3) tokens in it
@@ -24,7 +24,7 @@ namespace Lifti.Tests.Querying
 
         private static readonly FakeItemStore<int> objectTextItemStore = new(
                 10,
-                new IndexStatistics(ImmutableDictionary<byte, long>.Empty.Add(1, 100), 100), // 100 total tokens in 1 field
+                new IndexStatistics(new Dictionary<byte, long>() { { 1, 100 } }, 100), // 100 total tokens in 1 field
                 Enumerable.Range(0, 10)
                     .Select(id => (id, ItemMetadata<int>.ForObject(
                         (byte)((id % 3) + 1), // Each item will be assigned to object type 1, 2, or 3 
