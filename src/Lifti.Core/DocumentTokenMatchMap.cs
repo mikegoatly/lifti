@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Lifti
@@ -131,6 +132,14 @@ namespace Lifti
             {
                 yield return (document.Key, document.Value);
             }
+        }
+
+        /// <summary>
+        /// Tries to get the list of indexed tokens for the specified document.
+        /// </summary>
+        public bool TryGetValue(int documentId, [NotNullWhen(true)] out IReadOnlyList<IndexedToken>? tokens)
+        {
+            return this.documentTokens.TryGetValue(documentId, out tokens);
         }
 
         /// <summary>
