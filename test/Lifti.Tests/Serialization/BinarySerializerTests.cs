@@ -184,7 +184,6 @@ namespace Lifti.Tests.Serialization
         }
 
         [Fact]
-        [Obsolete]
         public async Task ShouldDeserializeV6Index()
         {
             var index = CreateObjectIndex();
@@ -209,7 +208,6 @@ namespace Lifti.Tests.Serialization
         }
 
         [Fact]
-        [Obsolete]
         public async Task ShouldDeserializeV5Index()
         {
             var index = CreateObjectIndex();
@@ -295,7 +293,6 @@ namespace Lifti.Tests.Serialization
         }
 
         [Fact]
-        [Obsolete]
         public async Task ShouldRoundTripIndexStructure()
         {
             var serializer = new BinarySerializer<string>();
@@ -363,7 +360,6 @@ namespace Lifti.Tests.Serialization
         }
 
         [Fact]
-        [Obsolete]
         public async Task ShouldRoundTripMixedScoringMetadata()
         {
             var index = CreateObjectIndex();

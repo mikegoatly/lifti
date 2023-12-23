@@ -6,7 +6,7 @@ using System.Linq;
 namespace Lifti
 {
     /// <inheritdoc />
-    internal sealed class IndexMetadata<TKey> : IIndexMetadata<TKey>
+    public sealed class IndexMetadata<TKey> : IIndexMetadata<TKey>
         where TKey : notnull
     {
         private readonly Dictionary<byte, ScoreBoostMetadata> scoreBoostMetadata;
@@ -74,38 +74,14 @@ namespace Lifti
                 id => DocumentMetadata<TKey>.ForLooseText(id, key, documentStatistics));
         }
 
-        /// <summary>
-        /// Adds the given document key associated to the given object.
-        /// </summary>
-        /// <inheritdoc cref="Add(TKey, DocumentStatistics)" />
-        public int Add<TObject>(TKey key, TObject item, DocumentStatistics documentStatistics, ObjectTypeConfiguration<TObject, TKey> objectConfiguration)
-        {
-            // Get the score boosts for the item
-            var scoreBoostOptions = objectConfiguration.ScoreBoostOptions;
-            var freshnessDate = scoreBoostOptions.FreshnessProvider?.Invoke(item);
-            var scoringMagnitude = scoreBoostOptions.MagnitudeProvider?.Invoke(item);
-
-            return this.Add(
-                documentId =>
-                {
-                    var documentMetadata = DocumentMetadata<TKey>.ForObject(
-                        objectTypeId: objectConfiguration.Id,
-                        documentId: documentId,
-                        key,
-                        documentStatistics,
-                        freshnessDate,
-                        scoringMagnitude);
-
-                    this.GetObjectTypeScoreBoostMetadata(objectConfiguration.Id)
-                        .Add(documentMetadata);
-
-                    return documentMetadata;
-                });
-        }
-
         /// <inheritdoc />
         public void Add(DocumentMetadata<TKey> documentMetadata)
         {
+            if (documentMetadata is null)
+            {
+                throw new ArgumentNullException(nameof(documentMetadata));
+            }
+
             // Make the ID pool aware of the ID we are using
             this.idPool.RegisterUsedId(documentMetadata.Id);
 
@@ -117,47 +93,6 @@ namespace Lifti
             }
 
             this.UpdateLookups(documentMetadata);
-        }
-
-        /// <summary>
-        /// Tries to get the internal id for the given key.
-        /// </summary>
-        public bool TryGetDocumentId(TKey key, out int documentId)
-        {
-            if (this.DocumentKeyLookup.TryGetValue(key, out var documentMetadata))
-            {
-                documentId = documentMetadata.Id;
-                return true;
-            }
-
-            documentId = -1;
-            return false;
-        }
-
-        /// <summary>
-        /// Removes information about a document from this instance.
-        /// </summary>
-        /// <returns>
-        /// The internal document id of the removed document.
-        /// </returns>
-        public int Remove(TKey key)
-        {
-            var documentInfo = this.DocumentKeyLookup[key];
-            var documentId = documentInfo.Id;
-            this.DocumentKeyLookup.Remove(key);
-            this.DocumentIdLookup.Remove(documentId);
-            this.IndexStatistics.Remove(documentInfo.DocumentStatistics);
-
-            if (documentInfo.ObjectTypeId is byte objectTypeId)
-            {
-                // Remove the document from the overall score boost metadata for the object type
-                this.GetObjectTypeScoreBoostMetadata(objectTypeId)
-                    .Remove(documentInfo);
-            }
-
-            this.idPool.Return(documentId);
-
-            return documentId;
         }
 
         /// <inheritdoc />
@@ -203,6 +138,61 @@ namespace Lifti
         DocumentMetadata IIndexMetadata.GetMetadata(int documentId)
         {
             return this.GetMetadata(documentId);
+        }
+
+        /// <summary>
+        /// Removes information about a document from this instance.
+        /// </summary>
+        /// <returns>
+        /// The internal document id of the removed document.
+        /// </returns>
+        internal int Remove(TKey key)
+        {
+            var documentInfo = this.DocumentKeyLookup[key];
+            var documentId = documentInfo.Id;
+            this.DocumentKeyLookup.Remove(key);
+            this.DocumentIdLookup.Remove(documentId);
+            this.IndexStatistics.Remove(documentInfo.DocumentStatistics);
+
+            if (documentInfo.ObjectTypeId is byte objectTypeId)
+            {
+                // Remove the document from the overall score boost metadata for the object type
+                this.GetObjectTypeScoreBoostMetadata(objectTypeId)
+                    .Remove(documentInfo);
+            }
+
+            this.idPool.Return(documentId);
+
+            return documentId;
+        }
+
+        /// <summary>
+        /// Adds the given document key associated to the given object.
+        /// </summary>
+        /// <inheritdoc cref="Add(TKey, DocumentStatistics)" />
+        internal int Add<TObject>(TKey key, TObject item, DocumentStatistics documentStatistics, ObjectTypeConfiguration<TObject, TKey> objectConfiguration)
+        {
+            // Get the score boosts for the item
+            var scoreBoostOptions = objectConfiguration.ScoreBoostOptions;
+            var freshnessDate = scoreBoostOptions.FreshnessProvider?.Invoke(item);
+            var scoringMagnitude = scoreBoostOptions.MagnitudeProvider?.Invoke(item);
+
+            return this.Add(
+                documentId =>
+                {
+                    var documentMetadata = DocumentMetadata<TKey>.ForObject(
+                        objectTypeId: objectConfiguration.Id,
+                        documentId: documentId,
+                        key,
+                        documentStatistics,
+                        freshnessDate,
+                        scoringMagnitude);
+
+                    this.GetObjectTypeScoreBoostMetadata(objectConfiguration.Id)
+                        .Add(documentMetadata);
+
+                    return documentMetadata;
+                });
         }
 
         private int Add(Func<int, DocumentMetadata<TKey>> createDocumentMetadata)

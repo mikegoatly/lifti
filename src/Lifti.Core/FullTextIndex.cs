@@ -1,4 +1,5 @@
 ﻿using Lifti.Querying;
+using Lifti.Serialization;
 using Lifti.Tokenization;
 using Lifti.Tokenization.Objects;
 using Lifti.Tokenization.TextExtraction;
@@ -105,6 +106,29 @@ namespace Lifti
         public IThesaurus DefaultThesaurus { get; }
 
         internal ObjectTypeConfigurationLookup<TKey> ObjectTypeConfiguration { get; }
+
+        /// <summary>
+        /// Restores the index from a previously serialized state.
+        /// </summary>
+        /// <param name="rootNode">
+        /// The root node of the index.
+        /// </param>
+        /// <param name="collectedMetadata">
+        /// The metadata for the index.
+        /// </param>
+        internal void RestoreIndex(IndexNode rootNode, DocumentMetadataCollector<TKey> collectedMetadata)
+        {
+            // Set the root node and metadata in a write lock to ensure that no other operations are happening
+            this.PerformWriteLockedAction(() =>
+            {
+                foreach (var metadata in collectedMetadata.Collected)
+                {
+                    this.metadata.Add(metadata);
+                }
+
+                this.Root = rootNode;
+            });
+        }
 
         /// <inheritdoc />
         public IIndexTokenizer GetTokenizerForField(string fieldName)
@@ -274,11 +298,6 @@ namespace Lifti
         public override string ToString()
         {
             return this.Root.ToString();
-        }
-
-        internal void SetRootWithLock(IndexNode indexNode)
-        {
-            this.PerformWriteLockedAction(() => this.Root = indexNode);
         }
 
         private static List<Token> ExtractDocumentTokens(
@@ -531,7 +550,7 @@ namespace Lifti
         /// and the ids in the new index. Assuming the index has been rebuilt with exactly the same configuration, the ids
         /// will match on each side of the map.
         /// </summary>
-        internal Dictionary<byte, byte> RehydrateSerializedFields(List<SerializedFieldInfo> serializedFields)
+        internal SerializedFieldIdMap MapSerializedFieldIds(List<SerializedFieldInfo> serializedFields)
         {
             var fieldMap = new Dictionary<byte, byte>
             {
@@ -565,7 +584,7 @@ namespace Lifti
                 fieldMap[field.FieldId] = newFieldId;
             }
 
-            return fieldMap;
+            return new SerializedFieldIdMap(fieldMap);
         }
     }
 }

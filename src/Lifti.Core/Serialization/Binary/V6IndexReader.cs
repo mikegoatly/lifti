@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
@@ -17,9 +19,11 @@ namespace Lifti.Serialization.Binary
         /// When reading document we now need to additionally read any associated object type id, and the score boost
         /// metadata associated to the object.
         /// </remarks>
-        protected override void ReadIndexedDocuments(FullTextIndex<TKey> index)
+        protected override ValueTask<DocumentMetadataCollector<TKey>> DeserializeDocumentMetadataAsync(CancellationToken cancellationToken)
         {
             var documentCount = this.reader.ReadNonNegativeVarInt32();
+            var documentMetadataCollector = new DocumentMetadataCollector<TKey>(documentCount);
+
             for (var i = 0; i < documentCount; i++)
             {
                 // First read the common information that's available whether or not the document is associated to an object
@@ -54,13 +58,15 @@ namespace Lifti.Serialization.Binary
                     DateTime? freshnessDate = hasScoringFreshnessDate ? new DateTime(this.reader.ReadInt64()) : null;
                     double? magnitude = hasScoringMagnitude ? this.reader.ReadDouble() : null;
 
-                    index.Metadata.Add(DocumentMetadata<TKey>.ForObject(objectTypeId, id, key, documentStatistics, freshnessDate, magnitude));
+                    documentMetadataCollector.Add(DocumentMetadata.ForObject(objectTypeId, id, key, documentStatistics, freshnessDate, magnitude));
                 }
                 else
                 {
-                    index.Metadata.Add(DocumentMetadata<TKey>.ForLooseText(id, key, documentStatistics));
+                    documentMetadataCollector.Add(DocumentMetadata.ForLooseText(id, key, documentStatistics));
                 }
             }
+
+            return new(documentMetadataCollector);
         }
     }
 }

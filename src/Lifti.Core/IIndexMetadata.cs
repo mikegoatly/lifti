@@ -67,11 +67,5 @@ namespace Lifti
         /// Thrown when the key is not known.
         /// </exception>
         DocumentMetadata<TKey> GetMetadata(TKey key);
-
-        /// <summary>
-        /// Adds the given <see cref="DocumentMetadata{TKey}"/>. This should only be used by deserializers as they 
-        /// rebuild the index.
-        /// </summary>
-        void Add(DocumentMetadata<TKey> documentMetadata);
     }
 }
