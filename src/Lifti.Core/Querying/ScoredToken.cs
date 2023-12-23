@@ -7,23 +7,27 @@ using System.Text;
 namespace Lifti.Querying
 {
     /// <summary>
-    /// Provides information about an item that was matched and scored whilst executing a query.
+    /// Provides information about a document's tokens that were matched and scored whilst executing a query.
     /// </summary>
     public readonly struct ScoredToken : IEquatable<ScoredToken>
     {
         /// <summary>
         /// Constructs a new instance of <see cref="ScoredToken"/>.
         /// </summary>
-        public ScoredToken(int itemId, IReadOnlyList<ScoredFieldMatch> fieldMatches)
+        public ScoredToken(int documentId, IReadOnlyList<ScoredFieldMatch> fieldMatches)
         {
-            this.ItemId = itemId;
+            this.DocumentId = documentId;
             this.FieldMatches = fieldMatches;
         }
 
+        /// <inheritdoc cref="DocumentId" />
+        [Obsolete("Use DocumentId property instead")]
+        public int ItemId => this.DocumentId;
+
         /// <summary>
-        /// Gets the id of the item that was matched.
+        /// Gets the id of the document that was matched.
         /// </summary>
-        public int ItemId { get; }
+        public int DocumentId { get; }
 
         /// <summary>
         /// Gets the fields in which the tokens were matched.
@@ -40,7 +44,7 @@ namespace Lifti.Querying
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.ItemId, this.FieldMatches);
+            return HashCode.Combine(this.DocumentId, this.FieldMatches);
         }
 
         /// <inheritdoc />
@@ -58,7 +62,7 @@ namespace Lifti.Querying
         /// <inheritdoc />
         public bool Equals(ScoredToken other)
         {
-            return this.ItemId == other.ItemId &&
+            return this.DocumentId == other.DocumentId &&
                    this.FieldMatches.SequenceEqual(other.FieldMatches);
         }
 
@@ -69,7 +73,7 @@ namespace Lifti.Querying
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Append("Item: ").AppendLine(this.ItemId.ToString(CultureInfo.InvariantCulture));
+            builder.Append("Document: ").AppendLine(this.DocumentId.ToString(CultureInfo.InvariantCulture));
             builder.AppendLine("Field matches:");
             foreach (var fieldMatch in this.FieldMatches)
             {

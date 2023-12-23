@@ -6,9 +6,9 @@ using System.Text;
 namespace Lifti.Querying.QueryParts
 {
     /// <summary>
-    /// An <see cref="IQueryPart"/> that matches items following wildcard rules:
-    /// "*" matches any number of characters
-    /// "%" matches a single character
+    /// An <see cref="IQueryPart"/> that matches text in a document using the following wildcard rules:
+    /// "*" matches any number of characters (<see cref="WildcardQueryFragmentKind.MultiCharacter"/>)
+    /// "%" matches a single character (<see cref="WildcardQueryFragmentKind.SingleCharacter"/>)
     /// </summary>
     public class WildcardQueryPart : ScoreBoostedQueryPart
     {
@@ -55,9 +55,9 @@ namespace Lifti.Querying.QueryParts
             var results = IntermediateQueryResult.Empty;
             var bookmarks = new DoubleBufferedList<IIndexNavigatorBookmark>(navigator.CreateBookmark());
             var scoreBoost = this.ScoreBoost ?? 1D;
-            for (var i = 0; i < Fragments.Count && bookmarks.Count > 0; i++)
+            for (var i = 0; i < this.Fragments.Count && bookmarks.Count > 0; i++)
             {
-                var nextFragment = i == Fragments.Count - 1 ? (WildcardQueryFragment?)null : Fragments[i + 1];
+                var nextFragment = i == this.Fragments.Count - 1 ? (WildcardQueryFragment?)null : this.Fragments[i + 1];
 
                 foreach (var bookmark in bookmarks)
                 {
@@ -66,7 +66,7 @@ namespace Lifti.Querying.QueryParts
                     var nextBookmarks = ProcessFragment(
                         navigator,
                         scoreBoost,
-                        Fragments[i],
+                        this.Fragments[i],
                         nextFragment,
                         ref results);
 

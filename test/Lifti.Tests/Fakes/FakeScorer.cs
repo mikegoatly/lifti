@@ -16,7 +16,7 @@ namespace Lifti.Tests.Fakes
         public IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryTokenMatch> tokens, double weighting)
         {
             return tokens.Select(m => new ScoredToken(
-                m.ItemId,
+                m.DocumentId,
                 m.FieldMatches.Select(fm => new ScoredFieldMatch(this.score, fm)).ToList())).ToList();
         }
     }

@@ -227,16 +227,16 @@ namespace Lifti.Serialization.Binary
 
         private async Task WriteDocumentsAsync(IIndexSnapshot<TKey> index)
         {
-            this.writer.WriteNonNegativeVarInt32(index.Items.Count);
+            this.writer.WriteNonNegativeVarInt32(index.Metadata.Count);
 
-            foreach (var itemMetadata in index.Items.GetIndexedItems())
+            foreach (var documentMetadata in index.Metadata.GetIndexedDocuments())
             {
                 // Write the standard information for the document, regardless of whether is was
                 // read from an object
-                this.writer.WriteNonNegativeVarInt32(itemMetadata.Id);
-                this.keySerializer.Write(this.writer, itemMetadata.Key);
-                this.writer.WriteNonNegativeVarInt32(itemMetadata.DocumentStatistics.TokenCountByField.Count);
-                foreach (var fieldTokenCount in itemMetadata.DocumentStatistics.TokenCountByField)
+                this.writer.WriteNonNegativeVarInt32(documentMetadata.Id);
+                this.keySerializer.Write(this.writer, documentMetadata.Key);
+                this.writer.WriteNonNegativeVarInt32(documentMetadata.DocumentStatistics.TokenCountByField.Count);
+                foreach (var fieldTokenCount in documentMetadata.DocumentStatistics.TokenCountByField)
                 {
                     this.writer.Write(fieldTokenCount.Key);
                     this.writer.WriteNonNegativeVarInt32(fieldTokenCount.Value);
@@ -244,9 +244,9 @@ namespace Lifti.Serialization.Binary
 
                 // If the object is associated to an object type, write the object type id and any
                 // associated freshness info
-                if (itemMetadata.ObjectTypeId is byte objectTypeId)
+                if (documentMetadata.ObjectTypeId is byte objectTypeId)
                 {
-                    this.WriteDocumentObjectMetadata(objectTypeId, itemMetadata);
+                    this.WriteDocumentObjectMetadata(objectTypeId, documentMetadata);
                 }
                 else
                 {
@@ -258,7 +258,7 @@ namespace Lifti.Serialization.Binary
             await this.FlushAsync().ConfigureAwait(false);
         }
 
-        private void WriteDocumentObjectMetadata(byte objectTypeId, ItemMetadata<TKey> itemMetadata)
+        private void WriteDocumentObjectMetadata(byte objectTypeId, DocumentMetadata<TKey> documentMetadata)
         {
             // Write the object info data byte
             // 0-4: The object type id
@@ -268,24 +268,24 @@ namespace Lifti.Serialization.Binary
             var objectInfoData = objectTypeId;
             Debug.Assert(objectTypeId < 32, "The object type id should be less than 32");
 
-            if (itemMetadata.ScoringFreshnessDate != null)
+            if (documentMetadata.ScoringFreshnessDate != null)
             {
                 objectInfoData |= 0x20;
             }
 
-            if (itemMetadata.ScoringMagnitude != null)
+            if (documentMetadata.ScoringMagnitude != null)
             {
                 objectInfoData |= 0x40;
             }
 
             this.writer.Write(objectInfoData);
 
-            if (itemMetadata.ScoringFreshnessDate is DateTime scoringFreshnessDate)
+            if (documentMetadata.ScoringFreshnessDate is DateTime scoringFreshnessDate)
             {
                 this.writer.Write(scoringFreshnessDate.Ticks);
             }
 
-            if (itemMetadata.ScoringMagnitude is double scoringMagnitude)
+            if (documentMetadata.ScoringMagnitude is double scoringMagnitude)
             {
                 this.writer.Write(scoringMagnitude);
             }

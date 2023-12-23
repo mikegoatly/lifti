@@ -46,12 +46,12 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Configures the behavior the index should exhibit when an item that already exists in the index is indexed again.
-        /// The default value is <see cref="DuplicateItemBehavior.ReplaceItem"/>.
+        /// Configures the behavior of the index when an key that has already been added to the index is indexed again.
+        /// The default value is <see cref="DuplicateKeyBehavior.Replace"/>.
         /// </summary>
-        public FullTextIndexBuilder<TKey> WithDuplicateItemBehavior(DuplicateItemBehavior duplicateItemBehavior)
+        public FullTextIndexBuilder<TKey> WithDuplicateKeyBehavior(DuplicateKeyBehavior duplicateKeyBehavior)
         {
-            this.advancedOptions.DuplicateItemBehavior = duplicateItemBehavior;
+            this.advancedOptions.DuplicateKeyBehavior = duplicateKeyBehavior;
             return this;
         }
 
@@ -123,11 +123,11 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Configures the index to support tokenizing an item of type <typeparamref name="TObject"/>
+        /// Configures the index to support tokenizing text from an object of type <typeparamref name="TObject"/>
         /// in the index.
         /// </summary>
         /// <param name="optionsBuilder">
-        /// A delegate capable of specifying all the required options for the item tokenization options.
+        /// A delegate capable of configuring an <see cref="ObjectTokenizationBuilder{TObject, TKey}"/> instance.
         /// </param>
         public FullTextIndexBuilder<TKey> WithObjectTokenization<TObject>(Func<ObjectTokenizationBuilder<TObject, TKey>, ObjectTokenizationBuilder<TObject, TKey>> optionsBuilder)
         {
@@ -256,7 +256,7 @@ namespace Lifti
             // Building the object tokenizers also populates the index's field lookup with
             // any static fields that have been defined.
             var fieldLookup = new IndexedFieldLookup();
-            var objectTokenizers = new List<IIndexedObjectConfiguration>();
+            var objectTokenizers = new List<IObjectTypeConfiguration>();
 
             // Start object type IDs at 1 - 0 is reserved for special use where the indexed document is
             // not associated with a specific object.

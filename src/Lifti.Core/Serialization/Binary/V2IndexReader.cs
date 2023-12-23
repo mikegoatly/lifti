@@ -50,8 +50,8 @@ namespace Lifti.Serialization.Binary
             // Keep track of all the distinct fields ids encountered during deserialization
             var distinctFieldIds = new HashSet<byte>();
 
-            var itemCount = this.reader.ReadInt32();
-            for (var i = 0; i < itemCount; i++)
+            var documentCount = this.reader.ReadInt32();
+            for (var i = 0; i < documentCount; i++)
             {
                 var id = this.reader.ReadInt32();
                 var key = keyReader(this.reader);
@@ -72,7 +72,7 @@ namespace Lifti.Serialization.Binary
 
                 // Using ForLooseText here because we don't know any of the new information associated to an object
                 // type, e.g. its id or score boost options. This is the closest we can get to the old format.
-                index.Items.Add(ItemMetadata<TKey>.ForLooseText(id, key, documentStatistics));
+                index.Metadata.Add(DocumentMetadata<TKey>.ForLooseText(id, key, documentStatistics));
             }
 
             // Double check that the index structure is aware of all the fields that are being deserialized
@@ -113,9 +113,9 @@ namespace Lifti.Serialization.Binary
                 childNodes![i] = new(matchChar, this.DeserializeNode(nodeFactory, depth + 1));
             }
 
-            for (var itemMatch = 0; itemMatch < matchCount; itemMatch++)
+            for (var documentMatch = 0; documentMatch < matchCount; documentMatch++)
             {
-                var itemId = this.reader.ReadInt32();
+                var documentId = this.reader.ReadInt32();
                 var fieldCount = this.reader.ReadInt32();
                 var indexedTokens = new IndexedToken[fieldCount];
 
@@ -129,7 +129,7 @@ namespace Lifti.Serialization.Binary
                     indexedTokens[fieldMatch] = new IndexedToken(fieldId, locationMatches);
                 }
 
-                matches!.Add(itemId, indexedTokens);
+                matches!.Add(documentId, indexedTokens);
             }
 
             return nodeFactory.CreateNode(

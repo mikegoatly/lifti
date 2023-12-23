@@ -10,28 +10,31 @@ namespace Lifti
 
         public IndexMutation(
             IndexNode root,
-            ItemStore<TKey> originalItemStore,
+            IndexMetadata<TKey> originalMetadata,
             IIndexNodeFactory indexNodeFactory)
         {
             this.root = new IndexNodeMutation(0, root, indexNodeFactory);
-            this.ItemStore = new(originalItemStore);
+            this.Metadata = new(originalMetadata);
         }
 
-        public ItemStore<TKey> ItemStore { get; }
+        /// <summary>
+        /// A mutating copy of the index metadata.
+        /// </summary>
+        public IndexMetadata<TKey> Metadata { get; }
 
-        internal void Add(int itemId, byte fieldId, Token token)
+        internal void Add(int documentId, byte fieldId, Token token)
         {
             if (token is null)
             {
                 throw new ArgumentNullException(nameof(token));
             }
 
-            this.root.Index(itemId, fieldId, token.Locations, token.Value.AsMemory());
+            this.root.Index(documentId, fieldId, token.Locations, token.Value.AsMemory());
         }
 
-        internal void Remove(int itemId)
+        internal void Remove(int documentId)
         {
-            this.root.Remove(itemId);
+            this.root.Remove(documentId);
         }
 
         public IndexNode Apply()

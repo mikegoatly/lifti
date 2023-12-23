@@ -3,26 +3,26 @@
 namespace Lifti
 {
     /// <summary>
-    /// Describes methods for accessing information about items stored in an index.
+    /// Describes methods for accessing metadata information about an index.
     /// </summary>
-    public interface IItemStore
+    public interface IIndexMetadata
     {
         /// <summary>
-        /// Gets the number of items managed by this instance.
+        /// Gets the number of documents in the index.
         /// </summary>
         int Count { get; }
 
         /// <summary>
-        /// Gets the item metadata for the given id.
+        /// Gets the <see cref="DocumentMetadata"/> for the given internal document id.
         /// </summary>
         /// <exception cref="LiftiException">
         /// Thrown when the id is not known.
         /// </exception>
-        ItemMetadata GetMetadata(int id);
+        DocumentMetadata GetMetadata(int documentId);
 
         /// <summary>
         /// Gets the calculated <see cref="ScoreBoostMetadata"/> for the given object type. This can be used
-        /// to determine the score boost for an instance of <see cref="ItemMetadata"/>.
+        /// to determine the score boost for an instance of <see cref="DocumentMetadata"/>.
         /// </summary>
         ScoreBoostMetadata GetObjectTypeScoreBoostMetadata(byte objectTypeId);
 
@@ -33,46 +33,45 @@ namespace Lifti
     }
 
     /// <summary>
-    /// Describes methods for accessing information about items stored in an index.
+    /// Describes methods for accessing metadata information about an index.
     /// </summary>
     /// <typeparam name="TKey">
     /// The type of the key in the index.
     /// </typeparam>
-    public interface IItemStore<TKey> : IItemStore
+    public interface IIndexMetadata<TKey> : IIndexMetadata
     {
         /// <summary>
-        /// Gets each of the items and their associated ids managed by this instance.
+        /// Enumerates each <see cref="DocumentMetadata{TKey}"/> in the index.
         /// </summary>
-        IEnumerable<ItemMetadata<TKey>> GetIndexedItems();
+        IEnumerable<DocumentMetadata<TKey>> GetIndexedDocuments();
 
         /// <summary>
-        /// Gets a value indicating whether the given item is managed by this instance.
+        /// Gets a value indicating whether the given key has been added to the index.
         /// </summary>
         bool Contains(TKey key);
 
         /// <summary>
-        /// Gets the item metadata for the given id.
+        /// Gets the <see cref="DocumentMetadata{TKey}"/> for the given document id.
         /// </summary>
         /// <exception cref="LiftiException">
         /// Thrown when the id is not known.
         /// </exception>
 #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-        ItemMetadata<TKey> GetMetadata(int id);
+        DocumentMetadata<TKey> GetMetadata(int documentId);
 #pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 
         /// <summary>
-        /// Gets the item metadata for the given item.
+        /// Gets the <see cref="DocumentMetadata{TKey}"/> for the given key.
         /// </summary>
         /// <exception cref="LiftiException">
-        /// Thrown when the item is not known.
+        /// Thrown when the key is not known.
         /// </exception>
-        ItemMetadata<TKey> GetMetadata(TKey key);
+        DocumentMetadata<TKey> GetMetadata(TKey key);
 
         /// <summary>
-        /// Adds the given item metadata to the item store. This should only be used by deserializers as they 
+        /// Adds the given <see cref="DocumentMetadata{TKey}"/>. This should only be used by deserializers as they 
         /// rebuild the index.
         /// </summary>
-        /// <param name="itemMetadata"></param>
-        void Add(ItemMetadata<TKey> itemMetadata);
+        void Add(DocumentMetadata<TKey> documentMetadata);
     }
 }

@@ -184,6 +184,7 @@ namespace Lifti.Tests.Serialization
         }
 
         [Fact]
+        [Obsolete]
         public async Task ShouldDeserializeV6Index()
         {
             var index = CreateObjectIndex();
@@ -197,17 +198,18 @@ namespace Lifti.Tests.Serialization
             index.Search("serialized").Should().HaveCount(1);
             index.Search("亜").Should().HaveCount(1);
 
-            var objectScoreBoostMetadata = index.Items.GetObjectTypeScoreBoostMetadata(1);
+            var objectScoreBoostMetadata = index.Metadata.GetObjectTypeScoreBoostMetadata(1);
             // The first item in the index wins for both score boosts, each with a weighting of 10.
-            objectScoreBoostMetadata.CalculateScoreBoost(index.Items.GetMetadata(0))
+            objectScoreBoostMetadata.CalculateScoreBoost(index.Metadata.GetMetadata(0))
                 .Should().Be(20D);
 
             // The first item in the index is at the bottom end of both scales, so should return 2.
-            objectScoreBoostMetadata.CalculateScoreBoost(index.Items.GetMetadata(1))
+            objectScoreBoostMetadata.CalculateScoreBoost(index.Metadata.GetMetadata(1))
                 .Should().Be(2D);
         }
 
         [Fact]
+        [Obsolete]
         public async Task ShouldDeserializeV5Index()
         {
             var index = CreateObjectIndex();
@@ -222,7 +224,7 @@ namespace Lifti.Tests.Serialization
             index.Search("亜").Should().HaveCount(1);
 
             // The old index won't have any scoring data associated to the documents, so should return 1
-            index.Items.GetObjectTypeScoreBoostMetadata(1).CalculateScoreBoost(index.Items.GetMetadata(0))
+            index.Metadata.GetObjectTypeScoreBoostMetadata(1).CalculateScoreBoost(index.Metadata.GetMetadata(0))
                 .Should().Be(1D);
         }
 
@@ -293,6 +295,7 @@ namespace Lifti.Tests.Serialization
         }
 
         [Fact]
+        [Obsolete]
         public async Task ShouldRoundTripIndexStructure()
         {
             var serializer = new BinarySerializer<string>();
@@ -301,7 +304,7 @@ namespace Lifti.Tests.Serialization
             using (var stream = File.Open(fileName, FileMode.CreateNew))
             {
                 var stopwatch = Stopwatch.StartNew();
-                var index = await CreateWikipediaIndexAsync();
+                var index = await this.CreateWikipediaIndexAsync();
                 await serializer.SerializeAsync(index, stream, false);
 
                 this.output.WriteLine($"Serialized in {stopwatch.ElapsedMilliseconds}ms");
@@ -317,7 +320,7 @@ namespace Lifti.Tests.Serialization
 
                 this.output.WriteLine($"Deserialized in {stopwatch.ElapsedMilliseconds}ms");
 
-                newIndex.Items.GetIndexedItems().Should().BeEquivalentTo(index.Items.GetIndexedItems());
+                newIndex.Metadata.GetIndexedDocuments().Should().BeEquivalentTo(index.Metadata.GetIndexedDocuments());
                 newIndex.Count.Should().Be(index.Count);
                 newIndex.Root.ToString().Should().Be(index.Root.ToString());
 
@@ -360,6 +363,7 @@ namespace Lifti.Tests.Serialization
         }
 
         [Fact]
+        [Obsolete]
         public async Task ShouldRoundTripMixedScoringMetadata()
         {
             var index = CreateObjectIndex();
@@ -398,15 +402,15 @@ namespace Lifti.Tests.Serialization
             var deserialized = CreateObjectIndex();
             await SerializeAndDeserializeAsync(index, deserialized);
 
-            var metadata = deserialized.Items.GetMetadata(0);
+            var metadata = deserialized.Metadata.GetMetadata(0);
             metadata.ScoringFreshnessDate.Should().Be(new DateTime(2022, 10, 1));
             metadata.ScoringMagnitude.Should().Be(5D);
 
-            metadata = deserialized.Items.GetMetadata(1);
+            metadata = deserialized.Metadata.GetMetadata(1);
             metadata.ScoringFreshnessDate.Should().BeNull();
             metadata.ScoringMagnitude.Should().BeNull();
 
-            metadata = deserialized.Items.GetMetadata(2);
+            metadata = deserialized.Metadata.GetMetadata(2);
             metadata.ScoringFreshnessDate.Should().BeNull();
             metadata.ScoringMagnitude.Should().BeNull();
         }
@@ -492,7 +496,7 @@ namespace Lifti.Tests.Serialization
             return index;
         }
 
-        private static async Task<FullTextIndex<string>> CreateWikipediaIndexAsync()
+        private async Task<FullTextIndex<string>> CreateWikipediaIndexAsync()
         {
             var index = new FullTextIndexBuilder<string>()
                 .WithTextExtractor<XmlTextExtractor>()

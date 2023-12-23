@@ -9,16 +9,16 @@ namespace Lifti.Tokenization.Objects
     /// <summary>
     /// A field tokenization capable of asynchronously reading a string for a field.
     /// </summary>
-    /// <typeparam name="TItem">
-    /// The type of item the field belongs to.
+    /// <typeparam name="TObject">
+    /// The type of object the field belongs to.
     /// </typeparam>
-    internal class AsyncStringFieldReader<TItem> : StaticFieldReader<TItem>
+    internal class AsyncStringFieldReader<TObject> : StaticFieldReader<TObject>
     {
-        private readonly Func<TItem, CancellationToken, Task<string>> reader;
+        private readonly Func<TObject, CancellationToken, Task<string>> reader;
 
         internal AsyncStringFieldReader(
             string name,
-            Func<TItem, CancellationToken, Task<string>> reader,
+            Func<TObject, CancellationToken, Task<string>> reader,
             IIndexTokenizer tokenizer,
             ITextExtractor textExtractor,
             IThesaurus thesaurus,
@@ -29,7 +29,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <inheritdoc />
-        public override async ValueTask<IEnumerable<string>> ReadAsync(TItem item, CancellationToken cancellationToken)
+        public override async ValueTask<IEnumerable<string>> ReadAsync(TObject item, CancellationToken cancellationToken)
         {
             return new[] { await this.reader(item, cancellationToken).ConfigureAwait(false) };
         }

@@ -121,7 +121,7 @@
     <value>When fields are configured with async access methods the async Add methods must be used on the index</value>
   </data>
   <data name="AtLeastOneFieldMustBeIndexed" xml:space="preserve">
-    <value>At least one field must be configured for an item</value>
+    <value>At least one field must be configured for an object type</value>
   </data>
   <data name="AttemptToReadFieldUnknownToDynamicFieldReader" xml:space="preserve">
     <value>An attempt was made to read a dynamic field ("{0}") from a provider that did not produce it.</value>
@@ -145,7 +145,7 @@
     <value>Duplicate dynamic field reader name encountered: {0}. Dynamic field readers must have unique names.</value>
   </data>
   <data name="DuplicateFieldEncounteredOnObject" xml:space="preserve">
-    <value>A duplicate field "{0}" was encountered while indexing item {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields.</value>
+    <value>A duplicate field "{0}" was encountered while indexing the object with key {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields.</value>
   </data>
   <data name="EarlierVersionSerializedIndexNotSupported" xml:space="preserve">
     <value>The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI.</value>
@@ -208,7 +208,7 @@
     <value>Expected a number to follow a score boost, e.g. "Term^3" would indicate that the search term "Term" should have a score boost of 3.</value>
   </data>
   <data name="ItemAlreadyIndexed" xml:space="preserve">
-    <value>Item already indexed</value>
+    <value>Document already indexed</value>
   </data>
   <data name="ItemNotFound" xml:space="preserve">
     <value>Item not found</value>

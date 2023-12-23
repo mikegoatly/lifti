@@ -29,7 +29,7 @@ namespace Lifti.Tests
                 .BeEquivalentTo(
                 new[]
                 {
-                    new ItemPhrases<int>(
+                    new DocumentPhrases<int>(
                         results.Single(x => x.Key == 1),
                         new[] { new FieldPhrases<int>(IndexedFieldLookup.DefaultFieldName , "big") })
                  });
@@ -47,7 +47,7 @@ namespace Lifti.Tests
                 .BeEquivalentTo(
                 new[]
                 {
-                    new ItemPhrases<int>(
+                    new DocumentPhrases<int>(
                         results.Single(x => x.Key == 3),
                         new[] { new FieldPhrases<int>(IndexedFieldLookup.DefaultFieldName, "vehicle") })
                  });
@@ -65,10 +65,10 @@ namespace Lifti.Tests
                 .BeEquivalentTo(
                 new[]
                 {
-                    new ItemPhrases<int>(
+                    new DocumentPhrases<int>(
                         results.Single(x => x.Key == 2),
                         new[] { new FieldPhrases<int>(IndexedFieldLookup.DefaultFieldName, "car") }),
-                    new ItemPhrases<int>(
+                    new DocumentPhrases<int>(
                         results.Single(x => x.Key == 3),
                         new[] { new FieldPhrases<int>(IndexedFieldLookup.DefaultFieldName, "vehicle") })
                  });
@@ -86,7 +86,7 @@ namespace Lifti.Tests
                 .BeEquivalentTo(
                 new[]
                 {
-                    new ItemPhrases<int>(
+                    new DocumentPhrases<int>(
                         results.Single(x => x.Key == 1),
                         new[] { new FieldPhrases<int>("Field" , "big") })
                  });
@@ -104,7 +104,7 @@ namespace Lifti.Tests
                 .BeEquivalentTo(
                 new[]
                 {
-                    new ItemPhrases<int>(
+                    new DocumentPhrases<int>(
                         results.Single(x => x.Key == 3),
                         new[] { new FieldPhrases<int>("Field", "vehicle") })
                  });
@@ -122,10 +122,10 @@ namespace Lifti.Tests
                 .BeEquivalentTo(
                 new[]
                 {
-                    new ItemPhrases<int>(
+                    new DocumentPhrases<int>(
                         results.Single(x => x.Key == 2),
                         new[] { new FieldPhrases<int>("Field", "car") }),
-                    new ItemPhrases<int>(
+                    new DocumentPhrases<int>(
                         results.Single(x => x.Key == 3),
                         new[] { new FieldPhrases<int>("Field", "vehicle") })
                  });

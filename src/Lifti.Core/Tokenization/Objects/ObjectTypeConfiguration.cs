@@ -8,9 +8,9 @@ namespace Lifti.Tokenization.Objects
     /// <inheritdoc />
     /// <typeparam name="TObject">The type of object this tokenization is capable of indexing.</typeparam>
     /// <typeparam name="TKey">The type of the key.</typeparam>
-    internal class IndexedObjectConfiguration<TObject, TKey> : IIndexedObjectConfiguration
+    internal class ObjectTypeConfiguration<TObject, TKey> : IObjectTypeConfiguration
     {
-        internal IndexedObjectConfiguration(
+        internal ObjectTypeConfiguration(
             byte id,
             Func<TObject, TKey> keyReader,
             IReadOnlyList<StaticFieldReader<TObject>> fieldReaders,
@@ -28,7 +28,7 @@ namespace Lifti.Tokenization.Objects
         public byte Id { get; }
 
         /// <summary>
-        /// Gets the delegate capable of reading the key from the item.
+        /// Gets the delegate capable of reading the key from the object.
         /// </summary>
         public Func<TObject, TKey> KeyReader { get; }
 
@@ -48,9 +48,9 @@ namespace Lifti.Tokenization.Objects
         public ObjectScoreBoostOptions<TObject> ScoreBoostOptions { get; }
 
         /// <inheritdoc />
-        Type IIndexedObjectConfiguration.ItemType { get; } = typeof(TObject);
+        Type IObjectTypeConfiguration.ObjectType { get; } = typeof(TObject);
 
         /// <inheritdoc />
-        ObjectScoreBoostOptions IIndexedObjectConfiguration.ScoreBoostOptions => this.ScoreBoostOptions;
+        ObjectScoreBoostOptions IObjectTypeConfiguration.ScoreBoostOptions => this.ScoreBoostOptions;
     }
 }

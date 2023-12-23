@@ -29,7 +29,7 @@ namespace Lifti.Tokenization.Objects
         /// * <see cref="ObjectTokenizationBuilder{T, TKey}.WithKey(Func{T, TKey})"/> has not been called.
         /// * No fields have been configured.
         /// </exception>
-        IIndexedObjectConfiguration Build(
+        IObjectTypeConfiguration Build(
             byte objectTypeId,
             IIndexTokenizer defaultTokenizer,
             ThesaurusBuilder defaultThesaurusBuilder,
@@ -56,10 +56,10 @@ namespace Lifti.Tokenization.Objects
         private ObjectScoreBoostBuilder<TObject>? objectScoreBoostBuilder;
 
         /// <summary>
-        /// Indicates how the unique key of the item can be read.
+        /// Indicates how the unique key of the object can be read.
         /// </summary>
         /// <param name="keyReader">
-        /// The delegate capable of reading the key from the item
+        /// The delegate capable of reading the key from the object.
         /// </param>
         public ObjectTokenizationBuilder<TObject, TKey> WithKey(Func<TObject, TKey> keyReader)
         {
@@ -74,7 +74,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <summary>
-        /// Adds a field to be indexed for the item.
+        /// Adds a field to be indexed for the object.
         /// </summary>
         /// <param name="name">
         /// The name of the field. This can be referred to when querying to restrict searches to text read for this field only.
@@ -120,7 +120,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <summary>
-        /// Registers a property on the item that exposes a set of dynamic fields and the text to be indexed for each.
+        /// Registers a property for the object that exposes a set of dynamic fields and the text to be indexed for each.
         /// Dynamic fields are automatically registered with the index's <see cref="IndexedFieldLookup"/> as they are encountered
         /// during indexing.
         /// </summary>
@@ -129,11 +129,11 @@ namespace Lifti.Tokenization.Objects
         /// restoring the relationship between the a dynamic field and its source provider.
         /// </param>
         /// <param name="dynamicFieldReader">
-        /// The delegate capable of reading the the field name/text pairs from the item.
+        /// The delegate capable of reading the the field name/text pairs from the object.
         /// </param>
         /// <param name="fieldNamePrefix">
         /// The optional prefix to apply to any field names read using the <paramref name="dynamicFieldReader"/>.
-        /// Use this if you need to register multiple sets of dynamic fields for the same item and there is a 
+        /// Use this if you need to register multiple sets of dynamic fields for the same object and there is a 
         /// chance the field names will overlap.
         /// </param>
         /// <param name="tokenizationOptions">
@@ -209,7 +209,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <summary>
-        /// Registers a property on the item that exposes a set of dynamic fields and the text to be indexed for each.
+        /// Registers a property for the object that exposes a set of dynamic fields and the text to be indexed for each.
         /// Dynamic fields are automatically registered with the index's <see cref="IndexedFieldLookup"/> as they are encountered
         /// during indexing.
         /// </summary>
@@ -228,7 +228,7 @@ namespace Lifti.Tokenization.Objects
         /// </param>
         /// <param name="fieldNamePrefix">
         /// The optional prefix to apply to any field names read using the <paramref name="dynamicFieldReader"/>.
-        /// Use this if you need to register multiple sets of dynamic fields for the same item and there is a 
+        /// Use this if you need to register multiple sets of dynamic fields for the same object and there is a 
         /// chance the field names will overlap.
         /// </param>
         /// <param name="tokenizationOptions">
@@ -264,7 +264,7 @@ namespace Lifti.Tokenization.Objects
 
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.dynamicFieldReaderBuilders.Add(
-                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringChildItemDynamicFieldReader<TObject, TChild>(
+                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringChildObjectDynamicFieldReader<TObject, TChild>(
                     dynamicFieldReader,
                     getFieldName,
                     getFieldText,
@@ -297,7 +297,7 @@ namespace Lifti.Tokenization.Objects
 
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.dynamicFieldReaderBuilders.Add(
-                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringArrayChildItemDynamicFieldReader<TObject, TChild>(
+                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringArrayChildObjectDynamicFieldReader<TObject, TChild>(
                     dynamicFieldReader,
                     getFieldName,
                     getFieldText,
@@ -312,7 +312,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <summary>
-        /// Adds a field to be indexed for the item.
+        /// Adds a field to be indexed for the object.
         /// </summary>
         /// <param name="name">
         /// The name of the field. This can be referred to when querying to restrict searches to text read for this field only.
@@ -358,7 +358,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <summary>
-        /// Adds a field to be indexed for the item.
+        /// Adds a field to be indexed for the object.
         /// </summary>
         /// <param name="name">
         /// The name of the field. This can be referred to when querying to restrict searches to text read for this field only.
@@ -422,7 +422,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <summary>
-        /// Adds a field to be indexed for the item.
+        /// Adds a field to be indexed for the object.
         /// </summary>
         /// <param name="name">
         /// The name of the field. This can be referred to when querying to restrict searches to text read for this field only.
@@ -520,7 +520,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <inheritdoc />
-        IIndexedObjectConfiguration IObjectTokenizationBuilder.Build(
+        IObjectTypeConfiguration IObjectTokenizationBuilder.Build(
             byte objectTypeId,
             IIndexTokenizer defaultTokenizer,
             ThesaurusBuilder defaultThesaurusBuilder,
@@ -549,7 +549,7 @@ namespace Lifti.Tokenization.Objects
                 fieldLookup.RegisterDynamicFieldReader(dynamicFieldReader);
             }
 
-            return new IndexedObjectConfiguration<TObject, TKey>(
+            return new ObjectTypeConfiguration<TObject, TKey>(
                 objectTypeId,
                 this.keyReader,
                 staticFields,

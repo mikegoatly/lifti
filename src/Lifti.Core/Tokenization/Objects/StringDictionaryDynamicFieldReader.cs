@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 namespace Lifti.Tokenization.Objects
 {
-    internal class StringDictionaryDynamicFieldReader<TItem> : DictionaryDynamicFieldReader<TItem, string>
+    internal class StringDictionaryDynamicFieldReader<TObject> : DictionaryDynamicFieldReader<TObject, string>
     {
         public StringDictionaryDynamicFieldReader(
-            Func<TItem, IDictionary<string, string>?> reader,
+            Func<TObject, IDictionary<string, string>?> reader,
             string dynamicFieldReaderName,
             string? fieldNamePrefix,
             IIndexTokenizer tokenizer,

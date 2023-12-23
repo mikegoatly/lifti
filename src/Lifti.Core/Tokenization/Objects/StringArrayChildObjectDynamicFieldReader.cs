@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace Lifti.Tokenization.Objects
 {
-    internal class StringArrayChildItemDynamicFieldReader<TItem, TChildItem> : ChildItemDynamicFieldReader<TItem, TChildItem, IEnumerable<string>>
+    internal class StringArrayChildObjectDynamicFieldReader<TItem, TChildItem> : ChildItemDynamicFieldReader<TItem, TChildItem, IEnumerable<string>>
     {
-        public StringArrayChildItemDynamicFieldReader(
+        public StringArrayChildObjectDynamicFieldReader(
             Func<TItem, ICollection<TChildItem>?> getChildObjects,
             Func<TChildItem, string> getFieldName,
             Func<TChildItem, IEnumerable<string>> getFieldText,

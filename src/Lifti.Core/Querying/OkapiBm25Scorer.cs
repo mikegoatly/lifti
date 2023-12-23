@@ -14,7 +14,7 @@ namespace Lifti.Querying
         private readonly double k1;
         private readonly double k1PlusOne;
         private readonly double b;
-        private readonly IItemStore documentStore;
+        private readonly IIndexMetadata documentStore;
         private readonly IFieldScoreBoostProvider fieldScoreBoosts;
 
         /// <summary>
@@ -23,12 +23,12 @@ namespace Lifti.Querying
         /// <param name="k1">The "k1" parameter for the scorer.</param>
         /// <param name="b">The "b" parameter for the scorer.</param>
         /// <param name="documentStore">
-        /// The <see cref="IItemStore"/> of the index snapshot being queried.
+        /// The <see cref="IIndexMetadata"/> of the index snapshot being queried.
         /// </param>
         /// <param name="fieldScoreBoosts">
         /// The <see cref="IFieldScoreBoostProvider"/> to use to get the score boost for a field.
         /// </param>
-        internal OkapiBm25Scorer(double k1, double b, IItemStore documentStore, IFieldScoreBoostProvider fieldScoreBoosts)
+        internal OkapiBm25Scorer(double k1, double b, IIndexMetadata documentStore, IFieldScoreBoostProvider fieldScoreBoosts)
         {
             if (documentStore is null)
             {
@@ -53,12 +53,12 @@ namespace Lifti.Querying
                 throw new ArgumentNullException(nameof(tokenMatches));
             }
 
-            var idf = CalculateInverseDocumentFrequency(tokenMatches);
+            var idf = this.CalculateInverseDocumentFrequency(tokenMatches);
 
             return tokenMatches.Select(t =>
             {
-                var documentMetadata = this.documentStore.GetMetadata(t.ItemId);
-                var itemTokenCounts = documentMetadata.DocumentStatistics.TokenCountByField;
+                var documentMetadata = this.documentStore.GetMetadata(t.DocumentId);
+                var documentTokenCounts = documentMetadata.DocumentStatistics.TokenCountByField;
                 var scoredFieldMatches = new List<ScoredFieldMatch>(t.FieldMatches.Count);
                 var objectScoreBoostMetadata = documentMetadata.ObjectTypeId is { } objectTypeId
                     ? this.documentStore.GetObjectTypeScoreBoostMetadata(objectTypeId)
@@ -68,11 +68,11 @@ namespace Lifti.Querying
                 {
                     var frequencyInDocument = fieldMatch.Locations.Count;
                     var fieldId = fieldMatch.FieldId;
-                    var tokensInDocument = itemTokenCounts[fieldId];
+                    var tokensInDocument = documentTokenCounts[fieldId];
                     var tokensInDocumentWeighting = tokensInDocument / this.averageTokenCountByField[fieldId];
 
                     var numerator = frequencyInDocument * this.k1PlusOne;
-                    var denominator = frequencyInDocument + this.k1 * (1 - this.b + this.b * tokensInDocumentWeighting);
+                    var denominator = frequencyInDocument + (this.k1 * (1 - this.b + (this.b * tokensInDocumentWeighting)));
 
                     var fieldScore = idf * (numerator / denominator);
 
@@ -88,7 +88,7 @@ namespace Lifti.Querying
                     scoredFieldMatches.Add(new ScoredFieldMatch(weightedScore, fieldMatch));
                 }
 
-                return new ScoredToken(t.ItemId, scoredFieldMatches);
+                return new ScoredToken(t.DocumentId, scoredFieldMatches);
             }).ToList();
         }
 

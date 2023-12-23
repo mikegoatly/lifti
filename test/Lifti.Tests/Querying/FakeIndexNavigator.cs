@@ -11,13 +11,13 @@ namespace Lifti.Tests.Querying
         {
         }
 
-        private FakeIndexNavigator(bool exactAndChildMatchOnly, params int[] matchedItems)
+        private FakeIndexNavigator(bool exactAndChildMatchOnly, params int[] matchedDocumentIds)
         {
             this.ExpectedExactAndChildMatches = new IntermediateQueryResult(
-                matchedItems.Select(
+                matchedDocumentIds.Select(
                     m => ScoredToken(
-                        m, 
-                        new[] { ScoredFieldMatch(1D, (byte)m, m) })));
+                        m,
+                        [ScoredFieldMatch(1D, (byte)m, m)])));
 
             this.ExpectedExactMatches = exactAndChildMatchOnly ? Lifti.Querying.IntermediateQueryResult.Empty : this.ExpectedExactAndChildMatches;
         }
@@ -31,20 +31,20 @@ namespace Lifti.Tests.Querying
 
         public IntermediateQueryResult ExpectedExactMatches { get; set; }
         public IntermediateQueryResult ExpectedExactAndChildMatches { get; set; }
-        public List<char> NavigatedCharacters { get; } = new List<char>();
-        public List<string> NavigatedStrings { get; } = new List<string>();
-        public List<double> ProvidedWeightings { get; } = new List<double>();
+        public List<char> NavigatedCharacters { get; } = [];
+        public List<string> NavigatedStrings { get; } = [];
+        public List<double> ProvidedWeightings { get; } = [];
 
         public bool HasExactMatches => this.ExpectedExactMatches.Matches.Count > 0;
 
-        public static FakeIndexNavigator ReturningExactMatches(params int[] matchedItems)
+        public static FakeIndexNavigator ReturningExactMatches(params int[] matchedDocumentIds)
         {
-            return new FakeIndexNavigator(false, matchedItems);
+            return new FakeIndexNavigator(false, matchedDocumentIds);
         }
 
-        public static FakeIndexNavigator ReturningExactAndChildMatches(params int[] matchedItems)
+        public static FakeIndexNavigator ReturningExactAndChildMatches(params int[] matchedDocumentIds)
         {
-            return new FakeIndexNavigator(true, matchedItems);
+            return new FakeIndexNavigator(true, matchedDocumentIds);
         }
 
         public static FakeIndexNavigator ReturningExactMatches(params ScoredToken[] matches)

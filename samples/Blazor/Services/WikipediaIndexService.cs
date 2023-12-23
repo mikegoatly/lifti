@@ -84,7 +84,7 @@ namespace BlazorApp.Services
 
         public IEnumerable<string> GetIndexedKeys()
         {
-            return this.Index.Items.GetIndexedItems().Select(i => i.Key);
+            return this.Index.Metadata.GetIndexedDocuments().Select(i => i.Key);
         }
 
         public string GetIndexTextualRepresentation()

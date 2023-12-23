@@ -104,8 +104,8 @@ namespace Lifti.Tests
         {
             await this.WithIndexedStringsAsync();
 
-            this.index.Items.IndexStatistics.TotalTokenCount.Should().Be(26);
-            this.index.Items.IndexStatistics.TokenCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
+            this.index.Metadata.IndexStatistics.TotalTokenCount.Should().Be(26);
+            this.index.Metadata.IndexStatistics.TokenCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
             {
                 { 0, 26 }
             });
@@ -116,8 +116,8 @@ namespace Lifti.Tests
         {
             await this.WithIndexedSingleStringPropertyObjectsAsync();
 
-            this.index.Items.IndexStatistics.TotalTokenCount.Should().Be(22L);
-            this.index.Items.IndexStatistics.TokenCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
+            this.index.Metadata.IndexStatistics.TotalTokenCount.Should().Be(22L);
+            this.index.Metadata.IndexStatistics.TokenCountByField.Should().BeEquivalentTo(new Dictionary<byte, long>
             {
                 { 1, 4 },
                 { 2, 4 },
@@ -273,10 +273,9 @@ namespace Lifti.Tests
         {
             var exception = await Assert.ThrowsAsync<LiftiException>(
                 async () => await CreateDynamicObjectTestIndexAsync(false));
-
             exception.Message.Should().Be(
-                "A duplicate field \"Field1\" was encountered while indexing item A. Most likely multiple dynamic field providers have been configured " +
-                "and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields.");
+                "A duplicate field \"Field1\" was encountered while indexing the object with key A. Most likely multiple dynamic field providers have been configured and the same " +
+                "field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields.");
         }
 
         [Fact]

@@ -1,4 +1,5 @@
 ﻿using Lifti.Querying;
+using System;
 
 namespace Lifti
 {
@@ -12,16 +13,20 @@ namespace Lifti
             IIndexNavigatorPool indexNavigatorPool,
             IIndexedFieldLookup fieldLookup,
             IndexNode rootNode,
-            IItemStore<TKey> itemStore)
+            IIndexMetadata<TKey> indexMetadata)
         {
-            this.Items = itemStore;
+            this.Metadata = indexMetadata;
             this.Root = rootNode;
             this.indexNavigatorPool = indexNavigatorPool;
             this.FieldLookup = fieldLookup;
         }
 
         /// <inheritdoc />
-        public IItemStore<TKey> Items { get; }
+        [Obsolete("Use Metadata property instead")]
+        public IIndexMetadata<TKey> Items => this.Metadata;
+
+        /// <inheritdoc />
+        public IIndexMetadata<TKey> Metadata { get; }
 
         /// <inheritdoc />
         public IndexNode Root { get; }
@@ -29,7 +34,9 @@ namespace Lifti
         /// <inheritdoc />
         public IIndexedFieldLookup FieldLookup { get; }
 
-        IItemStore IIndexSnapshot.Items => this.Items;
+        IIndexMetadata IIndexSnapshot.Metadata => this.Metadata;
+
+        IIndexMetadata IIndexSnapshot.Items => this.Metadata;
 
         /// <inheritdoc />
         public IIndexNavigator CreateNavigator()

@@ -20,7 +20,7 @@ namespace Lifti
         private readonly SemaphoreSlim writeLock = new(1);
         private readonly TimeSpan writeLockTimeout = TimeSpan.FromSeconds(10);
         private readonly IndexedFieldLookup fieldLookup;
-        private ItemStore<TKey> itemStore;
+        private IndexMetadata<TKey> metadata;
         private bool isDisposed;
 
         /// <remarks>
@@ -44,7 +44,7 @@ namespace Lifti
             Func<IIndexSnapshot<TKey>, CancellationToken, Task>[]? indexModifiedActions)
         {
             this.indexNavigatorPool = new IndexNavigatorPool(scorer);
-            this.itemStore = new ItemStore<TKey>(objectTypeConfiguration.AllConfigurations);
+            this.metadata = new IndexMetadata<TKey>(objectTypeConfiguration.AllConfigurations);
 
             this.indexOptions = indexOptions;
             this.ObjectTypeConfiguration = objectTypeConfiguration ?? throw new ArgumentNullException(nameof(objectTypeConfiguration));
@@ -70,18 +70,22 @@ namespace Lifti
                     this.indexNavigatorPool,
                     this.fieldLookup,
                     value,
-                    this.itemStore);
+                    this.metadata);
             }
         }
 
         /// <inheritdoc />
-        public IItemStore<TKey> Items => this.itemStore;
+        [Obsolete("Use the Metadata property instead")]
+        public IIndexMetadata<TKey> Items => this.Metadata;
+
+        /// <inheritdoc />
+        public IIndexMetadata<TKey> Metadata => this.metadata;
 
         /// <inheritdoc />
         public IIndexedFieldLookup FieldLookup => this.fieldLookup;
 
         /// <inheritdoc />
-        public int Count => this.currentSnapshot.Items.Count;
+        public int Count => this.currentSnapshot.Metadata.Count;
 
         internal IIndexNodeFactory IndexNodeFactory { get; }
 
@@ -124,7 +128,7 @@ namespace Lifti
                     throw new LiftiException(ExceptionMessages.BatchChangeAlreadyStarted);
                 }
 
-                this.batchMutation = new IndexMutation<TKey>(this.Root, this.itemStore, this.IndexNodeFactory);
+                this.batchMutation = new IndexMutation<TKey>(this.Root, this.metadata, this.IndexNodeFactory);
             });
         }
 
@@ -148,7 +152,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public async Task AddAsync(TKey itemKey, IEnumerable<string> text, CancellationToken cancellationToken = default)
+        public async Task AddAsync(TKey key, IEnumerable<string> text, CancellationToken cancellationToken = default)
         {
             await this.PerformWriteLockedActionAsync(
                 async () =>
@@ -157,7 +161,7 @@ namespace Lifti
                         m =>
                         {
                             var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer, this.DefaultThesaurus);
-                            this.AddForDefaultField(m, itemKey, tokens);
+                            this.AddForDefaultField(m, key, tokens);
                         },
                         cancellationToken)
                     .ConfigureAwait(false);
@@ -167,7 +171,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public async Task AddAsync(TKey itemKey, string text, CancellationToken cancellationToken = default)
+        public async Task AddAsync(TKey key, string text, CancellationToken cancellationToken = default)
         {
             await this.PerformWriteLockedActionAsync(
                 async () =>
@@ -176,7 +180,7 @@ namespace Lifti
                         m =>
                         {
                             var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer, this.DefaultThesaurus);
-                            this.AddForDefaultField(m, itemKey, tokens);
+                            this.AddForDefaultField(m, key, tokens);
                         },
                         cancellationToken)
                     .ConfigureAwait(false);
@@ -224,19 +228,19 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public async Task<bool> RemoveAsync(TKey itemKey, CancellationToken cancellationToken = default)
+        public async Task<bool> RemoveAsync(TKey key, CancellationToken cancellationToken = default)
         {
-            var itemRemoved = false;
+            var documentRemoved = false;
             await this.PerformWriteLockedActionAsync(
                 async () =>
                 {
                     await this.MutateAsync(
                         m =>
                         {
-                            itemRemoved = m.ItemStore.Contains(itemKey);
-                            if (itemRemoved)
+                            documentRemoved = m.Metadata.Contains(key);
+                            if (documentRemoved)
                             {
-                                RemoveKeyFromIndex(itemKey, m);
+                                RemoveKeyFromIndex(key, m);
                             }
                         },
                         cancellationToken)
@@ -245,7 +249,7 @@ namespace Lifti
                 cancellationToken)
                 .ConfigureAwait(false);
 
-            return itemRemoved;
+            return documentRemoved;
         }
 
         /// <inheritdoc />
@@ -309,15 +313,15 @@ namespace Lifti
             return tokenizer.Process(fragments).SelectMany(thesaurus.Process).ToList();
         }
 
-        private void AddForDefaultField(IndexMutation<TKey> mutation, TKey itemKey, List<Token> tokens)
+        private void AddForDefaultField(IndexMutation<TKey> mutation, TKey key, List<Token> tokens)
         {
             var fieldId = this.FieldLookup.DefaultField;
-            var itemId = this.GetUniqueIdForItem(
-                itemKey,
+            var documentId = this.GetUniqueIdForDocument(
+                key,
                 new DocumentStatistics(fieldId, tokens.CalculateTotalTokenCount()),
                 mutation);
 
-            IndexTokens(mutation, itemId, fieldId, tokens);
+            IndexTokens(mutation, documentId, fieldId, tokens);
         }
 
         private void PerformWriteLockedAction(Action action)
@@ -368,7 +372,7 @@ namespace Lifti
 
         private async Task ApplyMutationsAsync(IndexMutation<TKey> indexMutation, CancellationToken cancellationToken)
         {
-            this.itemStore = indexMutation.ItemStore;
+            this.metadata = indexMutation.Metadata;
             this.Root = indexMutation.Apply();
             if (this.indexModifiedActions != null)
             {
@@ -381,7 +385,7 @@ namespace Lifti
 
         private IndexMutation<TKey> GetCurrentMutationOrCreateTransient()
         {
-            return this.batchMutation ?? new IndexMutation<TKey>(this.Root, this.itemStore, this.IndexNodeFactory);
+            return this.batchMutation ?? new IndexMutation<TKey>(this.Root, this.metadata, this.IndexNodeFactory);
         }
 
         private async Task MutateAsync(Func<IndexMutation<TKey>, Task> asyncMutationAction, CancellationToken cancellationToken)
@@ -396,25 +400,25 @@ namespace Lifti
             }
         }
 
-        private static void IndexTokens(IndexMutation<TKey> indexMutation, int itemId, byte fieldId, IEnumerable<Token> tokens)
+        private static void IndexTokens(IndexMutation<TKey> indexMutation, int documentId, byte fieldId, IEnumerable<Token> tokens)
         {
             foreach (var token in tokens)
             {
-                indexMutation.Add(itemId, fieldId, token);
+                indexMutation.Add(documentId, fieldId, token);
             }
         }
 
-        private static void RemoveKeyFromIndex(TKey itemKey, IndexMutation<TKey> mutation)
+        private static void RemoveKeyFromIndex(TKey key, IndexMutation<TKey> mutation)
         {
-            var id = mutation.ItemStore.Remove(itemKey);
+            var documentId = mutation.Metadata.Remove(key);
 
-            mutation.Remove(id);
+            mutation.Remove(documentId);
         }
 
         /// <remarks>This method is thread safe as we only allow one mutation operation at a time.</remarks>
-        private async Task AddAsync<TObject>(TObject item, IndexedObjectConfiguration<TObject, TKey> options, IndexMutation<TKey> indexMutation, CancellationToken cancellationToken)
+        private async Task AddAsync<TObject>(TObject item, ObjectTypeConfiguration<TObject, TKey> options, IndexMutation<TKey> indexMutation, CancellationToken cancellationToken)
         {
-            var itemKey = options.KeyReader(item);
+            var key = options.KeyReader(item);
 
             var fieldTokens = new Dictionary<byte, List<Token>>();
 
@@ -429,11 +433,11 @@ namespace Lifti
                     tokenizer,
                     thesaurus);
 
-                MergeFieldTokens(fieldTokens, itemKey, field.Name, fieldId, tokens);
+                MergeFieldTokens(fieldTokens, key, field.Name, fieldId, tokens);
             }
 
             // Next process any dynamic field readers
-            var itemType = typeof(TObject);
+            var objectType = typeof(TObject);
             foreach (var dynamicFieldReader in options.DynamicFieldReaders)
             {
                 var dynamicFields = await dynamicFieldReader.ReadAsync(item, cancellationToken).ConfigureAwait(false);
@@ -444,7 +448,7 @@ namespace Lifti
 
                     var tokens = ExtractDocumentTokens(rawText, textExtractor, tokenizer, thesaurus);
 
-                    MergeFieldTokens(fieldTokens, itemKey, name, fieldId, tokens);
+                    MergeFieldTokens(fieldTokens, key, name, fieldId, tokens);
                 }
             }
 
@@ -453,11 +457,11 @@ namespace Lifti
                     t => t.Key,
                     t => t.Value.CalculateTotalTokenCount()));
 
-            var itemId = this.GetUniqueIdForItem(item, itemKey, documentStatistics, options, indexMutation);
+            var documentId = this.GetUniqueIdForDocument(item, key, documentStatistics, options, indexMutation);
 
             foreach (var fieldTokenList in fieldTokens)
             {
-                IndexTokens(indexMutation, itemId, fieldTokenList.Key, fieldTokenList.Value);
+                IndexTokens(indexMutation, documentId, fieldTokenList.Key, fieldTokenList.Value);
             }
         }
 
@@ -471,27 +475,27 @@ namespace Lifti
             fieldTokens.Add(fieldId, tokens);
         }
 
-        private int GetUniqueIdForItem(TKey itemKey, DocumentStatistics documentStatistics, IndexMutation<TKey> mutation)
+        private int GetUniqueIdForDocument(TKey key, DocumentStatistics documentStatistics, IndexMutation<TKey> mutation)
         {
-            this.EnforceDuplicateItemBehavior(itemKey, mutation);
+            this.EnforceDuplicateKeyBehavior(key, mutation);
 
-            return mutation.ItemStore.Add(itemKey, documentStatistics);
+            return mutation.Metadata.Add(key, documentStatistics);
         }
 
-        private int GetUniqueIdForItem<TObject>(TObject item, TKey itemKey, DocumentStatistics documentStatistics, IndexedObjectConfiguration<TObject, TKey> options, IndexMutation<TKey> mutation)
+        private int GetUniqueIdForDocument<TObject>(TObject item, TKey key, DocumentStatistics documentStatistics, ObjectTypeConfiguration<TObject, TKey> options, IndexMutation<TKey> mutation)
         {
-            this.EnforceDuplicateItemBehavior(itemKey, mutation);
+            this.EnforceDuplicateKeyBehavior(key, mutation);
 
-            return mutation.ItemStore.Add(itemKey, item, documentStatistics, options);
+            return mutation.Metadata.Add(key, item, documentStatistics, options);
         }
 
-        private void EnforceDuplicateItemBehavior(TKey itemKey, IndexMutation<TKey> mutation)
+        private void EnforceDuplicateKeyBehavior(TKey key, IndexMutation<TKey> mutation)
         {
-            if (this.indexOptions.DuplicateItemBehavior == DuplicateItemBehavior.ReplaceItem)
+            if (this.indexOptions.DuplicateKeyBehavior == DuplicateKeyBehavior.Replace)
             {
-                if (mutation.ItemStore.Contains(itemKey))
+                if (mutation.Metadata.Contains(key))
                 {
-                    RemoveKeyFromIndex(itemKey, mutation);
+                    RemoveKeyFromIndex(key, mutation);
                 }
             }
         }
@@ -537,7 +541,7 @@ namespace Lifti
 
             foreach (var field in serializedFields)
             {
-                byte newId;
+                byte newFieldId;
                 switch (field.Kind)
                 {
                     case FieldKind.Dynamic:
@@ -547,18 +551,18 @@ namespace Lifti
                         }
 
                         var newDynamicField = this.fieldLookup.GetOrCreateDynamicFieldInfo(field.DynamicFieldReaderName, field.Name);
-                        newId = newDynamicField.Id;
+                        newFieldId = newDynamicField.Id;
                         break;
                     case FieldKind.Static:
                         var fieldInfo = this.fieldLookup.GetFieldInfo(field.Name);
-                        newId = fieldInfo.Id;
+                        newFieldId = fieldInfo.Id;
                         break;
                     default:
                         throw new LiftiException(ExceptionMessages.UnknownFieldKind, field.Kind);
 
                 }
 
-                fieldMap[field.FieldId] = newId;
+                fieldMap[field.FieldId] = newFieldId;
             }
 
             return fieldMap;

@@ -3,7 +3,7 @@
 namespace Lifti.Querying.QueryParts
 {
     /// <summary>
-    /// An <see cref="IQueryPart"/> that restricts the resulting item matches to only those 
+    /// An <see cref="IQueryPart"/> that restricts the resulting matches to only those 
     /// that include matching tokens in a specific field.
     /// </summary>
     public class FieldFilterQueryOperator : IQueryPart
@@ -57,8 +57,8 @@ namespace Lifti.Querying.QueryParts
         public static FieldFilterQueryOperator CreateForField(IIndexedFieldLookup fieldLookup, string fieldName, IQueryPart statement)
         {
             return new FieldFilterQueryOperator(
-                fieldName, 
-                fieldLookup?.GetFieldInfo(fieldName).Id ?? throw new ArgumentNullException(nameof(fieldLookup)), 
+                fieldName,
+                fieldLookup?.GetFieldInfo(fieldName).Id ?? throw new ArgumentNullException(nameof(fieldLookup)),
                 statement);
         }
     }

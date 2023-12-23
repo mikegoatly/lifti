@@ -19,19 +19,19 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Calculates the score boost for the given item.
+        /// Calculates the score boost for the given <see cref="DocumentMetadata"/>.
         /// </summary>
         /// <remarks>
         /// This is virtual to allow for unit tests to override its behavior.
         /// </remarks>
-        public virtual double CalculateScoreBoost(ItemMetadata itemMetadata)
+        public virtual double CalculateScoreBoost(DocumentMetadata documentMetadata)
         {
-            if (itemMetadata is null)
+            if (documentMetadata is null)
             {
-                throw new ArgumentNullException(nameof(itemMetadata));
+                throw new ArgumentNullException(nameof(documentMetadata));
             }
 
-            if (itemMetadata.ScoringFreshnessDate is null && itemMetadata.ScoringMagnitude is null)
+            if (documentMetadata.ScoringFreshnessDate is null && documentMetadata.ScoringMagnitude is null)
             {
                 return 1.0D;
             }
@@ -41,20 +41,20 @@ namespace Lifti
                 throw new LiftiException(ExceptionMessages.ScoreBoostsNotCalculated);
             }
 
-            return this.freshnessBoost.CalculateBoost(this.scoreBoostOptions.FreshnessMultiplier, itemMetadata.ScoringFreshnessDate)
-                + this.magnitudeBoost.CalculateBoost(this.scoreBoostOptions.MagnitudeMultiplier, itemMetadata.ScoringMagnitude);
+            return this.freshnessBoost.CalculateBoost(this.scoreBoostOptions.FreshnessMultiplier, documentMetadata.ScoringFreshnessDate)
+                + this.magnitudeBoost.CalculateBoost(this.scoreBoostOptions.MagnitudeMultiplier, documentMetadata.ScoringMagnitude);
         }
 
-        internal void Add(ItemMetadata itemMetadata)
+        internal void Add(DocumentMetadata documentMetadata)
         {
-            AddToBoostValues(this.freshnessBoost, itemMetadata.ScoringFreshnessDate);
-            AddToBoostValues(this.magnitudeBoost, itemMetadata.ScoringMagnitude);
+            AddToBoostValues(this.freshnessBoost, documentMetadata.ScoringFreshnessDate);
+            AddToBoostValues(this.magnitudeBoost, documentMetadata.ScoringMagnitude);
         }
 
-        internal void Remove(ItemMetadata itemMetadata)
+        internal void Remove(DocumentMetadata documentMetadata)
         {
-            RemoveFromBoostValues(this.freshnessBoost, itemMetadata.ScoringFreshnessDate);
-            RemoveFromBoostValues(this.magnitudeBoost, itemMetadata.ScoringMagnitude);
+            RemoveFromBoostValues(this.freshnessBoost, documentMetadata.ScoringFreshnessDate);
+            RemoveFromBoostValues(this.magnitudeBoost, documentMetadata.ScoringMagnitude);
         }
 
         private static void RemoveFromBoostValues<T>(ScoreBoostValues<T> boostValues, T? newValue)

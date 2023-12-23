@@ -36,7 +36,7 @@ namespace TestConsole
             IEnumerable<SearchResult<TKey>> results,
             Func<TKey, string>? objectResultText = null)
         {
-            Console.WriteLine("Matched items total score:");
+            Console.WriteLine("Matched documents total score:");
             foreach (var result in results)
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;

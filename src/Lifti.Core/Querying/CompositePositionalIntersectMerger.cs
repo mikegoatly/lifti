@@ -20,11 +20,11 @@ namespace Lifti.Querying
             SwapIf(swapLeftAndRight, ref left, ref right);
             SwapIf(swapLeftAndRight, ref leftTolerance, ref rightTolerance);
 
-            var rightItems = right.Matches.ToDictionary(m => m.ItemId);
+            var rightMatches = right.Matches.ToDictionary(m => m.DocumentId);
 
             foreach (var leftMatch in left.Matches)
             {
-                if (rightItems.TryGetValue(leftMatch.ItemId, out var rightMatch))
+                if (rightMatches.TryGetValue(leftMatch.DocumentId, out var rightMatch))
                 {
                     var positionalMatches = PositionallyMatchAndCombineTokens(
                         swapLeftAndRight,
@@ -35,7 +35,7 @@ namespace Lifti.Querying
 
                     if (positionalMatches.Count > 0)
                     {
-                        yield return new ScoredToken(leftMatch.ItemId, positionalMatches);
+                        yield return new ScoredToken(leftMatch.DocumentId, positionalMatches);
                     }
                 }
             }

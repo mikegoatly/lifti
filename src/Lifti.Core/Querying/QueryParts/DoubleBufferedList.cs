@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Lifti.Querying.QueryParts
 {
+    /// <summary>
+    /// A list that allows for mutations to take place on a separate list to the one being enumerated, and then swapped.
+    /// </summary>
     internal class DoubleBufferedList<T> : IEnumerable<T>
     {
         private List<T> current = [];

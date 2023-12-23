@@ -12,8 +12,8 @@ namespace Lifti
         private readonly Dictionary<string, IndexedFieldDetails> fieldToDetailsLookup = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// This allows us to create a dynamic field at runtime while only knowing the name of the dynamic field reader.
-        /// In this situation we won't know the associated item type and we can avoid runtime reflection.
+        /// This allows us to create a dynamic field at runtime while only knowing the name of the dynamic field reader,
+        /// because in this situation we won't know the associated object type and we want to avoid runtime reflection.
         /// </summary>
         private readonly Dictionary<string, Func<string, IndexedFieldDetails>> dynamicFieldFactoryLookup = [];
 

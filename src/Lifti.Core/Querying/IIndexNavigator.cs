@@ -21,7 +21,7 @@ namespace Lifti.Querying
         IEnumerable<string> EnumerateIndexedTokens();
 
         /// <summary>
-        /// Gets all the items that are indexed under from where the navigator is located.
+        /// Gets all the matches that are indexed under from where the navigator is located.
         /// </summary>
         /// <param name="weighting">
         /// The weighting to apply to the matched tokens. This can be used to adjust the resulting score for the match.
@@ -29,7 +29,7 @@ namespace Lifti.Querying
         IntermediateQueryResult GetExactAndChildMatches(double weighting = 1D);
 
         /// <summary>
-        /// Gets all the items that are indexed exactly at the point of the navigators current location.
+        /// Gets all the matches that are indexed exactly at the point of the navigators current location.
         /// </summary>
         /// <param name="weighting">
         /// The weighting to apply to the matched tokens. This can be used to adjust the resulting score for the match.
@@ -59,7 +59,7 @@ namespace Lifti.Querying
         /// Creates an <see cref="IIndexNavigatorBookmark"/> for the current state of this instance.
         /// </summary>
         IIndexNavigatorBookmark CreateBookmark();
-        
+
         /// <summary>
         /// Enumerates all the characters that are available as options to process from the navigators current location.
         /// </summary>

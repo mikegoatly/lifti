@@ -50,7 +50,7 @@ namespace Lifti
         public bool HasChildNodes => this.ChildNodes.Count > 0;
 
         /// <summary>
-        /// Gets a value indicating whether this instance has any items matched at it.
+        /// Gets a value indicating whether this instance has any documents matched at it.
         /// </summary>
         public bool HasMatches => this.Matches.Count > 0;
 

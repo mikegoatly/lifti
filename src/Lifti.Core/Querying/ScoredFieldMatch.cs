@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Lifti.Querying
 {
     /// <summary>
-    /// Information about an item's field that was matched and scored during the execution of a query.
+    /// Information about an document's field that was matched and scored during the execution of a query.
     /// </summary>
     public readonly struct ScoredFieldMatch : IEquatable<ScoredFieldMatch>
     {
