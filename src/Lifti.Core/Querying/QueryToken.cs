@@ -37,7 +37,7 @@ namespace Lifti.Querying
         public int Tolerance { get; }
 
         /// <summary>
-        /// The score boost to apply to any items matching the search term. This is multiplied with any score boosts
+        /// The score boost to apply to any documents matching the search term. This is multiplied with any score boosts
         /// applied to matching fields. A null value indicates that no additional score boost should be applied.
         /// </summary>
         public double? ScoreBoost { get; }
@@ -62,7 +62,7 @@ namespace Lifti.Querying
         /// The <see cref="IIndexTokenizer"/> to use when further tokenizing the captured text. 
         /// </param>
         /// <param name="scoreBoost">
-        /// The score boost to apply to any items matching the search term. This is multiplied with any score boosts
+        /// The score boost to apply to any documents matching the search term. This is multiplied with any score boosts
         /// applied to matching fields. A null value indicates that no additional score boost should be applied.
         /// </param>
         public static QueryToken ForText(string text, IIndexTokenizer indexTokenizer, double? scoreBoost)

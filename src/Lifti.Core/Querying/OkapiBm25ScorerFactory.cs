@@ -40,7 +40,7 @@ namespace Lifti.Querying
             var scorer = new OkapiBm25Scorer(
                 this.k1,
                 this.b,
-                indexSnapshot.Items,
+                indexSnapshot.Metadata,
                 new FieldScoreBoostProvider(indexSnapshot.FieldLookup));
 
             this.cachedScorer = (indexSnapshot, scorer);

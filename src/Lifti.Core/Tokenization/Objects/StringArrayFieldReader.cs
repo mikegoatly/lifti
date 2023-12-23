@@ -9,16 +9,16 @@ namespace Lifti.Tokenization.Objects
     /// <summary>
     /// A field tokenization capable of reading an enumerable of strings for a field.
     /// </summary>
-    /// <typeparam name="TItem">
+    /// <typeparam name="TObject">
     /// The type of item the field belongs to.
     /// </typeparam>
-    internal class StringArrayFieldReader<TItem> : StaticFieldReader<TItem>
+    internal class StringArrayFieldReader<TObject> : StaticFieldReader<TObject>
     {
-        private readonly Func<TItem, IEnumerable<string>> reader;
+        private readonly Func<TObject, IEnumerable<string>> reader;
 
         internal StringArrayFieldReader(
             string name,
-            Func<TItem, IEnumerable<string>> reader,
+            Func<TObject, IEnumerable<string>> reader,
             IIndexTokenizer tokenizer,
             ITextExtractor textExtractor,
             IThesaurus thesaurus,
@@ -29,7 +29,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <inheritdoc />
-        public override ValueTask<IEnumerable<string>> ReadAsync(TItem item, CancellationToken cancellationToken)
+        public override ValueTask<IEnumerable<string>> ReadAsync(TObject item, CancellationToken cancellationToken)
         {
             return new ValueTask<IEnumerable<string>>(this.reader(item));
         }

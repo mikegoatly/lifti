@@ -4,15 +4,14 @@ using System;
 namespace Lifti
 {
     /// <summary>
-    /// Describes the configuration that should be used when indexing
-    /// a strongly typed item against an index.
+    /// Describes the configuration that should be used when indexing text from an object type.
     /// </summary>
-    internal interface IIndexedObjectConfiguration
+    internal interface IObjectTypeConfiguration
     {
         /// <summary>
-        /// Gets the type of the item this instance represents.
+        /// Gets the type of the object this configuration is for.
         /// </summary>
-        Type ItemType { get; }
+        Type ObjectType { get; }
 
         /// <summary>
         /// Gets the unique id for the object type.

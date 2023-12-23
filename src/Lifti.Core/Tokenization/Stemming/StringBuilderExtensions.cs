@@ -167,7 +167,7 @@ namespace Lifti.Tokenization.Stemming
 
                     if (bestMatch.Matches.Count > 0)
                     {
-                        return replacementSetLookup.Items.GetMetadata(bestMatch.Matches[0].ItemId).Key;
+                        return replacementSetLookup.Metadata.GetMetadata(bestMatch.Matches[0].DocumentId).Key;
                     }
                 }
             }

@@ -71,14 +71,14 @@ namespace Lifti.Querying
                     foreach (var (documentId, indexedTokens) in node.Matches.Enumerate())
                     {
                         var fieldMatches = indexedTokens.Select(v => new FieldMatch(v));
-                        if (!matches.TryGetValue(documentId, out var mergedItemResults))
+                        if (!matches.TryGetValue(documentId, out var mergedResults))
                         {
-                            mergedItemResults = new List<FieldMatch>(fieldMatches);
-                            matches[documentId] = mergedItemResults;
+                            mergedResults = new List<FieldMatch>(fieldMatches);
+                            matches[documentId] = mergedResults;
                         }
                         else
                         {
-                            mergedItemResults.AddRange(fieldMatches);
+                            mergedResults.AddRange(fieldMatches);
                         }
                     }
                 }
@@ -94,7 +94,7 @@ namespace Lifti.Querying
 
             var queryTokenMatches = matches.Select(m => new QueryTokenMatch(
                     m.Key,
-                    MergeItemMatches(m.Value).ToList()));
+                    MergeMatches(m.Value).ToList()));
 
             return this.CreateIntermediateQueryResult(queryTokenMatches, weighting);
         }
@@ -262,7 +262,7 @@ namespace Lifti.Querying
             }
         }
 
-        private static IEnumerable<FieldMatch> MergeItemMatches(List<FieldMatch> fieldMatches)
+        private static IEnumerable<FieldMatch> MergeMatches(List<FieldMatch> fieldMatches)
         {
             return fieldMatches.ToLookup(m => m.FieldId)
                 .Select(m => new FieldMatch(

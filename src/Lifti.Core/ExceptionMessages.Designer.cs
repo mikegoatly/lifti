@@ -70,7 +70,7 @@ namespace Lifti {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to At least one field must be configured for an item.
+        ///   Looks up a localized string similar to At least one field must be configured for an object type.
         /// </summary>
         internal static string AtLeastOneFieldMustBeIndexed {
             get {
@@ -142,7 +142,7 @@ namespace Lifti {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A duplicate field &quot;{0}&quot; was encountered while indexing item {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields..
+        ///   Looks up a localized string similar to A duplicate field &quot;{0}&quot; was encountered while indexing the object with key {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields..
         /// </summary>
         internal static string DuplicateFieldEncounteredOnObject {
             get {
@@ -331,7 +331,7 @@ namespace Lifti {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Item already indexed.
+        ///   Looks up a localized string similar to Document already indexed.
         /// </summary>
         internal static string ItemAlreadyIndexed {
             get {

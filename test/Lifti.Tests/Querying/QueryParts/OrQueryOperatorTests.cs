@@ -18,7 +18,7 @@ namespace Lifti.Tests.Querying.QueryParts
 
             var result = op.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
 
-            result.Matches.Select(m => m.ItemId).Should().BeEquivalentTo(
+            result.Matches.Select(m => m.DocumentId).Should().BeEquivalentTo(
                 new[] { 2, 5, 8, 9 });
         }
 

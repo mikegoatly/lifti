@@ -254,8 +254,8 @@ namespace Lifti.Tests
             var action1 = new List<string>();
             var action2 = new List<int>();
 
-            this.sut.WithIndexModificationAction(i => action1.Add(i.Items.Count.ToString()))
-                .WithIndexModificationAction(i => action2.Add(i.Items.Count));
+            this.sut.WithIndexModificationAction(i => action1.Add(i.Metadata.Count.ToString()))
+                .WithIndexModificationAction(i => action2.Add(i.Metadata.Count));
 
             var index = this.sut.Build();
 
@@ -268,7 +268,7 @@ namespace Lifti.Tests
         [Fact]
         public async Task WithDuplicateItemKeysThrowingExceptions_ShouldPassOptionToIndex()
         {
-            var index = this.sut.WithDuplicateItemBehavior(DuplicateItemBehavior.ThrowException)
+            var index = this.sut.WithDuplicateKeyBehavior(DuplicateKeyBehavior.ThrowException)
                 .Build();
 
             await index.AddAsync(1, "Test");
@@ -280,7 +280,7 @@ namespace Lifti.Tests
         [Fact]
         public async Task WithDuplicateItemKeysReplacingItems_ShouldPassOptionToIndex()
         {
-            var index = this.sut.WithDuplicateItemBehavior(DuplicateItemBehavior.ReplaceItem)
+            var index = this.sut.WithDuplicateKeyBehavior(DuplicateKeyBehavior.Replace)
                 .Build();
 
             await index.AddAsync(1, "Test");

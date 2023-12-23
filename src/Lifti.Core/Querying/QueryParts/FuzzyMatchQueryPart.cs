@@ -25,7 +25,7 @@ namespace Lifti.Querying.QueryParts
     }
 
     /// <summary>
-    /// An <see cref="IQueryPart"/> that matches items that contain an fuzzy match for the given text.
+    /// An <see cref="IQueryPart"/> that matches documents that contain a fuzzy match for the given text.
     /// </summary>
     public class FuzzyMatchQueryPart : WordQueryPart
     {
@@ -44,7 +44,7 @@ namespace Lifti.Querying.QueryParts
             // It's very likely that we'll encounter the same point in the index multiple times while processing a fuzzy match.
             // There's no point in traversing the same part multiple times for a given point in the search term, so this hashset keeps track of each logical
             // location that has been reached at each index within the search term.
-            private readonly HashSet<(int wordIndex, IIndexNavigatorBookmark bookmark)> processedBookmarks = new();
+            private readonly HashSet<(int wordIndex, IIndexNavigatorBookmark bookmark)> processedBookmarks = [];
 
             public FuzzyMatchStateStore(IIndexNavigator navigator, ushort maxEditDistance, ushort maxSequentialEdits)
             {
@@ -232,11 +232,11 @@ namespace Lifti.Querying.QueryParts
         /// <param name="maxSequentialEdits">The maximum number of edits that are allowed to appear sequentially. By default this is 1,
         /// which forces matches to be more similar to the search criteria.</param>
         /// <param name="scoreBoost">
-        /// The score boost to apply to any items matching the search term. This is multiplied with any score boosts
+        /// The score boost to apply to any matches of the search term. This is multiplied with any score boosts
         /// applied to matching fields. A null value indicates that no additional score boost should be applied.
         /// </param>
         /// <remarks>
-        /// A transposition of neighboring characters is considered as single edit, not two distinct substitutions.
+        /// A transposition of neighbouring characters is considered as single edit, not two distinct substitutions.
         /// </remarks>
         public FuzzyMatchQueryPart(string word, ushort maxEditDistance = DefaultMaxEditDistance, ushort maxSequentialEdits = DefaultMaxSequentialEdits, double? scoreBoost = null)
             : base(word, scoreBoost)

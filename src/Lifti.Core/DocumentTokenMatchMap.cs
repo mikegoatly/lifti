@@ -77,23 +77,23 @@ namespace Lifti
         {
             this.mutated ??= [];
 
-            if (this.mutated.TryGetValue(documentId, out var itemFieldLocations))
+            if (this.mutated.TryGetValue(documentId, out var documentFieldLocations))
             {
                 // The field locations list will already have been cloned when it was added to the mutations dictionary
                 // so it's safe to just add to it here
-                itemFieldLocations.Add(indexedToken);
+                documentFieldLocations.Add(indexedToken);
             }
             else
             {
-                itemFieldLocations = this.original.StartMutation(documentId);
-                itemFieldLocations.Add(indexedToken);
-                this.mutated.Add(documentId, itemFieldLocations);
+                documentFieldLocations = this.original.StartMutation(documentId);
+                documentFieldLocations.Add(indexedToken);
+                this.mutated.Add(documentId, documentFieldLocations);
             }
         }
     }
 
     /// <summary>
-    /// A read only map of <see cref="IndexedToken"/>s keyed by the internal item id.
+    /// A read only map of <see cref="IndexedToken"/>s keyed by the internal document id.
     /// </summary>
     public readonly struct DocumentTokenMatchMap : IEquatable<DocumentTokenMatchMap>
     {

@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 namespace Lifti.Tokenization.Objects
 {
     /// <summary>
-    /// A field tokenization capable of asynchronously reading s string for a field.
+    /// A field tokenization capable of asynchronously reading a string for a field.
     /// </summary>
-    /// <typeparam name="TItem">
-    /// The type of item the field belongs to.
+    /// <typeparam name="TObject">
+    /// The type of object the field belongs to.
     /// </typeparam>
-    internal class StringFieldReader<TItem> : StaticFieldReader<TItem>
+    internal class StringFieldReader<TObject> : StaticFieldReader<TObject>
     {
-        private readonly Func<TItem, string> reader;
+        private readonly Func<TObject, string> reader;
 
         internal StringFieldReader(
             string name,
-            Func<TItem, string> reader,
+            Func<TObject, string> reader,
             IIndexTokenizer tokenizer,
             ITextExtractor textExtractor,
             IThesaurus thesaurus,
@@ -29,7 +29,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <inheritdoc />
-        public override ValueTask<IEnumerable<string>> ReadAsync(TItem item, CancellationToken cancellationToken)
+        public override ValueTask<IEnumerable<string>> ReadAsync(TObject item, CancellationToken cancellationToken)
         {
             return new ValueTask<IEnumerable<string>>(new[] { this.reader(item) });
         }

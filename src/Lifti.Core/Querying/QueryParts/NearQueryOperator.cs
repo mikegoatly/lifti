@@ -5,7 +5,7 @@ namespace Lifti.Querying.QueryParts
 {
     /// <summary>
     /// An <see cref="IQueryPart"/> that produces an intersection of two <see cref="IQueryPart"/>s, restricting
-    /// an item's field matches such that the locations are close to one another. Items that result in no field matches
+    /// a document's field matches such that the locations are close to one another. Documents that result in no field matches
     /// are filtered out.
     /// </summary>
     public class NearQueryOperator : BinaryQueryOperator

@@ -5,23 +5,27 @@ using System.Linq;
 namespace Lifti.Querying
 {
     /// <summary>
-    /// Provides information about an item that was matched whilst executing a query.
+    /// Provides information about a document that was matched whilst executing a query.
     /// </summary>
     public readonly struct QueryTokenMatch : IEquatable<QueryTokenMatch>
     {
         /// <summary>
         /// Constructs a new <see cref="QueryTokenMatch"/> instance.
         /// </summary>
-        public QueryTokenMatch(int itemId, IReadOnlyList<FieldMatch> fieldMatches)
+        public QueryTokenMatch(int documentId, IReadOnlyList<FieldMatch> fieldMatches)
         {
-            this.ItemId = itemId;
+            this.DocumentId = documentId;
             this.FieldMatches = fieldMatches;
         }
 
+        /// <inheritdoc cref="DocumentId"/>
+        [Obsolete("Use DocumentId instead")]
+        public int ItemId => this.DocumentId;
+
         /// <summary>
-        /// Gets the id of the item that was matched.
+        /// Gets the id of the matched document.
         /// </summary>
-        public int ItemId { get; }
+        public int DocumentId { get; }
 
         /// <summary>
         /// Gets the fields in which the tokens were matched.
@@ -38,7 +42,7 @@ namespace Lifti.Querying
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.ItemId, this.FieldMatches);
+            return HashCode.Combine(this.DocumentId, this.FieldMatches);
         }
 
         /// <inheritdoc />
@@ -56,7 +60,7 @@ namespace Lifti.Querying
         /// <inheritdoc />
         public bool Equals(QueryTokenMatch other)
         {
-            return this.ItemId == other.ItemId &&
+            return this.DocumentId == other.DocumentId &&
                    this.FieldMatches.SequenceEqual(other.FieldMatches);
         }
     }

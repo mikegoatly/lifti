@@ -16,11 +16,11 @@ namespace Lifti.Tokenization.Objects
     }
 
     /// <inheritdoc />
-    internal interface IStaticFieldReader<TItem> : IStaticFieldReader
+    internal interface IStaticFieldReader<TObject> : IStaticFieldReader
     {
         /// <summary>
         /// Reads the field's text from the given item.
         /// </summary>
-        ValueTask<IEnumerable<string>> ReadAsync(TItem item, CancellationToken cancellationToken);
+        ValueTask<IEnumerable<string>> ReadAsync(TObject item, CancellationToken cancellationToken);
     }
 }

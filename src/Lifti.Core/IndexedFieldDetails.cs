@@ -81,8 +81,11 @@ namespace Lifti
         public double ScoreBoost { get; }
 
         /// <summary>
-        /// Reads the text for the field from the specified item. The item must be of the type specified by the <see cref="ObjectType"/> property.
+        /// Reads the text for the field from the specified object. The object must be of the type specified by the <see cref="ObjectType"/> property.
         /// </summary>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the <paramref name="item"/> is not of the expected type.
+        /// </exception>
         public abstract ValueTask<IEnumerable<string>> ReadAsync(object item, CancellationToken cancellationToken);
 
         internal void Deconstruct(out byte fieldId, out ITextExtractor textExtractor, out IIndexTokenizer tokenizer, out IThesaurus thesaurus)
@@ -168,7 +171,7 @@ namespace Lifti
                 return this.fieldReader(typedItem, cancellationToken);
             }
 
-            throw new ArgumentException($"Item type {item.GetType().Name} is not expected type {this.ObjectType.Name}");
+            throw new ArgumentException($"Object type {item.GetType().Name} is not expected type {this.ObjectType.Name}");
 
         }
     }

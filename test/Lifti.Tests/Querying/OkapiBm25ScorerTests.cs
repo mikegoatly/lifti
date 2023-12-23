@@ -14,19 +14,19 @@ namespace Lifti.Tests.Querying
         private const double expectedScore2 = 2.3792189708272073D;
 
         private readonly QueryTokenMatch[] tokenMatches;
-        private static readonly FakeItemStore<int> looseTextItemStore = new(
+        private static readonly FakeIndexMetadata<int> looseTextIndexMetadata = new(
                 10,
                 new IndexStatistics(new Dictionary<byte, long>() { { 1, 100 } }, 100), // 100 total tokens in 1 field
                 Enumerable.Range(0, 10)
-                    .Select(id => (id, ItemMetadata<int>.ForLooseText(id, id, new DocumentStatistics(1, id * 3))))
+                    .Select(id => (id, DocumentMetadata<int>.ForLooseText(id, id, new DocumentStatistics(1, id * 3))))
                     .ToArray(), // Each item will have (id * 3) tokens in it
-                Array.Empty<(byte, Func<ItemMetadata, double>)>());
+                Array.Empty<(byte, Func<DocumentMetadata, double>)>());
 
-        private static readonly FakeItemStore<int> objectTextItemStore = new(
+        private static readonly FakeIndexMetadata<int> objectTextIndexMetadata = new(
                 10,
                 new IndexStatistics(new Dictionary<byte, long>() { { 1, 100 } }, 100), // 100 total tokens in 1 field
                 Enumerable.Range(0, 10)
-                    .Select(id => (id, ItemMetadata<int>.ForObject(
+                    .Select(id => (id, DocumentMetadata<int>.ForObject(
                         (byte)((id % 3) + 1), // Each item will be assigned to object type 1, 2, or 3 
                         id,
                         id,
@@ -34,11 +34,11 @@ namespace Lifti.Tests.Querying
                         null,
                         null)))
                     .ToArray(), // Each item will have (id * 3) tokens in it
-                new (byte, Func<ItemMetadata, double>)[]
+                new (byte, Func<DocumentMetadata, double>)[]
                 {
-                    (1, (ItemMetadata itemMetadata) => 10D), // 10x score boost for object type 1
-                    (2, (ItemMetadata itemMetadata) => 1D), // No field score boost for object type 2
-                    (3, (ItemMetadata itemMetadata) => 1D) // No field score boost for object type 3
+                    (1, (DocumentMetadata metadata) => 10D), // 10x score boost for object type 1
+                    (2, (DocumentMetadata metadata) => 1D), // No field score boost for object type 2
+                    (3, (DocumentMetadata metadata) => 1D) // No field score boost for object type 3
                 });
 
         public OkapiBm25ScorerTests()
@@ -53,7 +53,7 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void VerifyScoreWithoutWeighting()
         {
-            var sut = CreateSut(looseTextItemStore);
+            var sut = CreateSut(looseTextIndexMetadata);
             var results = sut.Score(this.tokenMatches, 1D);
 
             results.Should().BeEquivalentTo(
@@ -68,7 +68,7 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void VerifyScoreWithWeighting()
         {
-            var sut = CreateSut(looseTextItemStore);
+            var sut = CreateSut(looseTextIndexMetadata);
             var results = sut.Score(this.tokenMatches, 0.5D);
 
             results.Should().BeEquivalentTo(
@@ -83,7 +83,7 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void VerifyScoreWithFieldWeighting()
         {
-            var sut = CreateSut(looseTextItemStore, new FakeFieldScoreBoostProvider((1, 10D)));
+            var sut = CreateSut(looseTextIndexMetadata, new FakeFieldScoreBoostProvider((1, 10D)));
 
             var results = sut.Score(this.tokenMatches, 0.5D);
 
@@ -100,7 +100,7 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void VerifyScoreWithObjectTypeWeighting()
         {
-            var sut = CreateSut(objectTextItemStore, new FakeFieldScoreBoostProvider());
+            var sut = CreateSut(objectTextIndexMetadata, new FakeFieldScoreBoostProvider());
 
             var results = sut.Score(this.tokenMatches, 1D);
 
@@ -115,7 +115,7 @@ namespace Lifti.Tests.Querying
                 o => o.Using<double>(ctx => ctx.Subject.Should().BeApproximately(ctx.Expectation, 0.00001D)).When(i => i.RuntimeType == typeof(double)));
         }
 
-        private static OkapiBm25Scorer CreateSut(FakeItemStore<int> itemStore, FakeFieldScoreBoostProvider? fieldScoreBoostProvider = null)
+        private static OkapiBm25Scorer CreateSut(FakeIndexMetadata<int> itemStore, FakeFieldScoreBoostProvider? fieldScoreBoostProvider = null)
         {
             return new OkapiBm25Scorer(
                 1.2D,

@@ -1,6 +1,7 @@
 ﻿using Lifti.Querying;
 using Lifti.Tokenization;
 using Lifti.Tokenization.TextExtraction;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,11 +12,15 @@ namespace Lifti
     /// </summary>
     public interface IFullTextIndex<TKey> : IIndexTokenizerProvider
     {
+        /// <inheritdoc cref="Metadata"/>
+        [Obsolete("Use the Metadata property instead")]
+        IIndexMetadata<TKey> Items { get; }
+
         /// <summary>
-        /// Internally an index keeps track of items and their metadata. Can be used get ids for items and 
-        /// visa-versa, along with other derived metadata such as token counts.
+        /// The <see cref="IIndexMetadata{TKey}"/> keeps track index metadata, including maps between internal document ids and keys, 
+        /// statistics about token counts and score boost aggregates. 
         /// </summary>
-        IItemStore<TKey> Items { get; }
+        IIndexMetadata<TKey> Metadata { get; }
 
         /// <summary>
         /// Fields are tracked internally as a id of type <see cref="byte"/>. This lookup can
@@ -24,7 +29,7 @@ namespace Lifti
         IIndexedFieldLookup FieldLookup { get; }
 
         /// <summary>
-        /// Gets the number of items contained in the index. This will not reflect any new items
+        /// Gets the number of documents contained in the index. This will not reflect any new documents
         /// that are currently being inserted in a batch until the batch completes.
         /// </summary>
         int Count { get; }
@@ -63,25 +68,25 @@ namespace Lifti
         /// <summary>
         /// Indexes some text against a given key.
         /// </summary>
-        /// <param name="itemKey">The key of the item being indexed.</param>
-        /// <param name="text">The text to index against the item.</param>
+        /// <param name="key">The key of the document being indexed.</param>
+        /// <param name="text">The text to index against the document.</param>
         /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
-        Task AddAsync(TKey itemKey, string text, CancellationToken cancellationToken = default);
+        Task AddAsync(TKey key, string text, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Indexes some text against a given key.
         /// </summary>
-        /// <param name="itemKey">The key of the item being indexed.</param>
-        /// <param name="text">The text to index against the item.</param>
+        /// <param name="key">The key of the document being indexed.</param>
+        /// <param name="text">The text to index against the document.</param>
         /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
-        Task AddAsync(TKey itemKey, IEnumerable<string> text, CancellationToken cancellationToken = default);
+        Task AddAsync(TKey key, IEnumerable<string> text, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Indexes a single item of type <typeparamref name="TObject"/>. This type must have been
+        /// Indexes a single document extracted from type <typeparamref name="TObject"/>. This type must have been
         /// configured when the index was built.
         /// </summary>
         /// <typeparam name="TObject">
-        /// The type of the item being indexed.
+        /// The type of the object being indexed.
         /// </typeparam>
         /// <param name="item">
         /// The item to index.
@@ -90,11 +95,11 @@ namespace Lifti
         Task AddAsync<TObject>(TObject item, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Indexes a set of items of type <typeparamref name="TObject"/>. This type must have been
+        /// Indexes a set of documents extracted from type <typeparamref name="TObject"/>. This type must have been
         /// configured when the index was built.
         /// </summary>
         /// <typeparam name="TObject">
-        /// The type of the item being indexed.
+        /// The type of the object being indexed.
         /// </typeparam>
         /// <param name="items">
         /// The items to index.
@@ -103,17 +108,17 @@ namespace Lifti
         Task AddRangeAsync<TObject>(IEnumerable<TObject> items, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Removes the item with the given key from this index. If the key is not indexed then
+        /// Removes the document with the given key from this index. If the key is not indexed then
         /// this operation is a no-op and <c>false</c> is returned.
         /// </summary>
-        /// <param name="itemKey">
-        /// The key of the item to remove.
+        /// <param name="key">
+        /// The key of the document to remove.
         /// </param>
         /// <returns>
-        /// <c>true</c> if the item was in the index, <c>false</c> if it was not.
+        /// <c>true</c> if the document was in the index, <c>false</c> if it was not.
         /// </returns>
         /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
-        Task<bool> RemoveAsync(TKey itemKey, CancellationToken cancellationToken = default);
+        Task<bool> RemoveAsync(TKey key, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Performs a search against this index.

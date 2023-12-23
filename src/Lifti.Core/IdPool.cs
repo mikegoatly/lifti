@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Lifti
 {
     /// <summary>
-    /// Provides methods for generating unique internal ids for items based on the key of the item.
+    /// Provides methods for generating unique internal ids for documents.
     /// </summary>
     /// <typeparam name="TKey">The type of key in the index.</typeparam>
     internal class IdPool<TKey>

@@ -4,8 +4,8 @@ namespace Lifti.Querying.QueryParts
 {
     /// <summary>
     /// An <see cref="IQueryPart"/> that produces an intersection of two <see cref="IQueryPart"/>s, restricting
-    /// an item's field matches such that the locations of the first appear before the locations of the second. 
-    /// Items that result in no field matches are filtered out.
+    /// a document's field matches such that the locations of the first appear before the locations of the second. 
+    /// Documents that result in no field matches are filtered out.
     /// </summary>
     public class PrecedingQueryOperator : BinaryQueryOperator
     {

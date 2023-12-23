@@ -1,4 +1,5 @@
 ﻿using Lifti.Querying;
+using System;
 
 namespace Lifti
 {
@@ -23,10 +24,14 @@ namespace Lifti
         /// </summary>
         IIndexNavigator CreateNavigator();
 
+        /// <inheritdoc cref="Metadata"/>
+        [Obsolete("Use Metadata property instead")]
+        IIndexMetadata Items { get; }
+
         /// <summary>
-        /// Gets the <see cref="IItemStore"/> in the state it was in when the snapshot was taken.
+        /// Gets the <see cref="IIndexMetadata"/> in the state it was in when the snapshot was taken.
         /// </summary>
-        IItemStore Items { get; }
+        IIndexMetadata Metadata { get; }
     }
 
     /// <summary>
@@ -34,11 +39,16 @@ namespace Lifti
     /// </summary>
     public interface IIndexSnapshot<TKey> : IIndexSnapshot
     {
-        /// <summary>
-        /// Gets the <see cref="IItemStore{T}"/> in the state it was in when the snapshot was taken.
-        /// </summary>
+
 #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-        IItemStore<TKey> Items { get; }
+        /// <inheritdoc cref="Metadata"/>
+        [Obsolete("Use Metadata property instead")]
+        IIndexMetadata<TKey> Items { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IIndexSnapshot{T}"/> in the state it was in when the snapshot was taken.
+        /// </summary>
+        IIndexMetadata<TKey> Metadata { get; }
 #pragma warning restore CS0108 // Member hides inherited member; missing new keyword
     }
 }

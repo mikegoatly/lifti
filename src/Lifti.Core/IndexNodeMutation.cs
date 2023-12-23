@@ -48,7 +48,7 @@ namespace Lifti
         public DocumentTokenMatchMapMutation? DocumentTokenMatchMapMutation { get; private set; }
 
         internal void Index(
-            int itemId,
+            int documentId,
             byte fieldId,
             IReadOnlyList<TokenLocation> locations,
             ReadOnlyMemory<char> remainingTokenText)
@@ -57,10 +57,10 @@ namespace Lifti
             switch (indexSupportLevel)
             {
                 case IndexSupportLevelKind.CharacterByCharacter:
-                    this.IndexFromCharacter(itemId, fieldId, locations, remainingTokenText);
+                    this.IndexFromCharacter(documentId, fieldId, locations, remainingTokenText);
                     break;
                 case IndexSupportLevelKind.IntraNodeText:
-                    this.IndexWithIntraNodeTextSupport(itemId, fieldId, locations, remainingTokenText);
+                    this.IndexWithIntraNodeTextSupport(documentId, fieldId, locations, remainingTokenText);
                     break;
                 default:
                     throw new LiftiException(ExceptionMessages.UnsupportedIndexSupportLevel, indexSupportLevel);
@@ -177,7 +177,7 @@ namespace Lifti
         }
 
         private void IndexFromCharacter(
-            int itemId,
+            int documentId,
             byte fieldId,
             IReadOnlyList<TokenLocation> locations,
             ReadOnlyMemory<char> remainingTokenText,
@@ -185,17 +185,17 @@ namespace Lifti
         {
             if (remainingTokenText.Length > testLength)
             {
-                this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingTokenText, testLength);
+                this.ContinueIndexingAtChild(documentId, fieldId, locations, remainingTokenText, testLength);
             }
             else
             {
                 // Remaining text == intraNodeText
-                this.AddMatchedDocument(itemId, fieldId, locations);
+                this.AddMatchedDocument(documentId, fieldId, locations);
             }
         }
 
         private void ContinueIndexingAtChild(
-            int itemId,
+            int documentId,
             byte fieldId,
             IReadOnlyList<TokenLocation> locations,
             ReadOnlyMemory<char> remainingTokenText,
@@ -212,7 +212,7 @@ namespace Lifti
                     // This is a novel branch in the index
                     : new IndexNodeMutation(this));
 
-            childNode.Index(itemId, fieldId, locations, remainingTokenText.Slice(remainingTextSplitPosition + 1));
+            childNode.Index(documentId, fieldId, locations, remainingTokenText.Slice(remainingTextSplitPosition + 1));
         }
 
         private ChildNodeMapMutation EnsureMutatedChildNodesCreated()
@@ -238,7 +238,7 @@ namespace Lifti
         }
 
         private void IndexWithIntraNodeTextSupport(
-            int itemId,
+            int documentId,
             byte fieldId,
             IReadOnlyList<TokenLocation> locations,
             ReadOnlyMemory<char> remainingTokenText)
@@ -249,11 +249,11 @@ namespace Lifti
                 {
                     // Currently a leaf node
                     this.IntraNodeText = remainingTokenText.Length == 0 ? null : remainingTokenText;
-                    this.AddMatchedDocument(itemId, fieldId, locations);
+                    this.AddMatchedDocument(documentId, fieldId, locations);
                 }
                 else
                 {
-                    this.IndexFromCharacter(itemId, fieldId, locations, remainingTokenText);
+                    this.IndexFromCharacter(documentId, fieldId, locations, remainingTokenText);
                 }
             }
             else
@@ -262,7 +262,7 @@ namespace Lifti
                 {
                     // The indexing ends before the start of the intranode text so we need to split
                     this.SplitIntraNodeText(0);
-                    this.AddMatchedDocument(itemId, fieldId, locations);
+                    this.AddMatchedDocument(documentId, fieldId, locations);
                     return;
                 }
 
@@ -276,7 +276,7 @@ namespace Lifti
                     if (tokenSpan[i] != intraNodeSpan[i])
                     {
                         this.SplitIntraNodeText(i);
-                        this.ContinueIndexingAtChild(itemId, fieldId, locations, remainingTokenText, i);
+                        this.ContinueIndexingAtChild(documentId, fieldId, locations, remainingTokenText, i);
                         return;
                     }
                 }
@@ -287,7 +287,7 @@ namespace Lifti
                     this.SplitIntraNodeText(testLength);
                 }
 
-                this.IndexFromCharacter(itemId, fieldId, locations, remainingTokenText, testLength);
+                this.IndexFromCharacter(documentId, fieldId, locations, remainingTokenText, testLength);
             }
         }
 

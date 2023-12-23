@@ -54,11 +54,11 @@ namespace Lifti.Serialization.Binary
                     DateTime? freshnessDate = hasScoringFreshnessDate ? new DateTime(this.reader.ReadInt64()) : null;
                     double? magnitude = hasScoringMagnitude ? this.reader.ReadDouble() : null;
 
-                    index.Items.Add(ItemMetadata<TKey>.ForObject(objectTypeId, id, key, documentStatistics, freshnessDate, magnitude));
+                    index.Metadata.Add(DocumentMetadata<TKey>.ForObject(objectTypeId, id, key, documentStatistics, freshnessDate, magnitude));
                 }
                 else
                 {
-                    index.Items.Add(ItemMetadata<TKey>.ForLooseText(id, key, documentStatistics));
+                    index.Metadata.Add(DocumentMetadata<TKey>.ForLooseText(id, key, documentStatistics));
                 }
             }
         }

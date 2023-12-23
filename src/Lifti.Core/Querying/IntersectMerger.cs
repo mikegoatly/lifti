@@ -17,14 +17,14 @@ namespace Lifti.Querying
             // The trade-off here is that we're building a larger dictionary
             SwapIf(left.Matches.Count > right.Matches.Count, ref left, ref right);
 
-            var rightItems = right.Matches.ToDictionary(m => m.ItemId);
+            var rightResults = right.Matches.ToDictionary(m => m.DocumentId);
 
             foreach (var leftMatch in left.Matches)
             {
-                if (rightItems.TryGetValue(leftMatch.ItemId, out var rightMatch))
+                if (rightResults.TryGetValue(leftMatch.DocumentId, out var rightMatch))
                 {
                     yield return new ScoredToken(
-                        leftMatch.ItemId,
+                        leftMatch.DocumentId,
                         MergeFields(leftMatch, rightMatch).ToList());
                 }
             }

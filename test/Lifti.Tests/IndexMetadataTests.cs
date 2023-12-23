@@ -6,21 +6,21 @@ using Xunit;
 
 namespace Lifti.Tests
 {
-    public class ItemStoreTests
+    public class IndexMetadataTests
     {
         private static readonly DocumentStatistics item1DocumentStatistics = DocumentStatistics((1, 100));
         private static readonly DocumentStatistics item2DocumentStatistics = DocumentStatistics((1, 50), (2, 200));
 
-        private readonly ItemStore<string> sut;
+        private readonly IndexMetadata<string> sut;
         private readonly int id1;
         private readonly int id2;
 
-        public ItemStoreTests()
+        public IndexMetadataTests()
         {
-            this.sut = new ItemStore<string>(
+            this.sut = new IndexMetadata<string>(
                 new[]
                 {
-                    new IndexedObjectConfiguration<string, string>(
+                    new ObjectTypeConfiguration<string, string>(
                         1,
                         x => x,
                         Array.Empty<StaticFieldReader<string>>(),
@@ -48,20 +48,20 @@ namespace Lifti.Tests
         public void Add_ItemOnly_ShouldThrowExceptionIfItemAlreadyIndexed()
         {
             Assert.Throws<LiftiException>(() => this.sut.Add("1", DocumentStatistics()))
-                .Message.Should().Be("Item already indexed");
+                .Message.Should().Be("Document already indexed");
         }
 
         [Fact]
         public void Add_ItemWithMatchingKey_ShouldThrowExceptionIfItemAlreadyIndexed()
         {
-            Assert.Throws<LiftiException>(() => this.sut.Add(ItemMetadata(0)))
-                .Message.Should().Be("Item already indexed");
+            Assert.Throws<LiftiException>(() => this.sut.Add(DocumentMetadata(0)))
+                .Message.Should().Be("Document already indexed");
         }
 
         [Fact]
         public void Add_ItemWithMatchingId_ShouldThrowExceptionIfIdAlreadyUsedAlreadyIndexed()
         {
-            Assert.Throws<LiftiException>(() => this.sut.Add(ItemMetadata(1, key: "DifferentKey")))
+            Assert.Throws<LiftiException>(() => this.sut.Add(DocumentMetadata(1, key: "DifferentKey")))
                 .Message.Should().Be("Id 1 is already registered in the index.");
         }
 
@@ -69,7 +69,7 @@ namespace Lifti.Tests
         public void Add_ItemWithId_ShouldAddItemToIndex()
         {
             var documentStatistics = DocumentStatistics((1, 20), (2, 50), (3, 10));
-            var itemMetadata = ItemMetadata<string>.ForObject(1, 9, "9", documentStatistics, new System.DateTime(2022, 11, 23), 12D);
+            var itemMetadata = DocumentMetadata<string>.ForObject(1, 9, "9", documentStatistics, new System.DateTime(2022, 11, 23), 12D);
             this.sut.Add(itemMetadata);
             this.sut.GetMetadata(9).Should().BeEquivalentTo(
                 itemMetadata);
@@ -79,7 +79,7 @@ namespace Lifti.Tests
         public void Add_ItemWithId_ShouldAdjustIndexStatistics()
         {
             var documentStatistics = DocumentStatistics((1, 20), (2, 50), (3, 10));
-            this.sut.Add(ItemMetadata(9, documentStatistics));
+            this.sut.Add(DocumentMetadata(9, documentStatistics));
             this.sut.IndexStatistics.Should().BeEquivalentTo(
                 IndexStatistics((1, 170), (2, 250), (3, 10)));
         }
@@ -87,19 +87,19 @@ namespace Lifti.Tests
         [Fact]
         public void Add_ItemWithId_ShouldResetTheNextIdBasedOnTheHighestIndexedId()
         {
-            this.sut.Add(ItemMetadata(10, DocumentStatistics((10, 10))));
-            this.sut.Add(ItemMetadata(9, DocumentStatistics((9, 9))));
+            this.sut.Add(DocumentMetadata(10, DocumentStatistics((10, 10))));
+            this.sut.Add(DocumentMetadata(9, DocumentStatistics((9, 9))));
 
             this.sut.Add("7", DocumentStatistics((7, 7)));
 
-            this.sut.GetIndexedItems().Should().BeEquivalentTo(
+            this.sut.GetIndexedDocuments().Should().BeEquivalentTo(
                 new[]
                 {
-                    ItemMetadata(0, item1DocumentStatistics),
-                    ItemMetadata(1, item2DocumentStatistics),
-                    ItemMetadata(9, DocumentStatistics((9, 9))),
-                    ItemMetadata(10,DocumentStatistics((10, 10))),
-                    ItemMetadata(11, DocumentStatistics((7, 7)), key: "7"),
+                    DocumentMetadata(0, item1DocumentStatistics),
+                    DocumentMetadata(1, item2DocumentStatistics),
+                    DocumentMetadata(9, DocumentStatistics((9, 9))),
+                    DocumentMetadata(10,DocumentStatistics((10, 10))),
+                    DocumentMetadata(11, DocumentStatistics((7, 7)), key: "7"),
                 });
         }
 
@@ -110,21 +110,21 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void GetIndexedItems_ShouldReturnMetadataForAllItemsInTheIndex()
+        public void GetIndexedDocuments_ShouldReturnMetadataForAllDocumentsInTheIndex()
         {
-            this.sut.GetIndexedItems().Should().BeEquivalentTo(
+            this.sut.GetIndexedDocuments().Should().BeEquivalentTo(
                 new[]
                 {
-                    ItemMetadata(0, item1DocumentStatistics),
-                    ItemMetadata(1, item2DocumentStatistics)
+                    DocumentMetadata(0, item1DocumentStatistics),
+                    DocumentMetadata(1, item2DocumentStatistics)
                 });
         }
 
         [Fact]
         public void GetMetadataById_ShouldReturnCorrectItemForId()
         {
-            this.sut.GetMetadata(this.id1).Should().BeEquivalentTo(ItemMetadata(this.id1, item1DocumentStatistics));
-            this.sut.GetMetadata(this.id2).Should().BeEquivalentTo(ItemMetadata(this.id2, item2DocumentStatistics));
+            this.sut.GetMetadata(this.id1).Should().BeEquivalentTo(DocumentMetadata(this.id1, item1DocumentStatistics));
+            this.sut.GetMetadata(this.id2).Should().BeEquivalentTo(DocumentMetadata(this.id2, item2DocumentStatistics));
         }
 
         [Fact]
@@ -177,9 +177,9 @@ namespace Lifti.Tests
                 .Message.Should().Be("Unknown object type id 2");
         }
 
-        private static ItemMetadata<string> ItemMetadata(int id, DocumentStatistics? documentStatistics = null, string? key = null)
+        private static DocumentMetadata<string> DocumentMetadata(int id, DocumentStatistics? documentStatistics = null, string? key = null)
         {
-            return ItemMetadata<string>.ForLooseText(id, key ?? (id + 1).ToString(), documentStatistics ?? DocumentStatistics());
+            return DocumentMetadata<string>.ForLooseText(id, key ?? (id + 1).ToString(), documentStatistics ?? DocumentStatistics());
         }
 
         private static DocumentStatistics DocumentStatistics(params (byte fieldId, int tokenCount)[] fieldWordCounts)

@@ -10,23 +10,23 @@ namespace Lifti.Tokenization.Objects
     /// <typeparam name="TKey">The type of key in the index.</typeparam>
     internal class ObjectTypeConfigurationLookup<TKey>
     {
-        private readonly Dictionary<Type, IIndexedObjectConfiguration> options;
+        private readonly Dictionary<Type, IObjectTypeConfiguration> options;
 
-        public ObjectTypeConfigurationLookup(IEnumerable<IIndexedObjectConfiguration> objectTokenizers)
+        public ObjectTypeConfigurationLookup(IEnumerable<IObjectTypeConfiguration> objectTypeConfigurations)
         {
-            this.options = objectTokenizers.ToDictionary(x => x.ItemType);
+            this.options = objectTypeConfigurations.ToDictionary(x => x.ObjectType);
         }
 
-        public IEnumerable<IIndexedObjectConfiguration> AllConfigurations => this.options.Values;
+        public IEnumerable<IObjectTypeConfiguration> AllConfigurations => this.options.Values;
 
-        public IndexedObjectConfiguration<TItem, TKey> Get<TItem>()
+        public ObjectTypeConfiguration<TObject, TKey> Get<TObject>()
         {
-            if (this.options.TryGetValue(typeof(TItem), out var itemTokenizationOptions))
+            if (this.options.TryGetValue(typeof(TObject), out var objectTypeConfiguration))
             {
-                return (IndexedObjectConfiguration<TItem, TKey>)itemTokenizationOptions;
+                return (ObjectTypeConfiguration<TObject, TKey>)objectTypeConfiguration;
             }
 
-            throw new LiftiException(ExceptionMessages.NoTokenizationOptionsProvidedForType, typeof(TItem));
+            throw new LiftiException(ExceptionMessages.NoTokenizationOptionsProvidedForType, typeof(TObject));
         }
     }
 }

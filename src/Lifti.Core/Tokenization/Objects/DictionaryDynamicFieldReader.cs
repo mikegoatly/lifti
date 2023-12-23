@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Lifti.Tokenization.Objects
 {
-    internal abstract class DictionaryDynamicFieldReader<TItem, TValue> : DynamicFieldReader<TItem>
+    internal abstract class DictionaryDynamicFieldReader<TObject, TValue> : DynamicFieldReader<TObject>
     {
-        private readonly Func<TItem, IDictionary<string, TValue>?> reader;
+        private readonly Func<TObject, IDictionary<string, TValue>?> reader;
 
         public DictionaryDynamicFieldReader(
-            Func<TItem, IDictionary<string, TValue>?> reader,
+            Func<TObject, IDictionary<string, TValue>?> reader,
             string dynamicFieldReaderName,
             string? fieldNamePrefix,
             IIndexTokenizer tokenizer,
@@ -24,7 +24,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <inheritdoc />
-        public override ValueTask<IEnumerable<(string field, IEnumerable<string> rawText)>> ReadAsync(TItem item, CancellationToken cancellationToken)
+        public override ValueTask<IEnumerable<(string field, IEnumerable<string> rawText)>> ReadAsync(TObject item, CancellationToken cancellationToken)
         {
             var fields = this.reader(item);
             if (fields == null)
@@ -45,7 +45,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <inheritdoc />
-        public override ValueTask<IEnumerable<string>> ReadAsync(TItem item, string fieldName, CancellationToken cancellationToken)
+        public override ValueTask<IEnumerable<string>> ReadAsync(TObject item, string fieldName, CancellationToken cancellationToken)
         {
             var unprefixedName = this.GetUnprefixedFieldName(fieldName);
 
@@ -55,8 +55,8 @@ namespace Lifti.Tokenization.Objects
                 return new ValueTask<IEnumerable<string>>(this.ReadFieldValueAsEnumerable(field));
             }
 
-            // The field is known to this reader, but not present for the given item instance.
-            return DynamicFieldReader<TItem>.EmptyField();
+            // The field is known to this reader, but not present for the given instance.
+            return EmptyField();
         }
 
         protected abstract IEnumerable<string> ReadFieldValueAsEnumerable(TValue field);

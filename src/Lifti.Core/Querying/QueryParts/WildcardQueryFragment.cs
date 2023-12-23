@@ -37,7 +37,10 @@ namespace Lifti.Querying.QueryParts
         /// Creates a new instance of <see cref="WildcardQueryFragment"/> representing a textual part of a wildcard query.
         /// </summary>
         /// <param name="text">The text that must be explicitly matched.</param>
-        public static WildcardQueryFragment CreateText(string text) => new WildcardQueryFragment(WildcardQueryFragmentKind.Text, text);
+        public static WildcardQueryFragment CreateText(string text)
+        {
+            return new(WildcardQueryFragmentKind.Text, text);
+        }
 
         /// <inheritdoc />
         public override bool Equals(object? obj)
