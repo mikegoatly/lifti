@@ -108,7 +108,10 @@ namespace Lifti.Serialization.Binary
             return new(documentMetadataCollector);
         }
 
-        protected override ValueTask<IndexNode> DeserializeIndexNodeHierarchyAsync(SerializedFieldIdMap serializedFieldIdMap, IIndexNodeFactory indexNodeFactory, CancellationToken cancellationToken)
+        protected override ValueTask<IndexNode> DeserializeIndexNodeHierarchyAsync(
+            SerializedFieldIdMap serializedFieldIdMap,
+            IIndexNodeFactory indexNodeFactory,
+            CancellationToken cancellationToken)
         {
             return new(this.DeserializeNode(serializedFieldIdMap, indexNodeFactory, 0));
         }
