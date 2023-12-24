@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace Lifti.Querying
 {
@@ -18,26 +17,47 @@ namespace Lifti.Querying
         /// * leftLocations: The locations from the left match
         /// * rightLocations: The locations from the right match
         /// </returns>
-        protected static IList<(
+        internal static IEnumerable<(
             byte fieldId,
             double score,
             IReadOnlyList<ITokenLocationMatch> leftLocations,
             IReadOnlyList<ITokenLocationMatch> rightLocations
         )>
             JoinFields(
-                IEnumerable<ScoredFieldMatch> leftFields,
-                IEnumerable<ScoredFieldMatch> rightFields)
+                IReadOnlyList<ScoredFieldMatch> leftFields,
+                IReadOnlyList<ScoredFieldMatch> rightFields)
         {
-            return leftFields.Join(
-                            rightFields,
-                            o => o.FieldId,
-                            o => o.FieldId,
-                            (inner, outer) => (
-                                fieldId: inner.FieldId,
-                                score: inner.Score + outer.Score,
-                                leftLocations: inner.Locations,
-                                rightLocations: outer.Locations))
-                            .ToList();
+            var leftIndex = 0;
+            var rightIndex = 0;
+
+            var leftCount = leftFields.Count;
+            var rightCount = rightFields.Count;
+
+            while (leftIndex < leftCount && rightIndex < rightCount)
+            {
+                var leftField = leftFields[leftIndex];
+                var rightField = rightFields[rightIndex];
+
+                if (leftField.FieldId == rightField.FieldId)
+                {
+                    yield return (
+                        leftField.FieldId,
+                        leftField.Score + rightField.Score,
+                        leftField.Locations,
+                        rightField.Locations);
+
+                    leftIndex++;
+                    rightIndex++;
+                }
+                else if (leftField.FieldId < rightField.FieldId)
+                {
+                    leftIndex++;
+                }
+                else
+                {
+                    rightIndex++;
+                }
+            }
         }
 
         /// <summary>
@@ -84,17 +104,6 @@ namespace Lifti.Querying
                     yield return rightField;
                     rightIndex++;
                 }
-            }
-        }
-
-        /// <summary>
-        /// A helper method to swap two fields when <paramref name="condition"/> is <c>true</c>.
-        /// </summary>
-        protected static void SwapIf<T>(bool condition, ref T left, ref T right)
-        {
-            if (condition)
-            {
-                (right, left) = (left, right);
             }
         }
     }

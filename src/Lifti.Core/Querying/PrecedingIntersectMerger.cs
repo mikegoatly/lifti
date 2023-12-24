@@ -14,39 +14,53 @@ namespace Lifti.Querying
         /// </summary>
         public static IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
-            // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
-            // "left" and "right" have no special meaning when performing an intersection
-            var swapLeftAndRight = left.Matches.Count > right.Matches.Count;
-            SwapIf(swapLeftAndRight, ref left, ref right);
+            // track two pointers through the lists on each side. The document ids are ordered on both sides, so we can
+            // move through the lists in a single pass
 
-            var rightMatches = right.Matches.ToDictionary(m => m.DocumentId);
+            var leftIndex = 0;
+            var rightIndex = 0;
 
-            foreach (var leftMatch in left.Matches)
+            var leftMatches = left.Matches;
+            var rightMatches = right.Matches;
+            var leftCount = leftMatches.Count;
+            var rightCount = rightMatches.Count;
+
+            List<ScoredFieldMatch> positionalMatches = [];
+            while (leftIndex < leftCount && rightIndex < rightCount)
             {
-                if (rightMatches.TryGetValue(leftMatch.DocumentId, out var rightMatch))
-                {
-                    var positionalMatches = EnumerateFieldMatches(
-                        (swapLeftAndRight ? rightMatch : leftMatch).FieldMatches,
-                        (swapLeftAndRight ? leftMatch : rightMatch).FieldMatches);
+                var leftMatch = leftMatches[leftIndex];
+                var rightMatch = rightMatches[rightIndex];
 
+                if (leftMatch.DocumentId == rightMatch.DocumentId)
+                {
+                    EnumerateFieldMatches(positionalMatches, leftMatch.FieldMatches, rightMatch.FieldMatches);
                     if (positionalMatches.Count > 0)
                     {
-                        yield return new ScoredToken(leftMatch.DocumentId, positionalMatches);
+                        yield return new ScoredToken(leftMatch.DocumentId, positionalMatches.ToList());
+                        positionalMatches.Clear();
                     }
+
+                    leftIndex++;
+                    rightIndex++;
+                }
+                else if (leftMatch.DocumentId < rightMatch.DocumentId)
+                {
+                    leftIndex++;
+                }
+                else
+                {
+                    rightIndex++;
                 }
             }
         }
 
-        private static List<ScoredFieldMatch> EnumerateFieldMatches(IReadOnlyList<ScoredFieldMatch> leftFields, IReadOnlyList<ScoredFieldMatch> rightFields)
+        private static void EnumerateFieldMatches(List<ScoredFieldMatch> fieldResults, IReadOnlyList<ScoredFieldMatch> leftFields, IReadOnlyList<ScoredFieldMatch> rightFields)
         {
             var matchedFields = JoinFields(leftFields, rightFields);
 
-            var fieldResults = new List<ScoredFieldMatch>(matchedFields.Count);
             var fieldTokenMatches = new List<ITokenLocationMatch>();
             foreach (var (fieldId, score, leftLocations, rightLocations) in matchedFields)
             {
-                fieldTokenMatches.Clear();
-
                 var furthestRightTokenStart = rightLocations[rightLocations.Count - 1].MinTokenIndex;
                 var earliestLeftTokenStart = leftLocations[0].MinTokenIndex;
 
@@ -70,10 +84,10 @@ namespace Lifti.Querying
                         new ScoredFieldMatch(
                             score,
                             new FieldMatch(fieldId, fieldTokenMatches)));
+
+                    fieldTokenMatches.Clear();
                 }
             }
-
-            return fieldResults;
         }
     }
 }
