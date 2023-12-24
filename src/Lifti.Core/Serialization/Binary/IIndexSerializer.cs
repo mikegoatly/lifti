@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
@@ -24,7 +25,10 @@ namespace Lifti.Serialization.Binary
         /// <param name="disposeStream">
         /// Whether the stream should be disposed of after serialization.
         /// </param>
-        Task SerializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true);
+        /// <param name="cancellationToken">
+        /// A cancellation token that can be used to cancel the operation.
+        /// </param>
+        Task SerializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Serializes an index into a binary format.
@@ -38,7 +42,10 @@ namespace Lifti.Serialization.Binary
         /// <param name="disposeStream">
         /// Whether the stream should be disposed of after serialization.
         /// </param>
-        Task SerializeAsync(IIndexSnapshot<TKey> snapshot, Stream stream, bool disposeStream = true);
+        /// <param name="cancellationToken">
+        /// A cancellation token that can be used to cancel the operation.
+        /// </param>
+        Task SerializeAsync(IIndexSnapshot<TKey> snapshot, Stream stream, bool disposeStream = true, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Deserializes an index from a binary format into an index.
@@ -52,6 +59,9 @@ namespace Lifti.Serialization.Binary
         /// <param name="disposeStream">
         /// Whether the stream should be disposed of after deserialization.
         /// </param>
-        Task DeserializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true);
+        /// <param name="cancellationToken">
+        /// A cancellation token that can be used to cancel the operation.
+        /// </param>
+        Task DeserializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true, CancellationToken cancellationToken = default);
     }
 }

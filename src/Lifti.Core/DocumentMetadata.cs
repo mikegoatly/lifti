@@ -37,6 +37,30 @@ namespace Lifti
         /// Gets the magnitude weighting for the indexed document, if one was specified.
         /// </summary>
         public double? ScoringMagnitude { get; } = scoringMagnitude;
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="DocumentMetadata{TKey}"/> class for the given document id and key.
+        /// This should be used when the text is not associated with an object.
+        /// </summary>
+        public static DocumentMetadata<TKey> ForLooseText<TKey>(int documentId, TKey key, DocumentStatistics documentStatistics)
+        {
+            return new DocumentMetadata<TKey>(documentId, key, documentStatistics);
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="DocumentMetadata{TKey}"/> class for the given document id and key.
+        /// This should be used when the text is associated with an object.
+        /// </summary>
+        public static DocumentMetadata<TKey> ForObject<TKey>(
+            byte objectTypeId,
+            int documentId,
+            TKey key,
+            DocumentStatistics documentStatistics,
+            DateTime? scoringFreshnessDate,
+            double? scoringMagnitude)
+        {
+            return new DocumentMetadata<TKey>(documentId, key, documentStatistics, objectTypeId, scoringFreshnessDate, scoringMagnitude);
+        }
     }
 
     /// <inheritdoc cref="DocumentMetadata" />
@@ -54,7 +78,7 @@ namespace Lifti
         /// </summary>
         public TKey Key { get; }
 
-        private DocumentMetadata(
+        internal DocumentMetadata(
             int documentId,
             TKey key,
             DocumentStatistics documentStatistics,
@@ -64,22 +88,6 @@ namespace Lifti
             : base(objectTypeId, documentId, documentStatistics, scoringFreshnessDate, scoringMagnitude)
         {
             this.Key = key;
-        }
-
-        internal static DocumentMetadata<TKey> ForLooseText(int documentId, TKey key, DocumentStatistics documentStatistics)
-        {
-            return new DocumentMetadata<TKey>(documentId, key, documentStatistics);
-        }
-
-        internal static DocumentMetadata<TKey> ForObject(
-            byte objectTypeId,
-            int documentId,
-            TKey key,
-            DocumentStatistics documentStatistics,
-            DateTime? scoringFreshnessDate,
-            double? scoringMagnitude)
-        {
-            return new DocumentMetadata<TKey>(documentId, key, documentStatistics, objectTypeId, scoringFreshnessDate, scoringMagnitude);
         }
     }
 }

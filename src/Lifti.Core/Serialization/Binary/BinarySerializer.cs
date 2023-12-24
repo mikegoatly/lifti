@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
@@ -35,7 +36,7 @@ namespace Lifti.Serialization.Binary
         }
 
         /// <inheritdoc/>
-        public async Task SerializeAsync(IIndexSnapshot<TKey> snapshot, Stream stream, bool disposeStream = true)
+        public async Task SerializeAsync(IIndexSnapshot<TKey> snapshot, Stream stream, bool disposeStream = true, CancellationToken cancellationToken = default)
         {
             if (snapshot is null)
             {
@@ -43,22 +44,22 @@ namespace Lifti.Serialization.Binary
             }
 
             using var writer = new IndexWriter<TKey>(stream, disposeStream, this.keySerializer);
-            await writer.WriteAsync(snapshot).ConfigureAwait(false);
+            await writer.WriteAsync(snapshot, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public async Task SerializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true)
+        public async Task SerializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true, CancellationToken cancellationToken = default)
         {
             if (index is null)
             {
                 throw new ArgumentNullException(nameof(index));
             }
 
-            await this.SerializeAsync(index.Snapshot, stream, disposeStream).ConfigureAwait(false);
+            await this.SerializeAsync(index.Snapshot, stream, disposeStream, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public async Task DeserializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true)
+        public async Task DeserializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true, CancellationToken cancellationToken = default)
         {
             if (index is null)
             {
@@ -71,10 +72,10 @@ namespace Lifti.Serialization.Binary
             }
 
             using var reader = await this.CreateVersionedIndexReaderAsync(stream, disposeStream).ConfigureAwait(false);
-            await reader.ReadIntoAsync(index).ConfigureAwait(false);
+            await reader.ReadAsync(index, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task<IIndexReader<TKey>> CreateVersionedIndexReaderAsync(Stream stream, bool disposeStream)
+        private async Task<IIndexDeserializer<TKey>> CreateVersionedIndexReaderAsync(Stream stream, bool disposeStream)
         {
             var version = await ReadFileVersionAsync(stream).ConfigureAwait(false);
 
