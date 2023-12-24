@@ -26,7 +26,9 @@ namespace Lifti.Querying
         )>
             JoinFields(
                 IEnumerable<ScoredFieldMatch> leftFields,
-                IEnumerable<ScoredFieldMatch> rightFields) => leftFields.Join(
+                IEnumerable<ScoredFieldMatch> rightFields)
+        {
+            return leftFields.Join(
                             rightFields,
                             o => o.FieldId,
                             o => o.FieldId,
@@ -36,42 +38,52 @@ namespace Lifti.Querying
                                 leftLocations: inner.Locations,
                                 rightLocations: outer.Locations))
                             .ToList();
+        }
 
         /// <summary>
         /// Merges the matched locations in two <see cref="ScoredToken"/>s. Field matches that only appear in one or the other
         /// <see cref="ScoredToken"/> are included but unaltered, field matches appearing in both <see cref="ScoredToken"/>s
         /// are unioned.
         /// </summary>
-        protected static IEnumerable<ScoredFieldMatch> MergeFields(ScoredToken leftMatch, ScoredToken rightMatch)
+        protected static IEnumerable<ScoredFieldMatch> MergeFields(ScoredToken left, ScoredToken right)
         {
-            // We will always iterate through the total number of merged field records, so we want to optimise
-            // for the smallest number of fields on the right to keep the dictionary as small as possible
-            SwapIf(leftMatch.FieldMatches.Count < rightMatch.FieldMatches.Count, ref leftMatch, ref rightMatch);
+            var leftIndex = 0;
+            var rightIndex = 0;
 
-            var rightFields = rightMatch.FieldMatches.ToDictionary(m => m.FieldId);
+            var leftMatches = left.FieldMatches;
+            var rightMatches = right.FieldMatches;
+            var leftCount = leftMatches.Count;
+            var rightCount = rightMatches.Count;
 
-            foreach (var leftField in leftMatch.FieldMatches)
+            while (leftIndex < leftCount && rightIndex < rightCount)
             {
-                if (rightFields.TryGetValue(leftField.FieldId, out var rightField))
+                var leftField = leftMatches[leftIndex];
+                var rightField = rightMatches[rightIndex];
+
+                if (leftField.FieldId == rightField.FieldId)
                 {
+                    var concatenatedLocations = new List<ITokenLocationMatch>(leftField.Locations);
+                    concatenatedLocations.AddRange(rightField.Locations);
+
                     yield return new ScoredFieldMatch(
                         leftField.Score + rightField.Score,
                         new FieldMatch(
                             leftField.FieldId,
-                            leftField.Locations.Concat(rightField.Locations)));
+                            concatenatedLocations));
 
-                    rightFields.Remove(leftField.FieldId);
+                    leftIndex++;
+                    rightIndex++;
+                }
+                else if (leftField.FieldId < rightField.FieldId)
+                {
+                    yield return leftField;
+                    leftIndex++;
                 }
                 else
                 {
-                    yield return leftField;
+                    yield return rightField;
+                    rightIndex++;
                 }
-            }
-
-            // Return any remaining right fields
-            foreach (var rightField in rightFields.Values)
-            {
-                yield return rightField;
             }
         }
 
@@ -82,9 +94,7 @@ namespace Lifti.Querying
         {
             if (condition)
             {
-                var temp = left;
-                left = right;
-                right = temp;
+                (right, left) = (left, right);
             }
         }
     }
