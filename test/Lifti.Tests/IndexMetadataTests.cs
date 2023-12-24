@@ -69,7 +69,7 @@ namespace Lifti.Tests
         public void Add_ItemWithId_ShouldAddItemToIndex()
         {
             var documentStatistics = DocumentStatistics((1, 20), (2, 50), (3, 10));
-            var itemMetadata = DocumentMetadata<string>.ForObject(1, 9, "9", documentStatistics, new System.DateTime(2022, 11, 23), 12D);
+            var itemMetadata = Lifti.DocumentMetadata.ForObject(1, 9, "9", documentStatistics, new System.DateTime(2022, 11, 23), 12D);
             this.sut.Add(itemMetadata);
             this.sut.GetMetadata(9).Should().BeEquivalentTo(
                 itemMetadata);
@@ -179,7 +179,7 @@ namespace Lifti.Tests
 
         private static DocumentMetadata<string> DocumentMetadata(int id, DocumentStatistics? documentStatistics = null, string? key = null)
         {
-            return DocumentMetadata<string>.ForLooseText(id, key ?? (id + 1).ToString(), documentStatistics ?? DocumentStatistics());
+            return Lifti.DocumentMetadata.ForLooseText(id, key ?? (id + 1).ToString(), documentStatistics ?? DocumentStatistics());
         }
 
         private static DocumentStatistics DocumentStatistics(params (byte fieldId, int tokenCount)[] fieldWordCounts)

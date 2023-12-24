@@ -71,7 +71,7 @@ namespace Lifti
         public int Add(TKey key, DocumentStatistics documentStatistics)
         {
             return this.Add(
-                id => DocumentMetadata<TKey>.ForLooseText(id, key, documentStatistics));
+                id => DocumentMetadata.ForLooseText(id, key, documentStatistics));
         }
 
         /// <inheritdoc />
@@ -180,7 +180,7 @@ namespace Lifti
             return this.Add(
                 documentId =>
                 {
-                    var documentMetadata = DocumentMetadata<TKey>.ForObject(
+                    var documentMetadata = DocumentMetadata.ForObject(
                         objectTypeId: objectConfiguration.Id,
                         documentId: documentId,
                         key,
