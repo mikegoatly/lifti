@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
-    internal class V5IndexReader<TKey> : IIndexReader<TKey>, IDisposable
+    internal class V5IndexReader<TKey> : IndexDeserializerBase<TKey>
         where TKey : notnull
     {
         private readonly Stream underlyingStream;
@@ -25,26 +25,29 @@ namespace Lifti.Serialization.Binary
             this.reader = new BinaryReader(this.buffer);
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            this.reader.Dispose();
-            this.buffer.Dispose();
+            base.Dispose(disposing);
 
-            if (this.disposeStream)
+            if (disposing)
             {
-                this.underlyingStream.Dispose();
+                this.reader.Dispose();
+                this.buffer.Dispose();
+
+                if (this.disposeStream)
+                {
+                    this.underlyingStream.Dispose();
+                }
             }
         }
 
-        public async Task ReadIntoAsync(FullTextIndex<TKey> index)
+        protected override async ValueTask OnDeserializationStartingAsync(CancellationToken cancellationToken)
         {
             await this.FillBufferAsync().ConfigureAwait(false);
+        }
 
-            var fieldIdMap = this.ReadFields(index);
-            this.ReadIndexedDocuments(index);
-
-            index.SetRootWithLock(this.DeserializeNode(fieldIdMap, index.IndexNodeFactory, 0));
-
+        protected override ValueTask OnDeserializationCompleteAsync(FullTextIndex<TKey> index, CancellationToken cancellationToken)
+        {
             if (this.reader.ReadInt32() != -1)
             {
                 throw new DeserializationException(ExceptionMessages.MissingIndexTerminator);
@@ -54,12 +57,14 @@ namespace Lifti.Serialization.Binary
             {
                 this.underlyingStream.Position = this.buffer.Position + this.initialUnderlyingStreamOffset;
             }
+
+            return default;
         }
 
-        private Dictionary<byte, byte> ReadFields(FullTextIndex<TKey> index)
+        protected override ValueTask<SerializedFieldCollector> DeserializeKnownFieldsAsync(CancellationToken cancellationToken)
         {
             var fieldCount = this.reader.ReadNonNegativeVarInt32();
-            var serializedFields = new List<SerializedFieldInfo>(fieldCount);
+            var serializedFields = new SerializedFieldCollector(fieldCount);
 
             for (var i = 0; i < fieldCount; i++)
             {
@@ -70,12 +75,14 @@ namespace Lifti.Serialization.Binary
                 serializedFields.Add(new(fieldId, name, kind, dynamicFieldReaderName));
             }
 
-            return index.RehydrateSerializedFields(serializedFields);
+            return new(serializedFields);
         }
 
-        protected virtual void ReadIndexedDocuments(FullTextIndex<TKey> index)
+        protected override ValueTask<DocumentMetadataCollector<TKey>> DeserializeDocumentMetadataAsync(CancellationToken cancellationToken)
         {
             var documentCount = this.reader.ReadNonNegativeVarInt32();
+            var documentMetadataCollector = new DocumentMetadataCollector<TKey>(documentCount);
+
             for (var i = 0; i < documentCount; i++)
             {
                 var id = this.reader.ReadNonNegativeVarInt32();
@@ -95,11 +102,21 @@ namespace Lifti.Serialization.Binary
 
                 // Using ForLooseText here because we don't know any of the new information associated to an object
                 // type, e.g. its id or score boost options. This is the closest we can get to the old format.
-                index.Metadata.Add(DocumentMetadata<TKey>.ForLooseText(id, key, documentStatistics));
+                documentMetadataCollector.Add(DocumentMetadata.ForLooseText(id, key, documentStatistics));
             }
+
+            return new(documentMetadataCollector);
         }
 
-        private IndexNode DeserializeNode(Dictionary<byte, byte> fieldIdMap, IIndexNodeFactory nodeFactory, int depth)
+        protected override ValueTask<IndexNode> DeserializeIndexNodeHierarchyAsync(
+            SerializedFieldIdMap serializedFieldIdMap,
+            IIndexNodeFactory indexNodeFactory,
+            CancellationToken cancellationToken)
+        {
+            return new(this.DeserializeNode(serializedFieldIdMap, indexNodeFactory, 0));
+        }
+
+        private IndexNode DeserializeNode(SerializedFieldIdMap fieldIdMap, IIndexNodeFactory nodeFactory, int depth)
         {
             var textLength = this.reader.ReadNonNegativeVarInt32();
             var matchCount = this.reader.ReadNonNegativeVarInt32();
@@ -124,7 +141,7 @@ namespace Lifti.Serialization.Binary
                 {
                     // We read the serialized file id and use the mapping that the index has given us to
                     // map it to the field id in the new index.
-                    var fieldId = fieldIdMap[this.reader.ReadByte()];
+                    var fieldId = fieldIdMap.Map(this.reader.ReadByte());
 
                     var locationCount = this.reader.ReadNonNegativeVarInt32();
                     var locationMatches = new List<TokenLocation>(locationCount);

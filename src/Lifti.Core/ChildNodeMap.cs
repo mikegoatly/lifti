@@ -152,8 +152,19 @@ namespace Lifti
             this.childNodes = [];
         }
 
-        internal ChildNodeMap(ChildNodeMapEntry[] map)
+        /// <summary>
+        /// Initializes a new instance of <see cref="ChildNodeMap"/>.
+        /// </summary>
+        /// <param name="map">
+        /// The child nodes to initialize the map with.
+        /// </param>
+        public ChildNodeMap(ChildNodeMapEntry[] map)
         {
+            if (map is null)
+            {
+                throw new ArgumentNullException(nameof(map));
+            }
+
             // Verify that the map is sorted
 #if DEBUG
             for (var i = 1; i < map.Length; i++)

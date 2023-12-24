@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Lifti
 {
@@ -65,11 +64,6 @@ namespace Lifti
 
         private void Adjust(DocumentStatistics documentStatistics, int direction)
         {
-            if (documentStatistics is null)
-            {
-                throw new ArgumentNullException(nameof(documentStatistics));
-            }
-
             foreach (var fieldTokenCount in documentStatistics.TokenCountByField)
             {
                 this.tokenCountByField.TryGetValue(fieldTokenCount.Key, out var previousCount);

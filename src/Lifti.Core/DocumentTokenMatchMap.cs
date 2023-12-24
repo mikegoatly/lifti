@@ -108,7 +108,13 @@ namespace Lifti
 #endif
         }
 
-        internal DocumentTokenMatchMap(Dictionary<int, IReadOnlyList<IndexedToken>> data)
+        /// <summary>
+        /// Constructs a new instance of <see cref="DocumentTokenMatchMap"/>.
+        /// </summary>
+        /// <param name="data">
+        /// A dictionary of document id to indexed tokens to initialize the map with.
+        /// </param>
+        public DocumentTokenMatchMap(Dictionary<int, IReadOnlyList<IndexedToken>> data)
         {
             this.documentTokens = data;
         }

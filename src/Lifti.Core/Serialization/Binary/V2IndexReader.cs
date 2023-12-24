@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
-    internal class V2IndexReader<TKey> : IIndexReader<TKey>
+    internal class V2IndexReader<TKey> : IIndexDeserializer<TKey>
         where TKey : notnull
     {
         private readonly Stream underlyingStream;
@@ -37,7 +38,9 @@ namespace Lifti.Serialization.Binary
             }
         }
 
-        public async Task ReadIntoAsync(FullTextIndex<TKey> index)
+        public async ValueTask ReadAsync(
+            FullTextIndex<TKey> index,
+            CancellationToken cancellationToken)
         {
             await this.FillBufferAsync().ConfigureAwait(false);
 
@@ -51,6 +54,7 @@ namespace Lifti.Serialization.Binary
             var distinctFieldIds = new HashSet<byte>();
 
             var documentCount = this.reader.ReadInt32();
+            var documentMetadataCollector = new DocumentMetadataCollector<TKey>(documentCount);
             for (var i = 0; i < documentCount; i++)
             {
                 var id = this.reader.ReadInt32();
@@ -72,7 +76,7 @@ namespace Lifti.Serialization.Binary
 
                 // Using ForLooseText here because we don't know any of the new information associated to an object
                 // type, e.g. its id or score boost options. This is the closest we can get to the old format.
-                index.Metadata.Add(DocumentMetadata<TKey>.ForLooseText(id, key, documentStatistics));
+                documentMetadataCollector.Add(DocumentMetadata.ForLooseText(id, key, documentStatistics));
             }
 
             // Double check that the index structure is aware of all the fields that are being deserialized
@@ -85,7 +89,7 @@ namespace Lifti.Serialization.Binary
                 throw new LiftiException(ExceptionMessages.UnknownFieldsInSerializedIndex);
             }
 
-            index.SetRootWithLock(this.DeserializeNode(index.IndexNodeFactory, 0));
+            var rootNode = this.DeserializeNode(index.IndexNodeFactory, 0);
 
             if (this.reader.ReadInt32() != -1)
             {
@@ -96,6 +100,8 @@ namespace Lifti.Serialization.Binary
             {
                 this.underlyingStream.Position = this.buffer.Position + this.initialUnderlyingStreamOffset;
             }
+
+            index.RestoreIndex(rootNode, documentMetadataCollector);
         }
 
         private IndexNode DeserializeNode(IIndexNodeFactory nodeFactory, int depth)
