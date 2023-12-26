@@ -18,6 +18,26 @@ namespace Lifti.Querying
         public IntermediateQueryResult(IEnumerable<ScoredToken> matches)
         {
             this.Matches = matches as IReadOnlyList<ScoredToken> ?? matches.ToList();
+
+#if DEBUG
+            // Verify that we are in document id order, and that there are no duplicates
+            for (var i = 0; i < this.Matches.Count; i++)
+            {
+                if (i > 0)
+                {
+                    var previous = this.Matches[i - 1].DocumentId;
+                    var next = this.Matches[i].DocumentId;
+                    if (previous > next)
+                    {
+                        System.Diagnostics.Debug.Fail("Intermediate query results must be in document id order");
+                    }
+                    else if (previous == next)
+                    {
+                        System.Diagnostics.Debug.Fail("Duplicate document id encountered in intermediate query results");
+                    }
+                }
+            }
+#endif
         }
 
         /// <summary>
