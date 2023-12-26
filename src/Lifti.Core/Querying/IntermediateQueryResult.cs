@@ -16,8 +16,20 @@ namespace Lifti.Querying
         /// Creates a new instance of <see cref="IntermediateQueryResult"/>.
         /// </summary>
         public IntermediateQueryResult(IEnumerable<ScoredToken> matches)
+            : this(matches, false)
         {
-            this.Matches = matches as IReadOnlyList<ScoredToken> ?? matches.ToList();
+        }
+
+        internal IntermediateQueryResult(IEnumerable<ScoredToken> matches, bool assumeSorted)
+        {
+            var matchList = matches as List<ScoredToken> ?? matches.ToList();
+
+            if (!assumeSorted)
+            {
+                matchList.Sort((x, y) => x.DocumentId.CompareTo(y.DocumentId));
+            }
+
+            this.Matches = matchList;
 
 #if DEBUG
             // Verify that we are in document id order, and that there are no duplicates
@@ -43,7 +55,7 @@ namespace Lifti.Querying
         /// <summary>
         /// Gets an <see cref="IntermediateQueryResult"/> with no matches.
         /// </summary>
-        public static IntermediateQueryResult Empty { get; } = new IntermediateQueryResult(Array.Empty<ScoredToken>());
+        public static IntermediateQueryResult Empty { get; } = new IntermediateQueryResult(Array.Empty<ScoredToken>(), true);
 
         /// <summary>
         /// Gets the set of <see cref="ScoredToken"/> matches that this instance captured.
@@ -55,7 +67,9 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult PrecedingIntersect(IntermediateQueryResult results)
         {
-            return new IntermediateQueryResult(PrecedingIntersectMerger.Apply(this, results));
+            return new IntermediateQueryResult(
+                PrecedingIntersectMerger.Apply(this, results),
+                true);
         }
 
         /// <summary>
@@ -64,7 +78,9 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult CompositePositionalIntersect(IntermediateQueryResult results, int leftTolerance, int rightTolerance)
         {
-            return new IntermediateQueryResult(CompositePositionalIntersectMerger.Apply(this, results, leftTolerance, rightTolerance));
+            return new IntermediateQueryResult(
+                CompositePositionalIntersectMerger.Apply(this, results, leftTolerance, rightTolerance),
+                true);
         }
 
         /// <summary>
@@ -72,7 +88,9 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult Intersect(IntermediateQueryResult results)
         {
-            return new IntermediateQueryResult(IntersectMerger.Apply(this, results));
+            return new IntermediateQueryResult(
+                IntersectMerger.Apply(this, results),
+                true);
         }
 
         /// <summary>
@@ -80,7 +98,9 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult Union(IntermediateQueryResult results)
         {
-            return new IntermediateQueryResult(UnionMerger.Apply(this, results));
+            return new IntermediateQueryResult(
+                UnionMerger.Apply(this, results),
+                true);
         }
 
         /// <inheritdoc />

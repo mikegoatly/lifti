@@ -54,6 +54,20 @@ namespace Lifti.Querying
                     rightIndex++;
                 }
             }
+
+            // Add any remaining matches from the left
+            while (leftIndex < leftCount)
+            {
+                yield return leftMatches[leftIndex];
+                leftIndex++;
+            }
+
+            // Add any remaining matches from the right
+            while (rightIndex < rightCount)
+            {
+                yield return rightMatches[rightIndex];
+                rightIndex++;
+            }
         }
     }
 }
