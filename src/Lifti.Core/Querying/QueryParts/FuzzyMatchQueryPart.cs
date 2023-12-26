@@ -83,7 +83,7 @@ namespace Lifti.Querying.QueryParts
             /// </summary>
             /// <param name="bookmark">The <see cref="IIndexNavigatorBookmark"/> for the state of the index that this instance is for.</param>
             /// <param name="totalEditCount">The current number number of edits this required to reach this point in the match.</param>
-            /// <param name="levenshteinDistance">The Levelshtein distance accumulated so far. This will differ from <paramref name="totalEditCount"/> 
+            /// <param name="levenshteinDistance">The Levenshtein distance accumulated so far. This will differ from <paramref name="totalEditCount"/> 
             /// only when substitutions are encountered, in which case an extra 1 per substitution will be accumulated here.</param>
             /// <param name="sequentialEdits">The number of sequential edits that have accumulated so far to reach this point. When
             /// an exact match is processed, this will be reset to zero.</param>

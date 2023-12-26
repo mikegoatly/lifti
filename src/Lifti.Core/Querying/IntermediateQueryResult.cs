@@ -16,14 +16,46 @@ namespace Lifti.Querying
         /// Creates a new instance of <see cref="IntermediateQueryResult"/>.
         /// </summary>
         public IntermediateQueryResult(IEnumerable<ScoredToken> matches)
+            : this(matches, false)
         {
-            this.Matches = matches as IReadOnlyList<ScoredToken> ?? matches.ToList();
+        }
+
+        internal IntermediateQueryResult(IEnumerable<ScoredToken> matches, bool assumeSorted)
+        {
+            var matchList = matches as List<ScoredToken> ?? matches.ToList();
+
+            if (!assumeSorted)
+            {
+                matchList.Sort((x, y) => x.DocumentId.CompareTo(y.DocumentId));
+            }
+
+            this.Matches = matchList;
+
+#if DEBUG
+            // Verify that we are in document id order, and that there are no duplicates
+            for (var i = 0; i < this.Matches.Count; i++)
+            {
+                if (i > 0)
+                {
+                    var previous = this.Matches[i - 1].DocumentId;
+                    var next = this.Matches[i].DocumentId;
+                    if (previous > next)
+                    {
+                        System.Diagnostics.Debug.Fail("Intermediate query results must be in document id order");
+                    }
+                    else if (previous == next)
+                    {
+                        System.Diagnostics.Debug.Fail("Duplicate document id encountered in intermediate query results");
+                    }
+                }
+            }
+#endif
         }
 
         /// <summary>
         /// Gets an <see cref="IntermediateQueryResult"/> with no matches.
         /// </summary>
-        public static IntermediateQueryResult Empty { get; } = new IntermediateQueryResult(Array.Empty<ScoredToken>());
+        public static IntermediateQueryResult Empty { get; } = new IntermediateQueryResult(Array.Empty<ScoredToken>(), true);
 
         /// <summary>
         /// Gets the set of <see cref="ScoredToken"/> matches that this instance captured.
@@ -35,7 +67,16 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult PrecedingIntersect(IntermediateQueryResult results)
         {
-            return new IntermediateQueryResult(PrecedingIntersectMerger.Apply(this, results));
+            // If either of the two results sets involved are empty, then there is no intersection, so 
+            // we can just return an empty result set
+            if (this.Matches.Count == 0 || results.Matches.Count == 0)
+            {
+                return Empty;
+            }
+
+            return new IntermediateQueryResult(
+                PrecedingIntersectMerger.Apply(this, results),
+                true);
         }
 
         /// <summary>
@@ -44,7 +85,16 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult CompositePositionalIntersect(IntermediateQueryResult results, int leftTolerance, int rightTolerance)
         {
-            return new IntermediateQueryResult(CompositePositionalIntersectMerger.Apply(this, results, leftTolerance, rightTolerance));
+            // If either of the two results sets involved are empty, then there is no intersection, so 
+            // we can just return an empty result set
+            if (this.Matches.Count == 0 || results.Matches.Count == 0)
+            {
+                return Empty;
+            }
+
+            return new IntermediateQueryResult(
+                CompositePositionalIntersectMerger.Apply(this, results, leftTolerance, rightTolerance),
+                true);
         }
 
         /// <summary>
@@ -52,7 +102,16 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult Intersect(IntermediateQueryResult results)
         {
-            return new IntermediateQueryResult(IntersectMerger.Apply(this, results));
+            // If either of the two results sets involved are empty, then there is no intersection, so 
+            // we can just return an empty result set
+            if (this.Matches.Count == 0 || results.Matches.Count == 0)
+            {
+                return Empty;
+            }
+
+            return new IntermediateQueryResult(
+                IntersectMerger.Apply(this, results),
+                true);
         }
 
         /// <summary>
@@ -60,7 +119,21 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult Union(IntermediateQueryResult results)
         {
-            return new IntermediateQueryResult(UnionMerger.Apply(this, results));
+            // We can shortcut the unioning logic if either of the two results sets involved are empty
+            // In this case we can just return the other result set
+            if (this.Matches.Count == 0)
+            {
+                return results;
+            }
+
+            if (results.Matches.Count == 0)
+            {
+                return this;
+            }
+
+            return new IntermediateQueryResult(
+                UnionMerger.Apply(this, results),
+                true);
         }
 
         /// <inheritdoc />

@@ -18,6 +18,30 @@ namespace Lifti.Querying
         {
             this.DocumentId = documentId;
             this.FieldMatches = fieldMatches;
+
+#if DEBUG
+            // Verify that we are in field id order, and that there are no duplicates
+            // This is fairly safe to assume as the fields are indexed in order for any
+            // given document.
+#pragma warning disable CA1062 // Validate arguments of public methods
+            for (var i = 0; i < fieldMatches.Count; i++)
+#pragma warning restore CA1062 // Validate arguments of public methods
+            {
+                if (i > 0)
+                {
+                    var previous = this.FieldMatches[i - 1].FieldId;
+                    var next = this.FieldMatches[i].FieldId;
+                    if (previous > next)
+                    {
+                        System.Diagnostics.Debug.Fail("Intermediate query results must be in field id order");
+                    }
+                    else if (previous == next)
+                    {
+                        System.Diagnostics.Debug.Fail("Duplicate field id encountered in intermediate query results");
+                    }
+                }
+            }
+#endif
         }
 
         /// <inheritdoc cref="DocumentId" />
