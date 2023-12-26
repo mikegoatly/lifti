@@ -34,6 +34,7 @@ namespace Lifti.Querying.QueryParts
                 var nextResults = this.Words[i].Evaluate(navigatorCreator, queryContext);
                 if (results.Matches.Count == 0)
                 {
+                    // Special case the first word, as we don't want to intersect with the initial empty set
                     results = nextResults;
                 }
                 else

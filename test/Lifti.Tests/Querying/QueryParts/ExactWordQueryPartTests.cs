@@ -17,7 +17,7 @@ namespace Lifti.Tests.Querying.QueryParts
             var actual = part.Evaluate(() => navigator, QueryContext.Empty);
 
             actual.Should().BeEquivalentTo(navigator.ExpectedExactMatches);
-            navigator.NavigatedStrings.Should().BeEquivalentTo(new[] { "test" });
+            navigator.NavigatedStrings.Should().BeEquivalentTo(["test"]);
             navigator.NavigatedCharacters.Should().BeEmpty();
             navigator.ProvidedWeightings.Should().BeEquivalentTo(new[] { 1D });
         }
@@ -31,7 +31,7 @@ namespace Lifti.Tests.Querying.QueryParts
             var actual = part.Evaluate(() => navigator, QueryContext.Empty);
 
             actual.Should().BeEquivalentTo(navigator.ExpectedExactMatches);
-            navigator.NavigatedStrings.Should().BeEquivalentTo(new[] { "test" });
+            navigator.NavigatedStrings.Should().BeEquivalentTo(["test"]);
             navigator.NavigatedCharacters.Should().BeEmpty();
             navigator.ProvidedWeightings.Should().BeEquivalentTo(new[] { 5D });
         }

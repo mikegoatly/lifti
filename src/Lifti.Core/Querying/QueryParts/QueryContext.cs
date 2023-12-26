@@ -26,7 +26,8 @@ namespace Lifti.Querying.QueryParts
                     .Select(m => new ScoredToken(
                         m.DocumentId,
                         m.FieldMatches.Where(fm => fm.FieldId == this.filterToFieldId).ToList()))
-                    .Where(m => m.FieldMatches.Count > 0));
+                    .Where(m => m.FieldMatches.Count > 0),
+                true);
         }
 
         public static IQueryContext Create(IQueryContext currentContext, byte? filterToFieldId = null)

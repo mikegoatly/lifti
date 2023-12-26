@@ -154,18 +154,16 @@ namespace Lifti.Tests.Querying
             var expectedTokens = new[] {
                 ScoredToken(
                     1,
-                    new[]
-                    {
+                    [
                         ScoredFieldMatch(0D, 1, SingleTokenLocationMatch(0, 0, 6), SingleTokenLocationMatch(1, 7, 3), SingleTokenLocationMatch(2, 11, 5)),
                         ScoredFieldMatch(0D, 2, SingleTokenLocationMatch(0, 0, 4), SingleTokenLocationMatch(1, 5, 5))
-                    }),
+                    ]),
                 ScoredToken(
                     2,
-                    new[]
-                    {
+                    [
                         ScoredFieldMatch(0D, 1, SingleTokenLocationMatch(0, 0, 3)),
                         ScoredFieldMatch(0D, 2, SingleTokenLocationMatch(0, 0, 5))
-                    })
+                    ])
                 };
 
             results.Matches.Should().BeEquivalentTo(
@@ -227,15 +225,15 @@ namespace Lifti.Tests.Querying
             var bookmark = this.sut.CreateBookmark();
 
             this.sut.Process("VIDUAL");
-            VerifyMatchedWordIndexes(13);
+            this.VerifyMatchedWordIndexes(13);
 
             bookmark.Apply();
 
             this.sut.Process("F");
-            VerifyMatchedWordIndexes(5);
+            this.VerifyMatchedWordIndexes(5);
 
             bookmark.Apply();
-            VerifyMatchedWordIndexes(5, 13);
+            this.VerifyMatchedWordIndexes(5, 13);
         }
 
         private void VerifyMatchedWordIndexes(params int[] indexes)

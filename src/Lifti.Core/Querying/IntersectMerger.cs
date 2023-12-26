@@ -13,19 +13,38 @@ namespace Lifti.Querying
         /// </summary>
         public static IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
-            // Swap over left and right to ensure we're performing as few iterations as possible in the intersection
-            // The trade-off here is that we're building a larger dictionary
-            SwapIf(left.Matches.Count > right.Matches.Count, ref left, ref right);
+            // track two pointers through the lists on each side. The document ids are ordered on both sides, so we can
+            // move through the lists in a single pass
 
-            var rightResults = right.Matches.ToDictionary(m => m.DocumentId);
+            var leftIndex = 0;
+            var rightIndex = 0;
 
-            foreach (var leftMatch in left.Matches)
+            var leftMatches = left.Matches;
+            var rightMatches = right.Matches;
+            var leftCount = leftMatches.Count;
+            var rightCount = rightMatches.Count;
+
+            while (leftIndex < leftCount && rightIndex < rightCount)
             {
-                if (rightResults.TryGetValue(leftMatch.DocumentId, out var rightMatch))
+                var leftMatch = leftMatches[leftIndex];
+                var rightMatch = rightMatches[rightIndex];
+
+                if (leftMatch.DocumentId == rightMatch.DocumentId)
                 {
                     yield return new ScoredToken(
                         leftMatch.DocumentId,
                         MergeFields(leftMatch, rightMatch).ToList());
+
+                    leftIndex++;
+                    rightIndex++;
+                }
+                else if (leftMatch.DocumentId < rightMatch.DocumentId)
+                {
+                    leftIndex++;
+                }
+                else
+                {
+                    rightIndex++;
                 }
             }
         }

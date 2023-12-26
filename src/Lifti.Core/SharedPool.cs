@@ -16,7 +16,7 @@ namespace Lifti
             this.resetForReuse = resetForReuse;
         }
 
-        public T Create()
+        public T Take()
         {
             if (!this.pool.TryTake(out var result))
             {

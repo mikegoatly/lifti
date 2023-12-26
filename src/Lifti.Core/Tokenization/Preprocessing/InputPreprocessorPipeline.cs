@@ -8,10 +8,10 @@ namespace Lifti.Tokenization.Preprocessing
     /// <inheritdoc />
     public class InputPreprocessorPipeline : IInputPreprocessorPipeline
     {
-        private readonly List<IInputPreprocessor> inputPreprocessors = new();
+        private readonly List<IInputPreprocessor> inputPreprocessors = [];
         private static readonly SharedPool<Queue<PreprocessedInput>> queuePool = new(
-            () => new Queue<PreprocessedInput>(4),
-            q => q.Clear());
+            static () => new Queue<PreprocessedInput>(4),
+            static q => q.Clear());
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InputPreprocessorPipeline"/> class.
@@ -48,8 +48,8 @@ namespace Lifti.Tokenization.Preprocessing
                 yield break;
             }
 
-            var processQueue = queuePool.Create();
-            var outputQueue = queuePool.Create();
+            var processQueue = queuePool.Take();
+            var outputQueue = queuePool.Take();
 
             processQueue.Enqueue(input);
 

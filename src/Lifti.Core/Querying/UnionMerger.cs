@@ -14,32 +14,59 @@ namespace Lifti.Querying
         /// </summary>
         public static IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
-            // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
-            // "left" and "right" have no special meaning when performing an intersection
-            var rightDictionary = right.Matches.ToDictionary(i => i.DocumentId);
+            // track two pointers through the lists on each side. The document ids are ordered on both sides, so we can
+            // move through the lists in a single pass
 
-            foreach (var leftMatch in left.Matches)
+            var leftIndex = 0;
+            var rightIndex = 0;
+
+            var leftMatches = left.Matches;
+            var rightMatches = right.Matches;
+            var leftCount = leftMatches.Count;
+            var rightCount = rightMatches.Count;
+
+            List<ScoredFieldMatch> positionalMatches = [];
+            while (leftIndex < leftCount && rightIndex < rightCount)
             {
-                if (rightDictionary.TryGetValue(leftMatch.DocumentId, out var rightMatch))
+                var leftMatch = leftMatches[leftIndex];
+                var rightMatch = rightMatches[rightIndex];
+
+                if (leftMatch.DocumentId == rightMatch.DocumentId)
                 {
                     // Exists in both
                     yield return new ScoredToken(
                         leftMatch.DocumentId,
                         MergeFields(leftMatch, rightMatch).ToList());
 
-                    rightDictionary.Remove(leftMatch.DocumentId);
+                    leftIndex++;
+                    rightIndex++;
                 }
-                else
+                else if (leftMatch.DocumentId < rightMatch.DocumentId)
                 {
                     // Exists only in current
                     yield return leftMatch;
+                    leftIndex++;
+                }
+                else
+                {
+                    // Exists only in next
+                    yield return rightMatch;
+                    rightIndex++;
                 }
             }
 
-            // Anything still remaining in nextDictionary exist only in the new results so can just be yielded
-            foreach (var rightMatch in rightDictionary.Values)
+            // Add any remaining matches from the left
+            while (leftIndex < leftCount)
             {
-                yield return rightMatch;
+                yield return leftMatches[leftIndex];
+                leftIndex++;
+            }
+
+            // Add any remaining matches from the right
+            while (rightIndex < rightCount)
+            {
+                yield return rightMatches[rightIndex];
+                rightIndex++;
             }
         }
     }
