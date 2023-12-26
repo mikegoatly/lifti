@@ -67,6 +67,13 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult PrecedingIntersect(IntermediateQueryResult results)
         {
+            // If either of the two results sets involved are empty, then there is no intersection, so 
+            // we can just return an empty result set
+            if (this.Matches.Count == 0 || results.Matches.Count == 0)
+            {
+                return Empty;
+            }
+
             return new IntermediateQueryResult(
                 PrecedingIntersectMerger.Apply(this, results),
                 true);
@@ -78,6 +85,13 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult CompositePositionalIntersect(IntermediateQueryResult results, int leftTolerance, int rightTolerance)
         {
+            // If either of the two results sets involved are empty, then there is no intersection, so 
+            // we can just return an empty result set
+            if (this.Matches.Count == 0 || results.Matches.Count == 0)
+            {
+                return Empty;
+            }
+
             return new IntermediateQueryResult(
                 CompositePositionalIntersectMerger.Apply(this, results, leftTolerance, rightTolerance),
                 true);
@@ -88,6 +102,13 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult Intersect(IntermediateQueryResult results)
         {
+            // If either of the two results sets involved are empty, then there is no intersection, so 
+            // we can just return an empty result set
+            if (this.Matches.Count == 0 || results.Matches.Count == 0)
+            {
+                return Empty;
+            }
+
             return new IntermediateQueryResult(
                 IntersectMerger.Apply(this, results),
                 true);
@@ -98,6 +119,18 @@ namespace Lifti.Querying
         /// </summary>
         public IntermediateQueryResult Union(IntermediateQueryResult results)
         {
+            // We can shortcut the unioning logic if either of the two results sets involved are empty
+            // In this case we can just return the other result set
+            if (this.Matches.Count == 0)
+            {
+                return results;
+            }
+
+            if (results.Matches.Count == 0)
+            {
+                return this;
+            }
+
             return new IntermediateQueryResult(
                 UnionMerger.Apply(this, results),
                 true);

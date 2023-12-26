@@ -52,17 +52,17 @@ namespace Lifti.Tests
                 await index.AddAsync(entry.Item1, entry.Item2);
             }
 
-            index.Search("\"* to  *\"").CreateMatchPhrases(x => data.First(d => d.Item1 == x).Item2)
+            index.Search("\"* to  *\"")
+                .CreateMatchPhrases(x => data.First(d => d.Item1 == x).Item2)
                 .SelectMany(x => x.FieldPhrases.SelectMany(x => x.Phrases))
                 .Should()
                 .BeEquivalentTo(
-                new[]
-                {
+                [
                     "seems to some",
                     "seems to be",
                     "seems to me",
                     "ought to work"
-                });
+                ]);
         }
 
         [Fact]
@@ -244,15 +244,14 @@ namespace Lifti.Tests
             var index = await CreateDynamicObjectTestIndexAsync(true);
 
             index.FieldLookup.AllFieldNames.Should().BeEquivalentTo(
-               new[]
-               {
+               [
                     "Details",
                     "Dyn1Field1",
                     "Dyn1Field2",
                     "Dyn2Field1",
                     "Dyn2Field2",
                     "Dyn1Field3"
-               });
+               ]);
         }
 
         [Fact]
