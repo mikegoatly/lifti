@@ -40,6 +40,55 @@ namespace Lifti.Querying
             }
         }
 
+        public void AddExactMatches(MatchCollector matchCollector)
+        {
+            if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess || !this.currentNode.HasMatches)
+            {
+                return;
+            }
+
+            matchCollector.Add(this.currentNode.Matches.Enumerate());
+        }
+
+        public void AddExactAndChildMatches(MatchCollector matchCollector)
+        {
+            if (this.currentNode == null)
+            {
+                return;
+            }
+
+            var childNodeStack = new Queue<IndexNode>();
+            childNodeStack.Enqueue(this.currentNode);
+
+            while (childNodeStack.Count > 0)
+            {
+                var node = childNodeStack.Dequeue();
+                if (node.HasMatches)
+                {
+                    matchCollector.Add(node.Matches.Enumerate());
+                }
+
+                if (node.HasChildNodes)
+                {
+                    foreach (var (_, childNode) in node.ChildNodes.CharacterMap)
+                    {
+                        childNodeStack.Enqueue(childNode);
+                    }
+                }
+            }
+        }
+
+        public IntermediateQueryResult CreateIntermediateQueryResult(MatchCollector matchCollector, double weighting = 1D)
+        {
+            var queryTokenMatches = matchCollector.CollectedMatches
+                .Where(m => m.Value.Count > 0)
+                .Select(m => new QueryTokenMatch(
+                    m.Key,
+                    MergeMatches(m.Value).ToList()));
+
+            return this.CreateIntermediateQueryResult(queryTokenMatches, weighting);
+        }
+
         public IntermediateQueryResult GetExactMatches(double weighting = 1D)
         {
             if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess || !this.currentNode.HasMatches)
@@ -59,44 +108,9 @@ namespace Lifti.Querying
                 return IntermediateQueryResult.Empty;
             }
 
-            var matches = new Dictionary<int, List<FieldMatch>>();
-            var childNodeStack = new Queue<IndexNode>();
-            childNodeStack.Enqueue(this.currentNode);
-
-            while (childNodeStack.Count > 0)
-            {
-                var node = childNodeStack.Dequeue();
-                if (node.HasMatches)
-                {
-                    foreach (var (documentId, indexedTokens) in node.Matches.Enumerate())
-                    {
-                        var fieldMatches = indexedTokens.Select(v => new FieldMatch(v));
-                        if (!matches.TryGetValue(documentId, out var mergedResults))
-                        {
-                            mergedResults = new List<FieldMatch>(fieldMatches);
-                            matches[documentId] = mergedResults;
-                        }
-                        else
-                        {
-                            mergedResults.AddRange(fieldMatches);
-                        }
-                    }
-                }
-
-                if (node.HasChildNodes)
-                {
-                    foreach (var (_, childNode) in node.ChildNodes.CharacterMap)
-                    {
-                        childNodeStack.Enqueue(childNode);
-                    }
-                }
-            }
-
-            var queryTokenMatches = matches.Select(m => new QueryTokenMatch(
-                    m.Key,
-                    MergeMatches(m.Value).ToList()));
-
-            return this.CreateIntermediateQueryResult(queryTokenMatches, weighting);
+            var collector = new MatchCollector();
+            this.AddExactAndChildMatches(collector);
+            return this.CreateIntermediateQueryResult(collector, weighting);
         }
 
         public bool Process(string text)
@@ -262,12 +276,12 @@ namespace Lifti.Querying
             }
         }
 
-        private static IEnumerable<FieldMatch> MergeMatches(List<FieldMatch> fieldMatches)
+        private static IEnumerable<FieldMatch> MergeMatches(List<IndexedToken> fieldMatches)
         {
             return fieldMatches.ToLookup(m => m.FieldId)
                 .Select(m => new FieldMatch(
                     m.Key,
-                    m.SelectMany(w => w.Locations)));
+                    m.SelectMany(w => w.Locations.Select(x => (ITokenLocationMatch)new SingleTokenLocationMatch(x)))));
         }
 
         private static QueryTokenMatch CreateQueryTokenMatch(

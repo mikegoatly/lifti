@@ -259,7 +259,7 @@ namespace Lifti.Querying.QueryParts
             }
 
             using var navigator = navigatorCreator();
-            var results = IntermediateQueryResult.Empty;
+            var matchCollectorByWeighting = new Dictionary<double, MatchCollector>();
             var stateStore = new FuzzyMatchStateStore(navigator, this.maxEditDistance, this.maxSequentialEdits);
 
             var characterCount = 0;
@@ -293,7 +293,13 @@ namespace Lifti.Querying.QueryParts
                                 var weighting = (double)(lengthTotal - state.LevenshteinDistance) / lengthTotal;
                                 weighting *= scoreBoost;
 
-                                results = results.Union(navigator.GetExactMatches(weighting));
+                                if (!matchCollectorByWeighting.TryGetValue(weighting, out var matchCollector))
+                                {
+                                    matchCollector = new MatchCollector();
+                                    matchCollectorByWeighting.Add(weighting, matchCollector);
+                                }
+
+                                navigator.AddExactMatches(matchCollector);
                             }
 
                             // Always assume there could be missing characters at the end
@@ -337,7 +343,14 @@ namespace Lifti.Querying.QueryParts
             }
             while (stateStore.HasEntries);
 
-            return queryContext.ApplyTo(results);
+            var results = IntermediateQueryResult.Empty;
+            foreach (var matchCollector in matchCollectorByWeighting)
+            {
+                queryContext.ApplyTo(matchCollector.Value);
+                results = results.Union(navigator.CreateIntermediateQueryResult(matchCollector.Value, matchCollector.Key));
+            }
+
+            return results;
         }
 
         private static void AddSubstitutionBookmarks(IIndexNavigator navigator, FuzzyMatchStateStore stateStore, char currentCharacter, FuzzyMatchState currentState)

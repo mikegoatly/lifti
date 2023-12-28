@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
-    [ShortRunJob(RuntimeMoniker.Net481)]
-    [ShortRunJob(RuntimeMoniker.Net70)]
+    //[ShortRunJob(RuntimeMoniker.Net481)]
+    //[ShortRunJob(RuntimeMoniker.Net70)]
     [ShortRunJob(RuntimeMoniker.Net80)]
-    [ShortRunJob(RuntimeMoniker.Net60)]
+    //[ShortRunJob(RuntimeMoniker.Net60)]
     [RankColumn, MemoryDiagnoser]
     public class IndexSearchingBenchmarks : IndexBenchmarkBase
     {
@@ -22,19 +22,19 @@ namespace PerformanceProfiling
         }
 
         [Params(
-            "(confiscation & th*) | \"and they\"",
+            //"(confiscation & th*) | \"and they\"",
             "*",
             "th*",
-            "and they also",
+            //"and they also",
             "?and ?they ?also",
             "con??*",
-            "Title=?great",
-            "confiscation",
-            "and > they",
-            "and ~10> they",
-            "\"also has a\"",
-            "and | they",
-            "and ~ they"
+            "Title=?great"
+            //"confiscation",
+            //"and > they",
+            //"and ~10> they",
+            //"\"also has a\"",
+            //"and | they",
+            //"and ~ they"
             )]
         public string SearchCriteria { get; set; }
 

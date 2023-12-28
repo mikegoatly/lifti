@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Lifti.Querying.QueryParts
 {
@@ -11,6 +12,19 @@ namespace Lifti.Querying.QueryParts
         private QueryContext(byte? filterToFieldId)
         {
             this.filterToFieldId = filterToFieldId;
+        }
+
+        public void ApplyTo(MatchCollector matchCollector)
+        {
+            if (this.filterToFieldId == null)
+            {
+                return;
+            }
+
+            foreach (var match in matchCollector.CollectedMatches)
+            {
+                match.Value.RemoveAll(fm => fm.FieldId != this.filterToFieldId);
+            }
         }
 
         /// <inheritdoc />
