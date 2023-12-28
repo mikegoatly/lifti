@@ -69,6 +69,21 @@ namespace Lifti.Tests.Querying
             return this.ExpectedExactMatches;
         }
 
+        public void AddExactAndChildMatches(MatchCollector matchCollector)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddExactMatches(MatchCollector matchCollector)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IntermediateQueryResult CreateIntermediateQueryResult(MatchCollector matches, double weighting = 1)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool Process(char value)
         {
             this.NavigatedCharacters.Add(value);

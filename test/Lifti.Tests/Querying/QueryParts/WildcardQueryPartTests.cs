@@ -28,7 +28,7 @@ namespace Lifti.Tests.Querying.QueryParts
         [Fact]
         public void Evaluating_WithSingleTextFragment_ShouldReturnOnlyExactMatches()
         {
-            var part = new WildcardQueryPart(new[] { WildcardQueryFragment.CreateText("ALSO") });
+            var part = new WildcardQueryPart([WildcardQueryFragment.CreateText("ALSO")]);
             var results = this.index.Search(new Query(part)).ToList();
 
             results.Should().HaveCount(1);
@@ -43,7 +43,7 @@ namespace Lifti.Tests.Querying.QueryParts
         [Fact]
         public void Evaluating_WithSScoreBoost_ShouldApplyBoostToResultingScore()
         {
-            var part = new WildcardQueryPart(new[] { WildcardQueryFragment.CreateText("ALSO") });
+            var part = new WildcardQueryPart([WildcardQueryFragment.CreateText("ALSO")]);
             var unboostedScore = this.index.Search(new Query(part)).ToList()[0].Score;
             part = new WildcardQueryPart(new[] { WildcardQueryFragment.CreateText("ALSO") }, 2D);
             var boostedScore = this.index.Search(new Query(part)).ToList()[0].Score;
@@ -54,12 +54,12 @@ namespace Lifti.Tests.Querying.QueryParts
         [Fact]
         public void Evaluating_WithSingleCharacterReplacement_ShouldReturnCorrectResults()
         {
-            var part = new WildcardQueryPart(new[]
-            {
+            var part = new WildcardQueryPart(
+            [
                 WildcardQueryFragment.CreateText("TH"),
                 WildcardQueryFragment.SingleCharacter,
                 WildcardQueryFragment.CreateText("S")
-            });
+            ]);
 
             var results = this.index.Search(new Query(part)).ToList();
 
@@ -81,12 +81,12 @@ namespace Lifti.Tests.Querying.QueryParts
         [Fact]
         public void Evaluating_WithTerminatingSingleCharacterReplacement_ShouldReturnCorrectResults()
         {
-            var part = new WildcardQueryPart(new[]
-            {
+            var part = new WildcardQueryPart(
+            [
                 WildcardQueryFragment.CreateText("TH"),
                 WildcardQueryFragment.SingleCharacter,
                 WildcardQueryFragment.SingleCharacter
-            });
+            ]);
 
             var results = this.index.Search(new Query(part)).ToList();
 
@@ -108,11 +108,11 @@ namespace Lifti.Tests.Querying.QueryParts
         [Fact]
         public void Evaluating_WithTerminatingMultiCharacterReplacement_ShouldReturnAllMatchesStartingWithText()
         {
-            var part = new WildcardQueryPart(new[]
-            {
+            var part = new WildcardQueryPart(
+            [
                 WildcardQueryFragment.CreateText("A"),
                 WildcardQueryFragment.MultiCharacter
-            });
+            ]);
 
             var results = this.index.Search(new Query(part)).ToList();
 
@@ -138,11 +138,11 @@ namespace Lifti.Tests.Querying.QueryParts
         [Fact]
         public void Evaluating_WithLeadingMultiCharacterReplacement_ShouldReturnAllMatchesEndingWithText()
         {
-            var part = new WildcardQueryPart(new[]
-            {
+            var part = new WildcardQueryPart(
+            [
                 WildcardQueryFragment.MultiCharacter,
                 WildcardQueryFragment.CreateText("ES")
-            });
+            ]);
 
             var results = this.index.Search(new Query(part)).ToList();
 
@@ -165,11 +165,11 @@ namespace Lifti.Tests.Querying.QueryParts
         [Fact]
         public void Evaluating_WithSequenceOfSingleCharacterWildcards_ShouldOnlyMatchWordsWithMatchingCharacterCounts()
         {
-            var part = new WildcardQueryPart(new[]
-            {
+            var part = new WildcardQueryPart(
+            [
                 WildcardQueryFragment.SingleCharacter,
                 WildcardQueryFragment.SingleCharacter
-            });
+            ]);
 
             var results = this.index.Search(new Query(part)).ToList();
 
@@ -185,8 +185,8 @@ namespace Lifti.Tests.Querying.QueryParts
         [Fact]
         public void Evaluating_WithSequenceOfSingleCharacterWildcardsFollowedByMultiCharacterWildcard_ShouldMatchWordsWithAtLeastCharacterCount()
         {
-            var part = new WildcardQueryPart(new[]
-            {
+            var part = new WildcardQueryPart(
+            [
                 WildcardQueryFragment.SingleCharacter,
                 WildcardQueryFragment.SingleCharacter,
                 WildcardQueryFragment.SingleCharacter,
@@ -194,7 +194,7 @@ namespace Lifti.Tests.Querying.QueryParts
                 WildcardQueryFragment.SingleCharacter,
                 WildcardQueryFragment.SingleCharacter,
                 WildcardQueryFragment.MultiCharacter
-            });
+            ]);
 
             var results = this.index.Search(new Query(part)).ToList();
 
@@ -218,13 +218,13 @@ namespace Lifti.Tests.Querying.QueryParts
         [Fact]
         public void Evaluating_WithConsecutiveSingleCharacterReplacement_ShouldReturnCorrectResults()
         {
-            var part = new WildcardQueryPart(new[]
-            {
+            var part = new WildcardQueryPart(
+            [
                 WildcardQueryFragment.CreateText("T"),
                 WildcardQueryFragment.SingleCharacter,
                 WildcardQueryFragment.SingleCharacter,
                 WildcardQueryFragment.CreateText("S")
-            });
+            ]);
 
             var results = this.index.Search(new Query(part)).ToList();
 
