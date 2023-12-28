@@ -52,7 +52,7 @@ namespace Lifti.Querying.QueryParts
             }
 
             using var navigator = navigatorCreator();
-            var results = IntermediateQueryResult.Empty;
+            var matchCollector = new MatchCollector();
             var bookmarks = new DoubleBufferedList<IIndexNavigatorBookmark>(navigator.CreateBookmark());
             var scoreBoost = this.ScoreBoost ?? 1D;
             for (var i = 0; i < this.Fragments.Count && bookmarks.Count > 0; i++)
@@ -65,10 +65,9 @@ namespace Lifti.Querying.QueryParts
 
                     var nextBookmarks = ProcessFragment(
                         navigator,
-                        scoreBoost,
+                        matchCollector,
                         this.Fragments[i],
-                        nextFragment,
-                        ref results);
+                        nextFragment);
 
                     bookmarks.AddRange(nextBookmarks);
                 }
@@ -76,7 +75,9 @@ namespace Lifti.Querying.QueryParts
                 bookmarks.Swap();
             }
 
-            return queryContext.ApplyTo(results);
+            queryContext.ApplyTo(matchCollector);
+
+            return navigator.CreateIntermediateQueryResult(matchCollector, scoreBoost);
         }
 
         /// <inheritdoc />
@@ -100,10 +101,9 @@ namespace Lifti.Querying.QueryParts
 
         private static IEnumerable<IIndexNavigatorBookmark> ProcessFragment(
             IIndexNavigator navigator,
-            double scoreBoost,
+            MatchCollector matchCollector,
             WildcardQueryFragment fragment,
-            WildcardQueryFragment? nextFragment,
-            ref IntermediateQueryResult results)
+            WildcardQueryFragment? nextFragment)
         {
             switch (fragment.Kind)
             {
@@ -117,7 +117,7 @@ namespace Lifti.Querying.QueryParts
                     if (nextFragment == null)
                     {
                         // This is the end of the query and we've ended up on some exact matches
-                        results = results.Union(navigator.GetExactMatches(scoreBoost));
+                        navigator.AddExactMatches(matchCollector);
                         return QueryCompleted;
                     }
 
@@ -129,7 +129,7 @@ namespace Lifti.Querying.QueryParts
                     {
                         // This wildcard is the last in the pattern - just return any exact and child matches under the current position
                         // I.e. as per the classic "starts with" operator
-                        results = results.Union(navigator.GetExactAndChildMatches(scoreBoost));
+                        navigator.AddExactAndChildMatches(matchCollector);
 
                         // No other work to process - no more bookmarks required.
                         return QueryCompleted;
@@ -162,7 +162,7 @@ namespace Lifti.Querying.QueryParts
                         foreach (var character in navigator.EnumerateNextCharacters())
                         {
                             navigator.Process(character);
-                            results = results.Union(navigator.GetExactMatches(scoreBoost));
+                            navigator.AddExactMatches(matchCollector);
                             bookmark.Apply();
                         }
 

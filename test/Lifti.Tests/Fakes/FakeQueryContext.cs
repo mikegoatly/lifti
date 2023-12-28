@@ -21,5 +21,9 @@ namespace Lifti.Tests.Fakes
         {
             return this.result;
         }
+
+        public void ApplyTo(MatchCollector matchCollector)
+        {
+        }
     }
 }
