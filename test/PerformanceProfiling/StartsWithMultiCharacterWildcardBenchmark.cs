@@ -5,10 +5,6 @@ using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
-    [ShortRunJob(RuntimeMoniker.Net481)]
-    [ShortRunJob(RuntimeMoniker.Net80)]
-    [ShortRunJob(RuntimeMoniker.Net70)]
-    [ShortRunJob(RuntimeMoniker.Net60)]
     [RankColumn, MemoryDiagnoser]
     public class StartsWithMultiCharacterWildcardBenchmark : IndexBenchmarkBase
     {
