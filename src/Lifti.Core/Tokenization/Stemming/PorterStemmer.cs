@@ -17,24 +17,24 @@ namespace Lifti.Tokenization.Stemming
         /// </summary>
         private static readonly WordReplacement[] exceptions =
             {
-                new WordReplacement("SKIS", "SKI"),
-                new WordReplacement("SKIES", "SKY"),
-                new WordReplacement("DYING", "DIE"),
-                new WordReplacement("LYING", "LIE"),
-                new WordReplacement("TYING", "TIE"),
-                new WordReplacement("IDLY", "IDL"),
-                new WordReplacement("GENTLY", "GENTL"),
-                new WordReplacement("UGLY", "UGLI"),
-                new WordReplacement("EARLY", "EARLI"),
-                new WordReplacement("ONLY", "ONLI"),
-                new WordReplacement("SINGLY", "SINGL"),
-                new WordReplacement("SKY"),
-                new WordReplacement("NEWS"),
-                new WordReplacement("HOWE"),
-                new WordReplacement("ATLAS"),
-                new WordReplacement("COSMOS"),
-                new WordReplacement("BIAS"),
-                new WordReplacement("ANDES")
+                new("SKIS", "SKI"),
+                new("SKIES", "SKY"),
+                new("DYING", "DIE"),
+                new("LYING", "LIE"),
+                new("TYING", "TIE"),
+                new("IDLY", "IDL"),
+                new("GENTLY", "GENTL"),
+                new("UGLY", "UGLI"),
+                new("EARLY", "EARLI"),
+                new("ONLY", "ONLI"),
+                new("SINGLY", "SINGL"),
+                new("SKY"),
+                new("NEWS"),
+                new("HOWE"),
+                new("ATLAS"),
+                new("COSMOS"),
+                new("BIAS"),
+                new("ANDES")
             };
 
         /// <summary>
@@ -42,14 +42,14 @@ namespace Lifti.Tokenization.Stemming
         /// </summary>
         private static readonly WordReplacement[] exceptions2 =
             {
-                new WordReplacement("INNING"),
-                new WordReplacement("OUTING"),
-                new WordReplacement("CANNING"),
-                new WordReplacement("HERRING"),
-                new WordReplacement("EARRING"),
-                new WordReplacement("PROCEED"),
-                new WordReplacement("EXCEED"),
-                new WordReplacement("SUCCEED")
+                new("INNING"),
+                new("OUTING"),
+                new("CANNING"),
+                new("HERRING"),
+                new("EARRING"),
+                new("PROCEED"),
+                new("EXCEED"),
+                new("SUCCEED")
             };
 
         /// <summary>
@@ -61,90 +61,96 @@ namespace Lifti.Tokenization.Stemming
         /// The replacements that can be made in step 1B.
         /// </summary>
         private static readonly FullTextIndex<WordReplacement> step1bReplacements = CreateReplacementLookup(
-            new[]
+            new WordReplacement[]
             {
-                new WordReplacement("EEDLY", 3),
-                new WordReplacement("INGLY", 5),
-                new WordReplacement("EDLY", 4),
-                new WordReplacement("EED", 1),
-                new WordReplacement("ING", 3),
-                new WordReplacement("ED", 2)
+                new("EEDLY", 3),
+                new("INGLY", 5),
+                new("EDLY", 4),
+                new("EED", 1),
+                new("ING", 3),
+                new("ED", 2)
             });
 
         /// <summary>
         /// The replacements that can be made in step 2.
         /// </summary>
         private static readonly FullTextIndex<WordReplacement> step2Replacements = CreateReplacementLookup(
-            new[]
+            new WordReplacement[]
             {
-                new WordReplacement("IZATION", "IZE"),
-                new WordReplacement("IVENESS", 4),
-                new WordReplacement("FULNESS", 4),
-                new WordReplacement("ATIONAL", "ATE"),
-                new WordReplacement("OUSNESS", 4),
-                new WordReplacement("BILITI", "BLE"),
-                new WordReplacement("TIONAL", 2),
-                new WordReplacement("LESSLI", 2),
-                new WordReplacement("FULLI", 2),
-                new WordReplacement("ENTLI", 2),
-                new WordReplacement("ATION", "ATE"),
-                new WordReplacement("ALITI", 3),
-                new WordReplacement("IVITI", "IVE"),
-                new WordReplacement("OUSLI", 2),
-                new WordReplacement("ALISM", 3),
-                new WordReplacement("ABLI", "ABLE"),
-                new WordReplacement("ANCI", "ANCE"),
-                new WordReplacement("ALLI", 2),
-                new WordReplacement("IZER", 1),
-                new WordReplacement("ENCI", "ENCE"),
-                new WordReplacement("ATOR", "ATE"),
-                new WordReplacement("BLI", "BLE"),
-                new WordReplacement("OGI", 1),
-                new WordReplacement("LI", 2)
+                new("IZATION", "IZE"),
+                new("IVENESS", 4),
+                new("FULNESS", 4),
+                new("ATIONAL", "ATE"),
+                new("OUSNESS", 4),
+                new("BILITI", "BLE"),
+                new("TIONAL", 2),
+                new("LESSLI", 2),
+                new("FULLI", 2),
+                new("ENTLI", 2),
+                new("ATION", "ATE"),
+                new("ALITI", 3),
+                new("IVITI", "IVE"),
+                new("OUSLI", 2),
+                new("ALISM", 3),
+                new("ABLI", "ABLE"),
+                new("ANCI", "ANCE"),
+                new("ALLI", 2),
+                new("IZER", 1),
+                new("ENCI", "ENCE"),
+                new("ATOR", "ATE"),
+                new("BLI", "BLE"),
+                new("OGI", 1),
+                new("LI", 2)
             });
 
         /// <summary>
         /// The replacements that can be made in step 3.
         /// </summary>
         private static readonly FullTextIndex<WordReplacement> step3Replacements = CreateReplacementLookup(
-            new[]
+            new WordReplacement[]
             {
-                new WordReplacement("ATIONAL", "ATE"),
-                new WordReplacement("TIONAL", 2),
-                new WordReplacement("ALIZE", 3),
-                new WordReplacement("ICATE", 3),
-                new WordReplacement("ICITI", 3),
-                new WordReplacement("ATIVE", 5),
-                new WordReplacement("ICAL", 2),
-                new WordReplacement("NESS", 4),
-                new WordReplacement("FUL", 3)
+                new("ATIONAL", "ATE"),
+                new("TIONAL", 2),
+                new("ALIZE", 3),
+                new("ICATE", 3),
+                new("ICITI", 3),
+                new("ATIVE", 5),
+                new("ICAL", 2),
+                new("NESS", 4),
+                new("FUL", 3)
             });
 
         /// <summary>
         /// The replacements that can be made in step 4.
         /// </summary>
         private static readonly FullTextIndex<WordReplacement> step4Replacements = CreateReplacementLookup(
-            new[]
+            new WordReplacement[]
             {
-                new WordReplacement("EMENT", 5),
-                new WordReplacement("MENT", 4),
-                new WordReplacement("ABLE", 4),
-                new WordReplacement("IBLE", 4),
-                new WordReplacement("ANCE", 4),
-                new WordReplacement("ENCE", 4),
-                new WordReplacement("ATE", 3),
-                new WordReplacement("ITI", 3),
-                new WordReplacement("ION", 3),
-                new WordReplacement("IZE", 3),
-                new WordReplacement("IVE", 3),
-                new WordReplacement("OUS", 3),
-                new WordReplacement("ANT", 3),
-                new WordReplacement("ISM", 3),
-                new WordReplacement("ENT", 3),
-                new WordReplacement("AL", 2),
-                new WordReplacement("ER", 2),
-                new WordReplacement("IC", 2)
+                new("EMENT", 5),
+                new("MENT", 4),
+                new("ABLE", 4),
+                new("IBLE", 4),
+                new("ANCE", 4),
+                new("ENCE", 4),
+                new("ATE", 3),
+                new("ITI", 3),
+                new("ION", 3),
+                new("IZE", 3),
+                new("IVE", 3),
+                new("OUS", 3),
+                new("ANT", 3),
+                new("ISM", 3),
+                new("ENT", 3),
+                new("AL", 2),
+                new("ER", 2),
+                new("IC", 2)
             });
+
+        /// <inheritdoc />
+        public bool RequiresCaseInsensitivity => true;
+
+        /// <inheritdoc />
+        public bool RequiresAccentInsensitivity => true;
 
         /// <inheritdoc />
         public void Stem(StringBuilder builder)

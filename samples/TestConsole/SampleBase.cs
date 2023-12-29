@@ -25,6 +25,7 @@ namespace TestConsole
 
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.WriteLine($"Executing query: {query}");
+            Console.WriteLine($"(Query parsed as: {index.ParseQuery(query)})");
             Console.ResetColor();
 
             var results = index.Search(query);
