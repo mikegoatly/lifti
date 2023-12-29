@@ -5,10 +5,6 @@ using System;
 
 namespace PerformanceProfiling
 {
-    [LongRunJob(RuntimeMoniker.Net481)]
-    [LongRunJob(RuntimeMoniker.Net70)]
-    [LongRunJob(RuntimeMoniker.Net80)]
-    [LongRunJob(RuntimeMoniker.Net60)]
     public class ChildNodeMapBenchmarks : IndexBenchmarkBase
     {
         private const int OperationCount = 1000000;
