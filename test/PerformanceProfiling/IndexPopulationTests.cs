@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
-    [MediumRunJob(RuntimeMoniker.Net481)]
-    [MediumRunJob(RuntimeMoniker.Net80)]
-    [MediumRunJob(RuntimeMoniker.Net70)]
-    [MediumRunJob(RuntimeMoniker.Net60)]
+    [ShortRunJob(RuntimeMoniker.Net481)]
+    [ShortRunJob(RuntimeMoniker.Net80)]
+    [ShortRunJob(RuntimeMoniker.Net70)]
+    [ShortRunJob(RuntimeMoniker.Net60)]
     [RankColumn, MemoryDiagnoser]
-    public class FullTextIndexTests : IndexBenchmarkBase
+    public class IndexPopulationTests : IndexBenchmarkBase
     {
         [Benchmark()]
         public async Task IndexingAlwaysSupportIntraNodeText()
@@ -18,12 +18,12 @@ namespace PerformanceProfiling
             await this.PopulateIndexAsync(index);
         }
 
-        [Benchmark()]
-        public async Task IndexingAlwaysIndexCharByChar()
-        {
-            var index = CreateNewIndex(1000);
-            await this.PopulateIndexAsync(index);
-        }
+        //[Benchmark()]
+        //public async Task IndexingAlwaysIndexCharByChar()
+        //{
+        //    var index = CreateNewIndex(1000);
+        //    await this.PopulateIndexAsync(index);
+        //}
 
         [Benchmark()]
         public async Task IndexingIntraNodeTextAt4Characters()
@@ -39,12 +39,12 @@ namespace PerformanceProfiling
         //    await this.PopulateIndexOneByOneAsync(index);
         //}
 
-        //[Benchmark()]
-        //public async Task IndexingOneByOneAlwaysSupportIntraNodeText()
-        //{
-        //    var index = CreateNewIndex(0);
-        //    await this.PopulateIndexOneByOneAsync(index);
-        //}
+        [Benchmark()]
+        public async Task IndexingOneByOneAlwaysSupportIntraNodeText()
+        {
+            var index = CreateNewIndex(0);
+            await this.PopulateIndexOneByOneAsync(index);
+        }
 
         //[Benchmark()]
         //public async Task IndexingOneByOneAlwaysIndexCharByChar()
@@ -53,18 +53,18 @@ namespace PerformanceProfiling
         //    await this.PopulateIndexOneByOneAsync(index);
         //}
 
-        //[Benchmark()]
-        //public async Task Task IndexingOneByOneIntraNodeTextAt4Characters()
-        //{
-        //    var index = CreateNewIndex(4);
-        //    await this.PopulateIndexOneByOneAsync(index);
-        //}
-
         [Benchmark()]
-        public async Task IndexingIntraNodeTextAt2Characters()
+        public async Task IndexingOneByOneIntraNodeTextAt4Characters()
         {
-            var index = CreateNewIndex(2);
-            await this.PopulateIndexAsync(index);
+            var index = CreateNewIndex(4);
+            await this.PopulateIndexOneByOneAsync(index);
         }
+
+        //[Benchmark()]
+        //public async Task IndexingIntraNodeTextAt2Characters()
+        //{
+        //    var index = CreateNewIndex(2);
+        //    await this.PopulateIndexAsync(index);
+        //}
     }
 }

@@ -11,12 +11,12 @@ namespace PerformanceProfiling
         {
             index.BeginBatchChange();
 
-            await this.PopulateIndexOneByOne(index);
+            await this.PopulateIndexOneByOneAsync(index);
 
             await index.CommitBatchChangeAsync();
         }
 
-        protected async Task PopulateIndexOneByOne(IFullTextIndex<int> index)
+        protected async Task PopulateIndexOneByOneAsync(IFullTextIndex<int> index)
         {
             for (var i = 0; i < WikipediaData.SampleData.Count; i++)
             {
