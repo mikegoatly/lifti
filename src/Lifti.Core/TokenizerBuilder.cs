@@ -1,4 +1,5 @@
 ﻿using Lifti.Tokenization;
+using Lifti.Tokenization.Stemming;
 using System;
 
 namespace Lifti
@@ -13,7 +14,7 @@ namespace Lifti
         private bool splitOnPunctuation = true;
         private bool accentInsensitive = true;
         private bool caseInsensitive = true;
-        private bool stemming;
+        private IStemmer? stemmer;
         private char[]? additionalSplitCharacters;
         private Func<TokenizationOptions, IIndexTokenizer> factory = defaultTokenizerFactory;
         private char[]? ignoreCharacters;
@@ -66,13 +67,26 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Configures the tokenizer to apply word stemming, e.g. de-pluralizing and stripping
-        /// endings such as ING from words. Enabling this will cause both case and accent 
-        /// insensitivity to be applied.
+        /// Configures the tokenizer to apply word stemming using the default english Porter Stemmer implementation. 
+        /// Used to reduce english words to a common root form, i.e. de-pluralizing and stripping endings such as ING from words. 
+        /// Enabling this will cause both case and accent insensitivity to be applied.
         /// </summary>
         public TokenizerBuilder WithStemming(bool stemming = true)
         {
-            this.stemming = stemming;
+            this.stemmer = new PorterStemmer();
+            return this;
+        }
+
+        /// <summary>
+        /// Configures the tokenizer to apply word stemming using the specified stemmer. Depending on the <see cref="IStemmer.RequiresAccentInsensitivity"/>
+        /// and <see cref="IStemmer.RequiresCaseInsensitivity"/> properties of the stemmer, accent and case insensitivity may be applied to the index.
+        /// </summary>
+        /// <param name="stemmer">
+        /// The stemmer to use.
+        /// </param>
+        public TokenizerBuilder WithStemming(IStemmer stemmer)
+        {
+            this.stemmer = stemmer;
             return this;
         }
 
@@ -112,7 +126,7 @@ namespace Lifti
                 SplitOnPunctuation = this.splitOnPunctuation,
                 AccentInsensitive = this.accentInsensitive,
                 CaseInsensitive = this.caseInsensitive,
-                Stemming = this.stemming
+                Stemmer = this.stemmer
             };
 
             if (this.ignoreCharacters != null)

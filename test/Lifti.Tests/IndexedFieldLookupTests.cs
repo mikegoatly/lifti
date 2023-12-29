@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
 using Lifti.Tokenization.Objects;
+using Lifti.Tokenization.Stemming;
 using Lifti.Tokenization.TextExtraction;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -94,8 +95,8 @@ namespace Lifti.Tests
         {
             this.WithBasicConfig();
 
-            ((IndexTokenizer)this.sut.GetFieldInfo("FieldX").Tokenizer).Options.Stemming.Should().BeTrue();
-            ((IndexTokenizer)this.sut.GetFieldInfo("FieldY").Tokenizer).Options.Stemming.Should().BeFalse();
+            ((IndexTokenizer)this.sut.GetFieldInfo("FieldX").Tokenizer).Options.Stemmer.Should().BeOfType<PorterStemmer>();
+            ((IndexTokenizer)this.sut.GetFieldInfo("FieldY").Tokenizer).Options.Stemmer.Should().BeNull();
         }
 
         [Fact]

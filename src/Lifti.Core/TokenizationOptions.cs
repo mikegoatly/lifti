@@ -41,7 +41,7 @@ namespace Lifti
         /// </summary>
         public bool CaseInsensitive
         {
-            get => this.caseInsensitive || this.Stemming;
+            get => this.caseInsensitive || (this.Stemmer?.RequiresCaseInsensitivity ?? false);
             internal set => this.caseInsensitive = value;
         }
 
@@ -50,7 +50,7 @@ namespace Lifti
         /// </summary>
         public bool AccentInsensitive
         {
-            get => this.accentInsensitive || this.Stemming;
+            get => this.accentInsensitive || (this.Stemmer?.RequiresAccentInsensitivity ?? false);
             internal set => this.accentInsensitive = value;
         }
 
@@ -59,7 +59,7 @@ namespace Lifti
         /// Gets a value indicating whether word stemming should be applied when tokenizing. Setting this value to true 
         /// forces both <see cref="CaseInsensitive"/> and <see cref="AccentInsensitive"/> to be <c>true</c>.
         /// </summary>
-        public bool Stemming { get; internal set; }
+        public IStemmer? Stemmer { get; internal set; }
 
         /// <summary>
         /// Gets the set of characters that should be ignored in any input.
