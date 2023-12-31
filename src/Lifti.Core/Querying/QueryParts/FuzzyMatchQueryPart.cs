@@ -246,16 +246,11 @@ namespace Lifti.Querying.QueryParts
         }
 
         /// <inheritdoc/>
-        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             if (navigatorCreator == null)
             {
                 throw new ArgumentNullException(nameof(navigatorCreator));
-            }
-
-            if (queryContext is null)
-            {
-                throw new ArgumentNullException(nameof(queryContext));
             }
 
             using var navigator = navigatorCreator();

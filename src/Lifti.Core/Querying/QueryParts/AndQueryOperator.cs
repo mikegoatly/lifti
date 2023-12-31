@@ -20,7 +20,7 @@ namespace Lifti.Querying.QueryParts
         public override OperatorPrecedence Precedence => OperatorPrecedence.And;
 
         /// <inheritdoc/>
-        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             return this.Left.Evaluate(navigatorCreator, queryContext)
                 .Intersect(this.Right.Evaluate(navigatorCreator, queryContext));

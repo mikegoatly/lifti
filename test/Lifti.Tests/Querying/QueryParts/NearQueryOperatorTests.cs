@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Lifti.Querying;
 using Lifti.Querying.QueryParts;
 using Xunit;
 

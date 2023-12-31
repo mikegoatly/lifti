@@ -24,7 +24,7 @@ namespace Lifti.Querying.QueryParts
         public double? ScoreBoost { get; }
 
         /// <inheritdoc />
-        public abstract IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext);
+        public abstract IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext);
 
         /// <summary>
         /// Returns a string representation of this query part.

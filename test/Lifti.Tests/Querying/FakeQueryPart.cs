@@ -23,7 +23,7 @@ namespace Lifti.Tests.Querying
                         new[] { ScoredFieldMatch(m, (byte)m, m) })));
         }
 
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             return this.results;
         }

@@ -34,11 +34,11 @@ namespace Lifti.Querying.QueryParts
         public IQueryPart Statement { get; }
 
         /// <inheritdoc/>
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             return this.Statement.Evaluate(
                     navigatorCreator,
-                    QueryContext.Create(queryContext, this.FieldId));
+                    queryContext with { FilterToFieldId = this.FieldId });
         }
 
         /// <inheritdoc/>

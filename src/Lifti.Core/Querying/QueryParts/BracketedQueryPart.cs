@@ -25,7 +25,7 @@ namespace Lifti.Querying.QueryParts
         }
 
         /// <inheritdoc/>
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             return this.Statement.Evaluate(navigatorCreator, queryContext);
         }

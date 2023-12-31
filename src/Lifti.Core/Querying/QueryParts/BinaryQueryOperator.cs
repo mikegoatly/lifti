@@ -37,7 +37,7 @@ namespace Lifti.Querying.QueryParts
         }
 
         /// <inheritdoc/>
-        public abstract IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext);
+        public abstract IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext);
     }
 
 }
