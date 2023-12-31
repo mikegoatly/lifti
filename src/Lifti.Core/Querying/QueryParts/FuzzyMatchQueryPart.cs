@@ -253,6 +253,11 @@ namespace Lifti.Querying.QueryParts
                 throw new ArgumentNullException(nameof(navigatorCreator));
             }
 
+            if (queryContext is null)
+            {
+                throw new ArgumentNullException(nameof(queryContext));
+            }
+
             using var navigator = navigatorCreator();
             var matchCollectorByWeighting = new Dictionary<double, MatchCollector>();
             var stateStore = new FuzzyMatchStateStore(navigator, this.maxEditDistance, this.maxSequentialEdits);

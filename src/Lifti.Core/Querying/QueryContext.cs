@@ -6,12 +6,12 @@ namespace Lifti.Querying
     /// <summary>
     /// Manages context during the execution of a query, allowing for aspects like field filters to be applied.
     /// </summary>
-    public record struct QueryContext(byte? FilterToFieldId = null)
+    public record QueryContext(byte? FilterToFieldId = null)
     {
         /// <summary>
         /// Gets an empty query context.
         /// </summary>
-        public static QueryContext Empty { get; }
+        public static QueryContext Empty { get; } = new();
 
         /// <summary>
         /// Applies any additional filters present in the current query context, e.g. field filters,
