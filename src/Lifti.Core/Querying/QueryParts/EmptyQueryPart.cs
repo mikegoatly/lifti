@@ -17,7 +17,7 @@ namespace Lifti.Querying.QueryParts
         public static EmptyQueryPart Instance { get; } = new EmptyQueryPart();
 
         /// <inheritdoc />
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             return IntermediateQueryResult.Empty;
         }

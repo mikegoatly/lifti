@@ -15,11 +15,11 @@ namespace Lifti.Querying.QueryParts
         /// being queried.
         /// </param>
         /// <param name="queryContext">
-        /// The current <see cref="IQueryContext"/>.
+        /// The current <see cref="QueryContext"/>.
         /// </param>
         /// <returns>
         /// The <see cref="IntermediateQueryResult"/> that contains the matches.
         /// </returns>
-        IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext);
+        IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext);
     }
 }

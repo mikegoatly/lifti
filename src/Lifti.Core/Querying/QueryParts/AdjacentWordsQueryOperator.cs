@@ -25,7 +25,7 @@ namespace Lifti.Querying.QueryParts
         public IReadOnlyList<IQueryPart> Words { get; }
 
         /// <inheritdoc/>
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             var i = 0;
             var results = IntermediateQueryResult.Empty;

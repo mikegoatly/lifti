@@ -43,7 +43,7 @@ namespace Lifti.Tests.Querying.QueryParts
             var navigator = FakeIndexNavigator.ReturningExactMatches(1, 2);
 
             var contextResults = new IntermediateQueryResult();
-            var queryContext = new FakeQueryContext(contextResults);
+            var queryContext = new QueryContext();
             var result = part.Evaluate(() => new FakeIndexNavigator(), queryContext);
 
             result.Should().Be(contextResults);

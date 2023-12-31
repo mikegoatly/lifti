@@ -29,7 +29,7 @@ namespace Lifti.Querying.QueryParts
         public int Tolerance { get; }
 
         /// <inheritdoc/>
-        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             return this.Left.Evaluate(navigatorCreator, queryContext)
                 .CompositePositionalIntersect(
