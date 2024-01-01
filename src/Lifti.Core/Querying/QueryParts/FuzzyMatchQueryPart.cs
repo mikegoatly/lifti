@@ -259,7 +259,7 @@ namespace Lifti.Querying.QueryParts
             }
 
             using var navigator = navigatorCreator();
-            var matchCollectorByWeighting = new Dictionary<double, MatchCollector>();
+            var results = IntermediateQueryResult.Empty;
             var stateStore = new FuzzyMatchStateStore(navigator, this.maxEditDistance, this.maxSequentialEdits);
 
             var characterCount = 0;
@@ -293,13 +293,7 @@ namespace Lifti.Querying.QueryParts
                                 var weighting = (double)(lengthTotal - state.LevenshteinDistance) / lengthTotal;
                                 weighting *= scoreBoost;
 
-                                if (!matchCollectorByWeighting.TryGetValue(weighting, out var matchCollector))
-                                {
-                                    matchCollector = new MatchCollector();
-                                    matchCollectorByWeighting.Add(weighting, matchCollector);
-                                }
-
-                                navigator.AddExactMatches(matchCollector);
+                                results = results.Union(navigator.GetExactMatches(queryContext, weighting));
                             }
 
                             // Always assume there could be missing characters at the end
@@ -342,13 +336,6 @@ namespace Lifti.Querying.QueryParts
                 characterCount++;
             }
             while (stateStore.HasEntries);
-
-            var results = IntermediateQueryResult.Empty;
-            foreach (var matchCollector in matchCollectorByWeighting)
-            {
-                queryContext.ApplyTo(matchCollector.Value);
-                results = results.Union(navigator.CreateIntermediateQueryResult(matchCollector.Value, matchCollector.Key));
-            }
 
             return results;
         }

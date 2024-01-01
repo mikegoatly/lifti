@@ -20,23 +20,6 @@ namespace Lifti.Querying
         /// </summary>
         IEnumerable<string> EnumerateIndexedTokens();
 
-        /// <summary>
-        /// Gets all the matches that are indexed under from where the navigator is located and adds them to the
-        /// given <see cref="MatchCollector"/>.
-        /// </summary>
-        void AddExactAndChildMatches(MatchCollector matchCollector);
-
-        /// <summary>
-        /// Gets all the matches that are indexed exactly at the point of the navigators current location and adds them to the
-        /// given <see cref="MatchCollector"/>.
-        /// </summary>
-        void AddExactMatches(MatchCollector matchCollector);
-
-        /// <summary>
-        /// Creates an <see cref="IntermediateQueryResult"/> from the matches that are indexed under from where the navigator is located,
-        /// scoring them, and applying the given weighting.
-        /// </summary>
-        IntermediateQueryResult CreateIntermediateQueryResult(MatchCollector matches, double weighting = 1);
 
         /// <summary>
         /// Gets all the matches that are indexed under from where the navigator is located.
@@ -53,6 +36,28 @@ namespace Lifti.Querying
         /// The weighting to apply to the matched tokens. This can be used to adjust the resulting score for the match.
         /// </param>
         IntermediateQueryResult GetExactMatches(double weighting = 1D);
+
+        /// <summary>
+        /// Gets all the matches that are indexed under from where the navigator is located.
+        /// </summary>
+        /// <param name="queryContext">
+        /// The current query context.
+        /// </param>
+        /// <param name="weighting">
+        /// The weighting to apply to the matched tokens. This can be used to adjust the resulting score for the match.
+        /// </param>
+        IntermediateQueryResult GetExactAndChildMatches(QueryContext queryContext, double weighting = 1D);
+
+        /// <summary>
+        /// Gets all the matches that are indexed exactly at the point of the navigators current location.
+        /// </summary>
+        /// <param name="queryContext">
+        /// The current query context.
+        /// </param>
+        /// <param name="weighting">
+        /// The weighting to apply to the matched tokens. This can be used to adjust the resulting score for the match.
+        /// </param>
+        IntermediateQueryResult GetExactMatches(QueryContext queryContext, double weighting = 1D);
 
         /// <summary>
         /// Processes a single character, moving the navigator along the index.

@@ -34,6 +34,7 @@ namespace Lifti.Tests.Querying
         public List<char> NavigatedCharacters { get; } = [];
         public List<string> NavigatedStrings { get; } = [];
         public List<double> ProvidedWeightings { get; } = [];
+        public List<QueryContext> ProvidedQueryContexts { get; } = [];
 
         public bool HasExactMatches => this.ExpectedExactMatches.Matches.Count > 0;
 
@@ -59,29 +60,26 @@ namespace Lifti.Tests.Querying
 
         public IntermediateQueryResult GetExactAndChildMatches(double weighting = 1D)
         {
-            this.ProvidedWeightings.Add(weighting);
-            return this.ExpectedExactAndChildMatches;
+            return this.GetExactAndChildMatches(QueryContext.Empty, weighting);
         }
 
         public IntermediateQueryResult GetExactMatches(double weighting = 1D)
         {
+            return this.GetExactMatches(QueryContext.Empty, weighting);
+        }
+
+        public IntermediateQueryResult GetExactAndChildMatches(QueryContext queryContext, double weighting = 1D)
+        {
             this.ProvidedWeightings.Add(weighting);
+            this.ProvidedQueryContexts.Add(queryContext);
+            return this.ExpectedExactAndChildMatches;
+        }
+
+        public IntermediateQueryResult GetExactMatches(QueryContext queryContext, double weighting = 1D)
+        {
+            this.ProvidedWeightings.Add(weighting);
+            this.ProvidedQueryContexts.Add(queryContext);
             return this.ExpectedExactMatches;
-        }
-
-        public void AddExactAndChildMatches(MatchCollector matchCollector)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AddExactMatches(MatchCollector matchCollector)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IntermediateQueryResult CreateIntermediateQueryResult(MatchCollector matches, double weighting = 1)
-        {
-            throw new NotImplementedException();
         }
 
         public bool Process(char value)

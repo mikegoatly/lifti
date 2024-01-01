@@ -17,6 +17,8 @@ namespace Lifti
             this.maxReturnSize = maxReturnSize;
         }
 
+        public static ListPool<T> Default { get; } = new(10, 10, 1000);
+
         public List<T> Take()
         {
             if (this.pool.TryTake(out var list))

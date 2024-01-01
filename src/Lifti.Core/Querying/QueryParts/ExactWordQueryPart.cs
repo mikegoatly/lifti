@@ -30,7 +30,7 @@ namespace Lifti.Querying.QueryParts
 
             using var navigator = navigatorCreator();
             navigator.Process(this.Word.AsSpan());
-            return queryContext.ApplyTo(navigator.GetExactMatches(this.ScoreBoost ?? 1D));
+            return navigator.GetExactMatches(queryContext, this.ScoreBoost ?? 1D);
         }
 
         /// <inheritdoc/>

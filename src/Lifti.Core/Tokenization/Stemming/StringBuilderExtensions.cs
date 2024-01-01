@@ -161,7 +161,8 @@ namespace Lifti.Tokenization.Stemming
 
                         if (navigator.HasExactMatches)
                         {
-                            bestMatch = navigator.GetExactMatches();
+                            // TODO this includes scoring - probably not the best time to include that!
+                            bestMatch = navigator.GetExactMatches(QueryContext.Empty);
                         }
                     }
 

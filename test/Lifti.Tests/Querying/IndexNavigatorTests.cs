@@ -39,7 +39,7 @@ namespace Lifti.Tests.Querying
         public void GettingExactMatches_WithNoExactMatch_ShouldReturnEmptyResults(string test)
         {
             this.sut.Process(test).Should().BeTrue();
-            var results = this.sut.GetExactMatches();
+            var results = this.sut.GetExactMatches(QueryContext.Empty);
             results.Should().NotBeNull();
             results.Matches.Should().BeEmpty();
         }
@@ -50,7 +50,7 @@ namespace Lifti.Tests.Querying
         public void GettingExactMatches_WithNonMatchingTextProcessed_ShouldReturnEmptyResults(string test)
         {
             this.sut.Process(test).Should().BeFalse();
-            var results = this.sut.GetExactMatches();
+            var results = this.sut.GetExactMatches(QueryContext.Empty);
             results.Should().NotBeNull();
             results.Matches.Should().BeEmpty();
         }
@@ -59,7 +59,7 @@ namespace Lifti.Tests.Querying
         public void GettingExactMatches_WithMatchingTextProcessed_ShouldReturnResults()
         {
             this.sut.Process("INDIFFERENCE").Should().BeTrue();
-            var results = this.sut.GetExactMatches();
+            var results = this.sut.GetExactMatches(QueryContext.Empty);
             results.Should().NotBeNull();
             results.Matches.Should().BeEquivalentTo(
                 new[]
@@ -82,7 +82,7 @@ namespace Lifti.Tests.Querying
         public void GettingExactAndChildMatches_WithNoExactMatch_ShouldReturnNonEmptyResults(string test)
         {
             this.sut.Process(test).Should().BeTrue();
-            var results = this.sut.GetExactAndChildMatches();
+            var results = this.sut.GetExactAndChildMatches(QueryContext.Empty);
             results.Should().NotBeNull();
             results.Matches.Should().NotBeEmpty();
         }
@@ -148,7 +148,7 @@ namespace Lifti.Tests.Querying
 
             var navigator = this.index.Snapshot.CreateNavigator();
             navigator.Process("Z").Should().BeTrue();
-            var results = navigator.GetExactAndChildMatches();
+            var results = navigator.GetExactAndChildMatches(QueryContext.Empty);
             results.Should().NotBeNull();
 
             var expectedTokens = new[] {
@@ -179,7 +179,7 @@ namespace Lifti.Tests.Querying
         public void GettingExactAndChildMatches_WithNonMatchingTextProcessed_ShouldReturnEmptyResults(string test)
         {
             this.sut.Process(test).Should().BeFalse();
-            var results = this.sut.GetExactAndChildMatches();
+            var results = this.sut.GetExactAndChildMatches(QueryContext.Empty);
             results.Should().NotBeNull();
             results.Matches.Should().BeEmpty();
         }
@@ -238,7 +238,7 @@ namespace Lifti.Tests.Querying
 
         private void VerifyMatchedWordIndexes(params int[] indexes)
         {
-            var results = this.sut.GetExactAndChildMatches();
+            var results = this.sut.GetExactAndChildMatches(QueryContext.Empty);
             results.Matches.Should().HaveCount(1);
             results.Matches[0].FieldMatches.Should().HaveCount(1);
             var fieldMatch = results.Matches[0].FieldMatches[0];

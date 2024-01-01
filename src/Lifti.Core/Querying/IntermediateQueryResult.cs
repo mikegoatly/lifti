@@ -15,7 +15,7 @@ namespace Lifti.Querying
         /// <summary>
         /// Creates a new instance of <see cref="IntermediateQueryResult"/>.
         /// </summary>
-        public IntermediateQueryResult(IEnumerable<ScoredToken> matches)
+        internal IntermediateQueryResult(IEnumerable<ScoredToken> matches)
             : this(matches, false)
         {
         }

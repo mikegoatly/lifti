@@ -120,7 +120,11 @@ namespace Lifti.Tests.Querying.QueryParts
                 new TestObject(3, "Item number 3", "Item number three content")
             });
 
-            var query = new Query(FieldFilterQueryOperator.CreateForField(index.FieldLookup, "title", new FuzzyMatchQueryPart("NUMBE", 1, 1)));
+            var query = new Query(
+                FieldFilterQueryOperator.CreateForField(
+                    index.FieldLookup, 
+                    "title", 
+                    new FuzzyMatchQueryPart("NUMBE", 1, 1)));
 
             var results = index.Search(query).ToList();
 
