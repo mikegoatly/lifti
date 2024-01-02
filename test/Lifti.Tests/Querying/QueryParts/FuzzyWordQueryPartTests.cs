@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -129,6 +130,34 @@ namespace Lifti.Tests.Querying.QueryParts
             var results = index.Search(query).ToList();
 
             results.Select(x => x.Key).Should().BeEquivalentTo(new[] { 1, 3 });
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldTakeIntoAccountNumberOfExactlyMatchedDocuments()
+        {
+            var part = new FuzzyMatchQueryPart("SOUNDS", 1, 1);
+            var weight = part.CalculateWeighting(this.fixture.Index.CreateNavigator);
+
+            // With a max distance of 1, it should be 1 + the base exact word score
+            // Base score would be approx 0.3 because only one document contains the word
+            weight.Should().BeApproximately(1.3D, 0.1D);
+
+            part = new FuzzyMatchQueryPart("TO", 1, 1);
+            weight = part.CalculateWeighting(this.fixture.Index.CreateNavigator);
+
+            // The base score here would be approx 0.6 because 2/3 documents contain the text
+            weight.Should().BeApproximately(1.6D, 0.1D);
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldBeMoreExpensiveWithHigherMaxEditDistance()
+        {
+            var part = new FuzzyMatchQueryPart("SOUNDS", 3, 2);
+            var weight = part.CalculateWeighting(this.fixture.Index.CreateNavigator);
+
+            // 3 edits, 2 sequential edits = 3 + ((2 - 1) * 2) = 5
+            // Add the base exact word score of approx 0.3
+            weight.Should().BeApproximately(5.3D, 0.1D);
         }
 
         [Fact]

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Lifti.Querying.QueryParts
@@ -31,6 +30,13 @@ namespace Lifti.Querying.QueryParts
         public override string ToString()
         {
             return $"{this.Left} | {this.Right}";
+        }
+
+        /// <inheritdoc/>
+        protected override double RunWeightingCalculation(Func<IIndexNavigator> navigatorCreator)
+        {
+            // Both sides of the OR operator are evaluated, so the weighting is the sum of the two
+            return this.Left.CalculateWeighting(navigatorCreator) + this.Right.CalculateWeighting(navigatorCreator);
         }
 
         /// <summary>

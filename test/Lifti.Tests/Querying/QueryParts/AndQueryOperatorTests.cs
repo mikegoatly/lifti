@@ -59,5 +59,13 @@ namespace Lifti.Tests.Querying.QueryParts
 
             op.ToString().Should().Be("test & test2 & test3");
         }
+
+        [Fact]
+        public void CalculateWeighting_ShouldReturnSmallestWeightingOfParts()
+        {
+            var op = new AndQueryOperator(new FakeQueryPart(2D), new FakeQueryPart(3D));
+
+            op.CalculateWeighting(() => new FakeIndexNavigator()).Should().Be(2D);
+        }
     }
 }

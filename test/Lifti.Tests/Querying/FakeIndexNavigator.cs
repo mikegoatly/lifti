@@ -36,9 +36,14 @@ namespace Lifti.Tests.Querying
         public List<double> ProvidedWeightings { get; } = [];
         public List<QueryContext> ProvidedQueryContexts { get; } = [];
 
+        public int ExactMatchCount()
+        {
+            return this.ExpectedExactMatches.Matches.Count;
+        }
+
         public bool HasExactMatches => this.ExpectedExactMatches.Matches.Count > 0;
 
-        public IIndexSnapshot Snapshot => throw new NotImplementedException();
+        public IIndexSnapshot Snapshot { get; set; }
 
         public static FakeIndexNavigator ReturningExactMatches(params int[] matchedDocumentIds)
         {

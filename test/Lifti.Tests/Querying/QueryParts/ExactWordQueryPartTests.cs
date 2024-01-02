@@ -62,5 +62,57 @@ namespace Lifti.Tests.Querying.QueryParts
             var part = new ExactWordQueryPart("test", 5.123);
             part.ToString().Should().Be("test^5.123");
         }
+
+        [Fact]
+        public void CalculateWeighting_ShouldReturnWeightingBasedOnNumberOfMatchedDocuments()
+        {
+            var navigator = FakeIndexNavigator.ReturningExactMatches(1, 2);
+            navigator.Snapshot = new FakeIndexSnapshot(new FakeIndexMetadata<int>(10));
+            var part = new ExactWordQueryPart("test", 5.123);
+
+            // 2 matches out of 10 documents results in a weighting of 0.2
+            part.CalculateWeighting(() => navigator).Should().Be(0.2D);
+
+            navigator.Snapshot = new FakeIndexSnapshot(new FakeIndexMetadata<int>(2));
+            part = new ExactWordQueryPart("test", 5.123);
+
+            // 2 matches out of 2 documents results in a weighting of 1
+            part.CalculateWeighting(() => navigator).Should().Be(1D);
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldCacheWeighting()
+        {
+            var navigator = FakeIndexNavigator.ReturningExactMatches(1, 2);
+            navigator.Snapshot = new FakeIndexSnapshot(new FakeIndexMetadata<int>(10));
+            var part = new ExactWordQueryPart("test", 5.123);
+            part.CalculateWeighting(() => navigator).Should().Be(0.2D);
+
+            // Changing the snapshot is a hacky way of checking that the score is cached - 
+            // if it isn't, the weighting will be recalculated and will be different
+            navigator.Snapshot = new FakeIndexSnapshot(new FakeIndexMetadata<int>(2));
+            part.CalculateWeighting(() => navigator).Should().Be(0.2D);
+        }
+    }
+
+    internal class FakeIndexSnapshot : IIndexSnapshot
+    {
+        public FakeIndexSnapshot(IIndexMetadata indexMetadata)
+        {
+            this.Metadata = indexMetadata;
+        }
+
+        public IndexNode Root => throw new System.NotImplementedException();
+
+        public IIndexedFieldLookup FieldLookup => throw new System.NotImplementedException();
+
+        public IIndexMetadata Items => this.Metadata;
+
+        public IIndexMetadata Metadata { get; private set; }
+
+        public IIndexNavigator CreateNavigator()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

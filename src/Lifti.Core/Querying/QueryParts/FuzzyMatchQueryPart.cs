@@ -246,6 +246,14 @@ namespace Lifti.Querying.QueryParts
         }
 
         /// <inheritdoc/>
+        protected override double RunWeightingCalculation(Func<IIndexNavigator> navigatorCreator)
+        {
+            return base.RunWeightingCalculation(navigatorCreator) 
+                + this.maxEditDistance
+                + ((this.maxSequentialEdits - 1) << 1);
+        }
+
+        /// <inheritdoc/>
         public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             if (navigatorCreator == null)

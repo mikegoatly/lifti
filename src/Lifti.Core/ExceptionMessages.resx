@@ -153,6 +153,9 @@
   <data name="EmptyAdjacentTextPartsAreNotSupported" xml:space="preserve">
     <value>Adjacent text query parts cannot be empty</value>
   </data>
+  <data name="EmptyAdjacentWordsQueryPart" xml:space="preserve">
+    <value>Cannot create an empty adjacent words query part</value>
+  </data>
   <data name="EmptyBracketedExpressionsAreNotSupported" xml:space="preserve">
     <value>Bracketed query parts cannot be empty</value>
   </data>
@@ -161,6 +164,9 @@
   </data>
   <data name="EmptyOrMissingTextQueryFragmentValue" xml:space="preserve">
     <value>Internal error - missing text value</value>
+  </data>
+  <data name="EmptyWildcardQuery" xml:space="preserve">
+    <value>Cannot create an empty wildcard query part</value>
   </data>
   <data name="ExpectedAtLeastOneQueryPartParsed" xml:space="preserve">
     <value>Expected at least one query part to be parsed</value>

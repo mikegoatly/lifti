@@ -8,10 +8,17 @@ namespace Lifti.Tests.Querying
     public class FakeQueryPart : QueryTestBase, IQueryPart
     {
         private readonly IntermediateQueryResult results;
+        private readonly double weighting = 1D;
 
         public FakeQueryPart(params ScoredToken[] matches)
         {
             this.results = new IntermediateQueryResult(matches);
+        }
+
+        public FakeQueryPart(double weighting, params ScoredToken[] matches)
+            : this(matches)
+        {
+            this.weighting = weighting;
         }
 
         public FakeQueryPart(params int[] matchedItems)
@@ -21,6 +28,11 @@ namespace Lifti.Tests.Querying
                     m => new ScoredToken(
                         m,
                         new[] { ScoredFieldMatch(m, (byte)m, m) })));
+        }
+
+        public double CalculateWeighting(Func<IIndexNavigator> navigatorCreator)
+        {
+            return this.weighting;
         }
 
         public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)

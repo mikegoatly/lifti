@@ -61,5 +61,13 @@ namespace Lifti.Tests.Querying.QueryParts
             // The first and second query parts should not combine together
             results.Matches.Should().BeEmpty();
         }
+
+        [Fact]
+        public void CalculateWeighting_ShouldReturnWeightOfFirstDividedByPartCount()
+        {
+            var op = new AdjacentWordsQueryOperator(new[] { new FakeQueryPart(9D), new FakeQueryPart(13D), new FakeQueryPart(33D) });
+
+            op.CalculateWeighting(() => new FakeIndexNavigator()).Should().Be(3D);
+        }
     }
 }

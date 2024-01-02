@@ -31,6 +31,13 @@ namespace Lifti.Querying.QueryParts
         }
 
         /// <inheritdoc/>
+        public double CalculateWeighting(Func<IIndexNavigator> navigatorCreator)
+        {
+            // Just defer to the weighting of the statement
+            return this.Statement.CalculateWeighting(navigatorCreator);
+        }
+
+        /// <inheritdoc/>
         public override string ToString()
         {
             return $"({this.Statement})";

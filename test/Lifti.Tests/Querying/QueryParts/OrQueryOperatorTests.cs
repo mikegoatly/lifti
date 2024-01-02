@@ -27,11 +27,11 @@ namespace Lifti.Tests.Querying.QueryParts
         {
             var op = new OrQueryOperator(
                 new FakeQueryPart(
-                    ScoredToken(4, ScoredFieldMatch(1D, 1, 5, 6) ),
+                    ScoredToken(4, ScoredFieldMatch(1D, 1, 5, 6)),
                     ScoredToken(5, ScoredFieldMatch(2D, 1, 9, 11))),
                 new FakeQueryPart(
                     ScoredToken(5, ScoredFieldMatch(3D, 1, 1, 103), ScoredFieldMatch(9D, 2, 2, 18)),
-                    ScoredToken(7, ScoredFieldMatch(4D, 1, 18) )));
+                    ScoredToken(7, ScoredFieldMatch(4D, 1, 18))));
 
             var result = op.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
 
@@ -63,6 +63,14 @@ namespace Lifti.Tests.Querying.QueryParts
             var op = OrQueryOperator.CombineAll(new[] { new ExactWordQueryPart("test"), new ExactWordQueryPart("test2"), new ExactWordQueryPart("test3") });
 
             op.ToString().Should().Be("test | test2 | test3");
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldReturnSumOfBothPartsWeightings()
+        {
+            var op = new OrQueryOperator(new FakeQueryPart(2D), new FakeQueryPart(3D));
+
+            op.CalculateWeighting(() => new FakeIndexNavigator()).Should().Be(5D);
         }
     }
 }

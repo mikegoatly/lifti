@@ -8,6 +8,8 @@ namespace Lifti.Querying.QueryParts
     /// </summary>
     public class AdjacentWordsQueryOperator : IQueryPart
     {
+        private double? weighting;
+
         /// <summary>
         /// Constructs a new <see cref="AdjacentWordsQueryOperator"/> instance.
         /// </summary>
@@ -16,6 +18,16 @@ namespace Lifti.Querying.QueryParts
         /// </param>
         public AdjacentWordsQueryOperator(IReadOnlyList<IQueryPart> words)
         {
+            if (words is null)
+            {
+                throw new ArgumentNullException(nameof(words));
+            }
+
+            if (words.Count == 0)
+            {
+                throw new LiftiException(ExceptionMessages.EmptyAdjacentWordsQueryPart);
+            }
+
             this.Words = words;
         }
 
@@ -55,6 +67,15 @@ namespace Lifti.Querying.QueryParts
             } while (i < this.Words.Count && results.Matches.Count > 0);
 
             return results;
+        }
+
+        /// <inheritdoc/>
+        public double CalculateWeighting(Func<IIndexNavigator> navigatorCreator)
+        {
+            // Each result is intersected in sequence, so we approximate the total weighting by calculating
+            // the first and dividing by the number of words
+            this.weighting ??= this.Words[0].CalculateWeighting(navigatorCreator) / this.Words.Count;
+            return this.weighting.GetValueOrDefault();
         }
 
         /// <inheritdoc/>

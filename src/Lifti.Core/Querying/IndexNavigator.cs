@@ -30,6 +30,11 @@ namespace Lifti.Querying
 
         private bool HasIntraNodeTextLeftToProcess => this.currentNode != null && this.intraNodeTextPosition < this.currentNode.IntraNodeText.Length;
 
+        public int ExactMatchCount()
+        {
+            return this.HasExactMatches ? this.currentNode!.Matches.Count : 0;
+        }
+
         /// <inheritdoc />
         public IIndexSnapshot Snapshot
         {

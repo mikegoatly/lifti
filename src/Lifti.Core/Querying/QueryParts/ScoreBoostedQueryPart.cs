@@ -5,6 +5,8 @@ namespace Lifti.Querying.QueryParts
     /// <inheritdoc />
     public abstract class ScoreBoostedQueryPart : IQueryPart
     {
+        private double? weighting;
+
         /// <summary>
         /// Constructs a new instance of <see cref="ScoreBoostedQueryPart"/>.
         /// </summary>
@@ -24,7 +26,19 @@ namespace Lifti.Querying.QueryParts
         public double? ScoreBoost { get; }
 
         /// <inheritdoc />
+        public double CalculateWeighting(Func<IIndexNavigator> navigatorCreator)
+        {
+            this.weighting ??= this.RunWeightingCalculation(navigatorCreator);
+            return this.weighting.GetValueOrDefault();
+        }
+
+        /// <inheritdoc />
         public abstract IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext);
+
+        /// <summary>
+        /// Runs the weighting calculation for this query part.
+        /// </summary>
+        protected abstract double RunWeightingCalculation(Func<IIndexNavigator> navigatorCreator);
 
         /// <summary>
         /// Returns a string representation of this query part.

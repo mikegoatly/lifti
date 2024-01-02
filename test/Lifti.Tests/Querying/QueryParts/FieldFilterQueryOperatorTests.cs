@@ -21,5 +21,13 @@ namespace Lifti.Tests.Querying.QueryParts
                     new QueryContext(4)
                 ]);
         }
+
+        [Fact]
+        public void CalculateWeighting_ShouldReturnHalfOfChildPartWeighting()
+        {
+            var op = new FieldFilterQueryOperator("Field", 1, new FakeQueryPart(4D));
+
+            op.CalculateWeighting(() => new FakeIndexNavigator()).Should().Be(2D);
+        }
     }
 }

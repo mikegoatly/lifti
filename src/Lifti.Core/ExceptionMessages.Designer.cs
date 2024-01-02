@@ -169,6 +169,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot create an empty adjacent words query part.
+        /// </summary>
+        internal static string EmptyAdjacentWordsQueryPart {
+            get {
+                return ResourceManager.GetString("EmptyAdjacentWordsQueryPart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bracketed query parts cannot be empty.
         /// </summary>
         internal static string EmptyBracketedExpressionsAreNotSupported {
@@ -192,6 +201,15 @@ namespace Lifti {
         internal static string EmptyOrMissingTextQueryFragmentValue {
             get {
                 return ResourceManager.GetString("EmptyOrMissingTextQueryFragmentValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot create an empty wildcard query part.
+        /// </summary>
+        internal static string EmptyWildcardQuery {
+            get {
+                return ResourceManager.GetString("EmptyWildcardQuery", resourceCulture);
             }
         }
         

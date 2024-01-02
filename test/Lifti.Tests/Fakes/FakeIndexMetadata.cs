@@ -11,14 +11,14 @@ namespace Lifti.Tests.Fakes
 
         public FakeIndexMetadata(
             int count,
-            IndexStatistics statistics,
-            (int documentId, DocumentMetadata<TKey> statistics)[] documentMetadata,
-            (byte objectTypeId, Func<DocumentMetadata, double> scoreProvider)[] objectTypeMetadata)
+            IndexStatistics? statistics = null,
+            (int documentId, DocumentMetadata<TKey> statistics)[]? documentMetadata = null,
+            (byte objectTypeId, Func<DocumentMetadata, double> scoreProvider)[]? objectTypeMetadata = null)
         {
             this.DocumentCount = count;
-            this.IndexStatistics = statistics;
-            this.documentMetadata = documentMetadata.ToDictionary(i => i.documentId, i => i.statistics);
-            this.objectTypeMetadata = objectTypeMetadata.ToDictionary(i => i.objectTypeId, i => i.scoreProvider);
+            this.IndexStatistics = statistics ?? new IndexStatistics();
+            this.documentMetadata = (documentMetadata ?? []).ToDictionary(i => i.documentId, i => i.statistics);
+            this.objectTypeMetadata = (objectTypeMetadata ?? []).ToDictionary(i => i.objectTypeId, i => i.scoreProvider);
         }
 
         public int DocumentCount { get; private set; }

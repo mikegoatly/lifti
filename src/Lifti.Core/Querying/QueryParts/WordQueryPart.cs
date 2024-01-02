@@ -20,5 +20,26 @@ namespace Lifti.Querying.QueryParts
         {
             get;
         }
+
+        /// <inheritdoc/>
+        protected override double RunWeightingCalculation(Func<IIndexNavigator> navigatorCreator)
+        {
+            if (navigatorCreator is null)
+            {
+                throw new ArgumentNullException(nameof(navigatorCreator));
+            }
+
+            using var navigator = navigatorCreator();
+            navigator.Process(this.Word.AsSpan());
+
+            var totalDocumentCount = navigator.Snapshot.Metadata.DocumentCount;
+            if (totalDocumentCount == 0)
+            {
+                // Edge case for an empty index
+                return 0;
+            }
+
+            return navigator.ExactMatchCount() / (double)totalDocumentCount;
+        }
     }
 }

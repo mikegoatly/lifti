@@ -36,6 +36,11 @@ namespace Lifti.Querying.QueryParts
             }
 
             this.Fragments = NormalizeFragmentSequence(fragments).ToList();
+
+            if (this.Fragments.Count == 0)
+            {
+                throw new QueryParserException(ExceptionMessages.EmptyWildcardQuery);
+            }
         }
 
         /// <inheritdoc />
@@ -78,6 +83,45 @@ namespace Lifti.Querying.QueryParts
             }
 
             return results;
+        }
+
+        /// <inheritdoc />
+        protected override double RunWeightingCalculation(Func<IIndexNavigator> navigatorCreator)
+        {
+            var firstFragment = this.Fragments[0];
+            if (this.Fragments.Count == 1 && firstFragment.Kind == WildcardQueryFragmentKind.MultiCharacter)
+            {
+                // Penalise the use of a full document search
+                return 1000D;
+            }
+
+            int weight = 0;
+
+            for (var i = 0; i < this.Fragments.Count; i++)
+            {
+                switch (this.Fragments[i].Kind)
+                {
+                    case WildcardQueryFragmentKind.MultiCharacter:
+                        weight += 4;
+                        break;
+                    case WildcardQueryFragmentKind.SingleCharacter:
+                        weight += 1;
+                        break;
+                    case WildcardQueryFragmentKind.Text:
+                        weight += 1;
+                        break;
+
+                }
+            }
+
+            return firstFragment.Kind switch
+            {
+                // Don't penalise wildcard searches that start with a text fragment as badly
+                WildcardQueryFragmentKind.Text => weight * 0.8D,
+                // Penalise the use of leading multi-character wildcards
+                WildcardQueryFragmentKind.MultiCharacter => weight * 1.2D,
+                _ => weight,
+            };
         }
 
         /// <inheritdoc />

@@ -92,5 +92,10 @@ namespace Lifti.Querying
         /// Enumerates all the characters that are available as options to process from the navigators current location.
         /// </summary>
         IEnumerable<char> EnumerateNextCharacters();
+
+        /// <summary>
+        /// Gets the number of exact matches that are indexed at the current location.
+        /// </summary>
+        int ExactMatchCount();
     }
 }

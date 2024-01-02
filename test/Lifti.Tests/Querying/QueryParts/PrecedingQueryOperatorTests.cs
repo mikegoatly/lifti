@@ -38,5 +38,13 @@ namespace Lifti.Tests.Querying.QueryParts
                         ScoredFieldMatch(13D, 2, TokenMatch(8), TokenMatch(104), TokenMatch(105)))
                 });
         }
+
+        [Fact]
+        public void CalculateWeighting_ShouldReturnSmallestWeightingOfParts()
+        {
+            var op = new PrecedingQueryOperator(new FakeQueryPart(3D), new FakeQueryPart(2D));
+
+            op.CalculateWeighting(() => new FakeIndexNavigator()).Should().Be(2D);
+        }
     }
 }

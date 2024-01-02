@@ -271,6 +271,71 @@ namespace Lifti.Tests.Querying.QueryParts
             results.Select(x => x.Key).Should().BeEquivalentTo(new[] { 1, 3 });
         }
 
+        [Fact]
+        public void CalculateWeighting_ShouldHeavilyPenaliseFullIndexSearch()
+        {
+            var part = new WildcardQueryPart(WildcardQueryFragment.MultiCharacter);
+            var weight = part.CalculateWeighting(this.index.CreateNavigator);
+
+            weight.Should().Be(1000D);
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldCalculateBaseScoreOfFragments()
+        {
+            var part = new WildcardQueryPart(
+                WildcardQueryFragment.SingleCharacter,
+                WildcardQueryFragment.MultiCharacter,
+                WildcardQueryFragment.CreateText("H"),
+                WildcardQueryFragment.SingleCharacter,
+                WildcardQueryFragment.MultiCharacter,
+                WildcardQueryFragment.CreateText("A"));
+
+            var weight = part.CalculateWeighting(this.index.CreateNavigator);
+
+            // Two multi, two single, two text
+            // 2 * 4 + 2 * 1 + 2 * 1 = 12
+            weight.Should().Be(12D);
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldPenaliseLeadingMulticharacter()
+        {
+            var part = new WildcardQueryPart(
+                WildcardQueryFragment.MultiCharacter,
+                WildcardQueryFragment.CreateText("H"),
+                WildcardQueryFragment.SingleCharacter,
+                WildcardQueryFragment.SingleCharacter,
+                WildcardQueryFragment.MultiCharacter,
+                WildcardQueryFragment.CreateText("A"));
+
+            var weight = part.CalculateWeighting(this.index.CreateNavigator);
+
+            // Two multi, two single, two text
+            // 2 * 4 + 2 * 1 + 2 * 1 = 12
+            // Penalisation of 20% = 14.4
+            weight.Should().BeApproximately(14.4D, 0.1D);
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldBoostLeadingText()
+        {
+            var part = new WildcardQueryPart(
+                WildcardQueryFragment.CreateText("H"),
+                WildcardQueryFragment.SingleCharacter,
+                WildcardQueryFragment.MultiCharacter,
+                WildcardQueryFragment.CreateText("A"),
+                WildcardQueryFragment.SingleCharacter,
+                WildcardQueryFragment.MultiCharacter);
+
+            var weight = part.CalculateWeighting(this.index.CreateNavigator);
+
+            // Two multi, two single, two text
+            // 2 * 4 + 2 * 1 + 2 * 1 = 12
+            // Boost = 12 * 0.8 = 9.6
+            weight.Should().BeApproximately(9.6D, 0.1D);
+        }
+
         private record TestObject(int Id, string Title, string Content);
     }
 }

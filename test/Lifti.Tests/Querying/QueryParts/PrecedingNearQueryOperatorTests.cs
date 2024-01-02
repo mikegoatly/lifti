@@ -61,6 +61,14 @@ namespace Lifti.Tests.Querying.QueryParts
                 });
         }
 
+        [Fact]
+        public void CalculateWeighting_ShouldReturnSmallestWeightingOfParts()
+        {
+            var op = new PrecedingNearQueryOperator(new FakeQueryPart(3D), new FakeQueryPart(2D));
+
+            op.CalculateWeighting(() => new FakeIndexNavigator()).Should().Be(2D);
+        }
+
         protected static async Task<IFullTextIndex<int>> CreateTestIndexAsync()
         {
             var index = new FullTextIndexBuilder<int>()

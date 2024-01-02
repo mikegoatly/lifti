@@ -21,5 +21,11 @@ namespace Lifti.Querying.QueryParts
         {
             return IntermediateQueryResult.Empty;
         }
+
+        /// <inheritdoc />
+        public double CalculateWeighting(Func<IIndexNavigator> navigatorCreator)
+        {
+            return 0;
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -71,6 +72,82 @@ namespace Lifti.Tests.Querying
                 o => o.ComparingByMembers<ScoredToken>()
                       .ComparingByMembers<ScoredFieldMatch>()
                       .Excluding(i => i.Path.EndsWith("Score")));
+        }
+
+        [Fact]
+        public async Task GettingExactMatches_WithDocumentFilter_ShouldOnlyReturnFilteredDocuments()
+        {
+            await this.index.AddAsync(("B", "Elephant", "Ellie"));
+            await this.index.AddAsync(("C", "Elephant", "Elon"));
+
+            this.sut = this.index.Snapshot.CreateNavigator();
+
+            this.sut.Process("ELEPHANT").Should().BeTrue();
+
+            var documentId = this.index.Metadata.GetMetadata("B").Id;
+
+            var results = this.sut.GetExactMatches(new QueryContext(FilterToDocumentIds: new HashSet<int> { documentId }));
+
+            results.Matches.Should().HaveCount(1);
+            results.Matches[0].DocumentId.Should().Be(documentId);
+        }
+
+        [Fact]
+        public async Task GettingExactMatches_WithFieldFilter_ShouldOnlyReturnFilteredDocuments()
+        {
+            await this.index.AddAsync(("B", "Elephant", "Ellie"));
+            await this.index.AddAsync(("C", "Elephant", "Elephant"));
+
+            this.sut = this.index.Snapshot.CreateNavigator();
+
+            this.sut.Process("ELEPHANT").Should().BeTrue();
+
+            var fieldId = this.index.FieldLookup.GetFieldInfo("Field2").Id;
+            var expectedDocumentId = this.index.Metadata.GetMetadata("C").Id;
+
+            var results = this.sut.GetExactMatches(new QueryContext(FilterToFieldId: fieldId));
+
+            results.Matches.Should().HaveCount(1);
+            results.Matches[0].DocumentId.Should().Be(expectedDocumentId);
+            results.Matches[0].FieldMatches.Should().AllSatisfy(x => x.FieldId.Should().Be(fieldId));
+        }
+
+        [Fact]
+        public async Task GettingExactAndChildMatches_WithDocumentFilter_ShouldOnlyReturnFilteredDocuments()
+        {
+            await this.index.AddAsync(("B", "Elephant", "Ellie"));
+            await this.index.AddAsync(("C", "Elephant", "Elon"));
+
+            this.sut = this.index.Snapshot.CreateNavigator();
+
+            this.sut.Process("ELE").Should().BeTrue();
+
+            var documentId = this.index.Metadata.GetMetadata("B").Id;
+
+            var results = this.sut.GetExactAndChildMatches(new QueryContext(FilterToDocumentIds: new HashSet<int> { documentId }));
+
+            results.Matches.Should().HaveCount(1);
+            results.Matches[0].DocumentId.Should().Be(documentId);
+        }
+
+        [Fact]
+        public async Task GettingExactAndChildMatches_WithFieldFilter_ShouldOnlyReturnFilteredDocuments()
+        {
+            await this.index.AddAsync(("B", "Elephant", "Ellie"));
+            await this.index.AddAsync(("C", "Elephant", "Elephant"));
+
+            this.sut = this.index.Snapshot.CreateNavigator();
+
+            this.sut.Process("ELE").Should().BeTrue();
+
+            var fieldId = this.index.FieldLookup.GetFieldInfo("Field2").Id;
+            var expectedDocumentId = this.index.Metadata.GetMetadata("C").Id;
+
+            var results = this.sut.GetExactAndChildMatches(new QueryContext(FilterToFieldId: fieldId));
+
+            results.Matches.Should().HaveCount(1);
+            results.Matches[0].DocumentId.Should().Be(expectedDocumentId);
+            results.Matches[0].FieldMatches.Should().AllSatisfy(x => x.FieldId.Should().Be(fieldId));
         }
 
         [Theory]
@@ -146,9 +223,9 @@ namespace Lifti.Tests.Querying
             await this.index.AddAsync(("B", "Zoopla Zoo Zammo", "Zany Zippy Llamas"));
             await this.index.AddAsync(("C", "Zak", "Ziggy Stardust"));
 
-            var navigator = this.index.Snapshot.CreateNavigator();
-            navigator.Process("Z").Should().BeTrue();
-            var results = navigator.GetExactAndChildMatches(QueryContext.Empty);
+            this.sut = this.index.Snapshot.CreateNavigator();
+            this.sut.Process("Z").Should().BeTrue();
+            var results = this.sut.GetExactAndChildMatches(QueryContext.Empty);
             results.Should().NotBeNull();
 
             var expectedTokens = new[] {

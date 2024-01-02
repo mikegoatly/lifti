@@ -47,6 +47,14 @@ namespace Lifti.Querying.QueryParts
         }
 
         /// <inheritdoc/>
+        public double CalculateWeighting(Func<IIndexNavigator> navigatorCreator)
+        {
+            // We're applying an additional level of filtering here, so reduce the weighting of the 
+            // child statement by 50% to reflect this.
+            return this.Statement.CalculateWeighting(navigatorCreator) * 0.5D;
+        }
+
+        /// <inheritdoc/>
         public override string ToString()
         {
             return $"{this.FieldName}={this.Statement}";
