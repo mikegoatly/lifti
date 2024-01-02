@@ -180,7 +180,7 @@ namespace Lifti.Tests
 
             index.Search("test").Should().BeEmpty();
 
-            parser.ParsedQueries.Should().BeEquivalentTo(new[] { "test" });
+            parser.ParsedQueries.Should().BeEquivalentTo(["test"]);
         }
 
         [Fact]
@@ -261,7 +261,7 @@ namespace Lifti.Tests
 
             await index.AddAsync(9, "Test");
 
-            action1.Should().BeEquivalentTo(new[] { "1" });
+            action1.Should().BeEquivalentTo(["1"]);
             action2.Should().BeEquivalentTo(new[] { 1 });
         }
 

@@ -12,7 +12,7 @@ namespace Lifti.Tests.Fakes
             this.returnedQuery = returnedQuery;
         }
 
-        public List<string> ParsedQueries { get; } = new List<string>();
+        public List<string> ParsedQueries { get; } = [];
 
         public IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, IIndexTokenizerProvider tokenizerProvider)
         {

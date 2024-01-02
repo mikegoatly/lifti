@@ -52,8 +52,8 @@ namespace Lifti.Tests.Tokenization.Objects
 
             await sut.ReadAsync(new TestObject(fieldValues), default);
 
-            (await sut.ReadAsync(new TestObject(fieldValues), "Foo", default)).Should().BeEquivalentTo(new[] { "Bar" });
-            (await sut.ReadAsync(new TestObject(fieldValues), "Baz", default)).Should().BeEquivalentTo(new[] { "Bam" });
+            (await sut.ReadAsync(new TestObject(fieldValues), "Foo", default)).Should().BeEquivalentTo(["Bar"]);
+            (await sut.ReadAsync(new TestObject(fieldValues), "Baz", default)).Should().BeEquivalentTo(["Bam"]);
         }
 
         [Fact]
@@ -63,8 +63,8 @@ namespace Lifti.Tests.Tokenization.Objects
 
             await sut.ReadAsync(new TestObject(fieldValues), default);
 
-            (await sut.ReadAsync(new TestObject(fieldValues), "Test_Foo", default)).Should().BeEquivalentTo(new[] { "Bar" });
-            (await sut.ReadAsync(new TestObject(fieldValues), "Test_Baz", default)).Should().BeEquivalentTo(new[] { "Bam" });
+            (await sut.ReadAsync(new TestObject(fieldValues), "Test_Foo", default)).Should().BeEquivalentTo(["Bar"]);
+            (await sut.ReadAsync(new TestObject(fieldValues), "Test_Baz", default)).Should().BeEquivalentTo(["Bam"]);
         }
 
         [Fact]

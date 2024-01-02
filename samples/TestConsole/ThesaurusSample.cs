@@ -10,8 +10,8 @@ namespace TestConsole
     {
         private record Animal(int Id, string Name, string Description);
 
-        private static readonly Animal[] animals = new[]
-{
+        private static readonly Animal[] animals =
+[
             new Animal(1, "cat", "A domestic mammal, also known as a feline." ),
             new Animal(2, "dog", "A domesticated carnivorous mammal." ),
             new Animal(3, "rabbit", "A small, fluffy, hoofed mammal with long ears." ),
@@ -22,7 +22,7 @@ namespace TestConsole
             new Animal(8, "hamster", "A tiny, stout-bodied rodent with a short, furry tail." ),
             new Animal(9, "turtle", "A reptile with a hard, protective shell." ),
             new Animal(10, "snake", "A long, slender reptile with scales and no legs.")
-        };
+        ];
 
         public override async Task RunAsync()
         {

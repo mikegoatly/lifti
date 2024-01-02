@@ -17,7 +17,7 @@ namespace Lifti.Querying
             List<WildcardQueryFragment>? fragments = null;
             void AddFragment(WildcardQueryFragment fragment)
             {
-                fragments ??= new List<WildcardQueryFragment>();
+                fragments ??= [];
                 fragments.Add(fragment);
             }
             

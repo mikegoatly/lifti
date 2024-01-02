@@ -15,11 +15,11 @@ namespace Lifti.Tests.Querying.QueryParts
 {
     public class FuzzyWordQueryPartTestsFixture : IAsyncLifetime
     {
-        public string[] IndexedText { get; } = {
+        public string[] IndexedText { get; } = [
             "Some sample comics text to match on",
             "Samples sounds like a solid plan to me",
             "Odius ogres obey Mobius"
-        };
+        ];
 
         public FullTextIndex<int> Index { get; private set; } = null!;
 

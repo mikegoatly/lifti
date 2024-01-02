@@ -41,7 +41,7 @@ namespace Lifti.Tests
             fieldInfo.FieldKind.Should().Be(FieldKind.Static);
             fieldInfo.Tokenizer.Should().NotBeNull();
             var readField = await fieldInfo.ReadAsync("foo", default);
-            readField.Should().BeEquivalentTo(new[] { "foo" });
+            readField.Should().BeEquivalentTo(["foo"]);
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Lifti.Tests
             fieldInfo.FieldKind.Should().Be(FieldKind.Dynamic);
             fieldInfo.Tokenizer.Should().NotBeNull();
             var readField = await fieldInfo.ReadAsync(new TestObject(), default);
-            readField.Should().BeEquivalentTo(new[] { "bar" });
+            readField.Should().BeEquivalentTo(["bar"]);
         }
 
         [Fact]

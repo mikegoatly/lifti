@@ -25,7 +25,7 @@ namespace Lifti.Tests.Tokenization
         {
             var sut = WithConfiguration();
 
-            var output = Execute(sut, new string[] { null! });
+            var output = Execute(sut, [null!]);
 
             output.Should().BeEmpty();
         }
@@ -76,7 +76,7 @@ namespace Lifti.Tests.Tokenization
             [Fact]
             public void WhenIgnoredCharacterIsAlsoSplitCharacter_ShouldNotSplitOnCharacter()
             {
-                var output = WithConfiguration(ignoreChars: new[] { ',' }, additionalSplitChars: new[] { ',' })
+                var output = WithConfiguration(ignoreChars: [','], additionalSplitChars: [','])
                     .Process("test,test test".AsSpan());
 
                 output.Should().BeEquivalentTo(new[]
@@ -89,7 +89,7 @@ namespace Lifti.Tests.Tokenization
             [Fact]
             public void WithIgnoredCharacter_ShouldNotIncludeCharactersInTokenMatches()
             {
-                var output = WithConfiguration(ignoreChars: new[] { '\'' })
+                var output = WithConfiguration(ignoreChars: ['\''])
                     .Process("O'Reilly's".AsSpan());
 
                 output.Should().BeEquivalentTo(new[]
@@ -259,7 +259,7 @@ namespace Lifti.Tests.Tokenization
             [Fact]
             public void WhenSplittingOnAdditionalCharacters_ShouldTokenizeAtWordBreaksAndAdditionalCharacters()
             {
-                var sut = WithConfiguration(splitOnPunctuation: false, additionalSplitChars: new[] { '@', '¬' });
+                var sut = WithConfiguration(splitOnPunctuation: false, additionalSplitChars: ['@', '¬']);
 
                 var input = "Test@string¬with custom\tsplits";
 

@@ -17,20 +17,20 @@ namespace Lifti.Tests.Querying
 
         public CompositeTokenMatchLocationTests()
         {
-            this.match1Locations = new[] 
-            {
+            this.match1Locations =
+            [
                 new TokenLocation(100, 1, 2),
                 new TokenLocation(200, 1, 2)
-            };
+            ];
 
             this.match1 = new FakeTokenLocationMatch(100, 200, this.match1Locations);
 
-            this.match2Locations = new[] 
-            {
+            this.match2Locations =
+            [
                 new TokenLocation(110, 1, 2),
                 new TokenLocation(150, 1, 2),
                 new TokenLocation(180, 1, 2)
-            };
+            ];
 
             this.match2 = new FakeTokenLocationMatch(110, 180, this.match2Locations);
 

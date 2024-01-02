@@ -9,7 +9,7 @@ namespace Lifti.Tokenization
             this.WordLookup = wordLookup;
         }
 
-        public static IThesaurus Empty { get; } = new Thesaurus(new Dictionary<string, IReadOnlyList<string>>());
+        public static IThesaurus Empty { get; } = new Thesaurus([]);
 
         public Dictionary<string, IReadOnlyList<string>> WordLookup { get; }
 

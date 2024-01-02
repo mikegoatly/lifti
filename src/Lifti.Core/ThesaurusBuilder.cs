@@ -11,8 +11,8 @@ namespace Lifti
     /// </summary>
     public class ThesaurusBuilder
     {
-        private readonly Dictionary<string, HashSet<string>> synonymLookup = new();
-        private readonly Dictionary<string, HashSet<string>> hypernymLookup = new();
+        private readonly Dictionary<string, HashSet<string>> synonymLookup = [];
+        private readonly Dictionary<string, HashSet<string>> hypernymLookup = [];
 
         internal ThesaurusBuilder()
         {

@@ -103,12 +103,11 @@ namespace Lifti.Tests.Serialization
             await SerializeAndDeserializeAsync(index, deserializedIndex);
 
             deserializedIndex.FieldLookup.AllFieldNames.Should().BeEquivalentTo(
-                new[]
-                {
+                [
                     "Name",
                     "Foo",
                     "Bar"
-                });
+                ]);
 
             deserializedIndex.FieldLookup.GetFieldInfo("Foo").Id.Should().Be(2);
 

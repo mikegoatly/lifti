@@ -10,13 +10,13 @@ namespace Lifti.Tokenization.Stemming
         /// <summary>
         /// The list of apostrophe based endings that can be pruned in step 0.
         /// </summary>
-        private static readonly Dictionary<char, string[]> apostropheEnds = CreateSearchLookup(new[] { "'S'", "'S", "'" });
+        private static readonly Dictionary<char, string[]> apostropheEnds = CreateSearchLookup(["'S'", "'S", "'"]);
 
         /// <summary>
         /// The set of exceptions that are obeyed prior to any steps being executed.
         /// </summary>
         private static readonly WordReplacement[] exceptions =
-            {
+            [
                 new("SKIS", "SKI"),
                 new("SKIES", "SKY"),
                 new("DYING", "DIE"),
@@ -35,13 +35,13 @@ namespace Lifti.Tokenization.Stemming
                 new("COSMOS"),
                 new("BIAS"),
                 new("ANDES")
-            };
+            ];
 
         /// <summary>
         /// The set of exceptions that are obeyed between steps 1A and 1B.
         /// </summary>
         private static readonly WordReplacement[] exceptions2 =
-            {
+            [
                 new("INNING"),
                 new("OUTING"),
                 new("CANNING"),
@@ -50,12 +50,12 @@ namespace Lifti.Tokenization.Stemming
                 new("PROCEED"),
                 new("EXCEED"),
                 new("SUCCEED")
-            };
+            ];
 
         /// <summary>
         /// The list of endings need to have an "e" appended to the word during step 1b.
         /// </summary>
-        private static readonly Dictionary<char, string[]> step1bAppendEEndings = CreateSearchLookup(new[] { "AT", "BL", "IZ" });
+        private static readonly Dictionary<char, string[]> step1bAppendEEndings = CreateSearchLookup(["AT", "BL", "IZ"]);
 
         /// <summary>
         /// The replacements that can be made in step 1B.

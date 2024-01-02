@@ -13,7 +13,7 @@ namespace TestConsole
         public class ShardedIndex
         {
             private static readonly BinarySerializer<int> serializer = new BinarySerializer<int>();
-            private readonly Dictionary<string, FullTextIndex<int>> indexShards = new Dictionary<string, FullTextIndex<int>>();
+            private readonly Dictionary<string, FullTextIndex<int>> indexShards = [];
             private readonly SemaphoreSlim syncObject = new SemaphoreSlim(1);
 
             public async Task<FullTextIndex<int>> GetIndexAsync(string partitionKey, CancellationToken cancellationToken = default)
