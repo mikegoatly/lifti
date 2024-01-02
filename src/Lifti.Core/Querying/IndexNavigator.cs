@@ -331,14 +331,6 @@ namespace Lifti.Querying
                     m.SelectMany(w => w.Locations)));
         }
 
-        private static QueryTokenMatch CreateQueryTokenMatch(
-            (int documentId, IReadOnlyList<IndexedToken> indexedTokens) match, Func<IndexedToken, bool> indexedTokenFilter)
-        {
-            return new QueryTokenMatch(
-                match.documentId,
-                match.indexedTokens.Where(indexedTokenFilter).Select(v => new FieldMatch(v)).ToList());
-        }
-
         internal readonly struct IndexNavigatorBookmark : IIndexNavigatorBookmark, IEquatable<IndexNavigatorBookmark>
         {
             private readonly IndexNavigator indexNavigator;
