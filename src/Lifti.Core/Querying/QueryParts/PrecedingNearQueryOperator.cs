@@ -31,11 +31,10 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
-            return this.Left.Evaluate(navigatorCreator, queryContext)
-                .CompositePositionalIntersect(
-                this.Right.Evaluate(navigatorCreator, queryContext),
-                    0,
-                    this.Tolerance);
+            var (leftResults, rightResults) = this.EvaluateWithDocumentIntersection(navigatorCreator, queryContext);
+
+            return leftResults
+                .CompositePositionalIntersect(rightResults, 0, this.Tolerance);
         }
 
         /// <inheritdoc/>

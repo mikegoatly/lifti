@@ -27,6 +27,11 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
+            if (queryContext is null)
+            {
+                throw new ArgumentNullException(nameof(queryContext));
+            }
+
             var i = 0;
             var results = IntermediateQueryResult.Empty;
             do
@@ -41,6 +46,9 @@ namespace Lifti.Querying.QueryParts
                 {
                     results = results.CompositePositionalIntersect(nextResults, 0, 1);
                 }
+
+                // Filter subsequent words to only those that match the document ids we have so far
+                queryContext = queryContext with { FilterToDocumentIds = results.ToDocumentIdLookup() };
 
                 i++;
 

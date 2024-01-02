@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Lifti.Querying
 {
@@ -53,10 +52,16 @@ namespace Lifti.Querying
                 return IntermediateQueryResult.Empty;
             }
 
+            var documentMatches = this.currentNode.Matches.Enumerate();
+            if (queryContext.FilterToDocumentIds != null)
+            {
+                documentMatches = documentMatches.Where(m => queryContext.FilterToDocumentIds.Contains(m.documentId));
+            }
+
             IEnumerable<QueryTokenMatch> matches;
             if (queryContext.FilterToFieldId is byte targetFieldId)
             {
-                matches = this.currentNode.Matches.Enumerate()
+                matches = documentMatches
                     .Select(m => new QueryTokenMatch(
                         m.documentId,
                         m.indexedTokens.Where(t => t.FieldId == targetFieldId)
@@ -65,7 +70,7 @@ namespace Lifti.Querying
             }
             else
             {
-                matches = this.currentNode.Matches.Enumerate()
+                matches = documentMatches
                     .Select(m => new QueryTokenMatch(
                         m.documentId,
                         m.indexedTokens.Select(v => new FieldMatch(v)).ToList()));
@@ -97,6 +102,11 @@ namespace Lifti.Querying
                 {
                     foreach (var (documentId, indexedTokens) in node.Matches.Enumerate())
                     {
+                        if (queryContext.FilterToDocumentIds?.Contains(documentId) == false)
+                        {
+                            continue;
+                        }
+
                         var fieldMatches = queryContext.FilterToFieldId is byte targetFieldId
                             ? indexedTokens.Where(t => t.FieldId == targetFieldId).Select(t => new FieldMatch(t))
                             : indexedTokens.Select(v => new FieldMatch(v));
