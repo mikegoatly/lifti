@@ -86,7 +86,7 @@ namespace Lifti
         public IIndexedFieldLookup FieldLookup => this.fieldLookup;
 
         /// <inheritdoc />
-        public int Count => this.currentSnapshot.Metadata.Count;
+        public int Count => this.currentSnapshot.Metadata.DocumentCount;
 
         internal IIndexNodeFactory IndexNodeFactory { get; }
 

@@ -35,7 +35,7 @@ namespace Lifti.Querying
                 throw new ArgumentNullException(nameof(documentStore));
             }
 
-            var documentCount = (double)documentStore.Count;
+            var documentCount = (double)documentStore.DocumentCount;
             this.averageTokenCountByField = documentStore.IndexStatistics.TokenCountByField.ToDictionary(k => k.Key, k => k.Value / documentCount);
             this.documentCount = documentCount;
             this.k1 = k1;

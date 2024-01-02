@@ -106,7 +106,7 @@ namespace Lifti.Tests
         [Fact]
         public void Count_ShouldReturnCorrectValue()
         {
-            this.sut.Count.Should().Be(2);
+            this.sut.DocumentCount.Should().Be(2);
         }
 
         [Fact]

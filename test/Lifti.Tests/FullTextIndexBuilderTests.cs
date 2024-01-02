@@ -254,8 +254,8 @@ namespace Lifti.Tests
             var action1 = new List<string>();
             var action2 = new List<int>();
 
-            this.sut.WithIndexModificationAction(i => action1.Add(i.Metadata.Count.ToString()))
-                .WithIndexModificationAction(i => action2.Add(i.Metadata.Count));
+            this.sut.WithIndexModificationAction(i => action1.Add(i.Metadata.DocumentCount.ToString()))
+                .WithIndexModificationAction(i => action2.Add(i.Metadata.DocumentCount));
 
             var index = this.sut.Build();
 

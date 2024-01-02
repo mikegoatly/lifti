@@ -14,6 +14,11 @@ namespace Lifti.Querying
         bool HasExactMatches { get; }
 
         /// <summary>
+        /// Gets the index snapshot the navigator is currently navigating.
+        /// </summary>
+        IIndexSnapshot Snapshot { get; }
+
+        /// <summary>
         /// Enumerates all the tokens that are indexed under the current position in the navigator. This method can be used
         /// to reverse-engineer the words (tokens) that have been indexed. Note that this method will throw a <see cref="LiftiException"/>
         /// if called after a bookmark obtained by <see cref="CreateBookmark"/> is applied.

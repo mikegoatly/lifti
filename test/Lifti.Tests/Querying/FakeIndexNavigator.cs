@@ -38,6 +38,8 @@ namespace Lifti.Tests.Querying
 
         public bool HasExactMatches => this.ExpectedExactMatches.Matches.Count > 0;
 
+        public IIndexSnapshot Snapshot => throw new NotImplementedException();
+
         public static FakeIndexNavigator ReturningExactMatches(params int[] matchedDocumentIds)
         {
             return new FakeIndexNavigator(false, matchedDocumentIds);

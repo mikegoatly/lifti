@@ -14,14 +14,12 @@ namespace Lifti.Querying
 
         public IIndexNavigator Create(IIndexSnapshot indexSnapshot)
         {
-            var node = indexSnapshot.Root;
-
             if (!this.pool.TryTake(out var navigator))
             {
                 navigator = new IndexNavigator();
             }
 
-            navigator.Initialize(node, this, this.scorer.CreateIndexScorer(indexSnapshot));
+            navigator.Initialize(indexSnapshot, this, this.scorer.CreateIndexScorer(indexSnapshot));
             return navigator;
         }
 

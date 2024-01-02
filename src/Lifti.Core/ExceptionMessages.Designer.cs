@@ -484,6 +484,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internal error: no snapshot initialized in navigator.
+        /// </summary>
+        internal static string NoSnapshotInitialized {
+            get {
+                return ResourceManager.GetString("NoSnapshotInitialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not all requested items were returned. Tme missing ids were: {0}.
         /// </summary>
         internal static string NotAllRequestedItemsReturned {

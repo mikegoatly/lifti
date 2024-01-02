@@ -258,6 +258,9 @@
   <data name="NoScorerInitialized" xml:space="preserve">
     <value>Attempting to score a query result with no scorer initialized</value>
   </data>
+  <data name="NoSnapshotInitialized" xml:space="preserve">
+    <value>Internal error: no snapshot initialized in navigator</value>
+  </data>
   <data name="NotAllRequestedItemsReturned" xml:space="preserve">
     <value>Not all requested items were returned. Tme missing ids were: {0}</value>
   </data>

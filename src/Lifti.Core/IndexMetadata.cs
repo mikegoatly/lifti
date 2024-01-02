@@ -35,7 +35,11 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public int Count => this.DocumentKeyLookup.Count;
+        [Obsolete("Use DocumentCount property instead")]
+        public int Count => this.DocumentCount;
+
+        /// <inheritdoc />
+        public int DocumentCount => this.DocumentKeyLookup.Count;
 
         /// <inheritdoc />
         public IndexStatistics IndexStatistics { get; }

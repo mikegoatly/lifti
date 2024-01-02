@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Lifti
 {
@@ -10,7 +11,13 @@ namespace Lifti
         /// <summary>
         /// Gets the number of documents in the index.
         /// </summary>
+        [Obsolete("Use DocumentCount property instead")]
         int Count { get; }
+
+        /// <summary>
+        /// Gets the number of documents in the index.
+        /// </summary>
+        int DocumentCount { get; }
 
         /// <summary>
         /// Gets the <see cref="DocumentMetadata"/> for the given internal document id.

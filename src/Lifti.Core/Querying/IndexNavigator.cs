@@ -11,21 +11,33 @@ namespace Lifti.Querying
         private readonly StringBuilder navigatedWith = new(16);
         private IIndexNavigatorPool? pool;
         private IScorer? scorer;
+        private IIndexSnapshot? snapshot;
+
         private IndexNode? currentNode;
         private int intraNodeTextPosition;
         private bool bookmarkApplied;
 
-        internal void Initialize(IndexNode node, IIndexNavigatorPool pool, IScorer scorer)
+        internal void Initialize(IIndexSnapshot indexSnapshot, IIndexNavigatorPool pool, IScorer scorer)
         {
             this.pool = pool;
             this.scorer = scorer;
-            this.currentNode = node;
+            this.snapshot = indexSnapshot;
+            this.currentNode = indexSnapshot.Root;
             this.intraNodeTextPosition = 0;
             this.navigatedWith.Length = 0;
             this.bookmarkApplied = false;
         }
 
         private bool HasIntraNodeTextLeftToProcess => this.currentNode != null && this.intraNodeTextPosition < this.currentNode.IntraNodeText.Length;
+
+        /// <inheritdoc />
+        public IIndexSnapshot Snapshot
+        {
+            get
+            {
+                return this.snapshot ?? throw new LiftiException(ExceptionMessages.NoSnapshotInitialized);
+            }
+        }
 
         public bool HasExactMatches
         {

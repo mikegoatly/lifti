@@ -78,7 +78,7 @@ namespace Lifti.Serialization.Binary
 
         protected override async ValueTask WriteIndexMetadataAsync(IIndexSnapshot<TKey> index, CancellationToken cancellationToken)
         {
-            this.writer.WriteNonNegativeVarInt32(index.Metadata.Count);
+            this.writer.WriteNonNegativeVarInt32(index.Metadata.DocumentCount);
 
             foreach (var documentMetadata in index.Metadata.GetIndexedDocuments())
             {
