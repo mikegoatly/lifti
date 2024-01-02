@@ -161,14 +161,13 @@ namespace Lifti.Tokenization.Stemming
 
                         if (navigator.HasExactMatches)
                         {
-                            // TODO this includes scoring - probably not the best time to include that!
                             bestMatch = navigator.GetExactMatches(QueryContext.Empty);
                         }
                     }
 
                     if (bestMatch.Matches.Count > 0)
                     {
-                        return replacementSetLookup.Metadata.GetMetadata(bestMatch.Matches[0].DocumentId).Key;
+                        return replacementSetLookup.Metadata.GetDocumentMetadata(bestMatch.Matches[0].DocumentId).Key;
                     }
                 }
             }

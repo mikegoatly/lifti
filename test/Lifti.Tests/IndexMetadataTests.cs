@@ -71,7 +71,7 @@ namespace Lifti.Tests
             var documentStatistics = DocumentStatistics((1, 20), (2, 50), (3, 10));
             var itemMetadata = Lifti.DocumentMetadata.ForObject(1, 9, "9", documentStatistics, new System.DateTime(2022, 11, 23), 12D);
             this.sut.Add(itemMetadata);
-            this.sut.GetMetadata(9).Should().BeEquivalentTo(
+            this.sut.GetDocumentMetadata(9).Should().BeEquivalentTo(
                 itemMetadata);
         }
 
@@ -123,14 +123,14 @@ namespace Lifti.Tests
         [Fact]
         public void GetMetadataById_ShouldReturnCorrectItemForId()
         {
-            this.sut.GetMetadata(this.id1).Should().BeEquivalentTo(DocumentMetadata(this.id1, item1DocumentStatistics));
-            this.sut.GetMetadata(this.id2).Should().BeEquivalentTo(DocumentMetadata(this.id2, item2DocumentStatistics));
+            this.sut.GetDocumentMetadata(this.id1).Should().BeEquivalentTo(DocumentMetadata(this.id1, item1DocumentStatistics));
+            this.sut.GetDocumentMetadata(this.id2).Should().BeEquivalentTo(DocumentMetadata(this.id2, item2DocumentStatistics));
         }
 
         [Fact]
         public void GetMetadataById_ShouldThrowExceptionIfItemNotGound()
         {
-            Assert.Throws<LiftiException>(() => this.sut.GetMetadata(this.id2 + 1))
+            Assert.Throws<LiftiException>(() => this.sut.GetDocumentMetadata(this.id2 + 1))
                 .Message.Should().Be("Item not found");
         }
 
@@ -138,7 +138,7 @@ namespace Lifti.Tests
         public void ReleaseItem_ShouldReturnIdOfReleasedItem()
         {
             this.sut.Remove("2").Should().Be(this.id2);
-            Assert.Throws<LiftiException>(() => this.sut.GetMetadata(this.id2));
+            Assert.Throws<LiftiException>(() => this.sut.GetDocumentMetadata(this.id2));
         }
 
         [Fact]

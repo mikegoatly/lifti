@@ -1,4 +1,6 @@
 ﻿using Lifti.Querying;
+using Lifti.Tests.Fakes;
+using Lifti.Tests.Querying.QueryParts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +11,11 @@ namespace Lifti.Tests.Querying
     {
         public FakeIndexNavigator()
         {
+            this.Snapshot = new FakeIndexSnapshot(new FakeIndexMetadata<int>(10));
         }
 
         private FakeIndexNavigator(bool exactAndChildMatchOnly, params int[] matchedDocumentIds)
+            : this()
         {
             this.ExpectedExactAndChildMatches = new IntermediateQueryResult(
                 matchedDocumentIds.Select(
@@ -23,6 +27,7 @@ namespace Lifti.Tests.Querying
         }
 
         private FakeIndexNavigator(bool exactAndChildMatchOnly, params ScoredToken[] matches)
+            : this()
         {
             this.ExpectedExactAndChildMatches = new IntermediateQueryResult(matches);
 

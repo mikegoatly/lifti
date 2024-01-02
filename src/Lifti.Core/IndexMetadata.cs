@@ -100,7 +100,14 @@ namespace Lifti
         }
 
         /// <inheritdoc />
+        [Obsolete("Use GetDocumentMetadata instead")]
         public DocumentMetadata<TKey> GetMetadata(int documentId)
+        {
+            return this.GetDocumentMetadata(documentId);
+        }
+
+        /// <inheritdoc />
+        public DocumentMetadata<TKey> GetDocumentMetadata(int documentId)
         {
             if (!this.DocumentIdLookup.TryGetValue(documentId, out var documentMetadata))
             {
@@ -139,9 +146,16 @@ namespace Lifti
         }
 
         /// <inheritdoc />
+        DocumentMetadata IIndexMetadata.GetDocumentMetadata(int documentId)
+        {
+            return this.GetDocumentMetadata(documentId);
+        }
+
+        /// <inheritdoc />
+        [Obsolete("Use GetDocumentMetadata instead")]
         DocumentMetadata IIndexMetadata.GetMetadata(int documentId)
         {
-            return this.GetMetadata(documentId);
+            return this.GetDocumentMetadata(documentId);
         }
 
         /// <summary>

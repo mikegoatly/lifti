@@ -41,7 +41,7 @@ namespace Lifti.Querying
                 return Enumerable.Empty<SearchResult<TKey>>();
             }
 
-            var idLookup = index.Metadata;
+            var indexMetadata = index.Metadata;
             var fieldLookup = index.FieldLookup;
             var evaluationResult = this.Root.Evaluate(index.CreateNavigator, QueryContext.Empty);
             var matches = evaluationResult.Matches;
@@ -61,7 +61,7 @@ namespace Lifti.Querying
             var searchResults = new List<SearchResult<TKey>>(matches.Count);
             foreach (var documentResults in matches)
             {
-                var documentMetadata = idLookup.GetMetadata(documentResults.DocumentId);
+                var documentMetadata = indexMetadata.GetDocumentMetadata(documentResults.DocumentId);
 
                 searchResults.Add(
                     new SearchResult<TKey>(

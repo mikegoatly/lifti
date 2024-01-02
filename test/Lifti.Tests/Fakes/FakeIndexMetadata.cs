@@ -27,9 +27,14 @@ namespace Lifti.Tests.Fakes
 
         public int Count => this.DocumentCount;
 
-        public DocumentMetadata GetMetadata(int documentId)
+        public DocumentMetadata GetDocumentMetadata(int documentId)
         {
             return this.documentMetadata[documentId];
+        }
+
+        public DocumentMetadata GetMetadata(int documentId)
+        {
+            return this.GetDocumentMetadata(documentId);
         }
 
         public ScoreBoostMetadata GetObjectTypeScoreBoostMetadata(byte objectTypeId)

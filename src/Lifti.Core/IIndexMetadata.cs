@@ -25,6 +25,10 @@ namespace Lifti
         /// <exception cref="LiftiException">
         /// Thrown when the id is not known.
         /// </exception>
+        DocumentMetadata GetDocumentMetadata(int documentId);
+
+        /// <inheritdoc cref="GetDocumentMetadata(int)"/>
+        [Obsolete("Use GetDocumentMetadata(int) instead")]
         DocumentMetadata GetMetadata(int documentId);
 
         /// <summary>
@@ -57,13 +61,17 @@ namespace Lifti
         /// </summary>
         bool Contains(TKey key);
 
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
         /// <summary>
         /// Gets the <see cref="DocumentMetadata{TKey}"/> for the given document id.
         /// </summary>
         /// <exception cref="LiftiException">
         /// Thrown when the id is not known.
         /// </exception>
-#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
+        DocumentMetadata<TKey> GetDocumentMetadata(int documentId);
+
+        /// <inheritdoc cref="GetDocumentMetadata(int)"/>
+        [Obsolete("Use GetDocumentMetadata(int) instead")]
         DocumentMetadata<TKey> GetMetadata(int documentId);
 #pragma warning restore CS0108 // Member hides inherited member; missing new keyword
 

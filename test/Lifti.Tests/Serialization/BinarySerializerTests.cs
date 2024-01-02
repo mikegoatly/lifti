@@ -199,11 +199,11 @@ namespace Lifti.Tests.Serialization
 
             var objectScoreBoostMetadata = index.Metadata.GetObjectTypeScoreBoostMetadata(1);
             // The first item in the index wins for both score boosts, each with a weighting of 10.
-            objectScoreBoostMetadata.CalculateScoreBoost(index.Metadata.GetMetadata(0))
+            objectScoreBoostMetadata.CalculateScoreBoost(index.Metadata.GetDocumentMetadata(0))
                 .Should().Be(20D);
 
             // The first item in the index is at the bottom end of both scales, so should return 2.
-            objectScoreBoostMetadata.CalculateScoreBoost(index.Metadata.GetMetadata(1))
+            objectScoreBoostMetadata.CalculateScoreBoost(index.Metadata.GetDocumentMetadata(1))
                 .Should().Be(2D);
         }
 
@@ -222,7 +222,7 @@ namespace Lifti.Tests.Serialization
             index.Search("亜").Should().HaveCount(1);
 
             // The old index won't have any scoring data associated to the documents, so should return 1
-            index.Metadata.GetObjectTypeScoreBoostMetadata(1).CalculateScoreBoost(index.Metadata.GetMetadata(0))
+            index.Metadata.GetObjectTypeScoreBoostMetadata(1).CalculateScoreBoost(index.Metadata.GetDocumentMetadata(0))
                 .Should().Be(1D);
         }
 
@@ -398,15 +398,15 @@ namespace Lifti.Tests.Serialization
             var deserialized = CreateObjectIndex();
             await SerializeAndDeserializeAsync(index, deserialized);
 
-            var metadata = deserialized.Metadata.GetMetadata(0);
+            var metadata = deserialized.Metadata.GetDocumentMetadata(0);
             metadata.ScoringFreshnessDate.Should().Be(new DateTime(2022, 10, 1));
             metadata.ScoringMagnitude.Should().Be(5D);
 
-            metadata = deserialized.Metadata.GetMetadata(1);
+            metadata = deserialized.Metadata.GetDocumentMetadata(1);
             metadata.ScoringFreshnessDate.Should().BeNull();
             metadata.ScoringMagnitude.Should().BeNull();
 
-            metadata = deserialized.Metadata.GetMetadata(2);
+            metadata = deserialized.Metadata.GetDocumentMetadata(2);
             metadata.ScoringFreshnessDate.Should().BeNull();
             metadata.ScoringMagnitude.Should().BeNull();
         }
