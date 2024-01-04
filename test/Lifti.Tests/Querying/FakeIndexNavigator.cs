@@ -1,6 +1,6 @@
 ﻿using Lifti.Querying;
+using Lifti.Querying.Lifti.Querying;
 using Lifti.Tests.Fakes;
-using Lifti.Tests.Querying.QueryParts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -128,6 +128,16 @@ namespace Lifti.Tests.Querying
         }
 
         public IEnumerable<char> EnumerateNextCharacters()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddExactAndChildMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddExactMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1)
         {
             throw new NotImplementedException();
         }

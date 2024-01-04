@@ -45,58 +45,42 @@ namespace Lifti.Querying
             this.fieldScoreBoosts = fieldScoreBoosts;
         }
 
-        /// <inheritdoc />
-        public IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryTokenMatch> tokenMatches, double weighting)
+        public double CalculateScore(int totalMatchedDocuments, int documentId, byte fieldId, IReadOnlyList<TokenLocation> tokenLocations, double weighting)
         {
-            if (tokenMatches is null)
+            // TODO LRU cache idf?
+            var idf = this.CalculateInverseDocumentFrequency(totalMatchedDocuments);
+
+            var documentMetadata = this.indexMetadata.GetDocumentMetadata(documentId);
+
+            // TODO LRU cache objectScoreBoost by documentId?
+
+            // TODO LRU cache tokensInDocumentWeighting by documentId and fieldId?
+            var documentTokenCounts = documentMetadata.DocumentStatistics.TokenCountByField;
+            var tokensInDocument = documentTokenCounts[fieldId];
+            var tokensInDocumentWeighting = tokensInDocument / this.averageTokenCountByField[fieldId];
+
+            var frequencyInDocument = tokenLocations.Count;
+            var numerator = frequencyInDocument * this.k1PlusOne;
+            var denominator = frequencyInDocument + (this.k1 * (1 - this.b + (this.b * tokensInDocumentWeighting)));
+
+            var fieldScore = idf * (numerator / denominator);
+            var fieldScoreBoost = this.fieldScoreBoosts.GetScoreBoost(fieldId);
+
+            var weightedScore = fieldScore * weighting * fieldScoreBoost;
+
+            if (documentMetadata.ObjectTypeId is { } objectTypeId)
             {
-                throw new ArgumentNullException(nameof(tokenMatches));
+                var objectScoreBoostMetadata = this.indexMetadata.GetObjectTypeScoreBoostMetadata(objectTypeId);
+                weightedScore *= objectScoreBoostMetadata.CalculateScoreBoost(documentMetadata);
             }
 
-            var idf = this.CalculateInverseDocumentFrequency(tokenMatches);
-
-            return tokenMatches.Select(t =>
-            {
-                var documentMetadata = this.indexMetadata.GetDocumentMetadata(t.DocumentId);
-                var documentTokenCounts = documentMetadata.DocumentStatistics.TokenCountByField;
-                var scoredFieldMatches = new List<ScoredFieldMatch>(t.FieldMatches.Count);
-                var objectScoreBoostMetadata = documentMetadata.ObjectTypeId is { } objectTypeId
-                    ? this.indexMetadata.GetObjectTypeScoreBoostMetadata(objectTypeId)
-                    : null;
-
-                foreach (var fieldMatch in t.FieldMatches)
-                {
-                    var frequencyInDocument = fieldMatch.Locations.Count;
-                    var fieldId = fieldMatch.FieldId;
-                    var tokensInDocument = documentTokenCounts[fieldId];
-                    var tokensInDocumentWeighting = tokensInDocument / this.averageTokenCountByField[fieldId];
-
-                    var numerator = frequencyInDocument * this.k1PlusOne;
-                    var denominator = frequencyInDocument + (this.k1 * (1 - this.b + (this.b * tokensInDocumentWeighting)));
-
-                    var fieldScore = idf * (numerator / denominator);
-
-                    var fieldScoreBoost = this.fieldScoreBoosts.GetScoreBoost(fieldId);
-
-                    var weightedScore = fieldScore * weighting * fieldScoreBoost;
-
-                    if (objectScoreBoostMetadata != null)
-                    {
-                        weightedScore *= objectScoreBoostMetadata.CalculateScoreBoost(documentMetadata);
-                    }
-
-                    scoredFieldMatches.Add(new ScoredFieldMatch(weightedScore, fieldMatch));
-                }
-
-                return new ScoredToken(t.DocumentId, scoredFieldMatches);
-            }).ToList();
+            return weightedScore;
         }
 
-        private double CalculateInverseDocumentFrequency(IReadOnlyList<QueryTokenMatch> tokens)
+        private double CalculateInverseDocumentFrequency(int matchedDocumentCount)
         {
-            var tokenCount = tokens.Count;
-            var idf = (this.documentCount - tokenCount + 0.5D)
-                    / (tokenCount + 0.5D);
+            var idf = (this.documentCount - matchedDocumentCount + 0.5D)
+                    / (matchedDocumentCount + 0.5D);
 
             idf = Math.Log(1D + idf);
 

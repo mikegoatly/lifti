@@ -65,7 +65,7 @@ namespace Lifti.Querying
         /// <see cref="ScoredToken"/> are included but unaltered, field matches appearing in both <see cref="ScoredToken"/>s
         /// are unioned.
         /// </summary>
-        protected static IEnumerable<ScoredFieldMatch> MergeFields(ScoredToken left, ScoredToken right)
+        protected static IReadOnlyList<ScoredFieldMatch> MergeFields(ScoredToken left, ScoredToken right)
         {
             var leftIndex = 0;
             var rightIndex = 0;
@@ -75,6 +75,8 @@ namespace Lifti.Querying
             var leftCount = leftMatches.Count;
             var rightCount = rightMatches.Count;
 
+            List<ScoredFieldMatch> results = new(leftCount + rightCount);
+
             while (leftIndex < leftCount && rightIndex < rightCount)
             {
                 var leftField = leftMatches[leftIndex];
@@ -82,26 +84,24 @@ namespace Lifti.Querying
 
                 if (leftField.FieldId == rightField.FieldId)
                 {
-                    var concatenatedLocations = new List<ITokenLocationMatch>(leftField.Locations);
-                    concatenatedLocations.AddRange(rightField.Locations);
+                    var concatenatedLocations = MergeSort(leftField.Locations, rightField.Locations);
 
-                    yield return new ScoredFieldMatch(
+                    results.Add(ScoredFieldMatch.CreateFromPresorted(
                         leftField.Score + rightField.Score,
-                        new FieldMatch(
-                            leftField.FieldId,
-                            concatenatedLocations));
+                        leftField.FieldId,
+                        concatenatedLocations));
 
                     leftIndex++;
                     rightIndex++;
                 }
                 else if (leftField.FieldId < rightField.FieldId)
                 {
-                    yield return leftField;
+                    results.Add(leftField);
                     leftIndex++;
                 }
                 else
                 {
-                    yield return rightField;
+                    results.Add(rightField);
                     rightIndex++;
                 }
             }
@@ -109,16 +109,62 @@ namespace Lifti.Querying
             // Add any remaining matches from the left
             while (leftIndex < leftCount)
             {
-                yield return leftMatches[leftIndex];
+                results.Add(leftMatches[leftIndex]);
                 leftIndex++;
             }
 
             // Add any remaining matches from the right
             while (rightIndex < rightCount)
             {
-                yield return rightMatches[rightIndex];
+                results.Add(rightMatches[rightIndex]);
                 rightIndex++;
             }
+
+            return results;
+        }
+
+        private static List<ITokenLocationMatch> MergeSort(IReadOnlyList<ITokenLocationMatch> left, IReadOnlyList<ITokenLocationMatch> right)
+        {
+            // When merging we'll compare the values by MinTokenIndex
+            var leftCount = left.Count;
+            var rightCount = right.Count;
+            var results = new List<ITokenLocationMatch>(leftCount + rightCount);
+
+            var leftIndex = 0;
+            var rightIndex = 0;
+
+            while (leftIndex < leftCount && rightIndex < rightCount)
+            {
+                var leftMatch = left[leftIndex];
+                var rightMatch = right[rightIndex];
+
+                if (leftMatch.MinTokenIndex < rightMatch.MinTokenIndex)
+                {
+                    results.Add(leftMatch);
+                    leftIndex++;
+                }
+                else
+                {
+                    results.Add(rightMatch);
+                    rightIndex++;
+                }
+            }
+
+            // Add any remaining matches from the left
+            while (leftIndex < leftCount)
+            {
+                results.Add(left[leftIndex]);
+                leftIndex++;
+            }
+
+            // Add any remaining matches from the right
+            while (rightIndex < rightCount)
+            {
+                results.Add(right[rightIndex]);
+                rightIndex++;
+            }
+
+            return results;
         }
     }
 }

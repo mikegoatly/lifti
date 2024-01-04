@@ -81,11 +81,13 @@ namespace Lifti.Querying
                 if (fieldTokenMatches.Count > 0)
                 {
                     fieldResults.Add(
-                        new ScoredFieldMatch(
+                        ScoredFieldMatch.CreateFromUnsorted(
                             score,
-                            new FieldMatch(fieldId, fieldTokenMatches)));
+                            fieldId, 
+                            // We need to copy the list here as we're going to reuse it
+                            fieldTokenMatches));
 
-                    fieldTokenMatches.Clear();
+                    fieldTokenMatches = [];
                 }
             }
         }

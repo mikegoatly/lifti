@@ -109,11 +109,12 @@ namespace Lifti.Querying
                 if (fieldTokenMatches.Count > 0)
                 {
                     positionalMatches.Add(
-                        new ScoredFieldMatch(
-                            score,
-                            new FieldMatch(fieldId, fieldTokenMatches)));
+                        ScoredFieldMatch.CreateFromPresorted(
+                            score, 
+                            fieldId, 
+                            fieldTokenMatches));
 
-                    fieldTokenMatches.Clear();
+                    fieldTokenMatches = new();
                 }
             }
         }

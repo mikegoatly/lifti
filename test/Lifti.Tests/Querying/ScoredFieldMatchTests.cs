@@ -1,6 +1,4 @@
 ﻿using FluentAssertions;
-using Lifti.Querying;
-using System.Collections.Generic;
 using Xunit;
 
 namespace Lifti.Tests.Querying
@@ -10,7 +8,10 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void ShouldReturnUniqueLocationsInOrder()
         {
-            var sut = new FieldMatch(1, new List<ITokenLocationMatch> { CompositeMatch(4, 5, 6, 9), TokenMatch(6), CompositeMatch(5, 6), TokenMatch(7) });
+            var sut = ScoredFieldMatch(
+                1D,
+                1,
+                [CompositeMatch(4, 5, 6, 9), TokenMatch(6), CompositeMatch(5, 6), TokenMatch(7)]);
 
             sut.GetTokenLocations().Should().BeEquivalentTo(
                 new[]
@@ -20,7 +21,7 @@ namespace Lifti.Tests.Querying
                     new TokenLocation(6, 6, 6),
                     new TokenLocation(7, 7, 7),
                     new TokenLocation(9, 9, 9)
-                }, 
+                },
                 options => options.WithStrictOrdering());
         }
     }
