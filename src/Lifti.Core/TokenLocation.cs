@@ -33,14 +33,8 @@ namespace Lifti
         /// </summary>
         public ushort Length { get; }
 
-        /// <summary>
-        /// Gets the maximum index in the field that the token matched.
-        /// </summary>
         int ITokenLocation.MaxTokenIndex => this.TokenIndex;
 
-        /// <summary>
-        /// Gets the minimum index in the field that the token matched.
-        /// </summary>
         int ITokenLocation.MinTokenIndex => this.TokenIndex;
 
         void ITokenLocation.AddTo(HashSet<TokenLocation> collector)

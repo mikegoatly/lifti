@@ -40,10 +40,6 @@ namespace Lifti.Querying
         {
             private readonly Dictionary<byte, FieldMatchCollector> fieldLookup = [];
 
-            public FieldMatches()
-            {
-            }
-
             public void Add(byte fieldId, double score, IReadOnlyList<TokenLocation> tokenLocations)
             {
                 if (!this.fieldLookup.TryGetValue(fieldId, out var fieldMatchCollector))

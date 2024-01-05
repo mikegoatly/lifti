@@ -30,11 +30,11 @@ namespace Lifti.Tests.Querying.QueryParts
             {
                 ScoredToken(
                     7,
-                    ScoredFieldMatch(4D, 1, CompositeMatch(8, 6), CompositeMatch(100, 102))),
+                    ScoredFieldMatch(4D, 1, CompositeTokenLocation(8, 6), CompositeTokenLocation(100, 102))),
                 ScoredToken(
                     8,
-                    ScoredFieldMatch(6D, 1, CompositeMatch(101, 106)),
-                    ScoredFieldMatch(13D, 2, CompositeMatch(8, 3), CompositeMatch(104, 105)))
+                    ScoredFieldMatch(6D, 1, CompositeTokenLocation(101, 106)),
+                    ScoredFieldMatch(13D, 2, CompositeTokenLocation(8, 3), CompositeTokenLocation(104, 105)))
             });
         }
 

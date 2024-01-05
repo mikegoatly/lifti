@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Lifti.Tests.Querying
 {
-    public class CompositeTokenMatchLocationTests : QueryTestBase
+    public class CompositeTokenLocationTests : QueryTestBase
     {
         private readonly FakeTokenLocation match2;
         private readonly FakeTokenLocation match1;
@@ -16,7 +16,7 @@ namespace Lifti.Tests.Querying
         private readonly TokenLocation[] match1Locations;
         private readonly TokenLocation[] match2Locations;
 
-        public CompositeTokenMatchLocationTests()
+        public CompositeTokenLocationTests()
         {
             this.match1Locations =
             [

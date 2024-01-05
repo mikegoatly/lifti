@@ -6,18 +6,18 @@ namespace Lifti.Tests.Querying
 {
     public abstract class QueryTestBase
     {
-        internal static CompositeTokenLocation CompositeMatch(int leftWordIndex, int rightWordIndex)
+        internal static CompositeTokenLocation CompositeTokenLocation(int leftWordIndex, int rightWordIndex)
         {
-            return new CompositeTokenLocation(TokenMatch(leftWordIndex), TokenMatch(rightWordIndex));
+            return new CompositeTokenLocation(TokenLocation(leftWordIndex), TokenLocation(rightWordIndex));
         }
 
-        internal static CompositeTokenLocation CompositeMatch(params int[] wordIndexes)
+        internal static CompositeTokenLocation CompositeTokenLocation(params int[] wordIndexes)
         {
-            var match = CompositeMatch(wordIndexes[0], wordIndexes[1]);
+            var match = CompositeTokenLocation(wordIndexes[0], wordIndexes[1]);
 
             for (var i = 2; i < wordIndexes.Length; i++)
             {
-                match = new CompositeTokenLocation(match, TokenMatch(wordIndexes[i]));
+                match = new CompositeTokenLocation(match, TokenLocation(wordIndexes[i]));
             }
 
             return match;
@@ -25,20 +25,15 @@ namespace Lifti.Tests.Querying
 
         internal static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params int[] wordIndexes)
         {
-            return Lifti.Querying.ScoredFieldMatch.CreateFromUnsorted(
+            return Lifti.Querying.ScoredFieldMatch.CreateFromPresorted(
                     score,
                     fieldId,
-                    TokenLocationMatches(wordIndexes));
-        }
-
-        internal static List<ITokenLocation> TokenLocationMatches(params int[] wordIndexes)
-        {
-            return wordIndexes.Select(TokenMatch).ToList();
+                    TokenLocations(wordIndexes));
         }
 
         internal static List<TokenLocation> TokenLocations(params int[] wordIndexes)
         {
-            return wordIndexes.Select(x => new TokenLocation(x, x, (ushort)x)).ToList();
+            return wordIndexes.Select(TokenLocation).ToList();
         }
 
         internal static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params (int, int)[] compositeMatches)
@@ -46,7 +41,7 @@ namespace Lifti.Tests.Querying
             return ScoredFieldMatch(
                 score,
                 fieldId,
-                compositeMatches.Select(i => (ITokenLocation)CompositeMatch(i.Item1, i.Item2)).ToArray());
+                compositeMatches.Select(i => (ITokenLocation)CompositeTokenLocation(i.Item1, i.Item2)).ToArray());
         }
 
         internal static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params ITokenLocation[] compositeMatches)
@@ -57,12 +52,12 @@ namespace Lifti.Tests.Querying
                 compositeMatches.ToList());
         }
 
-        internal static ITokenLocation TokenMatch(int index)
+        internal static TokenLocation TokenLocation(int index)
         {
             return new TokenLocation(index, index, (ushort)index);
         }
 
-        internal static ITokenLocation SingleTokenLocationMatch(int index, int start, int length)
+        internal static TokenLocation TokenLocation(int index, int start, int length)
         {
             return new TokenLocation(index, start, (ushort)length);
         }
@@ -72,10 +67,10 @@ namespace Lifti.Tests.Querying
             return new IntermediateQueryResult(matches);
         }
 
-        internal static ScoredToken ScoredToken(int itemId, params ScoredFieldMatch[] matches)
+        internal static ScoredToken ScoredToken(int documentId, params ScoredFieldMatch[] matches)
         {
             return new ScoredToken(
-                itemId,
+                documentId,
                 matches);
         }
     }

@@ -249,6 +249,8 @@ namespace Lifti
         private IndexNode? BinarySearchChildNodes(char value)
         {
             // We don't want to use Array.BinarySearch here because of the need to use a custom comparer.
+            // This custom implementation is significantly faster because we don't get involved in 
+            // any boxing/unboxing of the value types.
             var left = 0;
             var right = this.childNodes.Length - 1;
 

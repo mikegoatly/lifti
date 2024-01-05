@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Lifti.Querying
@@ -7,15 +8,23 @@ namespace Lifti.Querying
     /// <summary>
     /// Information about an document's field that was matched and scored during the execution of a query.
     /// </summary>
-    public readonly struct ScoredFieldMatch : IEquatable<ScoredFieldMatch>
+    public class ScoredFieldMatch : IEquatable<ScoredFieldMatch>
     {
-        /// <summary>
-        /// Constructs a new instance of <see cref="ScoredFieldMatch"/>.
-        /// </summary>
+        private readonly IReadOnlyList<TokenLocation>? rawOrderedLocations;
+        private readonly IReadOnlyList<ITokenLocation>? interfacedLocations;
+        private ScoredFieldMatch(double score, byte fieldId, IReadOnlyList<TokenLocation> tokenLocations)
+        {
+            this.Score = score;
+            this.FieldId = fieldId;
+            this.rawOrderedLocations = tokenLocations;
+            this.Locations = tokenLocations;
+        }
+
         private ScoredFieldMatch(double score, byte fieldId, IReadOnlyList<ITokenLocation> tokenLocations)
         {
             this.Score = score;
             this.FieldId = fieldId;
+            this.interfacedLocations = tokenLocations;
             this.Locations = tokenLocations;
         }
 
@@ -23,7 +32,20 @@ namespace Lifti.Querying
         /// Creates a new instance of the <see cref="ScoredFieldMatch"/> class where the caller is guaranteeing that 
         /// the set of token locations is already sorted.
         /// </summary>
+        internal static ScoredFieldMatch CreateFromPresorted(double score, byte fieldId, IReadOnlyList<TokenLocation> tokenLocations)
+        {
+            EnsureTokenLocationOrder(tokenLocations);
+            return new ScoredFieldMatch(score, fieldId, tokenLocations);
+        }
+
         internal static ScoredFieldMatch CreateFromPresorted(double score, byte fieldId, IReadOnlyList<ITokenLocation> tokenLocations)
+        {
+            EnsureTokenLocationOrder(tokenLocations);
+            return new ScoredFieldMatch(score, fieldId, tokenLocations);
+        }
+
+        [Conditional("DEBUG")]
+        private static void EnsureTokenLocationOrder(IReadOnlyList<ITokenLocation> tokenLocations)
         {
 #if DEBUG
             // Verify that the tokens locations are in token index order
@@ -31,12 +53,10 @@ namespace Lifti.Querying
             {
                 if (tokenLocations[i - 1].MinTokenIndex > tokenLocations[i].MinTokenIndex)
                 {
-                    System.Diagnostics.Debug.Fail("Token locations must be in token index order");
+                    Debug.Fail("Token locations must be in token index order");
                 }
             }
 #endif
-
-            return new ScoredFieldMatch(score, fieldId, tokenLocations);
         }
 
         internal static ScoredFieldMatch CreateFromUnsorted(double score, byte fieldId, List<ITokenLocation> tokenLocations)
@@ -67,13 +87,18 @@ namespace Lifti.Querying
         /// </summary>
         public IReadOnlyList<TokenLocation> GetTokenLocations()
         {
+            if (this.rawOrderedLocations != null)
+            {
+                return this.rawOrderedLocations;
+            }
+
             var results = new HashSet<TokenLocation>();
 
 #if !NETSTANDARD
-            results.EnsureCapacity(this.Locations.Count);
+            results.EnsureCapacity(this.interfacedLocations!.Count);
 #endif
 
-            foreach (var location in this.Locations)
+            foreach (var location in this.interfacedLocations!)
             {
                 location.AddTo(results);
             }
@@ -104,11 +129,28 @@ namespace Lifti.Querying
         }
 
         /// <inheritdoc />
-        public bool Equals(ScoredFieldMatch other)
+        public bool Equals(ScoredFieldMatch? other)
         {
-            return this.Score == other.Score &&
-                   this.FieldId == other.FieldId &&
-                   this.Locations.SequenceEqual(other.Locations);
+            return other is not null &&
+                this.Score == other.Score &&
+                this.FieldId == other.FieldId &&
+                this.Locations.SequenceEqual(other.Locations);
+        }
+
+        internal static ScoredFieldMatch Merge(ScoredFieldMatch leftField, ScoredFieldMatch rightField)
+        {
+            if (leftField.rawOrderedLocations != null && rightField.rawOrderedLocations != null)
+            {
+                return CreateFromPresorted(
+                    leftField.Score + rightField.Score,
+                    leftField.FieldId,
+                    MergeSort(leftField.rawOrderedLocations, rightField.rawOrderedLocations));
+            }
+
+            return CreateFromPresorted(
+                leftField.Score + rightField.Score,
+                leftField.FieldId,
+                MergeSort(leftField.Locations, rightField.Locations));
         }
 
         /// <summary>
@@ -116,7 +158,7 @@ namespace Lifti.Querying
         /// </summary>
         public static bool operator ==(ScoredFieldMatch left, ScoredFieldMatch right)
         {
-            return left.Equals(right);
+            return left?.Equals(right) ?? right is null;
         }
 
         /// <summary>
@@ -125,6 +167,58 @@ namespace Lifti.Querying
         public static bool operator !=(ScoredFieldMatch left, ScoredFieldMatch right)
         {
             return !(left == right);
+        }
+
+        private static List<T> MergeSort<T>(IReadOnlyList<T> left, IReadOnlyList<T> right)
+            where T : IComparable<T>
+        {
+            // When merging we'll compare the values by MinTokenIndex
+            var leftCount = left.Count;
+            var rightCount = right.Count;
+            var results = new List<T>(leftCount + rightCount);
+
+            var leftIndex = 0;
+            var rightIndex = 0;
+
+            while (leftIndex < leftCount && rightIndex < rightCount)
+            {
+                var leftMatch = left[leftIndex];
+                var rightMatch = right[rightIndex];
+
+                switch (leftMatch.CompareTo(rightMatch))
+                {
+                    case -1:
+                        results.Add(leftMatch);
+                        leftIndex++;
+                        break;
+                    case 1:
+                        results.Add(rightMatch);
+                        rightIndex++;
+                        break;
+                    default:
+                        // They're equal, so we deduplicate and just add one
+                        results.Add(leftMatch);
+                        leftIndex++;
+                        rightIndex++;
+                        break;
+                }
+            }
+
+            // Add any remaining matches from the left
+            while (leftIndex < leftCount)
+            {
+                results.Add(left[leftIndex]);
+                leftIndex++;
+            }
+
+            // Add any remaining matches from the right
+            while (rightIndex < rightCount)
+            {
+                results.Add(right[rightIndex]);
+                rightIndex++;
+            }
+
+            return results;
         }
     }
 }

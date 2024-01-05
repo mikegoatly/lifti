@@ -232,14 +232,14 @@ namespace Lifti.Tests.Querying
                 ScoredToken(
                     1,
                     [
-                        ScoredFieldMatch(0D, 1, SingleTokenLocationMatch(0, 0, 6), SingleTokenLocationMatch(1, 7, 3), SingleTokenLocationMatch(2, 11, 5)),
-                        ScoredFieldMatch(0D, 2, SingleTokenLocationMatch(0, 0, 4), SingleTokenLocationMatch(1, 5, 5))
+                        ScoredFieldMatch(0D, 1, TokenLocation(0, 0, 6), TokenLocation(1, 7, 3), TokenLocation(2, 11, 5)),
+                        ScoredFieldMatch(0D, 2, TokenLocation(0, 0, 4), TokenLocation(1, 5, 5))
                     ]),
                 ScoredToken(
                     2,
                     [
-                        ScoredFieldMatch(0D, 1, SingleTokenLocationMatch(0, 0, 3)),
-                        ScoredFieldMatch(0D, 2, SingleTokenLocationMatch(0, 0, 5))
+                        ScoredFieldMatch(0D, 1, TokenLocation(0, 0, 3)),
+                        ScoredFieldMatch(0D, 2, TokenLocation(0, 0, 5))
                     ])
                 };
 

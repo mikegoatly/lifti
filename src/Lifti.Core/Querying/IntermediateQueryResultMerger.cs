@@ -84,12 +84,7 @@ namespace Lifti.Querying
 
                 if (leftField.FieldId == rightField.FieldId)
                 {
-                    var concatenatedLocations = MergeSort(leftField.Locations, rightField.Locations);
-
-                    results.Add(ScoredFieldMatch.CreateFromPresorted(
-                        leftField.Score + rightField.Score,
-                        leftField.FieldId,
-                        concatenatedLocations));
+                    results.Add(ScoredFieldMatch.Merge(leftField, rightField));
 
                     leftIndex++;
                     rightIndex++;
@@ -117,50 +112,6 @@ namespace Lifti.Querying
             while (rightIndex < rightCount)
             {
                 results.Add(rightMatches[rightIndex]);
-                rightIndex++;
-            }
-
-            return results;
-        }
-
-        private static List<ITokenLocation> MergeSort(IReadOnlyList<ITokenLocation> left, IReadOnlyList<ITokenLocation> right)
-        {
-            // When merging we'll compare the values by MinTokenIndex
-            var leftCount = left.Count;
-            var rightCount = right.Count;
-            var results = new List<ITokenLocation>(leftCount + rightCount);
-
-            var leftIndex = 0;
-            var rightIndex = 0;
-
-            while (leftIndex < leftCount && rightIndex < rightCount)
-            {
-                var leftMatch = left[leftIndex];
-                var rightMatch = right[rightIndex];
-
-                if (leftMatch.MinTokenIndex < rightMatch.MinTokenIndex)
-                {
-                    results.Add(leftMatch);
-                    leftIndex++;
-                }
-                else
-                {
-                    results.Add(rightMatch);
-                    rightIndex++;
-                }
-            }
-
-            // Add any remaining matches from the left
-            while (leftIndex < leftCount)
-            {
-                results.Add(left[leftIndex]);
-                leftIndex++;
-            }
-
-            // Add any remaining matches from the right
-            while (rightIndex < rightCount)
-            {
-                results.Add(right[rightIndex]);
                 rightIndex++;
             }
 
