@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,7 +11,8 @@ namespace Lifti.Querying
     internal class OkapiBm25Scorer : IScorer
     {
         private readonly Dictionary<byte, double> averageTokenCountByField;
-        private readonly Dictionary<int, double> idfCache = new(100);
+        private readonly ConcurrentDictionary<(int documentId, byte fieldId), (double scoreBoost, double tokensInDocumentWeighting)> documentFieldCache = new();
+        private readonly ConcurrentDictionary<int, double> idfCache = new();
         private readonly double documentCount;
         private readonly double k1;
         private readonly double k1PlusOne;
@@ -50,31 +52,38 @@ namespace Lifti.Querying
         {
             var idf = this.CalculateInverseDocumentFrequency(totalMatchedDocuments);
 
-            var documentMetadata = this.indexMetadata.GetDocumentMetadata(documentId);
+            double scoreBoost;
+            double tokensInDocumentWeighting;
+            if (this.documentFieldCache.TryGetValue((documentId, fieldId), out var cacheEntry))
+            {
+                (scoreBoost, tokensInDocumentWeighting) = cacheEntry;
+            }
+            else
+            {
+                var documentMetadata = this.indexMetadata.GetDocumentMetadata(documentId);
+                var documentTokenCounts = documentMetadata.DocumentStatistics.TokenCountByField;
+                var tokensInDocument = documentTokenCounts[fieldId];
+                tokensInDocumentWeighting = tokensInDocument / this.averageTokenCountByField[fieldId];
 
-            // TODO LRU cache objectScoreBoost by documentId?
+                // We can cache the score boost for the field and object type (if applicable) because it won't
+                // change for the lifetime of the associated index snapshot.
+                scoreBoost = this.fieldScoreBoosts.GetScoreBoost(fieldId);
+                if (documentMetadata.ObjectTypeId is { } objectTypeId)
+                {
+                    var objectScoreBoostMetadata = this.indexMetadata.GetObjectTypeScoreBoostMetadata(objectTypeId);
+                    scoreBoost *= objectScoreBoostMetadata.CalculateScoreBoost(documentMetadata);
+                }
 
-            // TODO LRU cache tokensInDocumentWeighting by documentId and fieldId?
-            var documentTokenCounts = documentMetadata.DocumentStatistics.TokenCountByField;
-            var tokensInDocument = documentTokenCounts[fieldId];
-            var tokensInDocumentWeighting = tokensInDocument / this.averageTokenCountByField[fieldId];
+                this.documentFieldCache.TryAdd((documentId, fieldId), (scoreBoost, tokensInDocumentWeighting));
+            }
 
             var frequencyInDocument = tokenLocations.Count;
             var numerator = frequencyInDocument * this.k1PlusOne;
             var denominator = frequencyInDocument + (this.k1 * (1 - this.b + (this.b * tokensInDocumentWeighting)));
 
             var fieldScore = idf * (numerator / denominator);
-            var fieldScoreBoost = this.fieldScoreBoosts.GetScoreBoost(fieldId);
 
-            var weightedScore = fieldScore * weighting * fieldScoreBoost;
-
-            if (documentMetadata.ObjectTypeId is { } objectTypeId)
-            {
-                var objectScoreBoostMetadata = this.indexMetadata.GetObjectTypeScoreBoostMetadata(objectTypeId);
-                weightedScore *= objectScoreBoostMetadata.CalculateScoreBoost(documentMetadata);
-            }
-
-            return weightedScore;
+            return fieldScore * weighting * scoreBoost;
         }
 
         private double CalculateInverseDocumentFrequency(int matchedDocumentCount)
@@ -86,7 +95,7 @@ namespace Lifti.Querying
 
                 idf = Math.Log(1D + idf);
 
-                this.idfCache.Add(matchedDocumentCount, idf);
+                this.idfCache.TryAdd(matchedDocumentCount, idf);
             }
 
             return idf;
