@@ -12,7 +12,7 @@ namespace Lifti.Querying
         /// <summary>
         /// Constructs a new instance of <see cref="ScoredFieldMatch"/>.
         /// </summary>
-        private ScoredFieldMatch(double score, byte fieldId, IReadOnlyList<ITokenLocationMatch> tokenLocations)
+        private ScoredFieldMatch(double score, byte fieldId, IReadOnlyList<ITokenLocation> tokenLocations)
         {
             this.Score = score;
             this.FieldId = fieldId;
@@ -23,7 +23,7 @@ namespace Lifti.Querying
         /// Creates a new instance of the <see cref="ScoredFieldMatch"/> class where the caller is guaranteeing that 
         /// the set of token locations is already sorted.
         /// </summary>
-        internal static ScoredFieldMatch CreateFromPresorted(double score, byte fieldId, IReadOnlyList<ITokenLocationMatch> tokenLocations)
+        internal static ScoredFieldMatch CreateFromPresorted(double score, byte fieldId, IReadOnlyList<ITokenLocation> tokenLocations)
         {
 #if DEBUG
             // Verify that the tokens locations are in token index order
@@ -39,7 +39,7 @@ namespace Lifti.Querying
             return new ScoredFieldMatch(score, fieldId, tokenLocations);
         }
 
-        internal static ScoredFieldMatch CreateFromUnsorted(double score, byte fieldId, List<ITokenLocationMatch> tokenLocations)
+        internal static ScoredFieldMatch CreateFromUnsorted(double score, byte fieldId, List<ITokenLocation> tokenLocations)
         {
             tokenLocations.Sort((x, y) => x.MinTokenIndex.CompareTo(y.MinTokenIndex));
             return new ScoredFieldMatch(score, fieldId, tokenLocations);
@@ -58,15 +58,27 @@ namespace Lifti.Querying
         /// <summary>
         /// Gets the locations in the field text at which the token was matched.
         /// </summary>
-        public IReadOnlyList<ITokenLocationMatch> Locations { get; }
+        internal IReadOnlyList<ITokenLocation> Locations { get; }
 
         /// <summary>
-        /// Enumerates through all the <see cref="Locations"/> and expands them to a set of <see cref="TokenLocation"/>s.
+        /// Collects, deduplicates and sorts all the <see cref="TokenLocation"/>s for this instance.
+        /// This method is only expected to be called once per instance, so the result of this is not cached.
+        /// Multiple calls to this method will result in multiple enumerations of the locations.
         /// </summary>
         public IReadOnlyList<TokenLocation> GetTokenLocations()
         {
-            return this.Locations.SelectMany(l => l.GetLocations())
-                .Distinct()
+            var results = new HashSet<TokenLocation>();
+
+#if !NETSTANDARD
+            results.EnsureCapacity(this.Locations.Count);
+#endif
+
+            foreach (var location in this.Locations)
+            {
+                location.AddTo(results);
+            }
+
+            return results
                 .OrderBy(l => l.TokenIndex)
                 .ToList();
         }

@@ -20,8 +20,8 @@ namespace Lifti.Querying
         internal static IEnumerable<(
             byte fieldId,
             double score,
-            IReadOnlyList<ITokenLocationMatch> leftLocations,
-            IReadOnlyList<ITokenLocationMatch> rightLocations
+            IReadOnlyList<ITokenLocation> leftLocations,
+            IReadOnlyList<ITokenLocation> rightLocations
         )>
             JoinFields(
                 IReadOnlyList<ScoredFieldMatch> leftFields,
@@ -123,12 +123,12 @@ namespace Lifti.Querying
             return results;
         }
 
-        private static List<ITokenLocationMatch> MergeSort(IReadOnlyList<ITokenLocationMatch> left, IReadOnlyList<ITokenLocationMatch> right)
+        private static List<ITokenLocation> MergeSort(IReadOnlyList<ITokenLocation> left, IReadOnlyList<ITokenLocation> right)
         {
             // When merging we'll compare the values by MinTokenIndex
             var leftCount = left.Count;
             var rightCount = right.Count;
-            var results = new List<ITokenLocationMatch>(leftCount + rightCount);
+            var results = new List<ITokenLocation>(leftCount + rightCount);
 
             var leftIndex = 0;
             var rightIndex = 0;

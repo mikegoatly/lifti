@@ -95,13 +95,7 @@ namespace Lifti.Querying
                     this.fieldLocations.Sort();
                 }
 
-                var tokenLocationMatches = new ITokenLocationMatch[this.fieldLocations.Count];
-                for (var i = 0; i < tokenLocationMatches.Length; i++)
-                {
-                    tokenLocationMatches[i] = new SingleTokenLocationMatch(this.fieldLocations[i]);
-                }
-
-                return ScoredFieldMatch.CreateFromPresorted(this.Score, fieldId, tokenLocationMatches);
+                return ScoredFieldMatch.CreateFromPresorted(this.Score, fieldId, this.fieldLocations);
             }
         }
     }

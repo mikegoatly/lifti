@@ -81,7 +81,7 @@ namespace Lifti.Querying
 
         /// <summary>
         /// Intersects this and the specified instance, but only when the positions of the matched tokens are within a given tolerance. Matching tokens are combined
-        /// into <see cref="CompositeTokenMatchLocation"/> instances.
+        /// into <see cref="CompositeTokenLocation"/> instances.
         /// </summary>
         public IntermediateQueryResult CompositePositionalIntersect(IntermediateQueryResult results, int leftTolerance, int rightTolerance)
         {

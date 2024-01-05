@@ -179,12 +179,12 @@ namespace Lifti.Serialization.Binary
                 }
                 else
                 {
-                    if (lastLocation == null)
+                    if (lastLocation is null)
                     {
                         throw new DeserializationException(ExceptionMessages.MalformedDataExpectedFullLocationEntry);
                     }
 
-                    location = this.DeserializeLocationData(lastLocation.Value, structureType);
+                    location = this.DeserializeLocationData(lastLocation, structureType);
                 }
 
                 locationMatches.Add(location);

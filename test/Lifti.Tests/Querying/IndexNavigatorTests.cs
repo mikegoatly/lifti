@@ -67,7 +67,7 @@ namespace Lifti.Tests.Querying
                 {
                     ScoredToken(
                         0,
-                        ScoredFieldMatch(double.Epsilon, 0, new SingleTokenLocationMatch(new TokenLocation(5, 42, 12))))
+                        ScoredFieldMatch(double.Epsilon, 0, new TokenLocation(5, 42, 12)))
                 },
                 o => o.ComparingByMembers<ScoredToken>()
                       .ComparingByMembers<ScoredFieldMatch>()
