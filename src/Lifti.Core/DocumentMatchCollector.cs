@@ -11,8 +11,7 @@ namespace Lifti.Querying
         /// </summary>
         public sealed class DocumentMatchCollector
         {
-            // TODO Pool?
-            private readonly Dictionary<int, FieldMatches> documentMatches = new(50);
+            private readonly Dictionary<int, FieldMatches> documentMatches = [];
 
             internal void Add(int documentId, byte fieldId, IReadOnlyList<TokenLocation> tokenLocations, double score)
             {
@@ -29,10 +28,8 @@ namespace Lifti.Querying
             /// Completes the match collection process and converts this instance into an <see cref="IntermediateQueryResult"/>.
             /// Once this method has been called, this instance should no longer be used.
             /// </summary>
-            public IntermediateQueryResult EndCollection()
+            public IntermediateQueryResult ToIntermediateQueryResult()
             {
-                // TODO Return to pool; make unusable
-
                 return new IntermediateQueryResult(
                     this.documentMatches.Select(
                         d => new ScoredToken(d.Key, d.Value.ToScoredFieldMatches())));
@@ -81,6 +78,11 @@ namespace Lifti.Querying
             public void Add(double score, IReadOnlyList<TokenLocation> tokenLocations)
             {
                 this.Score += score;
+
+#if !NETSTANDARD
+                this.fieldLocations.EnsureCapacity(this.fieldLocations.Count + tokenLocations.Count);
+#endif
+
                 this.fieldLocations.AddRange(tokenLocations);
                 this.additionCount++;
             }

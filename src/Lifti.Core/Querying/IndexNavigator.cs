@@ -74,7 +74,7 @@ namespace Lifti.Querying
 
             this.AddExactMatches(this.currentNode, queryContext, collector, weighting);
 
-            return collector.EndCollection();
+            return collector.ToIntermediateQueryResult();
         }
 
         public void AddExactMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1D)
@@ -103,7 +103,7 @@ namespace Lifti.Querying
 
             this.AddExactAndChildMatches(this.currentNode, queryContext, collector, weighting);
 
-            return collector.EndCollection();
+            return collector.ToIntermediateQueryResult();
         }
 
         public void AddExactAndChildMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1)
