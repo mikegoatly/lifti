@@ -10,6 +10,7 @@ namespace Lifti.Querying
     internal class OkapiBm25Scorer : IScorer
     {
         private readonly Dictionary<byte, double> averageTokenCountByField;
+        private readonly Dictionary<int, double> idfCache = new(100);
         private readonly double documentCount;
         private readonly double k1;
         private readonly double k1PlusOne;
@@ -47,7 +48,6 @@ namespace Lifti.Querying
 
         public double CalculateScore(int totalMatchedDocuments, int documentId, byte fieldId, IReadOnlyList<TokenLocation> tokenLocations, double weighting)
         {
-            // TODO LRU cache idf?
             var idf = this.CalculateInverseDocumentFrequency(totalMatchedDocuments);
 
             var documentMetadata = this.indexMetadata.GetDocumentMetadata(documentId);
@@ -79,10 +79,15 @@ namespace Lifti.Querying
 
         private double CalculateInverseDocumentFrequency(int matchedDocumentCount)
         {
-            var idf = (this.documentCount - matchedDocumentCount + 0.5D)
+            if (!this.idfCache.TryGetValue(matchedDocumentCount, out var idf))
+            {
+                idf  = (this.documentCount - matchedDocumentCount + 0.5D)
                     / (matchedDocumentCount + 0.5D);
 
-            idf = Math.Log(1D + idf);
+                idf = Math.Log(1D + idf);
+
+                this.idfCache.Add(matchedDocumentCount, idf);
+            }
 
             return idf;
         }
