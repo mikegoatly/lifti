@@ -6,7 +6,7 @@ namespace Lifti.Querying
     /// <summary>
     /// Provides logic for intersecting the results in two <see cref="IntermediateQueryResult"/>s.
     /// </summary>
-    public class IntersectMerger : IntermediateQueryResultMerger
+    internal sealed class IntersectMerger : IntermediateQueryResultMerger
     {
         /// <summary>
         /// Applies the intersection to the two <see cref="IntermediateQueryResult"/>s.

@@ -7,7 +7,7 @@ namespace Lifti.Querying
     /// Provides logic for unioning the results in two <see cref="IntermediateQueryResult"/>s. The results from
     /// both parts of the query will be combined into one and field match locations combined where documents appear on both sides.
     /// </summary>
-    public class UnionMerger : IntermediateQueryResultMerger
+    internal sealed class UnionMerger : IntermediateQueryResultMerger
     {
         /// <summary>
         /// Applies the union operation to the <see cref="IntermediateQueryResult"/> instances.

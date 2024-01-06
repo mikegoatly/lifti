@@ -7,7 +7,7 @@ namespace Lifti.Querying
     /// Provides logic for intersecting the results in two <see cref="IntermediateQueryResult"/>s where the fields 
     /// locations on the left must be within a specified positional tolerance of the the matching field locations on the right.
     /// </summary>
-    public class CompositePositionalIntersectMerger : IntermediateQueryResultMerger
+    internal sealed class CompositePositionalIntersectMerger : IntermediateQueryResultMerger
     {
         /// <summary>
         /// Applies the intersection to the <see cref="IntermediateQueryResult"/> instances.

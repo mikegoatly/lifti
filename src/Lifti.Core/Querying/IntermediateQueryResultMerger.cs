@@ -5,7 +5,7 @@ namespace Lifti.Querying
     /// <summary>
     /// A base helper class for classes capable of merging two <see cref="IntermediateQueryResult"/> instances.
     /// </summary>
-    public abstract class IntermediateQueryResultMerger
+    internal abstract class IntermediateQueryResultMerger
     {
         /// <summary>
         /// Performs an inner join on two sets of field results.

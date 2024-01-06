@@ -7,7 +7,7 @@ namespace Lifti.Querying
     /// Provides logic for intersecting the results in two <see cref="IntermediateQueryResult"/>s where the fields 
     /// locations on the left must precede the matching field locations on the right.
     /// </summary>
-    public class PrecedingIntersectMerger : IntermediateQueryResultMerger
+    internal sealed class PrecedingIntersectMerger : IntermediateQueryResultMerger
     {
         /// <summary>
         /// Applies the intersection logic.
