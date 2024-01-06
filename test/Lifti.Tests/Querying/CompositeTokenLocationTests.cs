@@ -1,21 +1,22 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
 using Lifti.Tests.Fakes;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
 namespace Lifti.Tests.Querying
 {
-    public class CompositeTokenMatchLocationTests : QueryTestBase
+    public class CompositeTokenLocationTests : QueryTestBase
     {
-        private readonly FakeTokenLocationMatch match2;
-        private readonly FakeTokenLocationMatch match1;
-        private readonly CompositeTokenMatchLocation sut1;
-        private readonly CompositeTokenMatchLocation sut2;
+        private readonly FakeTokenLocation match2;
+        private readonly FakeTokenLocation match1;
+        private readonly CompositeTokenLocation sut1;
+        private readonly CompositeTokenLocation sut2;
         private readonly TokenLocation[] match1Locations;
         private readonly TokenLocation[] match2Locations;
 
-        public CompositeTokenMatchLocationTests()
+        public CompositeTokenLocationTests()
         {
             this.match1Locations =
             [
@@ -23,7 +24,7 @@ namespace Lifti.Tests.Querying
                 new TokenLocation(200, 1, 2)
             ];
 
-            this.match1 = new FakeTokenLocationMatch(100, 200, this.match1Locations);
+            this.match1 = new FakeTokenLocation(100, 200, this.match1Locations);
 
             this.match2Locations =
             [
@@ -32,10 +33,10 @@ namespace Lifti.Tests.Querying
                 new TokenLocation(180, 1, 2)
             ];
 
-            this.match2 = new FakeTokenLocationMatch(110, 180, this.match2Locations);
+            this.match2 = new FakeTokenLocation(110, 180, this.match2Locations);
 
-            this.sut1 = new CompositeTokenMatchLocation(this.match1, this.match2);
-            this.sut2 = new CompositeTokenMatchLocation(this.match2, this.match1);
+            this.sut1 = new CompositeTokenLocation(this.match1, this.match2);
+            this.sut2 = new CompositeTokenLocation(this.match2, this.match1);
         }
 
         [Fact]
@@ -55,8 +56,14 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void GetLocationsShouldReturnAllLocations()
         {
-            this.sut1.GetLocations().Should().BeEquivalentTo(this.match1Locations.Concat(this.match2Locations).ToList());
-            this.sut2.GetLocations().Should().BeEquivalentTo(this.match2Locations.Concat(this.match1Locations).ToList());
+            var locations = new HashSet<TokenLocation>();
+            this.sut1.AddTo(locations);
+            locations.Should().BeEquivalentTo(this.match1Locations.Concat(this.match2Locations).ToList());
+
+            locations.Clear();
+
+            this.sut2.AddTo(locations);
+            locations.Should().BeEquivalentTo(this.match2Locations.Concat(this.match1Locations).ToList());
         }
     }
 }

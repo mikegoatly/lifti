@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace Lifti.Querying
 {
@@ -25,6 +24,8 @@ namespace Lifti.Querying
             var leftCount = leftMatches.Count;
             var rightCount = rightMatches.Count;
 
+            List<ScoredToken> result = new(leftCount + rightCount);
+
             List<ScoredFieldMatch> positionalMatches = [];
             while (leftIndex < leftCount && rightIndex < rightCount)
             {
@@ -34,9 +35,9 @@ namespace Lifti.Querying
                 if (leftMatch.DocumentId == rightMatch.DocumentId)
                 {
                     // Exists in both
-                    yield return new ScoredToken(
+                    result.Add(new ScoredToken(
                         leftMatch.DocumentId,
-                        MergeFields(leftMatch, rightMatch).ToList());
+                        MergeFields(leftMatch, rightMatch)));
 
                     leftIndex++;
                     rightIndex++;
@@ -44,13 +45,13 @@ namespace Lifti.Querying
                 else if (leftMatch.DocumentId < rightMatch.DocumentId)
                 {
                     // Exists only in current
-                    yield return leftMatch;
+                    result.Add(leftMatch);
                     leftIndex++;
                 }
                 else
                 {
                     // Exists only in next
-                    yield return rightMatch;
+                    result.Add(rightMatch);
                     rightIndex++;
                 }
             }
@@ -58,16 +59,18 @@ namespace Lifti.Querying
             // Add any remaining matches from the left
             while (leftIndex < leftCount)
             {
-                yield return leftMatches[leftIndex];
+                result.Add(leftMatches[leftIndex]);
                 leftIndex++;
             }
 
             // Add any remaining matches from the right
             while (rightIndex < rightCount)
             {
-                yield return rightMatches[rightIndex];
+                result.Add(rightMatches[rightIndex]);
                 rightIndex++;
             }
+
+            return result;
         }
     }
 }

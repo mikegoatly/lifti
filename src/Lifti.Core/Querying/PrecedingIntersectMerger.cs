@@ -58,7 +58,7 @@ namespace Lifti.Querying
         {
             var matchedFields = JoinFields(leftFields, rightFields);
 
-            var fieldTokenMatches = new List<ITokenLocationMatch>();
+            var fieldTokenMatches = new List<ITokenLocation>();
             foreach (var (fieldId, score, leftLocations, rightLocations) in matchedFields)
             {
                 var furthestRightTokenStart = rightLocations[rightLocations.Count - 1].MinTokenIndex;
@@ -81,11 +81,13 @@ namespace Lifti.Querying
                 if (fieldTokenMatches.Count > 0)
                 {
                     fieldResults.Add(
-                        new ScoredFieldMatch(
+                        ScoredFieldMatch.CreateFromUnsorted(
                             score,
-                            new FieldMatch(fieldId, fieldTokenMatches)));
+                            fieldId, 
+                            // We need to copy the list here as we're going to reuse it
+                            fieldTokenMatches));
 
-                    fieldTokenMatches.Clear();
+                    fieldTokenMatches = [];
                 }
             }
         }

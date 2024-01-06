@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lifti.Querying.Lifti.Querying;
+using System;
 using System.Collections.Generic;
 
 namespace Lifti.Querying
@@ -25,6 +26,33 @@ namespace Lifti.Querying
         /// </summary>
         IEnumerable<string> EnumerateIndexedTokens();
 
+        /// <summary>
+        /// Gets all the matches that are indexed under from where the navigator is located.
+        /// </summary>
+        /// <param name="queryContext">
+        /// The current query context.
+        /// </param>
+        /// <param name="documentMatchCollector">
+        /// The document match collector to add the matches to.
+        /// </param>
+        /// <param name="weighting">
+        /// The weighting to apply to the matched tokens. This can be used to adjust the resulting score for the match.
+        /// </param>
+        void AddExactAndChildMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1D);
+
+        /// <summary>
+        /// Gets all the matches that are indexed exactly at the point of the navigators current location.
+        /// </summary>
+        /// <param name="queryContext">
+        /// The current query context.
+        /// </param>
+        /// <param name="documentMatchCollector">
+        /// The document match collector to add the matches to.
+        /// </param>
+        /// <param name="weighting">
+        /// The weighting to apply to the matched tokens. This can be used to adjust the resulting score for the match.
+        /// </param>
+        void AddExactMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1D);
 
         /// <summary>
         /// Gets all the matches that are indexed under from where the navigator is located.

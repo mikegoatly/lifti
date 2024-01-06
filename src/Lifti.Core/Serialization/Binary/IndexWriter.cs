@@ -169,9 +169,9 @@ namespace Lifti.Serialization.Binary
             TokenLocation? lastLocation = null;
             foreach (var location in fieldMatch.Locations)
             {
-                if (lastLocation != null)
+                if (lastLocation is not null)
                 {
-                    var locationData = DeriveEntryStructureInformation(lastLocation.Value, location);
+                    var locationData = DeriveEntryStructureInformation(lastLocation, location);
 
                     if (locationData.structure == LocationEntrySerializationOptimizations.Full)
                     {

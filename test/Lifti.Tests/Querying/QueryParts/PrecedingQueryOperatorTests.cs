@@ -31,11 +31,11 @@ namespace Lifti.Tests.Querying.QueryParts
                 {
                     ScoredToken(
                         7,
-                        ScoredFieldMatch(4D, 1, TokenMatch(8), TokenMatch(14), TokenMatch(20), TokenMatch(100), TokenMatch(102))),
+                        ScoredFieldMatch(4D, 1, TokenLocation(8), TokenLocation(14), TokenLocation(20), TokenLocation(100), TokenLocation(102))),
                     ScoredToken(
                         8,
-                        ScoredFieldMatch(6D, 1, TokenMatch(11), TokenMatch(101), TokenMatch(106)),
-                        ScoredFieldMatch(13D, 2, TokenMatch(8), TokenMatch(104), TokenMatch(105)))
+                        ScoredFieldMatch(6D, 1, TokenLocation(11), TokenLocation(101), TokenLocation(106)),
+                        ScoredFieldMatch(13D, 2, TokenLocation(8), TokenLocation(104), TokenLocation(105)))
                 });
         }
 

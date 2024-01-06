@@ -300,7 +300,14 @@ namespace Lifti.Tests.Serialization
             using (var stream = File.Open(fileName, FileMode.CreateNew))
             {
                 var stopwatch = Stopwatch.StartNew();
+
+/* Unmerged change from project 'Lifti.Tests (net8.0)'
+Before:
                 var index = await this.CreateWikipediaIndexAsync();
+After:
+                var index = await CreateWikipediaIndexAsync();
+*/
+                var index = await BinarySerializerTests.CreateWikipediaIndexAsync();
                 await serializer.SerializeAsync(index, stream, false);
 
                 this.output.WriteLine($"Serialized in {stopwatch.ElapsedMilliseconds}ms");
@@ -491,7 +498,7 @@ namespace Lifti.Tests.Serialization
             return index;
         }
 
-        private async Task<FullTextIndex<string>> CreateWikipediaIndexAsync()
+        private static async Task<FullTextIndex<string>> CreateWikipediaIndexAsync()
         {
             var index = new FullTextIndexBuilder<string>()
                 .WithTextExtractor<XmlTextExtractor>()

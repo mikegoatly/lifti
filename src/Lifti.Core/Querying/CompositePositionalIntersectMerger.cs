@@ -69,7 +69,7 @@ namespace Lifti.Querying
         {
             var matchedFields = JoinFields(leftFields, rightFields);
 
-            var fieldTokenMatches = new List<ITokenLocationMatch>();
+            var fieldTokenMatches = new List<ITokenLocation>();
             foreach (var (fieldId, score, leftLocations, rightLocations) in matchedFields)
             {
                 var leftIndex = 0;
@@ -84,7 +84,7 @@ namespace Lifti.Querying
                     {
                         if ((currentToken.MinTokenIndex - nextToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(leftTolerance))
                         {
-                            fieldTokenMatches.Add(new CompositeTokenMatchLocation(currentToken, nextToken));
+                            fieldTokenMatches.Add(new CompositeTokenLocation(currentToken, nextToken));
                         }
                     }
 
@@ -92,7 +92,7 @@ namespace Lifti.Querying
                     {
                         if ((nextToken.MinTokenIndex - currentToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(rightTolerance))
                         {
-                            fieldTokenMatches.Add(new CompositeTokenMatchLocation(currentToken, nextToken));
+                            fieldTokenMatches.Add(new CompositeTokenLocation(currentToken, nextToken));
                         }
                     }
 
@@ -109,11 +109,12 @@ namespace Lifti.Querying
                 if (fieldTokenMatches.Count > 0)
                 {
                     positionalMatches.Add(
-                        new ScoredFieldMatch(
-                            score,
-                            new FieldMatch(fieldId, fieldTokenMatches)));
+                        ScoredFieldMatch.CreateFromPresorted(
+                            score, 
+                            fieldId, 
+                            fieldTokenMatches));
 
-                    fieldTokenMatches.Clear();
+                    fieldTokenMatches = new();
                 }
             }
         }

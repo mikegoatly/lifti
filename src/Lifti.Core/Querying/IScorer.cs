@@ -8,18 +8,26 @@ namespace Lifti.Querying
     public interface IScorer
     {
         /// <summary>
-        /// Scores the set of <see cref="QueryTokenMatch"/> that have been matched in the document.
+        /// Calculates the score for a match in a single document's field.
         /// </summary>
-        /// <param name="tokens">
-        /// The <see cref="QueryTokenMatch"/> instances to score.
+        /// <param name="totalMatchedDocuments">
+        /// The total number of documents that matched the query.
+        /// </param>
+        /// <param name="documentId">
+        /// The id of the document that the match is in.
+        /// </param>
+        /// <param name="fieldId">
+        /// The id of the field that the match is in.
+        /// </param>
+        /// <param name="tokenLocations">
+        /// The complete set of locations that the token was found in the document.
         /// </param>
         /// <param name="weighting">
         /// The weighting multiplier to apply to the score.
         /// </param>
         /// <returns>
-        /// The <see cref="ScoredToken"/> representations of the input <paramref name="tokens"/>. There will be a 1:1
-        /// mapping of input -> output and the order will be preserved.
+        /// The score for the match.
         /// </returns>
-        IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryTokenMatch> tokens, double weighting);
+        double CalculateScore(int totalMatchedDocuments, int documentId, byte fieldId, IReadOnlyList<TokenLocation> tokenLocations, double weighting);
     }
 }

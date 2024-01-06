@@ -2,6 +2,7 @@
 // Enabling TRACK_MATCH_STATE_TEXT in DEBUG builds will allow you inspect the state of a fuzzy match
 // as it is being processed using the MatchText property. This is not available in release builds for performance.
 
+using Lifti.Querying.Lifti.Querying;
 using System;
 using System.Collections.Generic;
 
@@ -248,7 +249,7 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         protected override double RunWeightingCalculation(Func<IIndexNavigator> navigatorCreator)
         {
-            return base.RunWeightingCalculation(navigatorCreator) 
+            return base.RunWeightingCalculation(navigatorCreator)
                 + this.maxEditDistance
                 + ((this.maxSequentialEdits - 1) << 1);
         }
@@ -267,7 +268,7 @@ namespace Lifti.Querying.QueryParts
             }
 
             using var navigator = navigatorCreator();
-            var results = IntermediateQueryResult.Empty;
+            var resultCollector = new DocumentMatchCollector();
             var stateStore = new FuzzyMatchStateStore(navigator, this.maxEditDistance, this.maxSequentialEdits);
 
             var characterCount = 0;
@@ -301,7 +302,7 @@ namespace Lifti.Querying.QueryParts
                                 var weighting = (double)(lengthTotal - state.LevenshteinDistance) / lengthTotal;
                                 weighting *= scoreBoost;
 
-                                results = results.Union(navigator.GetExactMatches(queryContext, weighting));
+                                navigator.AddExactMatches(queryContext, resultCollector, weighting);
                             }
 
                             // Always assume there could be missing characters at the end
@@ -345,7 +346,7 @@ namespace Lifti.Querying.QueryParts
             }
             while (stateStore.HasEntries);
 
-            return results;
+            return resultCollector.ToIntermediateQueryResult();
         }
 
         private static void AddSubstitutionBookmarks(IIndexNavigator navigator, FuzzyMatchStateStore stateStore, char currentCharacter, FuzzyMatchState currentState)

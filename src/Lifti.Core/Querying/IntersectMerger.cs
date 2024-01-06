@@ -33,7 +33,7 @@ namespace Lifti.Querying
                 {
                     yield return new ScoredToken(
                         leftMatch.DocumentId,
-                        MergeFields(leftMatch, rightMatch).ToList());
+                        MergeFields(leftMatch, rightMatch));
 
                     leftIndex++;
                     rightIndex++;

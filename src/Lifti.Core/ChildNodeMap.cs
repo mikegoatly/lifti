@@ -241,31 +241,40 @@ namespace Lifti
                         return false;
                     }
 
-                    var index = Array.BinarySearch(this.childNodes, value, ChildCharComparer.Instance);
-                    if (index < 0)
-                    {
-                        nextNode = null;
-                        return false;
-                    }
-
-                    nextNode = this.childNodes[index].ChildNode;
-                    return true;
+                    nextNode = BinarySearchChildNodes(value);
+                    return nextNode is not null;
             }
         }
 
-        private class ChildCharComparer : System.Collections.IComparer
+        private IndexNode? BinarySearchChildNodes(char value)
         {
-            public static ChildCharComparer Instance { get; } = new ChildCharComparer();
+            // We don't want to use Array.BinarySearch here because of the need to use a custom comparer.
+            // This custom implementation is significantly faster because we don't get involved in 
+            // any boxing/unboxing of the value types.
+            var left = 0;
+            var right = this.childNodes.Length - 1;
 
-            public int Compare(object? x, object? y)
+            while (left <= right)
             {
-                if (x is ChildNodeMapEntry entry && y is char character)
+                var middle = left + (right - left) / 2;
+                var middleChar = this.childNodes[middle].ChildChar;
+
+                if (middleChar == value)
                 {
-                    return entry.ChildChar.CompareTo(character);
+                    return this.childNodes[middle].ChildNode;
                 }
 
-                throw new ArgumentException("Cannot compare the specified objects");
+                if (middleChar < value)
+                {
+                    left = middle + 1;
+                }
+                else
+                {
+                    right = middle - 1;
+                }
             }
+
+            return null;
         }
 
         /// <inheritdoc />

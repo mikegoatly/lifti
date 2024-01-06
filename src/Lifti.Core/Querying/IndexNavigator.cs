@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lifti.Querying.Lifti.Querying;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -69,31 +70,21 @@ namespace Lifti.Querying
                 return IntermediateQueryResult.Empty;
             }
 
-            var documentMatches = this.currentNode.Matches.Enumerate();
-            if (queryContext.FilterToDocumentIds != null)
+            var collector = new DocumentMatchCollector();
+
+            this.AddExactMatches(this.currentNode, queryContext, collector, weighting);
+
+            return collector.ToIntermediateQueryResult();
+        }
+
+        public void AddExactMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1D)
+        {
+            if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess || !this.currentNode.HasMatches)
             {
-                documentMatches = documentMatches.Where(m => queryContext.FilterToDocumentIds.Contains(m.documentId));
+                return;
             }
 
-            IEnumerable<QueryTokenMatch> matches;
-            if (queryContext.FilterToFieldId is byte targetFieldId)
-            {
-                matches = documentMatches
-                    .Select(m => new QueryTokenMatch(
-                        m.documentId,
-                        m.indexedTokens.Where(t => t.FieldId == targetFieldId)
-                        .Select(v => new FieldMatch(v)).ToList()))
-                    .Where(m => m.FieldMatches.Count > 0);
-            }
-            else
-            {
-                matches = documentMatches
-                    .Select(m => new QueryTokenMatch(
-                        m.documentId,
-                        m.indexedTokens.Select(v => new FieldMatch(v)).ToList()));
-            }
-
-            return this.CreateIntermediateQueryResult(matches, weighting);
+            this.AddExactMatches(this.currentNode, queryContext, documentMatchCollector, weighting);
         }
 
         public IntermediateQueryResult GetExactAndChildMatches(double weighting = 1D)
@@ -108,56 +99,19 @@ namespace Lifti.Querying
                 return IntermediateQueryResult.Empty;
             }
 
-            var matches = new Dictionary<int, List<FieldMatch>>();
-            var childNodeStack = new Queue<IndexNode>();
-            childNodeStack.Enqueue(this.currentNode);
+            var collector = new DocumentMatchCollector();
 
-            while (childNodeStack.Count > 0)
+            this.AddExactAndChildMatches(this.currentNode, queryContext, collector, weighting);
+
+            return collector.ToIntermediateQueryResult();
+        }
+
+        public void AddExactAndChildMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1)
+        {
+            if (this.currentNode != null)
             {
-                var node = childNodeStack.Dequeue();
-                if (node.HasMatches)
-                {
-                    foreach (var (documentId, indexedTokens) in node.Matches.Enumerate())
-                    {
-                        if (queryContext.FilterToDocumentIds?.Contains(documentId) == false)
-                        {
-                            continue;
-                        }
-
-                        var fieldMatches = queryContext.FilterToFieldId is byte targetFieldId
-                            ? indexedTokens.Where(t => t.FieldId == targetFieldId).Select(t => new FieldMatch(t))
-                            : indexedTokens.Select(v => new FieldMatch(v));
-
-                        if (!matches.TryGetValue(documentId, out var mergedResults))
-                        {
-                            mergedResults = new List<FieldMatch>(fieldMatches);
-                            if (mergedResults.Count > 0)
-                            {
-                                matches[documentId] = mergedResults;
-                            }
-                        }
-                        else
-                        {
-                            mergedResults.AddRange(fieldMatches);
-                        }
-                    }
-                }
-
-                if (node.HasChildNodes)
-                {
-                    foreach (var (_, childNode) in node.ChildNodes.CharacterMap)
-                    {
-                        childNodeStack.Enqueue(childNode);
-                    }
-                }
+                this.AddExactAndChildMatches(this.currentNode, queryContext, documentMatchCollector, weighting);
             }
-
-            var queryTokenMatches = matches
-                .Select(m => new QueryTokenMatch(
-                    m.Key,
-                    MergeMatches(m.Value).ToList()));
-
-            return this.CreateIntermediateQueryResult(queryTokenMatches, weighting);
         }
 
         public bool Process(string text)
@@ -279,18 +233,6 @@ namespace Lifti.Querying
             this.pool.Return(this);
         }
 
-        private IntermediateQueryResult CreateIntermediateQueryResult(IEnumerable<QueryTokenMatch> matches, double weighting)
-        {
-            if (this.scorer == null)
-            {
-                throw new InvalidOperationException(ExceptionMessages.NoScorerInitialized);
-            }
-
-            var matchList = matches as IReadOnlyList<QueryTokenMatch> ?? matches.ToList();
-            var scoredMatches = this.scorer.Score(matchList, weighting);
-            return new IntermediateQueryResult(scoredMatches);
-        }
-
         private IEnumerable<string> EnumerateIndexedTokens(IndexNode node)
         {
             if (node.IntraNodeText.Length > 0)
@@ -323,12 +265,65 @@ namespace Lifti.Querying
             }
         }
 
-        private static IEnumerable<FieldMatch> MergeMatches(List<FieldMatch> fieldMatches)
+        private void AddExactAndChildMatches(IndexNode startNode, QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting)
         {
-            return fieldMatches.ToLookup(m => m.FieldId)
-                .Select(m => new FieldMatch(
-                    m.Key,
-                    m.SelectMany(w => w.Locations)));
+            var childNodeStack = new Queue<IndexNode>();
+            childNodeStack.Enqueue(startNode);
+
+            while (childNodeStack.Count > 0)
+            {
+                var node = childNodeStack.Dequeue();
+                if (node.HasMatches)
+                {
+                    AddExactMatches(node, queryContext, documentMatchCollector, weighting);
+                }
+
+                if (node.HasChildNodes)
+                {
+                    foreach (var (_, childNode) in node.ChildNodes.CharacterMap)
+                    {
+                        childNodeStack.Enqueue(childNode);
+                    }
+                }
+            }
+        }
+
+        private void AddExactMatches(IndexNode node, QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting)
+        {
+            if (this.scorer == null)
+            {
+                throw new InvalidOperationException(ExceptionMessages.NoScorerInitialized);
+            }
+
+            var documentMatches = node.Matches.Enumerate();
+            if (queryContext.FilterToDocumentIds != null)
+            {
+                documentMatches = documentMatches.Where(m => queryContext.FilterToDocumentIds.Contains(m.documentId));
+            }
+
+            var filterToFieldId = queryContext.FilterToFieldId;
+            var matchedDocumentCount = node.Matches.Count;
+            var scorer = this.scorer;
+            foreach (var (documentId, indexedTokens) in documentMatches)
+            {
+                foreach (var indexedToken in indexedTokens)
+                {
+                    var fieldId = indexedToken.FieldId;
+                    if (filterToFieldId.HasValue && filterToFieldId.GetValueOrDefault() != fieldId)
+                    {
+                        continue;
+                    }
+
+                    var score = scorer.CalculateScore(
+                        matchedDocumentCount,
+                        documentId,
+                        fieldId,
+                        indexedToken.Locations,
+                        weighting);
+
+                    documentMatchCollector.Add(documentId, fieldId, indexedToken.Locations, score);
+                }
+            }
         }
 
         internal readonly struct IndexNavigatorBookmark : IIndexNavigatorBookmark, IEquatable<IndexNavigatorBookmark>

@@ -13,7 +13,6 @@ namespace Lifti.Tests.Querying
         private const double expectedScore1 = 2.536599214033677D;
         private const double expectedScore2 = 2.3792189708272073D;
 
-        private readonly QueryTokenMatch[] tokenMatches;
         private static readonly FakeIndexMetadata<int> looseTextIndexMetadata = new(
                 10,
                 new IndexStatistics(new Dictionary<byte, long>() { { 1, 100 } }, 100), // 100 total tokens in 1 field
@@ -41,43 +40,20 @@ namespace Lifti.Tests.Querying
                     (3, (DocumentMetadata metadata) => 1D) // No field score boost for object type 3
                 });
 
-        public OkapiBm25ScorerTests()
-        {
-            this.tokenMatches =
-            [
-                new QueryTokenMatch(1, new[] { FieldMatch(1, 3, 6) }),
-                new QueryTokenMatch(3, new[] { FieldMatch(1, 8, 2, 5) })
-            ];
-        }
-
         [Fact]
         public void VerifyScoreWithoutWeighting()
         {
             var sut = CreateSut(looseTextIndexMetadata);
-            var results = sut.Score(this.tokenMatches, 1D);
-
-            results.Should().BeEquivalentTo(
-                new[]
-                {
-                    new ScoredToken(1, new[] { ScoredFieldMatch(expectedScore1, 1, 3, 6) }),
-                    new ScoredToken(3, new[] { ScoredFieldMatch(expectedScore2, 1, 8, 2, 5) })
-                },
-                o => o.Using<double>(ctx => ctx.Subject.Should().BeApproximately(ctx.Expectation, 0.00001D)).When(i => i.RuntimeType == typeof(double)));
+            VerifyScore(sut, 2, 1, 1, TokenLocations(3, 6), 1D, expectedScore1);
+            VerifyScore(sut, 2, 3, 1, TokenLocations(8, 2, 5), 1D, expectedScore2);
         }
 
         [Fact]
         public void VerifyScoreWithWeighting()
         {
             var sut = CreateSut(looseTextIndexMetadata);
-            var results = sut.Score(this.tokenMatches, 0.5D);
-
-            results.Should().BeEquivalentTo(
-                new[]
-                {
-                    new ScoredToken(1, new[] { ScoredFieldMatch(expectedScore1 / 2D, 1, 3, 6) }),
-                    new ScoredToken(3, new[] { ScoredFieldMatch(expectedScore2 / 2D, 1, 8, 2, 5) })
-                },
-                o => o.Using<double>(ctx => ctx.Subject.Should().BeApproximately(ctx.Expectation, 0.00001D)).When(i => i.RuntimeType == typeof(double)));
+            VerifyScore(sut, 2, 1, 1, TokenLocations(3, 6), 0.5D, expectedScore1 / 2);
+            VerifyScore(sut, 2, 3, 1, TokenLocations(8, 2, 5), 0.5D, expectedScore2 / 2);
         }
 
         [Fact]
@@ -85,16 +61,9 @@ namespace Lifti.Tests.Querying
         {
             var sut = CreateSut(looseTextIndexMetadata, new FakeFieldScoreBoostProvider((1, 10D)));
 
-            var results = sut.Score(this.tokenMatches, 0.5D);
-
             // Results are calculated with a field score boost of 10, but a multiplier of 0.5D, so the resulting boost is 5
-            results.Should().BeEquivalentTo(
-                new[]
-                {
-                    new ScoredToken(1, new[] { ScoredFieldMatch(expectedScore1 * 5, 1, 3, 6) }),
-                    new ScoredToken(3, new[] { ScoredFieldMatch(expectedScore2 * 5, 1, 8, 2, 5) })
-                },
-                o => o.Using<double>(ctx => ctx.Subject.Should().BeApproximately(ctx.Expectation, 0.00001D)).When(i => i.RuntimeType == typeof(double)));
+            VerifyScore(sut, 2, 1, 1, TokenLocations(3, 6), 0.5D, expectedScore1 * 5);
+            VerifyScore(sut, 2, 3, 1, TokenLocations(8, 2, 5), 0.5D, expectedScore2 * 5);
         }
 
         [Fact]
@@ -102,17 +71,29 @@ namespace Lifti.Tests.Querying
         {
             var sut = CreateSut(objectTextIndexMetadata, new FakeFieldScoreBoostProvider());
 
-            var results = sut.Score(this.tokenMatches, 1D);
+            // Document 1 has an object type of 2
+            VerifyScore(sut, 2, 1, 1, TokenLocations(3, 6), 1D, expectedScore1);
+            // Document 3 has an object type of 1, so gets a 10x boost
+            VerifyScore(sut, 2, 3, 1, TokenLocations(8, 2, 5), 1D, expectedScore2 * 10);
+        }
 
-            results.Should().BeEquivalentTo(
-                new[]
-                {
-                    // Document 1 has an object type of 2
-                    new ScoredToken(1, new[] { ScoredFieldMatch(expectedScore1, 1, 3, 6) }),
-                    // Document 3 has an object type of 1, so gets a 10x boost
-                    new ScoredToken(3, new[] { ScoredFieldMatch(expectedScore2 * 10, 1, 8, 2, 5) })
-                },
-                o => o.Using<double>(ctx => ctx.Subject.Should().BeApproximately(ctx.Expectation, 0.00001D)).When(i => i.RuntimeType == typeof(double)));
+        private static void VerifyScore(
+            OkapiBm25Scorer sut,
+            int totalMatchedDocuments,
+            int documentId,
+            byte fieldId,
+            IReadOnlyList<TokenLocation> tokenLocations,
+            double weighting,
+            double expectedScore)
+        {
+            var result = sut.CalculateScore(
+                totalMatchedDocuments,
+                documentId,
+                fieldId,
+                tokenLocations,
+                weighting);
+
+            result.Should().BeApproximately(expectedScore, 0.00001D);
         }
 
         private static OkapiBm25Scorer CreateSut(FakeIndexMetadata<int> itemStore, FakeFieldScoreBoostProvider? fieldScoreBoostProvider = null)

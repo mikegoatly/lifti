@@ -1,75 +1,76 @@
 ﻿using Lifti.Querying;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lifti.Tests.Querying
 {
     public abstract class QueryTestBase
     {
-        protected static CompositeTokenMatchLocation CompositeMatch(int leftWordIndex, int rightWordIndex)
+        internal static CompositeTokenLocation CompositeTokenLocation(int leftWordIndex, int rightWordIndex)
         {
-            return new CompositeTokenMatchLocation(TokenMatch(leftWordIndex), TokenMatch(rightWordIndex));
+            return new CompositeTokenLocation(TokenLocation(leftWordIndex), TokenLocation(rightWordIndex));
         }
 
-        protected static CompositeTokenMatchLocation CompositeMatch(params int[] wordIndexes)
+        internal static CompositeTokenLocation CompositeTokenLocation(params int[] wordIndexes)
         {
-            var match = CompositeMatch(wordIndexes[0], wordIndexes[1]);
+            var match = CompositeTokenLocation(wordIndexes[0], wordIndexes[1]);
 
             for (var i = 2; i < wordIndexes.Length; i++)
             {
-                match = new CompositeTokenMatchLocation(match, TokenMatch(wordIndexes[i]));
+                match = new CompositeTokenLocation(match, TokenLocation(wordIndexes[i]));
             }
 
             return match;
         }
 
-        protected static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params int[] wordIndexes)
+        internal static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params int[] wordIndexes)
         {
-            return new ScoredFieldMatch(
+            return Lifti.Querying.ScoredFieldMatch.CreateFromPresorted(
                     score,
-                    FieldMatch(fieldId, wordIndexes));
+                    fieldId,
+                    TokenLocations(wordIndexes));
         }
 
-        protected static FieldMatch FieldMatch(byte fieldId, params int[] wordIndexes)
+        internal static List<TokenLocation> TokenLocations(params int[] wordIndexes)
         {
-            return new FieldMatch(
-                fieldId,
-                wordIndexes.Select(i => TokenMatch(i)));
+            return wordIndexes.Select(TokenLocation).ToList();
         }
 
-        protected static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params (int, int)[] compositeMatches)
+        internal static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params (int, int)[] compositeMatches)
         {
             return ScoredFieldMatch(
                 score,
                 fieldId,
-                compositeMatches.Select(i => (ITokenLocationMatch)CompositeMatch(i.Item1, i.Item2)).ToArray());
+                compositeMatches.Select(i => (ITokenLocation)CompositeTokenLocation(i.Item1, i.Item2)).ToArray());
         }
 
-        protected static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params ITokenLocationMatch[] compositeMatches)
+        internal static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params ITokenLocation[] compositeMatches)
         {
-            return new ScoredFieldMatch(
+            return Lifti.Querying.ScoredFieldMatch.CreateFromUnsorted(
                 score,
-                new FieldMatch(fieldId, compositeMatches));
+                fieldId, 
+                compositeMatches.ToList());
         }
 
-        protected static ITokenLocationMatch TokenMatch(int index)
+        internal static TokenLocation TokenLocation(int index)
         {
-            return new SingleTokenLocationMatch(new TokenLocation(index, index, (ushort)index));
+            return new TokenLocation(index, index, (ushort)index);
         }
 
-        protected static ITokenLocationMatch SingleTokenLocationMatch(int index, int start, int length)
+        internal static TokenLocation TokenLocation(int index, int start, int length)
         {
-            return new SingleTokenLocationMatch(new TokenLocation(index, start, (ushort)length));
+            return new TokenLocation(index, start, (ushort)length);
         }
 
-        protected static IntermediateQueryResult IntermediateQueryResult(params ScoredToken[] matches)
+        internal static IntermediateQueryResult IntermediateQueryResult(params ScoredToken[] matches)
         {
             return new IntermediateQueryResult(matches);
         }
 
-        protected static ScoredToken ScoredToken(int itemId, params ScoredFieldMatch[] matches)
+        internal static ScoredToken ScoredToken(int documentId, params ScoredFieldMatch[] matches)
         {
             return new ScoredToken(
-                itemId,
+                documentId,
                 matches);
         }
     }

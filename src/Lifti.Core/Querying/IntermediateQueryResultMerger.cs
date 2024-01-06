@@ -20,8 +20,8 @@ namespace Lifti.Querying
         internal static IEnumerable<(
             byte fieldId,
             double score,
-            IReadOnlyList<ITokenLocationMatch> leftLocations,
-            IReadOnlyList<ITokenLocationMatch> rightLocations
+            IReadOnlyList<ITokenLocation> leftLocations,
+            IReadOnlyList<ITokenLocation> rightLocations
         )>
             JoinFields(
                 IReadOnlyList<ScoredFieldMatch> leftFields,
@@ -65,7 +65,7 @@ namespace Lifti.Querying
         /// <see cref="ScoredToken"/> are included but unaltered, field matches appearing in both <see cref="ScoredToken"/>s
         /// are unioned.
         /// </summary>
-        protected static IEnumerable<ScoredFieldMatch> MergeFields(ScoredToken left, ScoredToken right)
+        protected static IReadOnlyList<ScoredFieldMatch> MergeFields(ScoredToken left, ScoredToken right)
         {
             var leftIndex = 0;
             var rightIndex = 0;
@@ -75,6 +75,8 @@ namespace Lifti.Querying
             var leftCount = leftMatches.Count;
             var rightCount = rightMatches.Count;
 
+            List<ScoredFieldMatch> results = new(leftCount + rightCount);
+
             while (leftIndex < leftCount && rightIndex < rightCount)
             {
                 var leftField = leftMatches[leftIndex];
@@ -82,26 +84,19 @@ namespace Lifti.Querying
 
                 if (leftField.FieldId == rightField.FieldId)
                 {
-                    var concatenatedLocations = new List<ITokenLocationMatch>(leftField.Locations);
-                    concatenatedLocations.AddRange(rightField.Locations);
-
-                    yield return new ScoredFieldMatch(
-                        leftField.Score + rightField.Score,
-                        new FieldMatch(
-                            leftField.FieldId,
-                            concatenatedLocations));
+                    results.Add(ScoredFieldMatch.Merge(leftField, rightField));
 
                     leftIndex++;
                     rightIndex++;
                 }
                 else if (leftField.FieldId < rightField.FieldId)
                 {
-                    yield return leftField;
+                    results.Add(leftField);
                     leftIndex++;
                 }
                 else
                 {
-                    yield return rightField;
+                    results.Add(rightField);
                     rightIndex++;
                 }
             }
@@ -109,16 +104,18 @@ namespace Lifti.Querying
             // Add any remaining matches from the left
             while (leftIndex < leftCount)
             {
-                yield return leftMatches[leftIndex];
+                results.Add(leftMatches[leftIndex]);
                 leftIndex++;
             }
 
             // Add any remaining matches from the right
             while (rightIndex < rightCount)
             {
-                yield return rightMatches[rightIndex];
+                results.Add(rightMatches[rightIndex]);
                 rightIndex++;
             }
+
+            return results;
         }
     }
 }

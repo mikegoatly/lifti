@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -9,8 +10,7 @@ namespace Lifti.Querying
     /// A partial search result that can subsequently be combined with other <see cref="IntermediateQueryResult"/> instances
     /// materialized as part of a query.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Should not be compared")]
-    public readonly struct IntermediateQueryResult
+    public readonly struct IntermediateQueryResult : IEquatable<IntermediateQueryResult>
     {
         /// <summary>
         /// Creates a new instance of <see cref="IntermediateQueryResult"/>.
@@ -81,7 +81,7 @@ namespace Lifti.Querying
 
         /// <summary>
         /// Intersects this and the specified instance, but only when the positions of the matched tokens are within a given tolerance. Matching tokens are combined
-        /// into <see cref="CompositeTokenMatchLocation"/> instances.
+        /// into <see cref="CompositeTokenLocation"/> instances.
         /// </summary>
         public IntermediateQueryResult CompositePositionalIntersect(IntermediateQueryResult results, int leftTolerance, int rightTolerance)
         {
@@ -160,6 +160,37 @@ namespace Lifti.Querying
             }
 
             return lookup;
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(this.Matches);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals([NotNullWhen(true)] object? obj)
+        {
+            return obj is IntermediateQueryResult result &&
+                   this.Equals(result);
+        }
+
+        /// <inheritdoc />
+        public bool Equals(IntermediateQueryResult other)
+        {
+            return this.Matches.SequenceEqual(other.Matches);
+        }
+
+        /// <inheritdoc />
+        public static bool operator ==(IntermediateQueryResult left, IntermediateQueryResult right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <inheritdoc />
+        public static bool operator !=(IntermediateQueryResult left, IntermediateQueryResult right)
+        {
+            return !(left == right);
         }
     }
 }

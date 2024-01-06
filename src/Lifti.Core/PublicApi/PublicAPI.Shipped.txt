@@ -385,7 +385,7 @@ Lifti.Querying.QueryTokenType.PrecedingNearOperator = 8 -> Lifti.Querying.QueryT
 Lifti.Querying.QueryTokenType.PrecedingOperator = 9 -> Lifti.Querying.QueryTokenType
 Lifti.Querying.QueryTokenType.Text = 0 -> Lifti.Querying.QueryTokenType
 Lifti.Querying.ScoredFieldMatch
-Lifti.Querying.ScoredFieldMatch.Equals(Lifti.Querying.ScoredFieldMatch other) -> bool
+Lifti.Querying.ScoredFieldMatch.Equals(Lifti.Querying.ScoredFieldMatch? other) -> bool
 Lifti.Querying.ScoredFieldMatch.FieldId.get -> byte
 Lifti.Querying.ScoredFieldMatch.FieldMatch.get -> Lifti.Querying.FieldMatch
 Lifti.Querying.ScoredFieldMatch.Locations.get -> System.Collections.Generic.IReadOnlyList<Lifti.Querying.ITokenLocationMatch!>!
@@ -511,7 +511,7 @@ Lifti.Tokenization.TextExtraction.XmlTextExtractor
 Lifti.Tokenization.TextExtraction.XmlTextExtractor.Extract(System.ReadOnlyMemory<char> document, int startOffset) -> System.Collections.Generic.IEnumerable<Lifti.Tokenization.TextExtraction.DocumentTextFragment>!
 Lifti.Tokenization.TextExtraction.XmlTextExtractor.XmlTextExtractor() -> void
 Lifti.Tokenization.Token
-Lifti.Tokenization.Token.AddLocation(Lifti.TokenLocation location) -> void
+Lifti.Tokenization.Token.AddLocation(Lifti.TokenLocation! location) -> void
 Lifti.Tokenization.Token.Locations.get -> System.Collections.Generic.IReadOnlyList<Lifti.TokenLocation>!
 Lifti.Tokenization.Token.Token(string! token, Lifti.TokenLocation location) -> void
 Lifti.Tokenization.Token.Token(string! token, params Lifti.TokenLocation[]! locations) -> void
@@ -629,8 +629,8 @@ static Lifti.Querying.QueryParts.WildcardQueryFragment.operator ==(Lifti.Queryin
 static Lifti.Querying.QueryParts.WildcardQueryFragment.SingleCharacter.get -> Lifti.Querying.QueryParts.WildcardQueryFragment
 static Lifti.Querying.QueryTokenMatch.operator !=(Lifti.Querying.QueryTokenMatch left, Lifti.Querying.QueryTokenMatch right) -> bool
 static Lifti.Querying.QueryTokenMatch.operator ==(Lifti.Querying.QueryTokenMatch left, Lifti.Querying.QueryTokenMatch right) -> bool
-static Lifti.Querying.ScoredFieldMatch.operator !=(Lifti.Querying.ScoredFieldMatch left, Lifti.Querying.ScoredFieldMatch right) -> bool
-static Lifti.Querying.ScoredFieldMatch.operator ==(Lifti.Querying.ScoredFieldMatch left, Lifti.Querying.ScoredFieldMatch right) -> bool
+static Lifti.Querying.ScoredFieldMatch.operator !=(Lifti.Querying.ScoredFieldMatch? left, Lifti.Querying.ScoredFieldMatch? right) -> bool
+static Lifti.Querying.ScoredFieldMatch.operator ==(Lifti.Querying.ScoredFieldMatch? left, Lifti.Querying.ScoredFieldMatch? right) -> bool
 static Lifti.Querying.ScoredToken.operator !=(Lifti.Querying.ScoredToken left, Lifti.Querying.ScoredToken right) -> bool
 static Lifti.Querying.ScoredToken.operator ==(Lifti.Querying.ScoredToken left, Lifti.Querying.ScoredToken right) -> bool
 static Lifti.Querying.SingleTokenLocationMatch.operator !=(Lifti.Querying.SingleTokenLocationMatch left, Lifti.Querying.SingleTokenLocationMatch right) -> bool
@@ -640,12 +640,12 @@ static Lifti.Tokenization.IndexTokenizer.Default.get -> Lifti.Tokenization.Index
 static Lifti.Tokenization.TextExtraction.DocumentTextFragment.operator !=(Lifti.Tokenization.TextExtraction.DocumentTextFragment left, Lifti.Tokenization.TextExtraction.DocumentTextFragment right) -> bool
 static Lifti.Tokenization.TextExtraction.DocumentTextFragment.operator ==(Lifti.Tokenization.TextExtraction.DocumentTextFragment left, Lifti.Tokenization.TextExtraction.DocumentTextFragment right) -> bool
 static Lifti.TokenizationOptions.Default.get -> Lifti.TokenizationOptions!
-static Lifti.TokenLocation.operator !=(Lifti.TokenLocation left, Lifti.TokenLocation right) -> bool
-static Lifti.TokenLocation.operator <(Lifti.TokenLocation left, Lifti.TokenLocation right) -> bool
-static Lifti.TokenLocation.operator <=(Lifti.TokenLocation left, Lifti.TokenLocation right) -> bool
-static Lifti.TokenLocation.operator ==(Lifti.TokenLocation left, Lifti.TokenLocation right) -> bool
-static Lifti.TokenLocation.operator >(Lifti.TokenLocation left, Lifti.TokenLocation right) -> bool
-static Lifti.TokenLocation.operator >=(Lifti.TokenLocation left, Lifti.TokenLocation right) -> bool
+static Lifti.TokenLocation.operator !=(Lifti.TokenLocation? left, Lifti.TokenLocation? right) -> bool
+static Lifti.TokenLocation.operator <(Lifti.TokenLocation? left, Lifti.TokenLocation? right) -> bool
+static Lifti.TokenLocation.operator <=(Lifti.TokenLocation? left, Lifti.TokenLocation? right) -> bool
+static Lifti.TokenLocation.operator ==(Lifti.TokenLocation? left, Lifti.TokenLocation? right) -> bool
+static Lifti.TokenLocation.operator >(Lifti.TokenLocation? left, Lifti.TokenLocation? right) -> bool
+static Lifti.TokenLocation.operator >=(Lifti.TokenLocation? left, Lifti.TokenLocation? right) -> bool
 System.Runtime.CompilerServices.IsExternalInit
 System.Runtime.CompilerServices.IsExternalInit.IsExternalInit() -> void
 virtual Lifti.Tokenization.IndexTokenizer.IsSplitCharacter(char character) -> bool
