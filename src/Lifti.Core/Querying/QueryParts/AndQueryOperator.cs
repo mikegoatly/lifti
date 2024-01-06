@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Lifti.Querying.QueryParts
 {
     /// <summary>
     /// A query part that filters matched documents to only those matched as an intersection of two <see cref="IQueryPart"/>s.
     /// </summary>
-    public class AndQueryOperator : BinaryQueryOperator
+    public sealed class AndQueryOperator : BinaryQueryOperator
     {
         /// <summary>
         /// Constructs a new instance of <see cref="AndQueryOperator"/>.

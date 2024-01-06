@@ -8,7 +8,7 @@ namespace Lifti.Querying.QueryParts
     /// a document's field matches such that the locations are close to one another. Documents that result in no field matches
     /// are filtered out.
     /// </summary>
-    public class NearQueryOperator : BinaryQueryOperator
+    public sealed class NearQueryOperator : BinaryQueryOperator
     {
         /// <summary>
         /// Constructs a new instance of <see cref="NearQueryOperator"/>.

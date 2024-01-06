@@ -27,7 +27,7 @@ namespace Lifti.Querying.QueryParts
     /// <summary>
     /// An <see cref="IQueryPart"/> that matches documents that contain a fuzzy match for the given text.
     /// </summary>
-    public class FuzzyMatchQueryPart : WordQueryPart
+    public sealed class FuzzyMatchQueryPart : WordQueryPart
     {
         internal const ushort DefaultMaxEditDistance = 4;
         internal const ushort DefaultMaxSequentialEdits = 1;

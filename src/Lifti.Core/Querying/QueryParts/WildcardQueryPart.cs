@@ -10,7 +10,7 @@ namespace Lifti.Querying.QueryParts
     /// "*" matches any number of characters (<see cref="WildcardQueryFragmentKind.MultiCharacter"/>)
     /// "%" matches a single character (<see cref="WildcardQueryFragmentKind.SingleCharacter"/>)
     /// </summary>
-    public class WildcardQueryPart : ScoreBoostedQueryPart
+    public sealed class WildcardQueryPart : ScoreBoostedQueryPart
     {
         private static readonly IIndexNavigatorBookmark[] QueryCompleted = [];
         internal IReadOnlyList<WildcardQueryFragment> Fragments { get; }

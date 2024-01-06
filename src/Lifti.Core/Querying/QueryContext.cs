@@ -19,25 +19,5 @@ namespace Lifti.Querying
         /// Gets an empty query context.
         /// </summary>
         public static QueryContext Empty { get; } = new();
-
-        ///// <summary>
-        ///// Applies any additional filters present in the current query context, e.g. field filters, 
-        ///// to the given <see cref="IntermediateQueryResult"/>, returning a new <see cref="IntermediateQueryResult"/> instance.
-        ///// </summary>
-        //public IntermediateQueryResult ApplyTo(IntermediateQueryResult intermediateQueryResult)
-        //{
-        //    if (this.FilterToFieldId is not byte targetFieldId)
-        //    {
-        //        return intermediateQueryResult;
-        //    }
-
-        //    return new IntermediateQueryResult(
-        //        intermediateQueryResult.Matches
-        //            .Select(m => new ScoredToken(
-        //                m.DocumentId,
-        //                m.FieldMatches.Where(fm => fm.FieldId == targetFieldId).ToList()))
-        //            .Where(m => m.FieldMatches.Count > 0),
-        //        true);
-        //}
     }
 }

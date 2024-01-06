@@ -5,7 +5,7 @@ namespace Lifti.Querying.QueryParts
     /// <summary>
     /// An <see cref="IQueryPart"/> that only matches documents that contain an exact match for the given text.
     /// </summary>
-    public class ExactWordQueryPart : WordQueryPart
+    public sealed class ExactWordQueryPart : WordQueryPart
     {
         /// <summary>
         /// Constructs a new instance of <see cref="ExactWordQueryPart"/>.

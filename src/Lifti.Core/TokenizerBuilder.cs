@@ -38,9 +38,9 @@ namespace Lifti
         /// be suppressed by passing <c>false</c> to this method, in which case only characters explicitly specified
         /// using <see cref="SplitOnCharacters(char[])" /> will be treated as word breaks.
         /// </summary>
-        public TokenizerBuilder SplitOnPunctuation(bool splitOnPunctionation = true)
+        public TokenizerBuilder SplitOnPunctuation(bool splitOnPunctuation = true)
         {
-            this.splitOnPunctuation = splitOnPunctionation;
+            this.splitOnPunctuation = splitOnPunctuation;
             return this;
         }
 
@@ -66,12 +66,22 @@ namespace Lifti
             return this;
         }
 
+        /// <inheritdoc cref="WithStemming()"/>
+        [Obsolete("Use WithStemming() instead.")]
+#pragma warning disable RS0027 // API with optional parameter(s) should have the most parameters amongst its public overloads
+        public TokenizerBuilder WithStemming(bool stemming = true)
+#pragma warning restore RS0027 // API with optional parameter(s) should have the most parameters amongst its public overloads
+        {
+            this.stemmer = new PorterStemmer();
+            return this;
+        }
+
         /// <summary>
-        /// Configures the tokenizer to apply word stemming using the default english Porter Stemmer implementation. 
-        /// Used to reduce english words to a common root form, i.e. de-pluralizing and stripping endings such as ING from words. 
+        /// Configures the tokenizer to apply word stemming using the default English Porter Stemmer implementation. 
+        /// Used to reduce English words to a common root form, i.e. de-pluralizing and stripping endings such as ING from words. 
         /// Enabling this will cause both case and accent insensitivity to be applied.
         /// </summary>
-        public TokenizerBuilder WithStemming(bool stemming = true)
+        public TokenizerBuilder WithStemming()
         {
             this.stemmer = new PorterStemmer();
             return this;

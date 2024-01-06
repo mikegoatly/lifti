@@ -6,7 +6,7 @@ namespace Lifti.Querying.QueryParts
     /// An <see cref="IQueryPart"/> that restricts the resulting matches to only those 
     /// that include matching tokens in a specific field.
     /// </summary>
-    public class FieldFilterQueryOperator : IQueryPart
+    public sealed class FieldFilterQueryOperator : IQueryPart
     {
         /// <summary>
         /// Constructs a new instance of <see cref="FieldFilterQueryOperator"/>.

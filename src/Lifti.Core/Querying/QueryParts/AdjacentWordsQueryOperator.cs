@@ -6,7 +6,7 @@ namespace Lifti.Querying.QueryParts
     /// <summary>
     /// A query part requiring that a series of words must appear in a document in sequence.
     /// </summary>
-    public class AdjacentWordsQueryOperator : IQueryPart
+    public sealed class AdjacentWordsQueryOperator : IQueryPart
     {
         private double? weighting;
 

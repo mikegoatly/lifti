@@ -5,7 +5,7 @@ namespace Lifti.Querying.QueryParts
     /// <summary>
     /// An <see cref="IQueryPart"/> that groups other statements together.
     /// </summary>
-    public class BracketedQueryPart : IQueryPart
+    public sealed class BracketedQueryPart : IQueryPart
     {
         /// <summary>
         /// Constructs a new instance of <see cref="BracketedQueryPart"/>.

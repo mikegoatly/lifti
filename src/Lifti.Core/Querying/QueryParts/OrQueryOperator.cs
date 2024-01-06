@@ -6,7 +6,7 @@ namespace Lifti.Querying.QueryParts
     /// <summary>
     /// An <see cref="IQueryPart"/> that produces a union of the results in two other <see cref="IQueryPart"/>s.
     /// </summary>
-    public class OrQueryOperator : BinaryQueryOperator
+    public sealed class OrQueryOperator : BinaryQueryOperator
     {
         /// <summary>
         /// Constructs a new <see cref="OrQueryOperator"/>.

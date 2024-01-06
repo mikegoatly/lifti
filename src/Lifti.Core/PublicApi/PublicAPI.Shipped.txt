@@ -1,0 +1,651 @@
+#nullable enable
+abstract Lifti.IndexedFieldDetails.ReadAsync(object! item, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IEnumerable<string!>!>
+abstract Lifti.Querying.QueryParts.BinaryQueryOperator.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+abstract Lifti.Querying.QueryParts.BinaryQueryOperator.Precedence.get -> Lifti.Querying.OperatorPrecedence
+Lifti.DocumentStatistics
+Lifti.DocumentStatistics.TokenCountByField.get -> System.Collections.Generic.IReadOnlyDictionary<byte, int>!
+Lifti.DocumentStatistics.TotalTokenCount.get -> int
+Lifti.DuplicateItemBehavior
+Lifti.DuplicateItemBehavior.ReplaceItem = 0 -> Lifti.DuplicateItemBehavior
+Lifti.DuplicateItemBehavior.ThrowException = 1 -> Lifti.DuplicateItemBehavior
+Lifti.FieldKind
+Lifti.FieldKind.Dynamic = 2 -> Lifti.FieldKind
+Lifti.FieldKind.Static = 1 -> Lifti.FieldKind
+Lifti.FieldKind.Unknown = 0 -> Lifti.FieldKind
+Lifti.FieldPhrases<TKey>
+Lifti.FieldPhrases<TKey>.FieldPhrases(string! foundIn, params string![]! phrases) -> void
+Lifti.FieldPhrases<TKey>.FieldPhrases(string! FoundIn, System.Collections.Generic.IReadOnlyList<string!>! Phrases) -> void
+Lifti.FieldPhrases<TKey>.FoundIn.get -> string!
+Lifti.FieldPhrases<TKey>.FoundIn.init -> void
+Lifti.FieldPhrases<TKey>.Phrases.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Lifti.FieldPhrases<TKey>.Phrases.init -> void
+Lifti.FieldSearchResult
+Lifti.FieldSearchResult.FieldSearchResult(string! foundIn, double score, System.Collections.Generic.IReadOnlyList<Lifti.TokenLocation>! locations) -> void
+Lifti.FieldSearchResult.FoundIn.get -> string!
+Lifti.FieldSearchResult.Locations.get -> System.Collections.Generic.IReadOnlyList<Lifti.TokenLocation>!
+Lifti.FieldSearchResult.Score.get -> double
+Lifti.FullTextIndex<TKey>
+Lifti.FullTextIndex<TKey>.AddAsync(TKey itemKey, string! text, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Lifti.FullTextIndex<TKey>.AddAsync(TKey itemKey, System.Collections.Generic.IEnumerable<string!>! text, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Lifti.FullTextIndex<TKey>.AddAsync<TItem>(TItem item, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Lifti.FullTextIndex<TKey>.AddRangeAsync<TItem>(System.Collections.Generic.IEnumerable<TItem>! items, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Lifti.FullTextIndex<TKey>.BeginBatchChange() -> void
+Lifti.FullTextIndex<TKey>.CommitBatchChangeAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Lifti.FullTextIndex<TKey>.Count.get -> int
+Lifti.FullTextIndex<TKey>.CreateNavigator() -> Lifti.Querying.IIndexNavigator!
+Lifti.FullTextIndex<TKey>.DefaultTextExtractor.get -> Lifti.Tokenization.TextExtraction.ITextExtractor!
+Lifti.FullTextIndex<TKey>.DefaultThesaurus.get -> Lifti.Tokenization.IThesaurus!
+Lifti.FullTextIndex<TKey>.DefaultTokenizer.get -> Lifti.Tokenization.IIndexTokenizer!
+Lifti.FullTextIndex<TKey>.Dispose() -> void
+Lifti.FullTextIndex<TKey>.FieldLookup.get -> Lifti.IIndexedFieldLookup!
+Lifti.FullTextIndex<TKey>.GetTokenizerForField(string! fieldName) -> Lifti.Tokenization.IIndexTokenizer!
+Lifti.FullTextIndex<TKey>.Items.get -> Lifti.IItemStore<TKey>!
+Lifti.FullTextIndex<TKey>.QueryParser.get -> Lifti.Querying.IQueryParser!
+Lifti.FullTextIndex<TKey>.RemoveAsync(TKey itemKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
+Lifti.FullTextIndex<TKey>.Root.get -> Lifti.IndexNode!
+Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query) -> Lifti.ISearchResults<TKey>!
+Lifti.FullTextIndex<TKey>.Search(string! searchText) -> Lifti.ISearchResults<TKey>!
+Lifti.FullTextIndex<TKey>.Snapshot.get -> Lifti.IIndexSnapshot<TKey>!
+Lifti.FullTextIndexBuilder<TKey>
+Lifti.FullTextIndexBuilder<TKey>.Build() -> Lifti.FullTextIndex<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.FullTextIndexBuilder() -> void
+Lifti.FullTextIndexBuilder<TKey>.WithDefaultThesaurus(System.Func<Lifti.ThesaurusBuilder!, Lifti.ThesaurusBuilder!>! thesaurusBuilder) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithDefaultTokenization(System.Func<Lifti.TokenizerBuilder!, Lifti.TokenizerBuilder!>! optionsBuilder) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithDuplicateItemBehavior(Lifti.DuplicateItemBehavior duplicateItemBehavior) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithIndexModificationAction(System.Action<Lifti.IIndexSnapshot<TKey>!>! action) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithIndexModificationAction(System.Func<Lifti.IIndexSnapshot<TKey>!, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! asyncAction) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithIndexModificationAction(System.Func<Lifti.IIndexSnapshot<TKey>!, System.Threading.Tasks.Task!>! asyncAction) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithIntraNodeTextSupportedAfterIndexDepth(int depth) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithObjectTokenization<TItem>(System.Func<Lifti.Tokenization.Objects.ObjectTokenizationBuilder<TItem, TKey>!, Lifti.Tokenization.Objects.ObjectTokenizationBuilder<TItem, TKey>!>! optionsBuilder) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithQueryParser(Lifti.Querying.IQueryParser! queryParser) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithQueryParser(System.Func<Lifti.Querying.QueryParserBuilder!, Lifti.Querying.QueryParserBuilder!>! optionsBuilder) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithScorerFactory(Lifti.Querying.IIndexScorerFactory! scorerFactory) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithSimpleQueryParser() -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithSimpleQueryParser(System.Func<Lifti.Querying.QueryParserBuilder!, Lifti.Querying.QueryParserBuilder!>! optionsBuilder) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithTextExtractor(Lifti.Tokenization.TextExtraction.ITextExtractor! textExtractor) -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexBuilder<TKey>.WithTextExtractor<T>() -> Lifti.FullTextIndexBuilder<TKey>!
+Lifti.FullTextIndexExtensions
+Lifti.IdPool<T>
+Lifti.IdPool<T>.Add(int id, T item, Lifti.DocumentStatistics! documentStatistics) -> void
+Lifti.IdPool<T>.Add(T item, Lifti.DocumentStatistics! documentStatistics) -> int
+Lifti.IdPool<T>.IdPool() -> void
+Lifti.IdPool<T>.ReleaseItem(T item) -> int
+Lifti.IFullTextIndex<TKey>
+Lifti.IFullTextIndex<TKey>.AddAsync(TKey itemKey, string! text, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Lifti.IFullTextIndex<TKey>.AddAsync(TKey itemKey, System.Collections.Generic.IEnumerable<string!>! text, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Lifti.IFullTextIndex<TKey>.AddAsync<TItem>(TItem item, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Lifti.IFullTextIndex<TKey>.AddRangeAsync<TItem>(System.Collections.Generic.IEnumerable<TItem>! items, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Lifti.IFullTextIndex<TKey>.BeginBatchChange() -> void
+Lifti.IFullTextIndex<TKey>.CommitBatchChangeAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Lifti.IFullTextIndex<TKey>.Count.get -> int
+Lifti.IFullTextIndex<TKey>.CreateNavigator() -> Lifti.Querying.IIndexNavigator!
+Lifti.IFullTextIndex<TKey>.DefaultTextExtractor.get -> Lifti.Tokenization.TextExtraction.ITextExtractor!
+Lifti.IFullTextIndex<TKey>.DefaultThesaurus.get -> Lifti.Tokenization.IThesaurus!
+Lifti.IFullTextIndex<TKey>.FieldLookup.get -> Lifti.IIndexedFieldLookup!
+Lifti.IFullTextIndex<TKey>.Items.get -> Lifti.IItemStore<TKey>!
+Lifti.IFullTextIndex<TKey>.QueryParser.get -> Lifti.Querying.IQueryParser!
+Lifti.IFullTextIndex<TKey>.RemoveAsync(TKey itemKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
+Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query) -> Lifti.ISearchResults<TKey>!
+Lifti.IFullTextIndex<TKey>.Search(string! searchText) -> Lifti.ISearchResults<TKey>!
+Lifti.IFullTextIndex<TKey>.Snapshot.get -> Lifti.IIndexSnapshot<TKey>!
+Lifti.IIndexedFieldLookup
+Lifti.IIndexedFieldLookup.AllFieldNames.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
+Lifti.IIndexedFieldLookup.DefaultField.get -> byte
+Lifti.IIndexedFieldLookup.GetFieldForId(byte id) -> string!
+Lifti.IIndexedFieldLookup.GetFieldInfo(string! fieldName) -> Lifti.IndexedFieldDetails!
+Lifti.IIndexedFieldLookup.IsKnownField(System.Type! objectType, string! fieldName) -> bool
+Lifti.IIndexNodeFactory
+Lifti.IIndexNodeFactory.CreateNode(System.ReadOnlyMemory<char> intraNodeText, System.Collections.Immutable.ImmutableDictionary<char, Lifti.IndexNode!>! childNodes, System.Collections.Immutable.ImmutableDictionary<int, System.Collections.Immutable.ImmutableList<Lifti.IndexedToken>!>! matches) -> Lifti.IndexNode!
+Lifti.IIndexNodeFactory.CreateRootNode() -> Lifti.IndexNode!
+Lifti.IIndexNodeFactory.GetIndexSupportLevelForDepth(int depth) -> Lifti.IndexSupportLevelKind
+Lifti.IIndexSnapshot
+Lifti.IIndexSnapshot.CreateNavigator() -> Lifti.Querying.IIndexNavigator!
+Lifti.IIndexSnapshot.FieldLookup.get -> Lifti.IIndexedFieldLookup!
+Lifti.IIndexSnapshot.Items.get -> Lifti.IItemStore!
+Lifti.IIndexSnapshot.Root.get -> Lifti.IndexNode!
+Lifti.IIndexSnapshot<TKey>
+Lifti.IIndexSnapshot<TKey>.Items.get -> Lifti.IItemStore<TKey>!
+Lifti.IIndexTokenizerProvider
+Lifti.IIndexTokenizerProvider.DefaultTokenizer.get -> Lifti.Tokenization.IIndexTokenizer!
+Lifti.IIndexTokenizerProvider.GetTokenizerForField(string! fieldName) -> Lifti.Tokenization.IIndexTokenizer!
+Lifti.IItemMetadata
+Lifti.IItemMetadata.DocumentStatistics.get -> Lifti.DocumentStatistics!
+Lifti.IItemMetadata.Id.get -> int
+Lifti.IItemMetadata<TKey>
+Lifti.IItemMetadata<TKey>.Item.get -> TKey
+Lifti.IItemStore
+Lifti.IItemStore.Count.get -> int
+Lifti.IItemStore.GetMetadata(int id) -> Lifti.IItemMetadata!
+Lifti.IItemStore.IndexStatistics.get -> Lifti.IndexStatistics!
+Lifti.IItemStore<TKey>
+Lifti.IItemStore<TKey>.Contains(TKey item) -> bool
+Lifti.IItemStore<TKey>.GetIndexedItems() -> System.Collections.Generic.IEnumerable<Lifti.ItemMetadata<TKey>!>!
+Lifti.IItemStore<TKey>.GetMetadata(int id) -> Lifti.IItemMetadata<TKey>!
+Lifti.IItemStore<TKey>.GetMetadata(TKey item) -> Lifti.IItemMetadata<TKey>!
+Lifti.IItemStore<TKey>.Snapshot() -> Lifti.IItemStore<TKey>!
+Lifti.IndexedFieldDetails
+Lifti.IndexedFieldDetails.DynamicFieldReaderName.get -> string?
+Lifti.IndexedFieldDetails.FieldKind.get -> Lifti.FieldKind
+Lifti.IndexedFieldDetails.Id.get -> byte
+Lifti.IndexedFieldDetails.Name.get -> string!
+Lifti.IndexedFieldDetails.ObjectType.get -> System.Type!
+Lifti.IndexedFieldDetails.TextExtractor.get -> Lifti.Tokenization.TextExtraction.ITextExtractor!
+Lifti.IndexedFieldDetails.Thesaurus.get -> Lifti.Tokenization.IThesaurus!
+Lifti.IndexedFieldDetails.Tokenizer.get -> Lifti.Tokenization.IIndexTokenizer!
+Lifti.IndexedFieldDetails<TItem>
+Lifti.IndexedToken
+Lifti.IndexedToken.Equals(Lifti.IndexedToken other) -> bool
+Lifti.IndexedToken.FieldId.get -> byte
+Lifti.IndexedToken.IndexedToken() -> void
+Lifti.IndexedToken.IndexedToken(byte fieldId, params Lifti.TokenLocation[]! locations) -> void
+Lifti.IndexedToken.IndexedToken(byte fieldId, System.Collections.Generic.IReadOnlyList<Lifti.TokenLocation>! locations) -> void
+Lifti.IndexedToken.Locations.get -> System.Collections.Generic.IReadOnlyList<Lifti.TokenLocation>!
+Lifti.IndexNode
+Lifti.IndexNode.ChildNodes.get -> System.Collections.Immutable.ImmutableDictionary<char, Lifti.IndexNode!>!
+Lifti.IndexNode.HasChildNodes.get -> bool
+Lifti.IndexNode.HasMatches.get -> bool
+Lifti.IndexNode.IntraNodeText.get -> System.ReadOnlyMemory<char>
+Lifti.IndexNode.IsEmpty.get -> bool
+Lifti.IndexNode.Matches.get -> System.Collections.Immutable.ImmutableDictionary<int, System.Collections.Immutable.ImmutableList<Lifti.IndexedToken>!>!
+Lifti.IndexNodeFactory
+Lifti.IndexNodeFactory.CreateNode(System.ReadOnlyMemory<char> intraNodeText, System.Collections.Immutable.ImmutableDictionary<char, Lifti.IndexNode!>! childNodes, System.Collections.Immutable.ImmutableDictionary<int, System.Collections.Immutable.ImmutableList<Lifti.IndexedToken>!>! matches) -> Lifti.IndexNode!
+Lifti.IndexNodeFactory.CreateRootNode() -> Lifti.IndexNode!
+Lifti.IndexNodeFactory.GetIndexSupportLevelForDepth(int depth) -> Lifti.IndexSupportLevelKind
+Lifti.IndexNodeFactory.IndexNodeFactory(Lifti.IndexOptions! options) -> void
+Lifti.IndexOptions
+Lifti.IndexOptions.DuplicateItemBehavior.get -> Lifti.DuplicateItemBehavior
+Lifti.IndexOptions.SupportIntraNodeTextAfterIndexDepth.get -> int
+Lifti.IndexSnapshot<TKey>
+Lifti.IndexSnapshot<TKey>.CreateNavigator() -> Lifti.Querying.IIndexNavigator!
+Lifti.IndexSnapshot<TKey>.FieldLookup.get -> Lifti.IIndexedFieldLookup!
+Lifti.IndexSnapshot<TKey>.Items.get -> Lifti.IItemStore<TKey>!
+Lifti.IndexSnapshot<TKey>.Root.get -> Lifti.IndexNode!
+Lifti.IndexStatistics
+Lifti.IndexStatistics.TokenCountByField.get -> System.Collections.Immutable.ImmutableDictionary<byte, long>!
+Lifti.IndexStatistics.TotalTokenCount.get -> long
+Lifti.IndexSupportLevelKind
+Lifti.IndexSupportLevelKind.CharacterByCharacter = 0 -> Lifti.IndexSupportLevelKind
+Lifti.IndexSupportLevelKind.IntraNodeText = 1 -> Lifti.IndexSupportLevelKind
+Lifti.ISearchResults<TKey>
+Lifti.ISearchResults<TKey>.CreateMatchPhrases(System.Func<TKey, string!>! loadText) -> System.Collections.Generic.IEnumerable<Lifti.ItemPhrases<TKey>!>!
+Lifti.ISearchResults<TKey>.CreateMatchPhrasesAsync(System.Func<TKey, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<string!>>! loadTextAsync, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Lifti.ItemPhrases<TKey>!>!>!
+Lifti.ISearchResults<TKey>.CreateMatchPhrasesAsync(System.Func<TKey, System.Threading.Tasks.ValueTask<string!>>! loadTextAsync, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Lifti.ItemPhrases<TKey>!>!>!
+Lifti.ISearchResults<TKey>.CreateMatchPhrasesAsync<TItem>(System.Func<System.Collections.Generic.IReadOnlyList<TKey>!, System.Collections.Generic.IReadOnlyList<TItem>!>! loadItems, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Lifti.ItemPhrases<TKey, TItem>!>!>!
+Lifti.ISearchResults<TKey>.CreateMatchPhrasesAsync<TItem>(System.Func<System.Collections.Generic.IReadOnlyList<TKey>!, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<TItem>!>>! loadItemsAsync, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Lifti.ItemPhrases<TKey, TItem>!>!>!
+Lifti.ISearchResults<TKey>.CreateMatchPhrasesAsync<TItem>(System.Func<System.Collections.Generic.IReadOnlyList<TKey>!, System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<TItem>!>>! loadItemsAsync, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Lifti.ItemPhrases<TKey, TItem>!>!>!
+Lifti.ISearchResults<TKey>.CreateMatchPhrasesAsync<TItem>(System.Func<TKey, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<TItem>>! loadItemAsync, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Lifti.ItemPhrases<TKey, TItem>!>!>!
+Lifti.ISearchResults<TKey>.CreateMatchPhrasesAsync<TItem>(System.Func<TKey, System.Threading.Tasks.ValueTask<TItem>>! loadItemAsync, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Lifti.ItemPhrases<TKey, TItem>!>!>!
+Lifti.ISearchResults<TKey>.CreateMatchPhrasesAsync<TItem>(System.Func<TKey, TItem>! loadItem, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Lifti.ItemPhrases<TKey, TItem>!>!>!
+Lifti.ISearchResults<TKey>.OrderByField(string! fieldName) -> Lifti.ISearchResults<TKey>!
+Lifti.ItemMetadata<T>
+Lifti.ItemMetadata<T>.DocumentStatistics.get -> Lifti.DocumentStatistics!
+Lifti.ItemMetadata<T>.Id.get -> int
+Lifti.ItemMetadata<T>.Item.get -> T
+Lifti.ItemMetadata<T>.ItemMetadata(int id, T item, Lifti.DocumentStatistics! documentStatistics) -> void
+Lifti.ItemPhrases<TKey, TItem>
+Lifti.ItemPhrases<TKey, TItem>.Item.get -> TItem
+Lifti.ItemPhrases<TKey, TItem>.Item.init -> void
+Lifti.ItemPhrases<TKey, TItem>.ItemPhrases(TItem item, Lifti.SearchResult<TKey>! SearchResult, System.Collections.Generic.IReadOnlyList<Lifti.FieldPhrases<TKey>!>! phrases) -> void
+Lifti.ItemPhrases<TKey>
+Lifti.ItemPhrases<TKey>.EnumeratePhrases() -> System.Collections.Generic.IEnumerable<string!>!
+Lifti.ItemPhrases<TKey>.FieldPhrases.get -> System.Collections.Generic.IReadOnlyList<Lifti.FieldPhrases<TKey>!>!
+Lifti.ItemPhrases<TKey>.FieldPhrases.init -> void
+Lifti.ItemPhrases<TKey>.ItemPhrases(Lifti.SearchResult<TKey>! SearchResult, System.Collections.Generic.IReadOnlyList<Lifti.FieldPhrases<TKey>!>! FieldPhrases) -> void
+Lifti.ItemPhrases<TKey>.SearchResult.get -> Lifti.SearchResult<TKey>!
+Lifti.ItemPhrases<TKey>.SearchResult.init -> void
+Lifti.ItemStore<T>
+Lifti.ItemStore<T>.Contains(T item) -> bool
+Lifti.ItemStore<T>.Count.get -> int
+Lifti.ItemStore<T>.GetIndexedItems() -> System.Collections.Generic.IEnumerable<Lifti.ItemMetadata<T>!>!
+Lifti.ItemStore<T>.GetMetadata(int id) -> Lifti.IItemMetadata<T>!
+Lifti.ItemStore<T>.GetMetadata(T item) -> Lifti.IItemMetadata<T>!
+Lifti.ItemStore<T>.IndexStatistics.get -> Lifti.IndexStatistics!
+Lifti.ItemStore<T>.Snapshot() -> Lifti.IItemStore<T>!
+Lifti.LiftiException
+Lifti.LiftiException.LiftiException() -> void
+Lifti.LiftiException.LiftiException(string! message) -> void
+Lifti.LiftiException.LiftiException(string! message, params object![]! args) -> void
+Lifti.LiftiException.LiftiException(string! message, System.Exception! inner) -> void
+Lifti.LiftiException.LiftiException(System.Runtime.Serialization.SerializationInfo! info, System.Runtime.Serialization.StreamingContext context) -> void
+Lifti.PreprocessedInput
+Lifti.PreprocessedInput.Equals(Lifti.PreprocessedInput other) -> bool
+Lifti.PreprocessedInput.PreprocessedInput() -> void
+Lifti.PreprocessedInput.PreprocessedInput(char value) -> void
+Lifti.PreprocessedInput.PreprocessedInput(string! replacement) -> void
+Lifti.PreprocessedInput.Replacement.get -> string?
+Lifti.PreprocessedInput.Value.get -> char
+Lifti.Querying.CompositePositionalIntersectMerger
+Lifti.Querying.CompositePositionalIntersectMerger.CompositePositionalIntersectMerger() -> void
+Lifti.Querying.CompositeTokenMatchLocation
+Lifti.Querying.CompositeTokenMatchLocation.CompositeTokenMatchLocation() -> void
+Lifti.Querying.CompositeTokenMatchLocation.CompositeTokenMatchLocation(Lifti.Querying.ITokenLocationMatch! leftToken, Lifti.Querying.ITokenLocationMatch! rightToken) -> void
+Lifti.Querying.CompositeTokenMatchLocation.Equals(Lifti.Querying.CompositeTokenMatchLocation other) -> bool
+Lifti.Querying.CompositeTokenMatchLocation.GetLocations() -> System.Collections.Generic.IEnumerable<Lifti.TokenLocation>!
+Lifti.Querying.CompositeTokenMatchLocation.MaxTokenIndex.get -> int
+Lifti.Querying.CompositeTokenMatchLocation.MinTokenIndex.get -> int
+Lifti.Querying.FieldMatch
+Lifti.Querying.FieldMatch.Equals(Lifti.Querying.FieldMatch other) -> bool
+Lifti.Querying.FieldMatch.FieldId.get -> byte
+Lifti.Querying.FieldMatch.FieldMatch() -> void
+Lifti.Querying.FieldMatch.FieldMatch(byte fieldId, System.Collections.Generic.IEnumerable<Lifti.Querying.ITokenLocationMatch!>! locations) -> void
+Lifti.Querying.FieldMatch.FieldMatch(Lifti.IndexedToken token) -> void
+Lifti.Querying.FieldMatch.GetTokenLocations() -> System.Collections.Generic.IReadOnlyList<Lifti.TokenLocation>!
+Lifti.Querying.FieldMatch.Locations.get -> System.Collections.Generic.IReadOnlyList<Lifti.Querying.ITokenLocationMatch!>!
+Lifti.Querying.IIndexNavigator
+Lifti.Querying.IIndexNavigator.CreateBookmark() -> Lifti.Querying.IIndexNavigatorBookmark!
+Lifti.Querying.IIndexNavigator.EnumerateIndexedTokens() -> System.Collections.Generic.IEnumerable<string!>!
+Lifti.Querying.IIndexNavigator.EnumerateNextCharacters() -> System.Collections.Generic.IEnumerable<char>!
+Lifti.Querying.IIndexNavigator.GetExactAndChildMatches(double weighting = 1) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.IIndexNavigator.GetExactMatches(double weighting = 1) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.IIndexNavigator.HasExactMatches.get -> bool
+Lifti.Querying.IIndexNavigator.Process(char value) -> bool
+Lifti.Querying.IIndexNavigator.Process(string! text) -> bool
+Lifti.Querying.IIndexNavigator.Process(System.ReadOnlySpan<char> text) -> bool
+Lifti.Querying.IIndexNavigatorBookmark
+Lifti.Querying.IIndexNavigatorBookmark.Apply() -> void
+Lifti.Querying.IIndexScorerFactory
+Lifti.Querying.IIndexScorerFactory.CreateIndexScorer(Lifti.IIndexSnapshot! indexSnapshot) -> Lifti.Querying.IScorer!
+Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.IntermediateQueryResult.CompositePositionalIntersect(Lifti.Querying.IntermediateQueryResult results, int leftTolerance, int rightTolerance) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.IntermediateQueryResult.IntermediateQueryResult() -> void
+Lifti.Querying.IntermediateQueryResult.IntermediateQueryResult(System.Collections.Generic.IEnumerable<Lifti.Querying.ScoredToken>! matches) -> void
+Lifti.Querying.IntermediateQueryResult.Intersect(Lifti.Querying.IntermediateQueryResult results) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.IntermediateQueryResult.Matches.get -> System.Collections.Generic.IReadOnlyList<Lifti.Querying.ScoredToken>!
+Lifti.Querying.IntermediateQueryResult.PrecedingIntersect(Lifti.Querying.IntermediateQueryResult results) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.IntermediateQueryResult.Union(Lifti.Querying.IntermediateQueryResult results) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.IntermediateQueryResultMerger
+Lifti.Querying.IntermediateQueryResultMerger.IntermediateQueryResultMerger() -> void
+Lifti.Querying.IntersectMerger
+Lifti.Querying.IntersectMerger.IntersectMerger() -> void
+Lifti.Querying.IQuery
+Lifti.Querying.IQuery.Execute<TKey>(Lifti.IIndexSnapshot<TKey>! index) -> System.Collections.Generic.IEnumerable<Lifti.SearchResult<TKey>!>!
+Lifti.Querying.IQuery.Root.get -> Lifti.Querying.QueryParts.IQueryPart!
+Lifti.Querying.IQueryParser
+Lifti.Querying.IQueryParser.Parse(Lifti.IIndexedFieldLookup! fieldLookup, string! queryText, Lifti.IIndexTokenizerProvider! tokenizerProvider) -> Lifti.Querying.IQuery!
+Lifti.Querying.IScorer
+Lifti.Querying.IScorer.Score(System.Collections.Generic.IReadOnlyList<Lifti.Querying.QueryTokenMatch>! tokens, double weighting) -> System.Collections.Generic.IReadOnlyList<Lifti.Querying.ScoredToken>!
+Lifti.Querying.ITokenLocationMatch
+Lifti.Querying.ITokenLocationMatch.GetLocations() -> System.Collections.Generic.IEnumerable<Lifti.TokenLocation>!
+Lifti.Querying.ITokenLocationMatch.MaxTokenIndex.get -> int
+Lifti.Querying.ITokenLocationMatch.MinTokenIndex.get -> int
+Lifti.Querying.OkapiBm25ScorerFactory
+Lifti.Querying.OkapiBm25ScorerFactory.CreateIndexScorer(Lifti.IIndexSnapshot! indexSnapshot) -> Lifti.Querying.IScorer!
+Lifti.Querying.OkapiBm25ScorerFactory.OkapiBm25ScorerFactory(double k1 = 1.2, double b = 0.75) -> void
+Lifti.Querying.OperatorPrecedence
+Lifti.Querying.OperatorPrecedence.And = 1 -> Lifti.Querying.OperatorPrecedence
+Lifti.Querying.OperatorPrecedence.Or = 2 -> Lifti.Querying.OperatorPrecedence
+Lifti.Querying.OperatorPrecedence.Positional = 0 -> Lifti.Querying.OperatorPrecedence
+Lifti.Querying.PrecedingIntersectMerger
+Lifti.Querying.PrecedingIntersectMerger.PrecedingIntersectMerger() -> void
+Lifti.Querying.Query
+Lifti.Querying.Query.Execute<TKey>(Lifti.IIndexSnapshot<TKey>! index) -> System.Collections.Generic.IEnumerable<Lifti.SearchResult<TKey>!>!
+Lifti.Querying.Query.Query(Lifti.Querying.QueryParts.IQueryPart! root) -> void
+Lifti.Querying.Query.Root.get -> Lifti.Querying.QueryParts.IQueryPart!
+Lifti.Querying.QueryParserBuilder
+Lifti.Querying.QueryParserBuilder.AssumeFuzzySearchTerms(bool fuzzySearchByDefault = true) -> Lifti.Querying.QueryParserBuilder!
+Lifti.Querying.QueryParserBuilder.Build() -> Lifti.Querying.IQueryParser!
+Lifti.Querying.QueryParserBuilder.WithDefaultJoiningOperator(Lifti.Querying.QueryTermJoinOperatorKind joiningOperator = Lifti.Querying.QueryTermJoinOperatorKind.And) -> Lifti.Querying.QueryParserBuilder!
+Lifti.Querying.QueryParserBuilder.WithFuzzySearchDefaults(System.Func<int, ushort>! maxEditDistance, System.Func<int, ushort>! maxSequentialEdits) -> Lifti.Querying.QueryParserBuilder!
+Lifti.Querying.QueryParserBuilder.WithFuzzySearchDefaults(ushort maxEditDistance = 4, ushort maxSequentialEdits = 1) -> Lifti.Querying.QueryParserBuilder!
+Lifti.Querying.QueryParserBuilder.WithQueryParserFactory(System.Func<Lifti.Querying.QueryParserOptions!, Lifti.Querying.IQueryParser!>! factory) -> Lifti.Querying.QueryParserBuilder!
+Lifti.Querying.QueryParserException
+Lifti.Querying.QueryParserException.QueryParserException() -> void
+Lifti.Querying.QueryParserException.QueryParserException(string! message) -> void
+Lifti.Querying.QueryParserException.QueryParserException(string! message, params object![]! args) -> void
+Lifti.Querying.QueryParserException.QueryParserException(string! message, System.Exception! inner) -> void
+Lifti.Querying.QueryParserException.QueryParserException(System.Runtime.Serialization.SerializationInfo! info, System.Runtime.Serialization.StreamingContext context) -> void
+Lifti.Querying.QueryParserOptions
+Lifti.Querying.QueryParserOptions.AssumeFuzzySearchTerms.get -> bool
+Lifti.Querying.QueryParserOptions.DefaultJoiningOperator.get -> Lifti.Querying.QueryTermJoinOperatorKind
+Lifti.Querying.QueryParserOptions.FuzzySearchMaxEditDistance.get -> System.Func<int, ushort>!
+Lifti.Querying.QueryParserOptions.FuzzySearchMaxSequentialEdits.get -> System.Func<int, ushort>!
+Lifti.Querying.QueryParts.AdjacentWordsQueryOperator
+Lifti.Querying.QueryParts.AdjacentWordsQueryOperator.AdjacentWordsQueryOperator(System.Collections.Generic.IReadOnlyList<Lifti.Querying.QueryParts.IQueryPart!>! words) -> void
+Lifti.Querying.QueryParts.AdjacentWordsQueryOperator.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.QueryParts.AdjacentWordsQueryOperator.Words.get -> System.Collections.Generic.IReadOnlyList<Lifti.Querying.QueryParts.IQueryPart!>!
+Lifti.Querying.QueryParts.AndQueryOperator
+Lifti.Querying.QueryParts.AndQueryOperator.AndQueryOperator(Lifti.Querying.QueryParts.IQueryPart! left, Lifti.Querying.QueryParts.IQueryPart! right) -> void
+Lifti.Querying.QueryParts.BinaryQueryOperator
+Lifti.Querying.QueryParts.BinaryQueryOperator.BinaryQueryOperator(Lifti.Querying.QueryParts.IQueryPart! left, Lifti.Querying.QueryParts.IQueryPart! right) -> void
+Lifti.Querying.QueryParts.BinaryQueryOperator.Left.get -> Lifti.Querying.QueryParts.IQueryPart!
+Lifti.Querying.QueryParts.BinaryQueryOperator.Left.set -> void
+Lifti.Querying.QueryParts.BinaryQueryOperator.Right.get -> Lifti.Querying.QueryParts.IQueryPart!
+Lifti.Querying.QueryParts.BinaryQueryOperator.Right.set -> void
+Lifti.Querying.QueryParts.BracketedQueryPart
+Lifti.Querying.QueryParts.BracketedQueryPart.BracketedQueryPart(Lifti.Querying.QueryParts.IQueryPart! statement) -> void
+Lifti.Querying.QueryParts.BracketedQueryPart.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.QueryParts.BracketedQueryPart.Statement.get -> Lifti.Querying.QueryParts.IQueryPart!
+Lifti.Querying.QueryParts.EmptyQueryPart
+Lifti.Querying.QueryParts.EmptyQueryPart.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.QueryParts.ExactWordQueryPart
+Lifti.Querying.QueryParts.ExactWordQueryPart.ExactWordQueryPart(string! word) -> void
+Lifti.Querying.QueryParts.FieldFilterQueryOperator
+Lifti.Querying.QueryParts.FieldFilterQueryOperator.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.QueryParts.FieldFilterQueryOperator.FieldFilterQueryOperator(string! fieldName, byte fieldId, Lifti.Querying.QueryParts.IQueryPart! statement) -> void
+Lifti.Querying.QueryParts.FieldFilterQueryOperator.FieldId.get -> byte
+Lifti.Querying.QueryParts.FieldFilterQueryOperator.FieldName.get -> string!
+Lifti.Querying.QueryParts.FieldFilterQueryOperator.Statement.get -> Lifti.Querying.QueryParts.IQueryPart!
+Lifti.Querying.QueryParts.FuzzyMatchQueryPart
+Lifti.Querying.QueryParts.FuzzyMatchQueryPart.FuzzyMatchQueryPart(string! word, ushort maxEditDistance = 4, ushort maxSequentialEdits = 1) -> void
+Lifti.Querying.QueryParts.IBinaryQueryOperator
+Lifti.Querying.QueryParts.IBinaryQueryOperator.Left.get -> Lifti.Querying.QueryParts.IQueryPart!
+Lifti.Querying.QueryParts.IBinaryQueryOperator.Left.set -> void
+Lifti.Querying.QueryParts.IBinaryQueryOperator.Precedence.get -> Lifti.Querying.OperatorPrecedence
+Lifti.Querying.QueryParts.IBinaryQueryOperator.Right.get -> Lifti.Querying.QueryParts.IQueryPart!
+Lifti.Querying.QueryParts.IBinaryQueryOperator.Right.set -> void
+Lifti.Querying.QueryParts.IQueryContext
+Lifti.Querying.QueryParts.IQueryContext.ApplyTo(Lifti.Querying.IntermediateQueryResult intermediateQueryResult) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.QueryParts.IQueryPart
+Lifti.Querying.QueryParts.IQueryPart.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.QueryParts.NearQueryOperator
+Lifti.Querying.QueryParts.NearQueryOperator.NearQueryOperator(Lifti.Querying.QueryParts.IQueryPart! left, Lifti.Querying.QueryParts.IQueryPart! right, int tolerance = 5) -> void
+Lifti.Querying.QueryParts.NearQueryOperator.Tolerance.get -> int
+Lifti.Querying.QueryParts.OrQueryOperator
+Lifti.Querying.QueryParts.OrQueryOperator.OrQueryOperator(Lifti.Querying.QueryParts.IQueryPart! left, Lifti.Querying.QueryParts.IQueryPart! right) -> void
+Lifti.Querying.QueryParts.PrecedingNearQueryOperator
+Lifti.Querying.QueryParts.PrecedingNearQueryOperator.PrecedingNearQueryOperator(Lifti.Querying.QueryParts.IQueryPart! left, Lifti.Querying.QueryParts.IQueryPart! right, int tolerance = 5) -> void
+Lifti.Querying.QueryParts.PrecedingNearQueryOperator.Tolerance.get -> int
+Lifti.Querying.QueryParts.PrecedingQueryOperator
+Lifti.Querying.QueryParts.PrecedingQueryOperator.PrecedingQueryOperator(Lifti.Querying.QueryParts.IQueryPart! left, Lifti.Querying.QueryParts.IQueryPart! right) -> void
+Lifti.Querying.QueryParts.WildcardQueryFragment
+Lifti.Querying.QueryParts.WildcardQueryFragment.Equals(Lifti.Querying.QueryParts.WildcardQueryFragment other) -> bool
+Lifti.Querying.QueryParts.WildcardQueryFragment.Kind.get -> Lifti.Querying.QueryParts.WildcardQueryFragmentKind
+Lifti.Querying.QueryParts.WildcardQueryFragment.Text.get -> string?
+Lifti.Querying.QueryParts.WildcardQueryFragment.WildcardQueryFragment() -> void
+Lifti.Querying.QueryParts.WildcardQueryFragmentKind
+Lifti.Querying.QueryParts.WildcardQueryFragmentKind.MultiCharacter = 2 -> Lifti.Querying.QueryParts.WildcardQueryFragmentKind
+Lifti.Querying.QueryParts.WildcardQueryFragmentKind.SingleCharacter = 1 -> Lifti.Querying.QueryParts.WildcardQueryFragmentKind
+Lifti.Querying.QueryParts.WildcardQueryFragmentKind.Text = 0 -> Lifti.Querying.QueryParts.WildcardQueryFragmentKind
+Lifti.Querying.QueryParts.WildcardQueryPart
+Lifti.Querying.QueryParts.WildcardQueryPart.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.QueryParts.WildcardQueryPart.WildcardQueryPart(params Lifti.Querying.QueryParts.WildcardQueryFragment[]! fragments) -> void
+Lifti.Querying.QueryParts.WildcardQueryPart.WildcardQueryPart(System.Collections.Generic.IEnumerable<Lifti.Querying.QueryParts.WildcardQueryFragment>! fragments) -> void
+Lifti.Querying.QueryParts.WordQueryPart
+Lifti.Querying.QueryParts.WordQueryPart.Word.get -> string!
+Lifti.Querying.QueryParts.WordQueryPart.WordQueryPart(string! word) -> void
+Lifti.Querying.QueryTermJoinOperatorKind
+Lifti.Querying.QueryTermJoinOperatorKind.And = 0 -> Lifti.Querying.QueryTermJoinOperatorKind
+Lifti.Querying.QueryTermJoinOperatorKind.Or = 1 -> Lifti.Querying.QueryTermJoinOperatorKind
+Lifti.Querying.QueryTokenMatch
+Lifti.Querying.QueryTokenMatch.Equals(Lifti.Querying.QueryTokenMatch other) -> bool
+Lifti.Querying.QueryTokenMatch.FieldMatches.get -> System.Collections.Generic.IReadOnlyList<Lifti.Querying.FieldMatch>!
+Lifti.Querying.QueryTokenMatch.ItemId.get -> int
+Lifti.Querying.QueryTokenMatch.QueryTokenMatch() -> void
+Lifti.Querying.QueryTokenMatch.QueryTokenMatch(int itemId, System.Collections.Generic.IReadOnlyList<Lifti.Querying.FieldMatch>! fieldMatches) -> void
+Lifti.Querying.QueryTokenType
+Lifti.Querying.QueryTokenType.AndOperator = 1 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.QueryTokenType.BeginAdjacentTextOperator = 5 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.QueryTokenType.CloseBracket = 4 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.QueryTokenType.EndAdjacentTextOperator = 6 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.QueryTokenType.FieldFilter = 10 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.QueryTokenType.NearOperator = 7 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.QueryTokenType.OpenBracket = 3 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.QueryTokenType.OrOperator = 2 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.QueryTokenType.PrecedingNearOperator = 8 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.QueryTokenType.PrecedingOperator = 9 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.QueryTokenType.Text = 0 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.ScoredFieldMatch
+Lifti.Querying.ScoredFieldMatch.Equals(Lifti.Querying.ScoredFieldMatch other) -> bool
+Lifti.Querying.ScoredFieldMatch.FieldId.get -> byte
+Lifti.Querying.ScoredFieldMatch.FieldMatch.get -> Lifti.Querying.FieldMatch
+Lifti.Querying.ScoredFieldMatch.Locations.get -> System.Collections.Generic.IReadOnlyList<Lifti.Querying.ITokenLocationMatch!>!
+Lifti.Querying.ScoredFieldMatch.Score.get -> double
+Lifti.Querying.ScoredFieldMatch.ScoredFieldMatch() -> void
+Lifti.Querying.ScoredFieldMatch.ScoredFieldMatch(double score, Lifti.Querying.FieldMatch fieldMatch) -> void
+Lifti.Querying.ScoredToken
+Lifti.Querying.ScoredToken.Equals(Lifti.Querying.ScoredToken other) -> bool
+Lifti.Querying.ScoredToken.FieldMatches.get -> System.Collections.Generic.IReadOnlyList<Lifti.Querying.ScoredFieldMatch>!
+Lifti.Querying.ScoredToken.ItemId.get -> int
+Lifti.Querying.ScoredToken.ScoredToken() -> void
+Lifti.Querying.ScoredToken.ScoredToken(int itemId, System.Collections.Generic.IReadOnlyList<Lifti.Querying.ScoredFieldMatch>! fieldMatches) -> void
+Lifti.Querying.SimpleQueryParser
+Lifti.Querying.SimpleQueryParser.Parse(Lifti.IIndexedFieldLookup! fieldLookup, string! queryText, Lifti.IIndexTokenizerProvider! tokenizerProvider) -> Lifti.Querying.IQuery!
+Lifti.Querying.SimpleQueryParser.SimpleQueryParser(Lifti.Querying.QueryParserOptions! options) -> void
+Lifti.Querying.SingleTokenLocationMatch
+Lifti.Querying.SingleTokenLocationMatch.Equals(Lifti.Querying.SingleTokenLocationMatch other) -> bool
+Lifti.Querying.SingleTokenLocationMatch.GetLocations() -> System.Collections.Generic.IEnumerable<Lifti.TokenLocation>!
+Lifti.Querying.SingleTokenLocationMatch.MaxTokenIndex.get -> int
+Lifti.Querying.SingleTokenLocationMatch.MinTokenIndex.get -> int
+Lifti.Querying.SingleTokenLocationMatch.SingleTokenLocationMatch() -> void
+Lifti.Querying.SingleTokenLocationMatch.SingleTokenLocationMatch(Lifti.TokenLocation original) -> void
+Lifti.Querying.UnionMerger
+Lifti.Querying.UnionMerger.UnionMerger() -> void
+Lifti.SearchResult<TKey>
+Lifti.SearchResult<TKey>.FieldMatches.get -> System.Collections.Generic.IReadOnlyList<Lifti.FieldSearchResult!>!
+Lifti.SearchResult<TKey>.Key.get -> TKey
+Lifti.SearchResult<TKey>.Score.get -> double
+Lifti.SearchResult<TKey>.SearchResult(TKey item, System.Collections.Generic.IReadOnlyList<Lifti.FieldSearchResult!>! locations) -> void
+Lifti.Serialization.Binary.BinarySerializer<TKey>
+Lifti.Serialization.Binary.BinarySerializer<TKey>.BinarySerializer() -> void
+Lifti.Serialization.Binary.BinarySerializer<TKey>.BinarySerializer(Lifti.Serialization.Binary.IKeySerializer<TKey>! keySerializer) -> void
+Lifti.Serialization.Binary.BinarySerializer<TKey>.DeserializeAsync(Lifti.FullTextIndex<TKey>! index, System.IO.Stream! stream, bool disposeStream = true) -> System.Threading.Tasks.Task!
+Lifti.Serialization.Binary.BinarySerializer<TKey>.SerializeAsync(Lifti.FullTextIndex<TKey>! index, System.IO.Stream! stream, bool disposeStream = true) -> System.Threading.Tasks.Task!
+Lifti.Serialization.Binary.BinarySerializer<TKey>.SerializeAsync(Lifti.IIndexSnapshot<TKey>! snapshot, System.IO.Stream! stream, bool disposeStream = true) -> System.Threading.Tasks.Task!
+Lifti.Serialization.Binary.DeserializationException
+Lifti.Serialization.Binary.DeserializationException.DeserializationException() -> void
+Lifti.Serialization.Binary.DeserializationException.DeserializationException(string! message) -> void
+Lifti.Serialization.Binary.DeserializationException.DeserializationException(string! message, params object![]! args) -> void
+Lifti.Serialization.Binary.DeserializationException.DeserializationException(string! message, System.Exception! inner) -> void
+Lifti.Serialization.Binary.GuidFormatterKeySerializer
+Lifti.Serialization.Binary.GuidFormatterKeySerializer.GuidFormatterKeySerializer() -> void
+Lifti.Serialization.Binary.IIndexReader<TKey>
+Lifti.Serialization.Binary.IIndexReader<TKey>.ReadIntoAsync(Lifti.FullTextIndex<TKey>! index) -> System.Threading.Tasks.Task!
+Lifti.Serialization.Binary.IIndexSerializer<TKey>
+Lifti.Serialization.Binary.IIndexSerializer<TKey>.DeserializeAsync(Lifti.FullTextIndex<TKey>! index, System.IO.Stream! stream, bool disposeStream = true) -> System.Threading.Tasks.Task!
+Lifti.Serialization.Binary.IIndexSerializer<TKey>.SerializeAsync(Lifti.FullTextIndex<TKey>! index, System.IO.Stream! stream, bool disposeStream = true) -> System.Threading.Tasks.Task!
+Lifti.Serialization.Binary.IIndexSerializer<TKey>.SerializeAsync(Lifti.IIndexSnapshot<TKey>! snapshot, System.IO.Stream! stream, bool disposeStream = true) -> System.Threading.Tasks.Task!
+Lifti.Serialization.Binary.IKeySerializer<TKey>
+Lifti.Serialization.Binary.IKeySerializer<TKey>.Read(System.IO.BinaryReader! reader) -> TKey
+Lifti.Serialization.Binary.IKeySerializer<TKey>.Write(System.IO.BinaryWriter! writer, TKey key) -> void
+Lifti.Serialization.Binary.IntFormatterKeySerializer
+Lifti.Serialization.Binary.IntFormatterKeySerializer.IntFormatterKeySerializer() -> void
+Lifti.Serialization.Binary.KeySerializerBase<TKey>
+Lifti.Serialization.Binary.KeySerializerBase<TKey>.KeySerializerBase(System.Action<System.IO.BinaryWriter!, TKey>! dataWriter, System.Func<System.IO.BinaryReader!, TKey>! dataReader) -> void
+Lifti.Serialization.Binary.KeySerializerBase<TKey>.Read(System.IO.BinaryReader! reader) -> TKey
+Lifti.Serialization.Binary.KeySerializerBase<TKey>.Write(System.IO.BinaryWriter! writer, TKey key) -> void
+Lifti.Serialization.Binary.StringFormatterKeySerializer
+Lifti.Serialization.Binary.StringFormatterKeySerializer.StringFormatterKeySerializer() -> void
+Lifti.Serialization.Binary.UIntFormatterKeySerializer
+Lifti.Serialization.Binary.UIntFormatterKeySerializer.UIntFormatterKeySerializer() -> void
+Lifti.ThesaurusBuilder
+Lifti.ThesaurusBuilder.WithHypernyms(string! word, params string![]! hypernyms) -> Lifti.ThesaurusBuilder!
+Lifti.ThesaurusBuilder.WithHypernyms(string! word, System.Collections.Generic.IEnumerable<string!>! hypernyms) -> Lifti.ThesaurusBuilder!
+Lifti.ThesaurusBuilder.WithHyponyms(string! word, params string![]! hyponyms) -> Lifti.ThesaurusBuilder!
+Lifti.ThesaurusBuilder.WithHyponyms(string! word, System.Collections.Generic.IEnumerable<string!>! hyponyms) -> Lifti.ThesaurusBuilder!
+Lifti.ThesaurusBuilder.WithSynonyms(params string![]! synonyms) -> Lifti.ThesaurusBuilder!
+Lifti.ThesaurusBuilder.WithSynonyms(System.Collections.Generic.ICollection<string!>! synonyms) -> Lifti.ThesaurusBuilder!
+Lifti.Tokenization.IIndexTokenizer
+Lifti.Tokenization.IIndexTokenizer.IsSplitCharacter(char character) -> bool
+Lifti.Tokenization.IIndexTokenizer.Normalize(System.ReadOnlySpan<char> tokenText) -> string!
+Lifti.Tokenization.IIndexTokenizer.Process(System.Collections.Generic.IEnumerable<Lifti.Tokenization.TextExtraction.DocumentTextFragment>! input) -> System.Collections.Generic.IReadOnlyCollection<Lifti.Tokenization.Token!>!
+Lifti.Tokenization.IIndexTokenizer.Process(System.ReadOnlySpan<char> tokenText) -> System.Collections.Generic.IReadOnlyCollection<Lifti.Tokenization.Token!>!
+Lifti.Tokenization.IndexTokenizer
+Lifti.Tokenization.IndexTokenizer.IndexTokenizer(Lifti.TokenizationOptions! tokenizationOptions) -> void
+Lifti.Tokenization.IndexTokenizer.Normalize(System.ReadOnlySpan<char> tokenText) -> string!
+Lifti.Tokenization.IndexTokenizer.Options.get -> Lifti.TokenizationOptions!
+Lifti.Tokenization.IndexTokenizer.Process(System.Collections.Generic.IEnumerable<Lifti.Tokenization.TextExtraction.DocumentTextFragment>! input) -> System.Collections.Generic.IReadOnlyCollection<Lifti.Tokenization.Token!>!
+Lifti.Tokenization.IndexTokenizer.Process(System.ReadOnlySpan<char> input) -> System.Collections.Generic.IReadOnlyCollection<Lifti.Tokenization.Token!>!
+Lifti.Tokenization.IThesaurus
+Lifti.Tokenization.IThesaurus.Process(Lifti.Tokenization.Token! token) -> System.Collections.Generic.IEnumerable<Lifti.Tokenization.Token!>!
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>.ObjectTokenizationBuilder() -> void
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>.WithDynamicFields(string! dynamicFieldReaderName, System.Func<T, System.Collections.Generic.IDictionary<string!, string!>?>! dynamicFieldReader, string? fieldNamePrefix = null, System.Func<Lifti.TokenizerBuilder!, Lifti.TokenizerBuilder!>? tokenizationOptions = null, Lifti.Tokenization.TextExtraction.ITextExtractor? textExtractor = null, System.Func<Lifti.ThesaurusBuilder!, Lifti.ThesaurusBuilder!>? thesaurusOptions = null) -> Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>!
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>.WithDynamicFields(string! dynamicFieldReaderName, System.Func<T, System.Collections.Generic.IDictionary<string!, System.Collections.Generic.IEnumerable<string!>!>!>! dynamicFieldReader, string? fieldNamePrefix = null, System.Func<Lifti.TokenizerBuilder!, Lifti.TokenizerBuilder!>? tokenizationOptions = null, Lifti.Tokenization.TextExtraction.ITextExtractor? textExtractor = null, System.Func<Lifti.ThesaurusBuilder!, Lifti.ThesaurusBuilder!>? thesaurusOptions = null) -> Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>!
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>.WithDynamicFields<TChild>(string! dynamicFieldReaderName, System.Func<T, System.Collections.Generic.ICollection<TChild>?>! dynamicFieldReader, System.Func<TChild, string!>! getFieldName, System.Func<TChild, string!>! getFieldText, string? fieldNamePrefix = null, System.Func<Lifti.TokenizerBuilder!, Lifti.TokenizerBuilder!>? tokenizationOptions = null, Lifti.Tokenization.TextExtraction.ITextExtractor? textExtractor = null, System.Func<Lifti.ThesaurusBuilder!, Lifti.ThesaurusBuilder!>? thesaurusOptions = null) -> Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>!
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>.WithDynamicFields<TChild>(string! dynamicFieldReaderName, System.Func<T, System.Collections.Generic.ICollection<TChild>?>! dynamicFieldReader, System.Func<TChild, string!>! getFieldName, System.Func<TChild, System.Collections.Generic.IEnumerable<string!>!>! getFieldText, string? fieldNamePrefix = null, System.Func<Lifti.TokenizerBuilder!, Lifti.TokenizerBuilder!>? tokenizationOptions = null, Lifti.Tokenization.TextExtraction.ITextExtractor? textExtractor = null, System.Func<Lifti.ThesaurusBuilder!, Lifti.ThesaurusBuilder!>? thesaurusOptions = null) -> Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>!
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>.WithField(string! name, System.Func<T, string!>! fieldTextReader, System.Func<Lifti.TokenizerBuilder!, Lifti.TokenizerBuilder!>? tokenizationOptions = null, Lifti.Tokenization.TextExtraction.ITextExtractor? textExtractor = null, System.Func<Lifti.ThesaurusBuilder!, Lifti.ThesaurusBuilder!>? thesaurusOptions = null) -> Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>!
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>.WithField(string! name, System.Func<T, System.Collections.Generic.IEnumerable<string!>!>! reader, System.Func<Lifti.TokenizerBuilder!, Lifti.TokenizerBuilder!>? tokenizationOptions = null, Lifti.Tokenization.TextExtraction.ITextExtractor? textExtractor = null, System.Func<Lifti.ThesaurusBuilder!, Lifti.ThesaurusBuilder!>? thesaurusOptions = null) -> Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>!
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>.WithField(string! name, System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task<string!>!>! fieldTextReader, System.Func<Lifti.TokenizerBuilder!, Lifti.TokenizerBuilder!>? tokenizationOptions = null, Lifti.Tokenization.TextExtraction.ITextExtractor? textExtractor = null, System.Func<Lifti.ThesaurusBuilder!, Lifti.ThesaurusBuilder!>? thesaurusOptions = null) -> Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>!
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>.WithField(string! name, System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<string!>!>!>! fieldTextReader, System.Func<Lifti.TokenizerBuilder!, Lifti.TokenizerBuilder!>? tokenizationOptions = null, Lifti.Tokenization.TextExtraction.ITextExtractor? textExtractor = null, System.Func<Lifti.ThesaurusBuilder!, Lifti.ThesaurusBuilder!>? thesaurusOptions = null) -> Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>!
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>.WithField(string! name, System.Func<T, System.Threading.Tasks.Task<string!>!>! fieldTextReader, System.Func<Lifti.TokenizerBuilder!, Lifti.TokenizerBuilder!>? tokenizationOptions = null, Lifti.Tokenization.TextExtraction.ITextExtractor? textExtractor = null, System.Func<Lifti.ThesaurusBuilder!, Lifti.ThesaurusBuilder!>? thesaurusOptions = null) -> Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>!
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>.WithField(string! name, System.Func<T, System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<string!>!>!>! fieldTextReader, System.Func<Lifti.TokenizerBuilder!, Lifti.TokenizerBuilder!>? tokenizationOptions = null, System.Func<Lifti.ThesaurusBuilder!, Lifti.ThesaurusBuilder!>? thesaurusOptions = null, Lifti.Tokenization.TextExtraction.ITextExtractor? textExtractor = null) -> Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>!
+Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>.WithKey(System.Func<T, TKey>! keyReader) -> Lifti.Tokenization.Objects.ObjectTokenizationBuilder<T, TKey>!
+Lifti.Tokenization.Preprocessing.CaseInsensitiveNormalizer
+Lifti.Tokenization.Preprocessing.CaseInsensitiveNormalizer.CaseInsensitiveNormalizer() -> void
+Lifti.Tokenization.Preprocessing.CaseInsensitiveNormalizer.Preprocess(char input) -> Lifti.PreprocessedInput
+Lifti.Tokenization.Preprocessing.IgnoredCharacterPreprocessor
+Lifti.Tokenization.Preprocessing.IgnoredCharacterPreprocessor.IgnoredCharacterPreprocessor(System.Collections.Generic.IReadOnlyList<char>! ignoreCharacters) -> void
+Lifti.Tokenization.Preprocessing.IgnoredCharacterPreprocessor.Preprocess(char input) -> Lifti.PreprocessedInput
+Lifti.Tokenization.Preprocessing.IInputPreprocessor
+Lifti.Tokenization.Preprocessing.IInputPreprocessor.Preprocess(char input) -> Lifti.PreprocessedInput
+Lifti.Tokenization.Preprocessing.IInputPreprocessorPipeline
+Lifti.Tokenization.Preprocessing.IInputPreprocessorPipeline.Process(char input) -> System.Collections.Generic.IEnumerable<char>!
+Lifti.Tokenization.Preprocessing.InputPreprocessorPipeline
+Lifti.Tokenization.Preprocessing.InputPreprocessorPipeline.InputPreprocessorPipeline(Lifti.TokenizationOptions! options) -> void
+Lifti.Tokenization.Preprocessing.InputPreprocessorPipeline.Process(char input) -> System.Collections.Generic.IEnumerable<char>!
+Lifti.Tokenization.Preprocessing.LatinCharacterNormalizer
+Lifti.Tokenization.Preprocessing.LatinCharacterNormalizer.LatinCharacterNormalizer() -> void
+Lifti.Tokenization.Preprocessing.LatinCharacterNormalizer.Preprocess(char input) -> Lifti.PreprocessedInput
+Lifti.Tokenization.TextExtraction.DocumentTextFragment
+Lifti.Tokenization.TextExtraction.DocumentTextFragment.DocumentTextFragment() -> void
+Lifti.Tokenization.TextExtraction.DocumentTextFragment.DocumentTextFragment(int offset, System.ReadOnlyMemory<char> text) -> void
+Lifti.Tokenization.TextExtraction.DocumentTextFragment.Equals(Lifti.Tokenization.TextExtraction.DocumentTextFragment other) -> bool
+Lifti.Tokenization.TextExtraction.DocumentTextFragment.Offset.get -> int
+Lifti.Tokenization.TextExtraction.DocumentTextFragment.Text.get -> System.ReadOnlyMemory<char>
+Lifti.Tokenization.TextExtraction.ITextExtractor
+Lifti.Tokenization.TextExtraction.ITextExtractor.Extract(System.ReadOnlyMemory<char> document, int startOffset = 0) -> System.Collections.Generic.IEnumerable<Lifti.Tokenization.TextExtraction.DocumentTextFragment>!
+Lifti.Tokenization.TextExtraction.PlainTextExtractor
+Lifti.Tokenization.TextExtraction.PlainTextExtractor.Extract(System.ReadOnlyMemory<char> document, int startOffset) -> System.Collections.Generic.IEnumerable<Lifti.Tokenization.TextExtraction.DocumentTextFragment>!
+Lifti.Tokenization.TextExtraction.PlainTextExtractor.PlainTextExtractor() -> void
+Lifti.Tokenization.TextExtraction.XmlTextExtractor
+Lifti.Tokenization.TextExtraction.XmlTextExtractor.Extract(System.ReadOnlyMemory<char> document, int startOffset) -> System.Collections.Generic.IEnumerable<Lifti.Tokenization.TextExtraction.DocumentTextFragment>!
+Lifti.Tokenization.TextExtraction.XmlTextExtractor.XmlTextExtractor() -> void
+Lifti.Tokenization.Token
+Lifti.Tokenization.Token.AddLocation(Lifti.TokenLocation location) -> void
+Lifti.Tokenization.Token.Locations.get -> System.Collections.Generic.IReadOnlyList<Lifti.TokenLocation>!
+Lifti.Tokenization.Token.Token(string! token, Lifti.TokenLocation location) -> void
+Lifti.Tokenization.Token.Token(string! token, params Lifti.TokenLocation[]! locations) -> void
+Lifti.Tokenization.Token.Token(string! token, System.Collections.Generic.IReadOnlyList<Lifti.TokenLocation>! locations) -> void
+Lifti.Tokenization.Token.Value.get -> string!
+Lifti.TokenizationOptions
+Lifti.TokenizationOptions.AccentInsensitive.get -> bool
+Lifti.TokenizationOptions.AdditionalSplitCharacters.get -> System.Collections.Generic.IReadOnlyList<char>!
+Lifti.TokenizationOptions.CaseInsensitive.get -> bool
+Lifti.TokenizationOptions.IgnoreCharacters.get -> System.Collections.Generic.IReadOnlyList<char>!
+Lifti.TokenizationOptions.SplitOnPunctuation.get -> bool
+Lifti.TokenizationOptions.Stemming.get -> bool
+Lifti.TokenizerBuilder
+Lifti.TokenizerBuilder.AccentInsensitive(bool accentInsensitive = true) -> Lifti.TokenizerBuilder!
+Lifti.TokenizerBuilder.Build() -> Lifti.Tokenization.IIndexTokenizer!
+Lifti.TokenizerBuilder.CaseInsensitive(bool caseInsensitive = true) -> Lifti.TokenizerBuilder!
+Lifti.TokenizerBuilder.IgnoreCharacters(params char[]! ignoreCharacters) -> Lifti.TokenizerBuilder!
+Lifti.TokenizerBuilder.SplitOnCharacters(params char[]! additionalSplitCharacters) -> Lifti.TokenizerBuilder!
+Lifti.TokenizerBuilder.SplitOnPunctuation(bool splitOnPunctionation = true) -> Lifti.TokenizerBuilder!
+Lifti.TokenizerBuilder.TokenizerBuilder() -> void
+Lifti.TokenizerBuilder.WithFactory(System.Func<Lifti.TokenizationOptions!, Lifti.Tokenization.IIndexTokenizer!>! tokenizerFactory) -> Lifti.TokenizerBuilder!
+Lifti.TokenizerBuilder.WithStemming(bool stemming = true) -> Lifti.TokenizerBuilder!
+Lifti.TokenLocation
+Lifti.TokenLocation.CompareTo(Lifti.TokenLocation other) -> int
+Lifti.TokenLocation.Length.get -> ushort
+Lifti.TokenLocation.Start.get -> int
+Lifti.TokenLocation.TokenIndex.get -> int
+Lifti.TokenLocation.TokenLocation() -> void
+Lifti.TokenLocation.TokenLocation(int tokenIndex, int start, ushort length) -> void
+override Lifti.FieldSearchResult.ToString() -> string!
+override Lifti.FullTextIndex<TKey>.ToString() -> string!
+override Lifti.IndexedFieldDetails<TItem>.ReadAsync(object! item, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IEnumerable<string!>!>
+override Lifti.IndexedToken.Equals(object? obj) -> bool
+override Lifti.IndexedToken.GetHashCode() -> int
+override Lifti.IndexNode.ToString() -> string!
+override Lifti.PreprocessedInput.Equals(object? obj) -> bool
+override Lifti.PreprocessedInput.GetHashCode() -> int
+override Lifti.Querying.CompositeTokenMatchLocation.Equals(object? obj) -> bool
+override Lifti.Querying.CompositeTokenMatchLocation.GetHashCode() -> int
+override Lifti.Querying.CompositeTokenMatchLocation.ToString() -> string!
+override Lifti.Querying.FieldMatch.Equals(object? obj) -> bool
+override Lifti.Querying.FieldMatch.GetHashCode() -> int
+override Lifti.Querying.IntermediateQueryResult.ToString() -> string!
+override Lifti.Querying.Query.ToString() -> string?
+override Lifti.Querying.QueryParts.AdjacentWordsQueryOperator.ToString() -> string!
+override Lifti.Querying.QueryParts.AndQueryOperator.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+override Lifti.Querying.QueryParts.AndQueryOperator.Precedence.get -> Lifti.Querying.OperatorPrecedence
+override Lifti.Querying.QueryParts.AndQueryOperator.ToString() -> string!
+override Lifti.Querying.QueryParts.BracketedQueryPart.ToString() -> string!
+override Lifti.Querying.QueryParts.ExactWordQueryPart.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+override Lifti.Querying.QueryParts.ExactWordQueryPart.ToString() -> string!
+override Lifti.Querying.QueryParts.FieldFilterQueryOperator.ToString() -> string!
+override Lifti.Querying.QueryParts.FuzzyMatchQueryPart.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+override Lifti.Querying.QueryParts.FuzzyMatchQueryPart.ToString() -> string!
+override Lifti.Querying.QueryParts.NearQueryOperator.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+override Lifti.Querying.QueryParts.NearQueryOperator.Precedence.get -> Lifti.Querying.OperatorPrecedence
+override Lifti.Querying.QueryParts.NearQueryOperator.ToString() -> string!
+override Lifti.Querying.QueryParts.OrQueryOperator.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+override Lifti.Querying.QueryParts.OrQueryOperator.Precedence.get -> Lifti.Querying.OperatorPrecedence
+override Lifti.Querying.QueryParts.OrQueryOperator.ToString() -> string!
+override Lifti.Querying.QueryParts.PrecedingNearQueryOperator.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+override Lifti.Querying.QueryParts.PrecedingNearQueryOperator.Precedence.get -> Lifti.Querying.OperatorPrecedence
+override Lifti.Querying.QueryParts.PrecedingNearQueryOperator.ToString() -> string!
+override Lifti.Querying.QueryParts.PrecedingQueryOperator.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryParts.IQueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+override Lifti.Querying.QueryParts.PrecedingQueryOperator.Precedence.get -> Lifti.Querying.OperatorPrecedence
+override Lifti.Querying.QueryParts.PrecedingQueryOperator.ToString() -> string!
+override Lifti.Querying.QueryParts.WildcardQueryFragment.Equals(object? obj) -> bool
+override Lifti.Querying.QueryParts.WildcardQueryFragment.GetHashCode() -> int
+override Lifti.Querying.QueryParts.WildcardQueryPart.ToString() -> string!
+override Lifti.Querying.QueryTokenMatch.Equals(object? obj) -> bool
+override Lifti.Querying.QueryTokenMatch.GetHashCode() -> int
+override Lifti.Querying.ScoredFieldMatch.Equals(object? obj) -> bool
+override Lifti.Querying.ScoredFieldMatch.GetHashCode() -> int
+override Lifti.Querying.ScoredToken.Equals(object? obj) -> bool
+override Lifti.Querying.ScoredToken.GetHashCode() -> int
+override Lifti.Querying.SingleTokenLocationMatch.Equals(object? obj) -> bool
+override Lifti.Querying.SingleTokenLocationMatch.GetHashCode() -> int
+override Lifti.Querying.SingleTokenLocationMatch.ToString() -> string!
+override Lifti.SearchResult<TKey>.ToString() -> string!
+override Lifti.Tokenization.TextExtraction.DocumentTextFragment.Equals(object? obj) -> bool
+override Lifti.Tokenization.TextExtraction.DocumentTextFragment.GetHashCode() -> int
+override Lifti.TokenLocation.Equals(object? obj) -> bool
+override Lifti.TokenLocation.GetHashCode() -> int
+override Lifti.TokenLocation.ToString() -> string!
+static Lifti.FullTextIndexExtensions.ParseQuery<TKey>(this Lifti.IFullTextIndex<TKey>! index, string! queryText) -> Lifti.Querying.IQuery!
+static Lifti.IndexedToken.operator !=(Lifti.IndexedToken left, Lifti.IndexedToken right) -> bool
+static Lifti.IndexedToken.operator ==(Lifti.IndexedToken left, Lifti.IndexedToken right) -> bool
+static Lifti.PreprocessedInput.Empty.get -> Lifti.PreprocessedInput
+static Lifti.PreprocessedInput.implicit operator Lifti.PreprocessedInput(char value) -> Lifti.PreprocessedInput
+static Lifti.PreprocessedInput.implicit operator Lifti.PreprocessedInput(string! replacement) -> Lifti.PreprocessedInput
+static Lifti.PreprocessedInput.operator !=(Lifti.PreprocessedInput left, Lifti.PreprocessedInput right) -> bool
+static Lifti.PreprocessedInput.operator ==(Lifti.PreprocessedInput left, Lifti.PreprocessedInput right) -> bool
+static Lifti.PreprocessedInput.ToPreprocessedInput(char value) -> Lifti.PreprocessedInput
+static Lifti.PreprocessedInput.ToPreprocessedInput(string! value) -> Lifti.PreprocessedInput
+static Lifti.Querying.CompositePositionalIntersectMerger.Apply(Lifti.Querying.IntermediateQueryResult left, Lifti.Querying.IntermediateQueryResult right, int leftTolerance, int rightTolerance) -> System.Collections.Generic.IEnumerable<Lifti.Querying.ScoredToken>!
+static Lifti.Querying.CompositeTokenMatchLocation.operator !=(Lifti.Querying.CompositeTokenMatchLocation left, Lifti.Querying.CompositeTokenMatchLocation right) -> bool
+static Lifti.Querying.CompositeTokenMatchLocation.operator ==(Lifti.Querying.CompositeTokenMatchLocation left, Lifti.Querying.CompositeTokenMatchLocation right) -> bool
+static Lifti.Querying.FieldMatch.operator !=(Lifti.Querying.FieldMatch left, Lifti.Querying.FieldMatch right) -> bool
+static Lifti.Querying.FieldMatch.operator ==(Lifti.Querying.FieldMatch left, Lifti.Querying.FieldMatch right) -> bool
+static Lifti.Querying.IntermediateQueryResult.Empty.get -> Lifti.Querying.IntermediateQueryResult
+static Lifti.Querying.IntermediateQueryResultMerger.JoinFields(System.Collections.Generic.IEnumerable<Lifti.Querying.ScoredFieldMatch>! leftFields, System.Collections.Generic.IEnumerable<Lifti.Querying.ScoredFieldMatch>! rightFields) -> System.Collections.Generic.IList<(byte fieldId, double score, System.Collections.Generic.IReadOnlyList<Lifti.Querying.ITokenLocationMatch!>! leftLocations, System.Collections.Generic.IReadOnlyList<Lifti.Querying.ITokenLocationMatch!>! rightLocations)>!
+static Lifti.Querying.IntermediateQueryResultMerger.MergeFields(Lifti.Querying.ScoredToken leftMatch, Lifti.Querying.ScoredToken rightMatch) -> System.Collections.Generic.IEnumerable<Lifti.Querying.ScoredFieldMatch>!
+static Lifti.Querying.IntermediateQueryResultMerger.SwapIf<T>(bool condition, ref T left, ref T right) -> void
+static Lifti.Querying.IntersectMerger.Apply(Lifti.Querying.IntermediateQueryResult left, Lifti.Querying.IntermediateQueryResult right) -> System.Collections.Generic.IEnumerable<Lifti.Querying.ScoredToken>!
+static Lifti.Querying.PrecedingIntersectMerger.Apply(Lifti.Querying.IntermediateQueryResult left, Lifti.Querying.IntermediateQueryResult right) -> System.Collections.Generic.IEnumerable<Lifti.Querying.ScoredToken>!
+static Lifti.Querying.Query.Empty.get -> Lifti.Querying.IQuery!
+static Lifti.Querying.QueryParts.AndQueryOperator.CombineAll(System.Collections.Generic.IEnumerable<Lifti.Querying.QueryParts.IQueryPart!>! queryParts) -> Lifti.Querying.QueryParts.IQueryPart!
+static Lifti.Querying.QueryParts.EmptyQueryPart.Instance.get -> Lifti.Querying.QueryParts.EmptyQueryPart!
+static Lifti.Querying.QueryParts.FieldFilterQueryOperator.CreateForField(Lifti.IIndexedFieldLookup! fieldLookup, string! fieldName, Lifti.Querying.QueryParts.IQueryPart! statement) -> Lifti.Querying.QueryParts.FieldFilterQueryOperator!
+static Lifti.Querying.QueryParts.OrQueryOperator.CombineAll(System.Collections.Generic.IEnumerable<Lifti.Querying.QueryParts.IQueryPart!>! queryParts) -> Lifti.Querying.QueryParts.IQueryPart!
+static Lifti.Querying.QueryParts.WildcardQueryFragment.CreateText(string! text) -> Lifti.Querying.QueryParts.WildcardQueryFragment
+static Lifti.Querying.QueryParts.WildcardQueryFragment.MultiCharacter.get -> Lifti.Querying.QueryParts.WildcardQueryFragment
+static Lifti.Querying.QueryParts.WildcardQueryFragment.operator !=(Lifti.Querying.QueryParts.WildcardQueryFragment left, Lifti.Querying.QueryParts.WildcardQueryFragment right) -> bool
+static Lifti.Querying.QueryParts.WildcardQueryFragment.operator ==(Lifti.Querying.QueryParts.WildcardQueryFragment left, Lifti.Querying.QueryParts.WildcardQueryFragment right) -> bool
+static Lifti.Querying.QueryParts.WildcardQueryFragment.SingleCharacter.get -> Lifti.Querying.QueryParts.WildcardQueryFragment
+static Lifti.Querying.QueryTokenMatch.operator !=(Lifti.Querying.QueryTokenMatch left, Lifti.Querying.QueryTokenMatch right) -> bool
+static Lifti.Querying.QueryTokenMatch.operator ==(Lifti.Querying.QueryTokenMatch left, Lifti.Querying.QueryTokenMatch right) -> bool
+static Lifti.Querying.ScoredFieldMatch.operator !=(Lifti.Querying.ScoredFieldMatch left, Lifti.Querying.ScoredFieldMatch right) -> bool
+static Lifti.Querying.ScoredFieldMatch.operator ==(Lifti.Querying.ScoredFieldMatch left, Lifti.Querying.ScoredFieldMatch right) -> bool
+static Lifti.Querying.ScoredToken.operator !=(Lifti.Querying.ScoredToken left, Lifti.Querying.ScoredToken right) -> bool
+static Lifti.Querying.ScoredToken.operator ==(Lifti.Querying.ScoredToken left, Lifti.Querying.ScoredToken right) -> bool
+static Lifti.Querying.SingleTokenLocationMatch.operator !=(Lifti.Querying.SingleTokenLocationMatch left, Lifti.Querying.SingleTokenLocationMatch right) -> bool
+static Lifti.Querying.SingleTokenLocationMatch.operator ==(Lifti.Querying.SingleTokenLocationMatch left, Lifti.Querying.SingleTokenLocationMatch right) -> bool
+static Lifti.Querying.UnionMerger.Apply(Lifti.Querying.IntermediateQueryResult left, Lifti.Querying.IntermediateQueryResult right) -> System.Collections.Generic.IEnumerable<Lifti.Querying.ScoredToken>!
+static Lifti.Tokenization.IndexTokenizer.Default.get -> Lifti.Tokenization.IndexTokenizer!
+static Lifti.Tokenization.TextExtraction.DocumentTextFragment.operator !=(Lifti.Tokenization.TextExtraction.DocumentTextFragment left, Lifti.Tokenization.TextExtraction.DocumentTextFragment right) -> bool
+static Lifti.Tokenization.TextExtraction.DocumentTextFragment.operator ==(Lifti.Tokenization.TextExtraction.DocumentTextFragment left, Lifti.Tokenization.TextExtraction.DocumentTextFragment right) -> bool
+static Lifti.TokenizationOptions.Default.get -> Lifti.TokenizationOptions!
+static Lifti.TokenLocation.operator !=(Lifti.TokenLocation left, Lifti.TokenLocation right) -> bool
+static Lifti.TokenLocation.operator <(Lifti.TokenLocation left, Lifti.TokenLocation right) -> bool
+static Lifti.TokenLocation.operator <=(Lifti.TokenLocation left, Lifti.TokenLocation right) -> bool
+static Lifti.TokenLocation.operator ==(Lifti.TokenLocation left, Lifti.TokenLocation right) -> bool
+static Lifti.TokenLocation.operator >(Lifti.TokenLocation left, Lifti.TokenLocation right) -> bool
+static Lifti.TokenLocation.operator >=(Lifti.TokenLocation left, Lifti.TokenLocation right) -> bool
+System.Runtime.CompilerServices.IsExternalInit
+System.Runtime.CompilerServices.IsExternalInit.IsExternalInit() -> void
+virtual Lifti.Tokenization.IndexTokenizer.IsSplitCharacter(char character) -> bool

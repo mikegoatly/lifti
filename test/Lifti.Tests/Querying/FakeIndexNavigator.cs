@@ -119,6 +119,7 @@ namespace Lifti.Tests.Querying
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
         }
 
         public IIndexNavigatorBookmark CreateBookmark()

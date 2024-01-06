@@ -7,7 +7,7 @@ namespace Lifti.Querying.QueryParts
     /// a document's field matches such that the locations of the first appear before the locations of the second. 
     /// Documents that result in no field matches are filtered out.
     /// </summary>
-    public class PrecedingQueryOperator : BinaryQueryOperator
+    public sealed class PrecedingQueryOperator : BinaryQueryOperator
     {
         /// <summary>
         /// Constructs a new instance of <see cref="PrecedingQueryOperator"/>.

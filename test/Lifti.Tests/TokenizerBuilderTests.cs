@@ -53,7 +53,7 @@ namespace Lifti.Tests
         public void WithStemming_ShouldSetTheStemmerToAPorterStemmer()
         {
             var builder = new TokenizerBuilder();
-            builder.WithStemming(true);
+            builder.WithStemming();
             builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options.Stemmer.Should().BeOfType<PorterStemmer>();
         }
 

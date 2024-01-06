@@ -23,6 +23,7 @@
 		<EnableNETAnalyzers>True</EnableNETAnalyzers>
 		<AnalysisLevel>latest-all</AnalysisLevel>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<NoWarn>RS0026</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -99,6 +100,16 @@
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>ExceptionMessages.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2'">
+		<AdditionalFiles Include="PublicAPI/netstandard2/PublicAPI.Shipped.txt" />
+		<AdditionalFiles Include="PublicAPI/netstandard2/PublicAPI.Unshipped.txt" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' != 'netstandard2'">
+		<AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
+		<AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
 	</ItemGroup>
 
 </Project>

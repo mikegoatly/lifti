@@ -9,7 +9,7 @@ namespace Lifti.Querying.QueryParts
     /// within a specified tolerance. 
     /// Documents that result in no field matches are filtered out.
     /// </summary>
-    public class PrecedingNearQueryOperator : BinaryQueryOperator
+    public sealed class PrecedingNearQueryOperator : BinaryQueryOperator
     {
         /// <summary>
         /// Constructs a new instance of <see cref="PrecedingNearQueryOperator"/>.

@@ -5,7 +5,7 @@ namespace Lifti.Querying.QueryParts
     /// <summary>
     /// A special case <see cref="IQueryPart"/> used to represent an empty query.
     /// </summary>
-    public class EmptyQueryPart : IQueryPart
+    public sealed class EmptyQueryPart : IQueryPart
     {
         private EmptyQueryPart()
         {
