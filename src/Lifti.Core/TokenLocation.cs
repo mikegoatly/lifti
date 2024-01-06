@@ -94,12 +94,27 @@ namespace Lifti
 
         int IComparable<ITokenLocation>.CompareTo(ITokenLocation? other)
         {
+            if (other is null)
+            {
+                return -1;
+            }
+
             if (other is TokenLocation location)
             {
-                return this.CompareTo(location);
+                return this.TokenIndex.CompareTo(location.TokenIndex);
             }
             
-            return -1;
+            var result = this.TokenIndex.CompareTo(other.MinTokenIndex);
+
+            if (result == 0)
+            {
+                // When comparing a single token location to a composite location, we'll
+                // always treat the single token location as being less than the composite
+                // location.
+                return -1;
+            }
+
+            return result;
         }
 
         bool IEquatable<ITokenLocation>.Equals(ITokenLocation? other)
@@ -113,37 +128,37 @@ namespace Lifti
         }
 
         /// <inheritdoc/>
-        public static bool operator ==(TokenLocation left, TokenLocation right)
+        public static bool operator ==(TokenLocation? left, TokenLocation? right)
         {
             return left?.Equals(right) ?? false;
         }
 
         /// <inheritdoc/>
-        public static bool operator !=(TokenLocation left, TokenLocation right)
+        public static bool operator !=(TokenLocation? left, TokenLocation? right)
         {
             return !(left == right);
         }
 
         /// <inheritdoc/>
-        public static bool operator <(TokenLocation left, TokenLocation right)
+        public static bool operator <(TokenLocation? left, TokenLocation? right)
         {
             return (left?.CompareTo(right) ?? -1) < 0 ;
         }
 
         /// <inheritdoc/>
-        public static bool operator <=(TokenLocation left, TokenLocation right)
+        public static bool operator <=(TokenLocation? left, TokenLocation? right)
         {
             return (left?.CompareTo(right) ?? -1) <= 0;
         }
 
         /// <inheritdoc/>
-        public static bool operator >(TokenLocation left, TokenLocation right)
+        public static bool operator >(TokenLocation? left, TokenLocation? right)
         {
             return (left?.CompareTo(right) ?? -1) > 0;
         }
 
         /// <inheritdoc/>
-        public static bool operator >=(TokenLocation left, TokenLocation right)
+        public static bool operator >=(TokenLocation? left, TokenLocation? right)
         {
             return (left?.CompareTo(right) ?? -1) >= 0;
         }

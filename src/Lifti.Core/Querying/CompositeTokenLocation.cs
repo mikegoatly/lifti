@@ -40,32 +40,29 @@ namespace Lifti.Querying
         /// <inheritdoc/>
         public bool Equals(ITokenLocation? other)
         {
-            switch (other)
+            return other switch
             {
-                case CompositeTokenLocation composite:
-                    return this.leftToken.Equals(composite.leftToken) &&
-                        this.rightToken.Equals(composite.rightToken);
-                default:
-                    return false;
-            }
+                CompositeTokenLocation composite => this.leftToken.Equals(composite.leftToken) &&
+                                        this.rightToken.Equals(composite.rightToken),
+                _ => false,
+            };
         }
 
         /// <inheritdoc/>
         public int CompareTo(ITokenLocation? other)
         {
-            switch (other)
+            if (other is { } ITokenLocation)
             {
-                case CompositeTokenLocation composite:
-                    var leftCompare = this.leftToken.CompareTo(composite.leftToken);
-                    if (leftCompare != 0)
-                    {
-                        return leftCompare;
-                    }
+                var result = this.MinTokenIndex.CompareTo(other.MinTokenIndex);
+                if (result == 0)
+                {
+                    result = this.MaxTokenIndex.CompareTo(other.MaxTokenIndex);
+                }
 
-                    return this.rightToken.CompareTo(composite.rightToken);
-                default:
-                    return -1;
+                return result;
             }
+
+            return -1;
         }
 
         /// <inheritdoc/>

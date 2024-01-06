@@ -156,7 +156,7 @@ namespace Lifti.Querying
         /// <summary>
         /// Implements the operator ==.
         /// </summary>
-        public static bool operator ==(ScoredFieldMatch left, ScoredFieldMatch right)
+        public static bool operator ==(ScoredFieldMatch? left, ScoredFieldMatch? right)
         {
             return left?.Equals(right) ?? right is null;
         }
@@ -164,7 +164,7 @@ namespace Lifti.Querying
         /// <summary>
         /// Implements the operator !=.
         /// </summary>
-        public static bool operator !=(ScoredFieldMatch left, ScoredFieldMatch right)
+        public static bool operator !=(ScoredFieldMatch? left, ScoredFieldMatch? right)
         {
             return !(left == right);
         }

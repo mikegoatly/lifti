@@ -10,7 +10,6 @@ namespace Lifti.Querying
     /// A partial search result that can subsequently be combined with other <see cref="IntermediateQueryResult"/> instances
     /// materialized as part of a query.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Should not be compared")]
     public readonly struct IntermediateQueryResult : IEquatable<IntermediateQueryResult>
     {
         /// <summary>
