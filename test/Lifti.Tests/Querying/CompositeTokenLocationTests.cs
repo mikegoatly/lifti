@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
 using Lifti.Tests.Fakes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -9,61 +10,69 @@ namespace Lifti.Tests.Querying
 {
     public class CompositeTokenLocationTests : QueryTestBase
     {
-        private readonly FakeTokenLocation match2;
-        private readonly FakeTokenLocation match1;
-        private readonly CompositeTokenLocation sut1;
-        private readonly CompositeTokenLocation sut2;
-        private readonly TokenLocation[] match1Locations;
-        private readonly TokenLocation[] match2Locations;
-
-        public CompositeTokenLocationTests()
+        [Fact]
+        public void ComposingTwoTokenLocations_ShouldBuildAppropriately()
         {
-            this.match1Locations =
-            [
-                new TokenLocation(100, 1, 2),
-                new TokenLocation(200, 1, 2)
-            ];
+            var composite = ((ITokenLocation)TokenLocation(3)).ComposeWith(TokenLocation(2));
+            composite.MinTokenIndex.Should().Be(2);
+            composite.MaxTokenIndex.Should().Be(3);
 
-            this.match1 = new FakeTokenLocation(100, 200, this.match1Locations);
+            // And the same if we compose the other way around
+            composite = ((ITokenLocation)TokenLocation(2)).ComposeWith(TokenLocation(3));
+            composite.MinTokenIndex.Should().Be(2);
+            composite.MaxTokenIndex.Should().Be(3);
 
-            this.match2Locations =
-            [
-                new TokenLocation(110, 1, 2),
-                new TokenLocation(150, 1, 2),
-                new TokenLocation(180, 1, 2)
-            ];
-
-            this.match2 = new FakeTokenLocation(110, 180, this.match2Locations);
-
-            this.sut1 = new CompositeTokenLocation(this.match1, this.match2);
-            this.sut2 = new CompositeTokenLocation(this.match2, this.match1);
+            // Both tokens should be returned
+            CompositeTokenLocationTests.VerifyCollectedTokens(composite, TokenLocations(2, 3));
         }
 
         [Fact]
-        public void MinLocationShouldBeMinimumOfTheLeftAndRightMinimumValues()
+        public void ComposingCompositeWithNewMaxTokenLocation_ShouldBuildAppropriately()
         {
-            this.sut1.MinTokenIndex.Should().Be(100);
-            this.sut2.MinTokenIndex.Should().Be(100);
+            var existingComposite = new CompositeTokenLocation([.. TokenLocations(6, 2)], 2, 6);
+
+            var composite = existingComposite.ComposeWith(TokenLocation(9));
+
+            composite.MinTokenIndex.Should().Be(2);
+            composite.MaxTokenIndex.Should().Be(9);
+
+            // All tokens should be returned
+            CompositeTokenLocationTests.VerifyCollectedTokens(composite, TokenLocations(2, 6, 9));
         }
 
         [Fact]
-        public void MaxLocationShouldBeMinimumOfTheLeftAndRightMinimumValues()
+        public void ComposingCompositeWithNewMinTokenLocation_ShouldBuildAppropriately()
         {
-            this.sut1.MaxTokenIndex.Should().Be(200);
-            this.sut2.MaxTokenIndex.Should().Be(200);
+            var existingComposite = new CompositeTokenLocation([.. TokenLocations(6, 2)], 2, 6);
+
+            var composite = existingComposite.ComposeWith(TokenLocation(1));
+
+            composite.MinTokenIndex.Should().Be(1);
+            composite.MaxTokenIndex.Should().Be(6);
+
+            // All tokens should be returned
+            CompositeTokenLocationTests.VerifyCollectedTokens(composite, TokenLocations(1, 2, 6));
         }
 
         [Fact]
-        public void GetLocationsShouldReturnAllLocations()
+        public void ComposingCompositeWithComposite_ShouldBuildAppropriately()
         {
-            var locations = new HashSet<TokenLocation>();
-            this.sut1.AddTo(locations);
-            locations.Should().BeEquivalentTo(this.match1Locations.Concat(this.match2Locations).ToList());
+            var composite1 = new CompositeTokenLocation([.. TokenLocations(6, 2)], 2, 6);
+            var composite2 = new CompositeTokenLocation([.. TokenLocations(1, 9)], 1, 9);
 
-            locations.Clear();
+            var composite = composite1.ComposeWith(composite2);
 
-            this.sut2.AddTo(locations);
-            locations.Should().BeEquivalentTo(this.match2Locations.Concat(this.match1Locations).ToList());
+            composite.MinTokenIndex.Should().Be(1);
+            composite.MaxTokenIndex.Should().Be(9);
+
+            CompositeTokenLocationTests.VerifyCollectedTokens(composite, TokenLocations(1, 2, 6, 9));
+        }
+
+        private static void VerifyCollectedTokens(CompositeTokenLocation composite, List<TokenLocation> tokenLocations)
+        {
+            var collectedTokens = new HashSet<TokenLocation>();
+            composite.AddTo(collectedTokens);
+            collectedTokens.Should().BeEquivalentTo(tokenLocations);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace Lifti.Querying
 {
@@ -11,30 +12,63 @@ namespace Lifti.Querying
     /// </summary>
     internal sealed class CompositeTokenLocation : ITokenLocation
     {
-        private readonly ITokenLocation leftToken;
-        private readonly ITokenLocation rightToken;
-        private readonly Lazy<int> minTokenIndex;
-        private readonly Lazy<int> maxTokenIndex;
+        private readonly TokenLocation[] locations;
 
         /// <summary>
         /// Constructs a new instance of <see cref="CompositeTokenLocation"/>.
         /// </summary>
-        public CompositeTokenLocation(ITokenLocation leftToken, ITokenLocation rightToken)
+        internal CompositeTokenLocation(TokenLocation[] locations, int minTokenIndex, int maxTokenIndex)
         {
-            this.leftToken = leftToken;
-            this.rightToken = rightToken;
-            this.minTokenIndex = new Lazy<int>(() => Math.Min(leftToken.MinTokenIndex, rightToken.MinTokenIndex));
-            this.maxTokenIndex = new Lazy<int>(() => Math.Max(leftToken.MaxTokenIndex, rightToken.MaxTokenIndex));
+            this.locations = locations;
+            this.MinTokenIndex = minTokenIndex;
+            this.MaxTokenIndex = maxTokenIndex;
         }
 
-        public int MaxTokenIndex => this.maxTokenIndex.Value;
+        public int MaxTokenIndex { get; }
 
-        public int MinTokenIndex => this.minTokenIndex.Value;
+        public int MinTokenIndex { get; }
 
         public void AddTo(HashSet<TokenLocation> collector)
         {
-            this.leftToken.AddTo(collector);
-            this.rightToken.AddTo(collector);
+            for (var i = 0; i < this.locations.Length; i++)
+            {
+                collector.Add(this.locations[i]);
+            }
+        }
+
+        public CompositeTokenLocation ComposeWith(ITokenLocation other)
+        {
+            var currentLength = this.locations.Length;
+            switch (other)
+            {
+                case CompositeTokenLocation composite:
+                    // We need to build a new array capable of storing both sets of locations
+                    var additionLength = composite.locations.Length;
+                    var newLocations = new TokenLocation[currentLength + additionLength];
+                    Array.Copy(this.locations, newLocations, currentLength);
+                    Array.Copy(composite.locations, 0, newLocations, currentLength, additionLength);
+
+                    return new CompositeTokenLocation(
+                        newLocations,
+                        Math.Min(this.MinTokenIndex, composite.MinTokenIndex),
+                        Math.Max(this.MaxTokenIndex, composite.MaxTokenIndex));
+
+
+                case TokenLocation location:
+                    // Just one more element to add
+                    newLocations = new TokenLocation[currentLength + 1];
+                    Array.Copy(this.locations, newLocations, currentLength);
+                    newLocations[currentLength] = location;
+
+                    var newTokenIndex = location.TokenIndex;
+                    return new CompositeTokenLocation(
+                        newLocations,
+                        Math.Min(this.MinTokenIndex, newTokenIndex),
+                        Math.Max(this.MaxTokenIndex, newTokenIndex));
+
+                default:
+                    throw new InvalidOperationException($"Cannot compose a {nameof(TokenLocation)} with a {other.GetType().Name}");
+            }
         }
 
         /// <inheritdoc/>
@@ -42,8 +76,7 @@ namespace Lifti.Querying
         {
             return other switch
             {
-                CompositeTokenLocation composite => this.leftToken.Equals(composite.leftToken) &&
-                                        this.rightToken.Equals(composite.rightToken),
+                CompositeTokenLocation composite => this.locations.SequenceEqual(composite.locations),
                 _ => false,
             };
         }

@@ -84,7 +84,7 @@ namespace Lifti.Querying
                     {
                         if ((currentToken.MinTokenIndex - nextToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(leftTolerance))
                         {
-                            fieldTokenMatches.Add(new CompositeTokenLocation(currentToken, nextToken));
+                            fieldTokenMatches.Add(currentToken.ComposeWith(nextToken));
                         }
                     }
 
@@ -92,7 +92,7 @@ namespace Lifti.Querying
                     {
                         if ((nextToken.MinTokenIndex - currentToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(rightTolerance))
                         {
-                            fieldTokenMatches.Add(new CompositeTokenLocation(currentToken, nextToken));
+                            fieldTokenMatches.Add(currentToken.ComposeWith(nextToken));
                         }
                     }
 
@@ -114,7 +114,7 @@ namespace Lifti.Querying
                             fieldId, 
                             fieldTokenMatches));
 
-                    fieldTokenMatches = new();
+                    fieldTokenMatches = [];
                 }
             }
         }

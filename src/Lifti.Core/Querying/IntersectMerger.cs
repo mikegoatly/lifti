@@ -11,7 +11,7 @@ namespace Lifti.Querying
         /// <summary>
         /// Applies the intersection to the two <see cref="IntermediateQueryResult"/>s.
         /// </summary>
-        public static IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
+        public static List<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
             // track two pointers through the lists on each side. The document ids are ordered on both sides, so we can
             // move through the lists in a single pass

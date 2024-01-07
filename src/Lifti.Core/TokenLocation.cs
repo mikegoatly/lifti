@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lifti.Querying;
+using System;
 using System.Collections.Generic;
 
 namespace Lifti
@@ -40,6 +41,19 @@ namespace Lifti
         void ITokenLocation.AddTo(HashSet<TokenLocation> collector)
         {
             collector.Add(this);
+        }
+
+        CompositeTokenLocation ITokenLocation.ComposeWith(ITokenLocation other)
+        {
+            return other switch
+            {
+                CompositeTokenLocation composite => composite.ComposeWith(this),
+                TokenLocation location => new CompositeTokenLocation(
+                    [this, location],
+                    Math.Min(this.TokenIndex, location.TokenIndex),
+                    Math.Max(this.TokenIndex, location.TokenIndex)),
+                _ => throw new InvalidOperationException($"Cannot compose a {nameof(TokenLocation)} with a {other.GetType().Name}"),
+            };
         }
 
         /// <inheritdoc/>
@@ -103,7 +117,7 @@ namespace Lifti
             {
                 return this.TokenIndex.CompareTo(location.TokenIndex);
             }
-            
+
             var result = this.TokenIndex.CompareTo(other.MinTokenIndex);
 
             if (result == 0)
@@ -142,7 +156,7 @@ namespace Lifti
         /// <inheritdoc/>
         public static bool operator <(TokenLocation? left, TokenLocation? right)
         {
-            return (left?.CompareTo(right) ?? -1) < 0 ;
+            return (left?.CompareTo(right) ?? -1) < 0;
         }
 
         /// <inheritdoc/>

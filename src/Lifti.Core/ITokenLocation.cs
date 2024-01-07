@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lifti.Querying;
+using System;
 using System.Collections.Generic;
 
 namespace Lifti
@@ -16,5 +17,7 @@ namespace Lifti
         int MinTokenIndex { get; }
 
         void AddTo(HashSet<TokenLocation> collector);
+
+        CompositeTokenLocation ComposeWith(ITokenLocation other);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Lifti.Querying;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,19 +9,18 @@ namespace Lifti.Tests.Querying
     {
         internal static CompositeTokenLocation CompositeTokenLocation(int leftWordIndex, int rightWordIndex)
         {
-            return new CompositeTokenLocation(TokenLocation(leftWordIndex), TokenLocation(rightWordIndex));
+            return new CompositeTokenLocation(
+                [.. TokenLocations(leftWordIndex, rightWordIndex)],
+                Math.Min(leftWordIndex, rightWordIndex),
+                Math.Max(leftWordIndex, rightWordIndex));
         }
 
         internal static CompositeTokenLocation CompositeTokenLocation(params int[] wordIndexes)
         {
-            var match = CompositeTokenLocation(wordIndexes[0], wordIndexes[1]);
-
-            for (var i = 2; i < wordIndexes.Length; i++)
-            {
-                match = new CompositeTokenLocation(match, TokenLocation(wordIndexes[i]));
-            }
-
-            return match;
+            return new CompositeTokenLocation(
+                 [.. TokenLocations(wordIndexes)],
+                 wordIndexes.Min(),
+                 wordIndexes.Max());
         }
 
         internal static ScoredFieldMatch ScoredFieldMatch(double score, byte fieldId, params int[] wordIndexes)
@@ -48,8 +48,8 @@ namespace Lifti.Tests.Querying
         {
             return Lifti.Querying.ScoredFieldMatch.CreateFromUnsorted(
                 score,
-                fieldId, 
-                compositeMatches.ToList());
+                fieldId,
+                [.. compositeMatches]);
         }
 
         internal static TokenLocation TokenLocation(int index)
