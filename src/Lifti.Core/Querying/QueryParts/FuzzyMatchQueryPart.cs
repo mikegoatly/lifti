@@ -45,7 +45,10 @@ namespace Lifti.Querying.QueryParts
             // It's very likely that we'll encounter the same point in the index multiple times while processing a fuzzy match.
             // There's no point in traversing the same part multiple times for a given point in the search term, so this hashset keeps track of each logical
             // location that has been reached at each index within the search term.
-            private readonly HashSet<(int wordIndex, IIndexNavigatorBookmark bookmark)> processedBookmarks = [];
+            // Note that because we're reusing bookmarks, we can't use the bookmark itself as the hashcode as it will change as the bookmark is reused,
+            // so instead we use the hashcode of the bookmark directly. Although this is not guaranteed to be unique, it's good enough for our purposes and
+            // saves thousands of allocations per query.
+            private readonly HashSet<(int wordIndex, int bookmarkHash)> processedBookmarks = [];
 
             public FuzzyMatchStateStore(IIndexNavigator navigator, ushort maxEditDistance, ushort maxSequentialEdits)
             {
@@ -56,13 +59,24 @@ namespace Lifti.Querying.QueryParts
 
             public bool HasEntries => this.state.Count > 0;
 
-            public void Add(FuzzyMatchState state)
+            public bool Add(FuzzyMatchState state, bool disposeIfNotUsed)
             {
                 if (state.TotalEditCount <= this.maxEditDistance &&
                     state.SequentialEdits <= this.maxSequentialEdits &&
-                    this.processedBookmarks.Add((state.WordIndex, state.Bookmark)))
+                    this.processedBookmarks.Add((state.WordIndex, state.Bookmark.GetHashCode())))
                 {
                     this.state.Add(state);
+                    return true;
+                }
+                else
+                {
+                    if (disposeIfNotUsed)
+                    {
+                        // Dispose of the bookmark as we're not going to use it
+                        state.Dispose();
+                    }
+
+                    return false;
                 }
             }
 
@@ -325,19 +339,18 @@ namespace Lifti.Querying.QueryParts
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                                 , currentCharacter
 #endif
-                                ));
+                                ), true);
                         }
                         else
                         {
                             // First skip this character (assume extra character inserted), but don't move the navigator on
-                            stateStore.Add(state.ApplyInsertion(
+                            // We'll handle this case specially if the state wasn't added as this will allow us to dispose of the
+                            // current bookmark after it has been used to add new deletion bookmarks
+                            disposeBookmark = !stateStore.Add(state.ApplyInsertion(
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                                 currentCharacter
 #endif
-                                ));
-
-                            // The bookmark has been reused for insertions at this point, so we can't dispose it yet
-                            disposeBookmark = false;
+                                ), false);
 
                             // Also try skipping this character (assume omission) by just moving on in the navigator
                             AddDeletionBookmarks(navigator, stateStore, state);
@@ -379,7 +392,11 @@ namespace Lifti.Querying.QueryParts
 
                 bookmark.Apply();
                 navigator.Process(c);
-                stateStore.Add(currentState.ApplySubstitution(navigator.CreateBookmark(), new SubstitutedCharacters(currentCharacter, c)));
+                stateStore.Add(
+                    currentState.ApplySubstitution(
+                        navigator.CreateBookmark(), 
+                        new SubstitutedCharacters(currentCharacter, c)),
+                    true);
             }
         }
 
@@ -392,12 +409,14 @@ namespace Lifti.Querying.QueryParts
             {
                 bookmark.Apply();
                 navigator.Process(c);
-                stateStore.Add(currentState.ApplyDeletion(
-                    navigator.CreateBookmark()
+                stateStore.Add(
+                    currentState.ApplyDeletion(
+                        navigator.CreateBookmark()
 #if DEBUG && TRACK_MATCH_STATE_TEXT
-                    , c
+                        , c
 #endif
-                    ));
+                    ),
+                    true);
             }
         }
 

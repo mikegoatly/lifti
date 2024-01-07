@@ -343,6 +343,7 @@ namespace Lifti.Querying
             private readonly IndexNavigator indexNavigator;
             private IndexNode? currentNode;
             private int intraNodeTextPosition;
+            private bool disposed;
 
             public IndexNavigatorBookmark(IndexNavigator indexNavigator)
             {
@@ -353,11 +354,17 @@ namespace Lifti.Querying
             {
                 this.currentNode = indexNavigator.currentNode;
                 this.intraNodeTextPosition = indexNavigator.intraNodeTextPosition;
+                this.disposed = false;
             }
 
             /// <inheritdoc />
             public void Apply()
             {
+                if (this.disposed)
+                {
+                    throw new LiftiException(ExceptionMessages.BookmarkDisposed);
+                }
+
                 var indexNavigator = this.indexNavigator;
                 indexNavigator.bookmarkApplied = true;
                 indexNavigator.currentNode = this.currentNode;
@@ -370,6 +377,8 @@ namespace Lifti.Querying
                 {
                     this.indexNavigator.bookmarkPool.Enqueue(this);
                 }
+
+                this.disposed = true;
             }
 
             public override bool Equals(object? obj)
@@ -384,13 +393,12 @@ namespace Lifti.Querying
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(this.indexNavigator, this.currentNode, this.intraNodeTextPosition);
+                return HashCode.Combine(this.currentNode, this.intraNodeTextPosition);
             }
 
             public bool Equals(IndexNavigatorBookmark? bookmark)
             {
                 return bookmark != null &&
-                       this.indexNavigator == bookmark.indexNavigator &&
                        this.currentNode == bookmark.currentNode &&
                        this.intraNodeTextPosition == bookmark.intraNodeTextPosition;
             }

@@ -207,7 +207,7 @@ namespace Lifti.Querying.QueryParts
                     if (nextFragment == null)
                     {
                         // Add all exact matches for every character under the current position
-                        var bookmark = navigator.CreateBookmark();
+                        using var bookmark = navigator.CreateBookmark();
                         foreach (var character in navigator.EnumerateNextCharacters())
                         {
                             navigator.Process(character);
@@ -229,7 +229,7 @@ namespace Lifti.Querying.QueryParts
 
         private static IEnumerable<IIndexNavigatorBookmark> CreateBookmarksForAllChildCharacters(IIndexNavigator navigator)
         {
-            var bookmark = navigator.CreateBookmark();
+            using var bookmark = navigator.CreateBookmark();
             foreach (var character in navigator.EnumerateNextCharacters())
             {
                 navigator.Process(character);
@@ -240,7 +240,7 @@ namespace Lifti.Querying.QueryParts
 
         private static IEnumerable<IIndexNavigatorBookmark> RecursivelyCreateBookmarksAtMatchingCharacter(IIndexNavigator navigator, char terminatingCharacter)
         {
-            var bookmark = navigator.CreateBookmark();
+            using var bookmark = navigator.CreateBookmark();
             foreach (var character in navigator.EnumerateNextCharacters())
             {
                 if (character == terminatingCharacter)

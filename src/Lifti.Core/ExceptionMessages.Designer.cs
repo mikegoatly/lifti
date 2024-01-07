@@ -106,6 +106,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot apply a disposed bookmark.
+        /// </summary>
+        internal static string BookmarkDisposed {
+            get {
+                return ResourceManager.GetString("BookmarkDisposed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot combine an empty set of query parts.
         /// </summary>
         internal static string CannotCombineAnEmptySetOfQueryParts {

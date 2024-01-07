@@ -132,6 +132,9 @@
   <data name="BatchChangeAlreadyStarted" xml:space="preserve">
     <value>Cannot start a new batch change while another is already in progress.</value>
   </data>
+  <data name="BookmarkDisposed" xml:space="preserve">
+    <value>Cannot apply a disposed bookmark</value>
+  </data>
   <data name="CannotCombineAnEmptySetOfQueryParts" xml:space="preserve">
     <value>Cannot combine an empty set of query parts</value>
   </data>

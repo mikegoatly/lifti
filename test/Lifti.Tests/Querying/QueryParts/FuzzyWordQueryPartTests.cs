@@ -1,13 +1,11 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
 using Lifti.Querying.QueryParts;
-using Lifti.Tests.Fakes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -46,7 +44,7 @@ namespace Lifti.Tests.Querying.QueryParts
 
     public class FuzzyWordQueryPartTests : IClassFixture<FuzzyWordQueryPartTestsFixture>
     {
-
+        private static readonly Regex expectedMatchRegex = new Regex(@"(^|\s)*((?<word>[^\s]*)($|\s))+", RegexOptions.Compiled);
         private readonly ITestOutputHelper outputHelper;
         private readonly FuzzyWordQueryPartTestsFixture fixture;
 
@@ -123,8 +121,8 @@ namespace Lifti.Tests.Querying.QueryParts
 
             var query = new Query(
                 FieldFilterQueryOperator.CreateForField(
-                    index.FieldLookup, 
-                    "title", 
+                    index.FieldLookup,
+                    "title",
                     new FuzzyMatchQueryPart("NUMBE", 1, 1)));
 
             var results = index.Search(query).ToList();
@@ -216,7 +214,6 @@ namespace Lifti.Tests.Querying.QueryParts
         private void RunTest(string word, ushort maxEditDistance, ushort maxSequentialEdits, params string[] expectedWords)
         {
             var expectedWordLookup = expectedWords.ToHashSet(StringComparer.OrdinalIgnoreCase);
-            var expectedMatchRegex = new Regex(@"(^|\s)*((?<word>[^\s]*)($|\s))+");
             var expectedResultCaptures = this.fixture.IndexedText.Select(
                 (text, id) =>
                     (
@@ -236,7 +233,7 @@ namespace Lifti.Tests.Querying.QueryParts
 
             var expectedResults = expectedResultCaptures.Select(
                 r => Tuple.Create(
-                    r.id, 
+                    r.id,
                     r.Item2.Select(
                         x => new TokenLocation(x.index, x.startLocation, (ushort)x.Value.Length)).ToList()
                     ))
