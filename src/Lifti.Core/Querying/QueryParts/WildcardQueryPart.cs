@@ -78,6 +78,8 @@ namespace Lifti.Querying.QueryParts
                         nextFragment);
 
                     bookmarks.AddRange(nextBookmarks);
+
+                    bookmark.Dispose();
                 }
 
                 bookmarks.Swap();

@@ -3,12 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Lifti.Querying
 {
     internal sealed class IndexNavigator : IIndexNavigator
     {
+        private readonly Queue<IndexNavigatorBookmark> bookmarkPool = new(10);
         private readonly StringBuilder navigatedWith = new(16);
         private IIndexNavigatorPool? pool;
         private IScorer? scorer;
@@ -219,7 +221,16 @@ namespace Lifti.Querying
 
         public IIndexNavigatorBookmark CreateBookmark()
         {
-            return new IndexNavigatorBookmark(this);
+            var bookmark = this.GetCachedBookmarkOrCreate();
+            bookmark.Capture();
+            return bookmark;
+        }
+
+        private IndexNavigatorBookmark GetCachedBookmarkOrCreate()
+        {
+            return this.bookmarkPool.Count == 0
+                ? new IndexNavigatorBookmark(this)
+                : this.bookmarkPool.Dequeue();
         }
 
         public void Dispose()
@@ -326,25 +337,38 @@ namespace Lifti.Querying
             }
         }
 
-        internal readonly struct IndexNavigatorBookmark : IIndexNavigatorBookmark, IEquatable<IndexNavigatorBookmark>
+        internal sealed class IndexNavigatorBookmark : IIndexNavigatorBookmark, IEquatable<IndexNavigatorBookmark>
         {
             private readonly IndexNavigator indexNavigator;
-            private readonly IndexNode? currentNode;
-            private readonly int intraNodeTextPosition;
+            private IndexNode? currentNode;
+            private int intraNodeTextPosition;
 
             public IndexNavigatorBookmark(IndexNavigator indexNavigator)
             {
+                this.indexNavigator = indexNavigator;
+            }
+
+            public void Capture()
+            {
                 this.currentNode = indexNavigator.currentNode;
                 this.intraNodeTextPosition = indexNavigator.intraNodeTextPosition;
-                this.indexNavigator = indexNavigator;
             }
 
             /// <inheritdoc />
             public void Apply()
             {
-                this.indexNavigator.bookmarkApplied = true;
-                this.indexNavigator.currentNode = this.currentNode;
-                this.indexNavigator.intraNodeTextPosition = this.intraNodeTextPosition;
+                var indexNavigator = this.indexNavigator;
+                indexNavigator.bookmarkApplied = true;
+                indexNavigator.currentNode = this.currentNode;
+                indexNavigator.intraNodeTextPosition = this.intraNodeTextPosition;
+            }
+
+            public void Dispose()
+            {
+                if (this.indexNavigator.bookmarkPool.Count < 10)
+                {
+                    this.indexNavigator.bookmarkPool.Enqueue(this);
+                }
             }
 
             public override bool Equals(object? obj)
@@ -362,9 +386,10 @@ namespace Lifti.Querying
                 return HashCode.Combine(this.indexNavigator, this.currentNode, this.intraNodeTextPosition);
             }
 
-            public bool Equals(IndexNavigatorBookmark bookmark)
+            public bool Equals(IndexNavigatorBookmark? bookmark)
             {
-                return this.indexNavigator == bookmark.indexNavigator &&
+                return bookmark != null &&
+                       this.indexNavigator == bookmark.indexNavigator &&
                        this.currentNode == bookmark.currentNode &&
                        this.intraNodeTextPosition == bookmark.intraNodeTextPosition;
             }

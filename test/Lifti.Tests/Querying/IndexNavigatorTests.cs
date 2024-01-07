@@ -313,6 +313,27 @@ namespace Lifti.Tests.Querying
             this.VerifyMatchedWordIndexes(5, 13);
         }
 
+        [Fact]
+        public void Bookmarking_ShouldReuseDisposedBookmark()
+        {
+            this.sut.Process("INDI");
+
+            var bookmark = this.sut.CreateBookmark();
+
+            bookmark.Dispose();
+
+            this.sut.Process("VIDUAL");
+
+            var nextBookmark = this.sut.CreateBookmark();
+
+            nextBookmark.Should().BeSameAs(bookmark);
+
+            // And the new bookmark should be usable at the current location, not the old
+            this.sut.Process("S");
+            nextBookmark.Apply();
+            this.VerifyMatchedWordIndexes(13);
+        }
+
         private void VerifyMatchedWordIndexes(params int[] indexes)
         {
             var results = this.sut.GetExactAndChildMatches(QueryContext.Empty);

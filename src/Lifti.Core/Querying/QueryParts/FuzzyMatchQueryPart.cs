@@ -77,7 +77,7 @@ namespace Lifti.Querying.QueryParts
             }
         }
 
-        private readonly struct FuzzyMatchState
+        private readonly struct FuzzyMatchState : IDisposable
         {
             /// <summary>
             /// Creates a new <see cref="FuzzyMatchState"/> instance.
@@ -222,6 +222,11 @@ namespace Lifti.Querying.QueryParts
 #endif
                     );
             }
+
+            public void Dispose()
+            {
+                this.Bookmark.Dispose();
+            }
         }
 
         /// <summary>
@@ -280,8 +285,8 @@ namespace Lifti.Querying.QueryParts
                 foreach (var state in stateStore.GetNextStateEntries())
                 {
                     var wordIndex = state.WordIndex;
-                    var bookmark = state.Bookmark;
-                    bookmark.Apply();
+                    state.Bookmark.Apply();
+                    var disposeBookmark = true;
 
                     if (state.WordIndex == searchTermLength)
                     {
@@ -331,12 +336,22 @@ namespace Lifti.Querying.QueryParts
 #endif
                                 ));
 
+                            // The bookmark has been reused for insertions at this point, so we can't dispose it yet
+                            disposeBookmark = false;
+
                             // Also try skipping this character (assume omission) by just moving on in the navigator
                             AddDeletionBookmarks(navigator, stateStore, state);
                         }
 
                         // Always assume this could be a substituted character
                         AddSubstitutionBookmarks(navigator, stateStore, currentCharacter, state);
+                    }
+
+                    // We're done with this entry now. Disposing it causes the bookmark to get disposed and returned
+                    // to the pool in the index navigator for reuse.
+                    if (disposeBookmark)
+                    {
+                        state.Dispose();
                     }
                 }
 
