@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Lifti.Querying
@@ -31,7 +31,8 @@ namespace Lifti.Querying
             this.bookmarkApplied = false;
         }
 
-        private bool HasIntraNodeTextLeftToProcess => this.currentNode != null && this.intraNodeTextPosition < this.currentNode.IntraNodeText.Length;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool HasIntraNodeTextLeftToProcess(int intraNodeTextPosition, IndexNode node) => intraNodeTextPosition < node.IntraNodeText.Length;
 
         public int ExactMatchCount()
         {
@@ -51,7 +52,7 @@ namespace Lifti.Querying
         {
             get
             {
-                if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess || !this.currentNode.HasMatches)
+                if (this.currentNode == null || HasIntraNodeTextLeftToProcess(this.intraNodeTextPosition, this.currentNode) || !this.currentNode.HasMatches)
                 {
                     return false;
                 }
@@ -67,7 +68,7 @@ namespace Lifti.Querying
 
         public IntermediateQueryResult GetExactMatches(QueryContext queryContext, double weighting = 1D)
         {
-            if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess || !this.currentNode.HasMatches)
+            if (this.currentNode == null || HasIntraNodeTextLeftToProcess(this.intraNodeTextPosition, this.currentNode) || !this.currentNode.HasMatches)
             {
                 return IntermediateQueryResult.Empty;
             }
@@ -81,7 +82,7 @@ namespace Lifti.Querying
 
         public void AddExactMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1D)
         {
-            if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess || !this.currentNode.HasMatches)
+            if (this.currentNode == null || HasIntraNodeTextLeftToProcess(this.intraNodeTextPosition, this.currentNode) || !this.currentNode.HasMatches)
             {
                 return;
             }
@@ -146,7 +147,7 @@ namespace Lifti.Querying
                 this.navigatedWith.Append(value);
             }
 
-            if (this.HasIntraNodeTextLeftToProcess)
+            if (HasIntraNodeTextLeftToProcess(this.intraNodeTextPosition, this.currentNode))
             {
                 if (value == this.currentNode.IntraNodeText.Span[this.intraNodeTextPosition])
                 {
@@ -204,7 +205,7 @@ namespace Lifti.Querying
         {
             if (this.currentNode != null)
             {
-                if (this.HasIntraNodeTextLeftToProcess)
+                if (HasIntraNodeTextLeftToProcess(this.intraNodeTextPosition, this.currentNode))
                 {
                     yield return this.currentNode.IntraNodeText.Span[this.intraNodeTextPosition];
                 }
