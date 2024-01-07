@@ -30,9 +30,13 @@ namespace Lifti.Querying
             /// </summary>
             public IntermediateQueryResult ToIntermediateQueryResult()
             {
-                return new IntermediateQueryResult(
+                var results = new List<ScoredToken>(this.documentMatches.Count);
+                
+                results.AddRange(
                     this.documentMatches.Select(
                         d => new ScoredToken(d.Key, d.Value.ToScoredFieldMatches())));
+
+                return new IntermediateQueryResult(results, false);
             }
         }
 

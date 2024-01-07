@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lifti.Querying
@@ -24,6 +25,8 @@ namespace Lifti.Querying
             var leftCount = leftMatches.Count;
             var rightCount = rightMatches.Count;
 
+            var results = new List<ScoredToken>(Math.Min(leftCount, rightCount));
+
             while (leftIndex < leftCount && rightIndex < rightCount)
             {
                 var leftMatch = leftMatches[leftIndex];
@@ -31,9 +34,9 @@ namespace Lifti.Querying
 
                 if (leftMatch.DocumentId == rightMatch.DocumentId)
                 {
-                    yield return new ScoredToken(
+                    results.Add(new ScoredToken(
                         leftMatch.DocumentId,
-                        MergeFields(leftMatch, rightMatch));
+                        MergeFields(leftMatch, rightMatch)));
 
                     leftIndex++;
                     rightIndex++;
@@ -47,6 +50,8 @@ namespace Lifti.Querying
                     rightIndex++;
                 }
             }
+
+            return results;
         }
     }
 }

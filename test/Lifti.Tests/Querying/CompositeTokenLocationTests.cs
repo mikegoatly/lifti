@@ -1,9 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
-using Lifti.Tests.Fakes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
 namespace Lifti.Tests.Querying

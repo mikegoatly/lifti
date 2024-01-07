@@ -21,7 +21,9 @@ namespace Lifti.Tests.Querying
                 matchedDocumentIds.Select(
                     m => ScoredToken(
                         m,
-                        [ScoredFieldMatch(1D, (byte)m, m)])));
+                        [ScoredFieldMatch(1D, (byte)m, m)]))
+                .ToList(),
+                false);
 
             this.ExpectedExactMatches = exactAndChildMatchOnly ? Lifti.Querying.IntermediateQueryResult.Empty : this.ExpectedExactAndChildMatches;
         }
@@ -29,7 +31,7 @@ namespace Lifti.Tests.Querying
         private FakeIndexNavigator(bool exactAndChildMatchOnly, params ScoredToken[] matches)
             : this()
         {
-            this.ExpectedExactAndChildMatches = new IntermediateQueryResult(matches);
+            this.ExpectedExactAndChildMatches = new IntermediateQueryResult(matches.ToList(), false);
 
             this.ExpectedExactMatches = exactAndChildMatchOnly ? Lifti.Querying.IntermediateQueryResult.Empty : this.ExpectedExactAndChildMatches;
         }

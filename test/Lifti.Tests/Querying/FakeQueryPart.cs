@@ -12,7 +12,7 @@ namespace Lifti.Tests.Querying
 
         public FakeQueryPart(params ScoredToken[] matches)
         {
-            this.results = new IntermediateQueryResult(matches);
+            this.results = new IntermediateQueryResult(matches.ToList(), false);
         }
 
         public FakeQueryPart(double weighting, params ScoredToken[] matches)
@@ -27,7 +27,9 @@ namespace Lifti.Tests.Querying
                 matchedItems.Select(
                     m => new ScoredToken(
                         m,
-                        new[] { ScoredFieldMatch(m, (byte)m, m) })));
+                        new[] { ScoredFieldMatch(m, (byte)m, m) }))
+                .ToList(),
+                false);
         }
 
         public double CalculateWeighting(Func<IIndexNavigator> navigatorCreator)

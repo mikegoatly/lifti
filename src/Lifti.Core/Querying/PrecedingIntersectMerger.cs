@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lifti.Querying
@@ -12,7 +13,7 @@ namespace Lifti.Querying
         /// <summary>
         /// Applies the intersection logic.
         /// </summary>
-        public static IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
+        public static List<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
             // track two pointers through the lists on each side. The document ids are ordered on both sides, so we can
             // move through the lists in a single pass
@@ -25,6 +26,8 @@ namespace Lifti.Querying
             var leftCount = leftMatches.Count;
             var rightCount = rightMatches.Count;
 
+            var results = new List<ScoredToken>(Math.Min(leftCount, rightCount));
+
             List<ScoredFieldMatch> positionalMatches = [];
             while (leftIndex < leftCount && rightIndex < rightCount)
             {
@@ -36,7 +39,7 @@ namespace Lifti.Querying
                     EnumerateFieldMatches(positionalMatches, leftMatch.FieldMatches, rightMatch.FieldMatches);
                     if (positionalMatches.Count > 0)
                     {
-                        yield return new ScoredToken(leftMatch.DocumentId, positionalMatches.ToList());
+                        results.Add(new ScoredToken(leftMatch.DocumentId, positionalMatches.ToList()));
                         positionalMatches.Clear();
                     }
 
@@ -52,6 +55,8 @@ namespace Lifti.Querying
                     rightIndex++;
                 }
             }
+
+            return results;
         }
 
         private static void EnumerateFieldMatches(List<ScoredFieldMatch> fieldResults, IReadOnlyList<ScoredFieldMatch> leftFields, IReadOnlyList<ScoredFieldMatch> rightFields)

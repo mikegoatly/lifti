@@ -12,24 +12,14 @@ namespace Lifti.Querying
     /// </summary>
     public readonly struct IntermediateQueryResult : IEquatable<IntermediateQueryResult>
     {
-        /// <summary>
-        /// Creates a new instance of <see cref="IntermediateQueryResult"/>.
-        /// </summary>
-        internal IntermediateQueryResult(IEnumerable<ScoredToken> matches)
-            : this(matches, false)
+        internal IntermediateQueryResult(List<ScoredToken> matches, bool assumeSorted)
         {
-        }
-
-        internal IntermediateQueryResult(IEnumerable<ScoredToken> matches, bool assumeSorted)
-        {
-            var matchList = matches as List<ScoredToken> ?? matches.ToList();
-
             if (!assumeSorted)
             {
-                matchList.Sort((x, y) => x.DocumentId.CompareTo(y.DocumentId));
+                matches.Sort((x, y) => x.DocumentId.CompareTo(y.DocumentId));
             }
 
-            this.Matches = matchList;
+            this.Matches = matches;
 
 #if DEBUG
             // Verify that we are in document id order, and that there are no duplicates
@@ -55,7 +45,7 @@ namespace Lifti.Querying
         /// <summary>
         /// Gets an <see cref="IntermediateQueryResult"/> with no matches.
         /// </summary>
-        public static IntermediateQueryResult Empty { get; } = new IntermediateQueryResult(Array.Empty<ScoredToken>(), true);
+        public static IntermediateQueryResult Empty { get; } = new IntermediateQueryResult([], true);
 
         /// <summary>
         /// Gets the set of <see cref="ScoredToken"/> matches that this instance captured.

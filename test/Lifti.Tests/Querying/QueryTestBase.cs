@@ -64,7 +64,7 @@ namespace Lifti.Tests.Querying
 
         internal static IntermediateQueryResult IntermediateQueryResult(params ScoredToken[] matches)
         {
-            return new IntermediateQueryResult(matches);
+            return new IntermediateQueryResult(matches.ToList(), false);
         }
 
         internal static ScoredToken ScoredToken(int documentId, params ScoredFieldMatch[] matches)
