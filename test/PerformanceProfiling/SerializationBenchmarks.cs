@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 using Lifti.Serialization.Binary;
 using System;
 using System.IO;
@@ -7,10 +6,6 @@ using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
-    [MediumRunJob(RuntimeMoniker.Net481)]
-    [MediumRunJob(RuntimeMoniker.Net70)]
-    [MediumRunJob(RuntimeMoniker.Net60)]
-    [RankColumn, MemoryDiagnoser]
     public class SerializationBenchmarks : IndexBenchmarkBase
     {
         private BinarySerializer<int> serializer;
