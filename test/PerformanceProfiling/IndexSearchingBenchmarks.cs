@@ -26,6 +26,7 @@ namespace PerformanceProfiling
             "con??*",
             "Title=?great",
             "confiscation",
+            "co*on",
             "and > they",
             "and ~10> they",
             "\"also has a\"",

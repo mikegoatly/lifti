@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Lifti.Querying
@@ -207,17 +208,15 @@ namespace Lifti.Querying
             {
                 if (HasIntraNodeTextLeftToProcess(this.intraNodeTextPosition, this.currentNode))
                 {
-                    yield return this.currentNode.IntraNodeText.Span[this.intraNodeTextPosition];
+                    return MemoryMarshal.ToEnumerable(this.currentNode.IntraNodeText.Slice(this.intraNodeTextPosition, 1));
                 }
                 else if (this.currentNode.HasChildNodes)
                 {
-                    var childChars = this.currentNode.ChildNodes.CharacterMap;
-                    for (var i = 0; i < childChars.Count; i++)
-                    {
-                        yield return childChars[i].ChildChar;
-                    }
+                    return this.currentNode.ChildNodes.CharacterMap.Select(static x => x.ChildChar);
                 }
             }
+
+            return Array.Empty<char>();
         }
 
         public IIndexNavigatorBookmark CreateBookmark()
