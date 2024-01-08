@@ -5,6 +5,7 @@
 using Lifti.Querying.Lifti.Querying;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Lifti.Querying.QueryParts
 {
@@ -30,6 +31,11 @@ namespace Lifti.Querying.QueryParts
     /// </summary>
     public sealed class FuzzyMatchQueryPart : WordQueryPart
     {
+        private static readonly SharedPool<FuzzyMatchStateStore> fuzzyMatchStateStorePool = new(
+            static () => new(), 
+            static s => s.Clear(),
+            3);
+
         internal const ushort DefaultMaxEditDistance = 4;
         internal const ushort DefaultMaxSequentialEdits = 1;
 
@@ -38,9 +44,9 @@ namespace Lifti.Querying.QueryParts
 
         private class FuzzyMatchStateStore
         {
-            private readonly ushort maxEditDistance;
-            private readonly ushort maxSequentialEdits;
-            private readonly DoubleBufferedList<FuzzyMatchState> state;
+            private ushort maxEditDistance;
+            private ushort maxSequentialEdits;
+            private readonly DoubleBufferedList<FuzzyMatchState> state = [];
 
             // It's very likely that we'll encounter the same point in the index multiple times while processing a fuzzy match.
             // There's no point in traversing the same part multiple times for a given point in the search term, so this hashset keeps track of each logical
@@ -50,14 +56,22 @@ namespace Lifti.Querying.QueryParts
             // saves thousands of allocations per query.
             private readonly HashSet<(int wordIndex, int bookmarkHash)> processedBookmarks = [];
 
-            public FuzzyMatchStateStore(IIndexNavigator navigator, ushort maxEditDistance, ushort maxSequentialEdits)
+            public FuzzyMatchStateStore()
             {
-                this.state = new DoubleBufferedList<FuzzyMatchState>(new FuzzyMatchState(navigator.CreateBookmark()));
+            }
+
+            public void Initialize(IIndexNavigator navigator, ushort maxEditDistance, ushort maxSequentialEdits)
+            {
+                this.state.AddToCurrent(new FuzzyMatchState(navigator.CreateBookmark()));
                 this.maxEditDistance = maxEditDistance;
                 this.maxSequentialEdits = maxSequentialEdits;
             }
 
-            public bool HasEntries => this.state.Count > 0;
+            public bool HasEntries
+            {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                get { return this.state.Count > 0; }
+            }
 
             public bool Add(FuzzyMatchState state, bool disposeIfNotUsed)
             {
@@ -88,6 +102,12 @@ namespace Lifti.Querying.QueryParts
             public void PrepareNextEntries()
             {
                 this.state.Swap();
+            }
+
+            public void Clear()
+            {
+                this.state.Clear();
+                this.processedBookmarks.Clear();
             }
         }
 
@@ -288,7 +308,8 @@ namespace Lifti.Querying.QueryParts
 
             using var navigator = navigatorCreator();
             var resultCollector = new DocumentMatchCollector();
-            var stateStore = new FuzzyMatchStateStore(navigator, this.maxEditDistance, this.maxSequentialEdits);
+            var stateStore = fuzzyMatchStateStorePool.Take();
+            stateStore.Initialize(navigator, this.maxEditDistance, this.maxSequentialEdits);
 
             var characterCount = 0;
             var searchTermLength = this.Word.Length;
@@ -373,6 +394,8 @@ namespace Lifti.Querying.QueryParts
                 characterCount++;
             }
             while (stateStore.HasEntries);
+
+            fuzzyMatchStateStorePool.Return(stateStore);
 
             return resultCollector.ToIntermediateQueryResult();
         }

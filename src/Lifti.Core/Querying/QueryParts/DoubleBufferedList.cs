@@ -20,6 +20,11 @@ namespace Lifti.Querying.QueryParts
             this.current.AddRange(initialData);
         }
 
+        public void AddToCurrent(T item)
+        {
+            this.current.Add(item);
+        }
+
         public void Add(T item)
         {
             this.swap.Add(item);
@@ -38,6 +43,12 @@ namespace Lifti.Querying.QueryParts
             tempStack.Clear();
             this.current = this.swap;
             this.swap = tempStack;
+        }
+
+        public void Clear()
+        {
+            this.current.Clear();
+            this.swap.Clear();
         }
 
         public IEnumerator<T> GetEnumerator()
