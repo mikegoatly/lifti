@@ -79,10 +79,6 @@ namespace Lifti.Querying
             {
                 this.Score += score;
 
-#if !NETSTANDARD
-                this.fieldLocations.EnsureCapacity(this.fieldLocations.Count + tokenLocations.Count);
-#endif
-
                 this.fieldLocations.AddRange(tokenLocations);
                 this.additionCount++;
             }
