@@ -240,22 +240,35 @@ namespace Lifti.Querying.QueryParts
 
         private static IEnumerable<IIndexNavigatorBookmark> RecursivelyCreateBookmarksAtMatchingCharacter(IIndexNavigator navigator, char terminatingCharacter)
         {
-            using var bookmark = navigator.CreateBookmark();
-            foreach (var character in navigator.EnumerateNextCharacters())
+            var bookmarkStack = new Stack<IIndexNavigatorBookmark>();
+            bookmarkStack.Push(navigator.CreateBookmark());
+
+            while (bookmarkStack.Count > 0)
             {
-                if (character == terminatingCharacter)
-                {
-                    yield return navigator.CreateBookmark();
-                }
-
-                navigator.Process(character);
-
-                foreach (var recursedBookmark in RecursivelyCreateBookmarksAtMatchingCharacter(navigator, terminatingCharacter))
-                {
-                    yield return recursedBookmark;
-                }
-
+                using var bookmark = bookmarkStack.Pop();
                 bookmark.Apply();
+
+                foreach (var character in navigator.EnumerateNextCharacters())
+                {
+                    if (character == terminatingCharacter)
+                    {
+                        // This node has a child node that matches the terminating character - return a bookmark at this point
+                        // so the next text fragment can be processed from here
+                        yield return navigator.CreateBookmark();
+                    }
+
+                    // Even if the character matches the terminating character, we still need to process it, as it may not be
+                    // the start of a successfully matched sequence. E.g. if the query is "*ERS" and we're in a hierarchy for the token "CENTERS"
+                    // the "E" would be the terminating character, but we need to keep going to find the second "E" for "ERS" to match.
+                    // Process the character from this node
+                    navigator.Process(character);
+
+                    // Push a bookmark so we can return to this point after processing all the characters from this node
+                    bookmarkStack.Push(navigator.CreateBookmark());
+
+                    // Return to the node we just processed the character from
+                    bookmark.Apply();
+                }
             }
         }
 
