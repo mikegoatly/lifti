@@ -7,10 +7,6 @@ using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
-    [MediumRunJob(RuntimeMoniker.Net481)]
-    [MediumRunJob(RuntimeMoniker.Net80)]
-    [MediumRunJob(RuntimeMoniker.Net70)]
-    [MediumRunJob(RuntimeMoniker.Net60)]
     [RankColumn, MemoryDiagnoser]
     public class SerializationBenchmarks : IndexBenchmarkBase
     {
