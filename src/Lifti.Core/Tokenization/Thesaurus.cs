@@ -21,7 +21,8 @@ namespace Lifti.Tokenization
                 // synonym. This list will include the original token text as well
                 foreach (string alternative in alternatives)
                 {
-                    yield return new Token(alternative, token.Locations);
+                    // We can share the exact locations list here.
+                    yield return token.WithAlternativeValue(alternative);
                 }
             }
             else

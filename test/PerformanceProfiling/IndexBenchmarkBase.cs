@@ -1,5 +1,6 @@
 ﻿using Lifti;
 using Lifti.Tokenization.TextExtraction;
+using System;
 using System.Threading.Tasks;
 
 namespace PerformanceProfiling
@@ -25,16 +26,19 @@ namespace PerformanceProfiling
             }
         }
 
-        protected static FullTextIndex<int> CreateNewIndex(int supportSplitAtIndex)
+        protected static FullTextIndex<int> CreateNewIndex(int supportSplitAtIndex, Action<FullTextIndexBuilder<int>>? additionalConfigurationActions = null)
         {
-            return new FullTextIndexBuilder<int>()
+            var builder = new FullTextIndexBuilder<int>()
                 .WithIntraNodeTextSupportedAfterIndexDepth(supportSplitAtIndex)
                 .WithObjectTokenization<(int id, string name, string text)>(
                     o => o
                     .WithKey(p => p.id)
                     .WithField("Title", p => p.name)
-                    .WithField("Text", p => p.text, t => t.WithStemming(), new XmlTextExtractor()))
-                .Build();
+                    .WithField("Text", p => p.text, t => t.WithStemming(), new XmlTextExtractor()));
+
+            additionalConfigurationActions?.Invoke(builder);
+
+            return builder.Build();
         }
     }
 }
