@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
-    [RankColumn, MemoryDiagnoser]
     public class RemovalFromIndexBenchmarks : IndexBenchmarkBase
     {
         private IFullTextIndex<int> index;

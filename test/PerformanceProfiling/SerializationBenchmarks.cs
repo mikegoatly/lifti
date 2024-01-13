@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
-    [RankColumn, MemoryDiagnoser]
     public class SerializationBenchmarks : IndexBenchmarkBase
     {
         private BinarySerializer<int> serializer;

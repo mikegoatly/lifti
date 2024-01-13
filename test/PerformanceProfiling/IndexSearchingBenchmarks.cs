@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 namespace PerformanceProfiling
 {
-    [RankColumn, MemoryDiagnoser]
     public class IndexSearchingBenchmarks : IndexBenchmarkBase
     {
         private IFullTextIndex<int> index;
