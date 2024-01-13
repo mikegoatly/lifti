@@ -87,7 +87,7 @@ stages:
 - stage: PublishCINugetPackage
   displayName: Publish to CI feed
   dependsOn: Build
-  condition: succeeded()
+  condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
 
   jobs:
   - job: PublishCI
@@ -100,12 +100,13 @@ stages:
     - download: current
       artifact: 'packages'
       
-    - task: DotNetCoreCLI@2
+    - task: NuGetCommand@2
+      displayName: 'Push NuGet Package'
       inputs:
         command: 'push'
-        packagesToPush: '$(Pipeline.Workspace)/packages/ci/*.nupkg'
-        nuGetFeedType: 'internal'
-        publishVstsFeed: '21c23043-21b0-4e5a-8557-00b88fc52fd4/9f4e269d-a35a-4657-b2a3-b56b01c01f8c'
+        packagesToPush: '$(Pipeline.Workspace)/packages/release/*.nupkg'
+        nuGetFeedType: 'external'
+        publishFeedCredentials: 'NuGet'
 
 - stage: 'PublishReleaseNuGetPackage'
   displayName: 'Publish Release NuGet Package'
