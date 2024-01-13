@@ -1,6 +1,6 @@
 ---
-title: "WithObjectTokenization"
-linkTitle: "WithObjectTokenization"
+title: "Object tokenization"
+linkTitle: "Object tokenization"
 weight: 2
 description: >
   Configure the index to accept a strongly typed object when indexing content.

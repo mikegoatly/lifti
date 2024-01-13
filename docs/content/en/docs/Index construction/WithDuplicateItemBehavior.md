@@ -1,9 +1,9 @@
 ---
-title: "WithDuplicateItemBehavior"
-linkTitle: "WithDuplicateItemBehavior"
+title: "Managing duplicate keys"
+linkTitle: "Managing duplicate keys"
 weight: 5
 description: >
-  Prescribes how the index should behave when indexing an item that is already present in the index.
+  Configure how the index should behave when indexing an item that is already present in the index.
 ---
 
 `FullTextIndexBuilder<TKey> WithDuplicateItemBehavior(DuplicateItemBehavior duplicateItemBehavior)`

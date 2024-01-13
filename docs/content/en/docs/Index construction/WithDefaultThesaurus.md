@@ -1,6 +1,6 @@
 ---
-title: "WithDefaultThesaurus"
-linkTitle: "WithDefaultThesaurus"
+title: "Thesaurus synonyms"
+linkTitle: "Thesaurus synonyms"
 weight: 5
 description: >
   Prescribes how the index should treat terms as synonymous when they are being added to the index.

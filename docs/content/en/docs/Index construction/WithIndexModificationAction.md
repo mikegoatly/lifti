@@ -1,9 +1,9 @@
 ---
-title: "WithIndexModificationAction"
-linkTitle: "WithIndexModificationAction"
+title: "Adding index modification actions"
+linkTitle: "Adding index modification actions"
 weight: 10
 description: >
-  Registers an async action that needs to occur when mutations to the index are committed and a new snapshot is generated.
+  You can register an async action that needs to occur when mutations to the index are committed and a new snapshot is generated.
 ---
 
 Every time an index is modified, either with a single document being added or a batch change being completed, a new immutable snapshot is created. 

@@ -1,9 +1,9 @@
 ---
-title: "WithSimpleQueryParser"
-linkTitle: "WithSimpleQueryParser"
+title: "Using the simple query parser"
+linkTitle: "Using the simple query parser"
 weight: 6
 description: >
-  Prescribes the use of a simple query parser that you can use when you don't want queries to make use of the full LIFTI query syntax.
+  You can use a simple query parser when you don't want queries to make use of the full LIFTI query syntax.
 ---
 
 ## Configuring the `SimpleQueryParser`

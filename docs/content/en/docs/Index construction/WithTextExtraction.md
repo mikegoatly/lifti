@@ -1,6 +1,6 @@
 ---
-title: "WithTextExtraction"
-linkTitle: "WithTextExtraction"
+title: "Document text extraction"
+linkTitle: "Document text extraction"
 weight: 6
 description: >
   Text extraction is the process by which fragments of text are lifted from a larger body of text prior to tokenization. 

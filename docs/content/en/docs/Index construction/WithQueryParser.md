@@ -1,9 +1,9 @@
 ---
-title: "WithQueryParser"
-linkTitle: "WithQueryParser"
+title: "Query parser configuration"
+linkTitle: "Query parser configuration"
 weight: 5
 description: >
-  Prescribes how the QueryParser implementation should be configured for the index.
+  Configure how the LIFTI query parser should operate for the index.
 ---
 
 ## Configuring the default LIFTI `QueryParser`

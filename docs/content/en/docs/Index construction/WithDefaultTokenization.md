@@ -1,9 +1,9 @@
 ---
-title: "WithDefaultTokenization"
-linkTitle: "WithDefaultTokenization"
+title: "Default tokenization"
+linkTitle: "Default tokenization"
 weight: 2
 description: >
-  Specifies the default tokenization options that should be used when searching or indexing when no other options are provided.
+  Specifies the default tokenization options that should be used when searching or indexing when tokenization options are not explicitly specified for an object type.
 ---
 
 ## Example usage
@@ -47,12 +47,12 @@ Additionally, characters that can be logically expressed as two characters are e
 
 `false`: The tokenizer will be case sensitive. Searching for `Cat` will match `Cat` but not `cat`.
 
-#### `WithStemming(bool)`
+#### `WithStemming()`
 
-`true`: Words will be stemmed using an implementation of the Porter Stemmer algorithm. For example, `ABANDON`, `ABANDONED` and `ABANDONING` will all
+Words will be stemmed using an implementation of the Porter Stemmer algorithm. For example, `ABANDON`, `ABANDONED` and `ABANDONING` will all
 be treated as `ABANDON`. Currently only English is supported.
 
-`false`: **Default** No stemming will be performed on words.
+A [custom stemmer](../../custom-stemmers/) can be used by implementing an `IStemmer` and using `WithStemming(new YourStemmerImplementation())`.
 
 ### Word break modifiers
 
