@@ -104,7 +104,7 @@ stages:
       displayName: 'Push NuGet Package'
       inputs:
         command: 'push'
-        packagesToPush: '$(Pipeline.Workspace)/packages/release/*.nupkg'
+        packagesToPush: '$(Pipeline.Workspace)/packages/ci/*.nupkg'
         nuGetFeedType: 'external'
         publishFeedCredentials: 'NuGet'
 
