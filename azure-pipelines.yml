@@ -8,7 +8,7 @@ trigger:
     - test
 
 variables:
-  majorVersion: 5
+  majorVersion: 6
   minorVersion: 0
   patchVersion: 0
   project: src/Lifti.Core/Lifti.Core.csproj
