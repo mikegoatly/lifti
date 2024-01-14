@@ -9,7 +9,7 @@ description: >
 ## `FullTextIndexBuilder<TKey>`
 
 `FullTextIndexBuilder` requires a single generic type provided to it. 
-This defines the type of the key that items will be indexed against.
+This defines the type of the key that documents will be indexed against.
 
 In simple cases this will just be a `string`, `Guid`, `Int32` or `UInt32`. 
 Indexes can be built with other key types, including composite types, but special care needs 

@@ -8,18 +8,18 @@ description: "`ISearchResults<T>` provides methods that allow you to combine the
 ## `CreateMatchPhrasesAsync` and `CreateMatchPhrases`
 
 The intent of the `ISearchResults<T>.CreateMatchPhrasesAsync` methods is to allow you to provide a mechanism by which
-LIFTI can retrieve the original source text, from items or loosely indexed text, and automatically
+LIFTI can retrieve the original source text, from objects or loosely indexed text, and automatically
 extract phrases for the matched token locations. Where a multiple tokens are matched in a sequence, they will be combined into 
 a single phrase.
 
-For the `CreateMatchPhrasesAsync<TItem>` overloads that create the matched phrases from an indexed item of type `TItem`,
-you can either fetch the items one at a time, or be provided with a list of item ids and fetch all the relevant items
+For the `CreateMatchPhrasesAsync<TObject>` overloads that create the matched phrases from an indexed object of type `TObject`,
+you can either fetch the objects one at a time, or be provided with a list of keys and fetch all the relevant objects
 in bulk. The latter is more efficient if you are having to go to an external source for the data, e.g. using a database
 query.
 
 ### Example
 
-This example demonstrates searching against an index of `Book` items:
+This example demonstrates searching against an index of `Book` objects:
 
 ``` csharp
 public class Book

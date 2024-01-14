@@ -40,7 +40,7 @@ await index.AddAsync(new CompositeKey(3, 11), "Text associated with C is both fi
 ```
 
 > `CompositeKey` could also be the key of an object that you want to index. You'd just need to use the
-> configure the `FullTextIndexBuilder` with the appropriate `WithKey` call when setting up the item tokenization options.
+> configure the `FullTextIndexBuilder` with the appropriate `WithKey` call when setting up the object tokenization options.
 
 The only additional work comes when constructing the BinarySerializer - here you need to pass a custom `IKeySerializer` implementation 
 so that the serializer knows how to read and write the data in your custom key:

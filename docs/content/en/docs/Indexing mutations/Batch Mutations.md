@@ -14,4 +14,4 @@ await index.AddAsync(3, "Text associated with C is both fizz and buzz");
 await index.CommitBatchChangeAsync();
 ```
 
-Only once `CommitBatchChangeAsync` has been called will the new data be available in the index for searching. If a search operation was to have been performed between any of the calls to `AddAsync` then the previous snapshot would have been used and it would be as if the new items had not been added yet.
+Only once `CommitBatchChangeAsync` has been called will the new data be available in the index for searching. If a search operation was to have been performed between any of the calls to `AddAsync` then the previous snapshot would have been used and it would be as if the new documents had not been added yet.

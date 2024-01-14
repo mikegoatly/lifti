@@ -11,13 +11,13 @@ This is part of LIFTI's thread safety mechanism.
 
 You can hook into this process by registering an action using the `FullTextIndexBuilder<TKey>.WithIndexModificationAction` method.
 
-This trivial example just logs to the console the number of items in the index whenever a new snapshot is created.
+This trivial example just logs to the console the number of documents in the index whenever a new snapshot is created.
 
 ``` csharp
 var index = new FullTextIndexBuilder<Guid>()
     .WithIndexModificationAction(async (idx) =>
     {
-        Console.WriteLine($"Index now contains {idx.IdLookup.Count} items");
+        Console.WriteLine($"Index now contains {idx.IdLookup.Count} documents");
     })
     .Build();
 ```

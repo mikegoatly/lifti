@@ -86,7 +86,7 @@ Examples:
 
 The and operator (`&`) Performs an intersection of two intermediate query results, combining word positions for successful matches.
 
-`Food & Burger` searches for items containing both `"food"` and `"burger"` at any position, and in any field.
+`Food & Burger` searches for documents containing both `"food"` and `"burger"` at any position, and in any field.
 
 (Alternatively `Food Burger` will have the same effect as the default operator between query parts is an `&`.)
 
@@ -94,7 +94,7 @@ The and operator (`&`) Performs an intersection of two intermediate query result
 
 ### Or (`|`)
 
-Performs a union of two intermediate query results. Where an items appears in both sets, word positions are combined into one list.
+Performs a union of two intermediate query results. Where a document appears in both sets, word positions are combined into one list.
 
 Restricts results to same field by default: **false**
 
@@ -112,9 +112,9 @@ e.g. `(food & cake) | (cheese & biscuit)`
 
 These allow for restricting searches within a given field.
 
-`title=analysis | body=(chocolate & cake)` Searches for items with `"analysis"` in the title field *or both* `"chocolate"` and `"cake"` in the body field.
+`title=analysis | body=(chocolate & cake)` Searches for documents with `"analysis"` in the title field *or both* `"chocolate"` and `"cake"` in the body field.
 
-`title=analysis food` Searches for items with `"analysis"` in the title field *and* `"food"` in *any* field.
+`title=analysis food` Searches for documents with `"analysis"` in the title field *and* `"food"` in *any* field.
 
 If your field name contains spaces or other special characters, you can escape it using square brackets `[` and `]`, e.g. `[my field]=chocolate`.
 
@@ -125,7 +125,7 @@ If your field name contains spaces or other special characters, you can escape i
 Placing quotes around a search phrase will enforce that the words all appear
 immediately next to each other in the source text.
 
-`"cheese burger"` will only match items that have text containing `"cheese"` followed immediately by `"burger"`.
+`"cheese burger"` will only match documents that have text containing `"cheese"` followed immediately by `"burger"`.
 
 ---
 
@@ -135,7 +135,7 @@ The near operator performs a positional intersection of two results based on the
 
 The `~` operator requires that words must be within 5 words of one another. This can value can be controlled by specifying a number, e.g. `~4` to restrict to only returning results within 4 words of one another.
 
-`cheese ~ cake` will return items containing the words `"cheese"` and `"cake"` in either order, up to 5 words apart, e.g. `"the cake was made with cheese"` and `"I like cheese and cake"` would both match, but `"cake is never to be considered a substitute for cheese"` would not.
+`cheese ~ cake` will return documents containing the words `"cheese"` and `"cake"` in either order, up to 5 words apart, e.g. `"the cake was made with cheese"` and `"I like cheese and cake"` would both match, but `"cake is never to be considered a substitute for cheese"` would not.
 
 ---
 

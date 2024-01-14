@@ -40,7 +40,7 @@ This abstract class contains information about a field that has been configured 
 
 #### Methods
 
-- **ReadAsync(object item, CancellationToken cancellationToken)**: Reads the text for the field from the specified item. The item must be of the type specified by the `ObjectType` property.
+- **ReadAsync(object item, CancellationToken cancellationToken)**: Reads the text for the field from the specified object. The object must be of the type specified by the `ObjectType` property.
 
 
 ## `IsKnownField(Type objectType, string fieldName)`
