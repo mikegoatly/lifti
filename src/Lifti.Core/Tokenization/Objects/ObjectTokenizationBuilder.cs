@@ -485,7 +485,15 @@ namespace Lifti.Tokenization.Objects
                 scoreBoost);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Configures the score boosting options for the object.
+        /// </summary>
+        /// <param name="scoreBoostingOptions">
+        /// The delegate capable of configuring the score boosting options.
+        /// </param>
+        /// <exception cref="LiftiException">
+        /// Thrown if this method is called more than once per object definition.
+        /// </exception>
         public ObjectTokenizationBuilder<TObject, TKey> WithScoreBoosting(Action<ObjectScoreBoostBuilder<TObject>> scoreBoostingOptions)
         {
             if (scoreBoostingOptions is null)

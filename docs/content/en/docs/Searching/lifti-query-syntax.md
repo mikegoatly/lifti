@@ -13,6 +13,7 @@ description: >
 Example|Meaning
 -|-
 West|**West** must appear in the text [exactly](#exact-word-matches).
+West\|Wing^2|**West** or **Wing** must appear in the text [exactly](#exact-word-matches), where matches on **Wing** will have a [score boost](#score-boosting) of 2.
 ?Wst|Words that [fuzzy match](#fuzzy-match-) with **wst** must appear in the text.
 ?3,2?Wst|Words that [fuzzy match](#fuzzy-match-) with **wst** must appear in the text, with a specified max edit distance and max sequential edits.
 title=West|A [field restricted](#field-restrictions-field) search. **West** must appear in the ***title*** field of an indexed object.
@@ -152,6 +153,10 @@ Same as Near (`~`) except that order is important in the positional intersection
 Same as Near Following (`~>`) except there are no constraints on how far apart the words can be.
 
 `cheese > cake` will match any text where `"cheese"` precedes `"cake"` in a given field.
+
+## Score boosting
+
+Wildcard, fuzzy match and exact match search terms can have their resulting scores boosted by adding `^n` after them. For example, `wild^2` will boost matches of "wild" by 2x. 
 
 ## Escaping search text
 

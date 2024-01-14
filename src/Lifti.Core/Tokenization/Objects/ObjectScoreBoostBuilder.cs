@@ -14,9 +14,9 @@ namespace Lifti.Tokenization.Objects
         internal double FreshnessMultiplier { get; private set; }
 
         /// <summary>
-        /// Boosts results based on the freshness of the document extracted from the object. 
-        /// For example, if a multiplier of 3 is specified, then the score of the newest document will be 3 times higher than 
-        /// the oldest.
+        /// Freshness boosting allows you to boost results based on a date associated to the object. For example, assuming 
+        /// all the documents have exactly the same text and a multiplier of 3 is specified, then the score of the newest 
+        /// document will be 3 times higher than the oldest.
         /// </summary>
         /// <param name="freshnessProvider">
         /// The delegate capable of reading the freshness value from the object.
@@ -40,9 +40,8 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <summary>
-        /// Boosts results based on the magnitude of the document extracted from the object. 
-        /// For example, if a multiplier of 3 is specified, then the score of the document with the highest magnitude will be 3 
-        /// times higher than the one with the lowest magnitude.
+        /// Magnitude boosting allows you to boost results based on a numeric value associated to the object. For example, if you used this with a "star rating" property,
+        /// documents with a higher rating will be more likely to appear nearer the top of search results.
         /// </summary>
         /// <param name="magnitudeProvider">
         /// The delegate capable of reading the magnitude value from the object.

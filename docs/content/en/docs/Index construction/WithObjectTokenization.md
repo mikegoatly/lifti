@@ -19,7 +19,7 @@ public class Customer
 var index = new FullTextIndexBuilder<int>()
     .WithObjectTokenization<Customer>(o => o
         .WithKey(c => c.Id)
-        .WithField("Name", c => c.Name)
+        .WithField("Name", c => c.Name, scoreBoost: 1.5D)
         .WithField("Profile", c => c.ProfileHtml, textExtractor: new XmlTextExtractor())
         .WithDynamicFields("Tags", c => c.TagDictionary, "Tag_")
         .WithDynamicFields(
@@ -27,18 +27,23 @@ var index = new FullTextIndexBuilder<int>()
             c => c.Questions, 
             q => q.QuestionName, 
             q => q.QuestionResponse, 
-            "Question_")
+            "Question_",
+            scoreBoost: 1.8D)
+        .WithScoreBoosting(
+            boost => boost
+                .Freshness(c => c.UpdatedDate, 2D)
+                .Magnitude(c => c.Rating, 2D))
     )
     .Build();
 
 await index.AddAsync(new Customer { ... });
 ```
 
-## WithKey
+## `WithKey`
 
 Each object configured against the index must have a key of the same type as the index's key. `WithKey` defines how this key is read from the object.
 
-## WithField
+## `WithField`
 
 An object can be configured with one *static* fields that are known at compile time. The `WithField` method overloads allow for static fields to be defined.
 
@@ -73,7 +78,11 @@ Equivalent to [WithTextExtraction](./WithTextExtraction) but for use exclusively
 
 Equivalent to [WithDefaultThesaurus](./WithDefaultThesaurus) but for use exclusively with this field. Left null, the default thesaurus builder for the index will be used.
 
-## WithDynamicFields
+### `scoreBoost`
+
+The multiplier to apply to the score of this field when ranking results. The default value of 1 is equivalent to no boosting.
+
+## `WithDynamicFields`
 
 In addition to the static fields configured using `WithField`, it is possible to configure dynamic fields that are not known at compile time. The `WithDynamicFields`
 overloads allow for dynamic field readers to be defined, each of which will be invoked to retrieve the field names for the object being indexed.
@@ -105,14 +114,28 @@ Or you can provice a function that returns a collection of *child objects*:
 These last two overloads also require you provide two more delegates via the `getFieldName` and `getFieldText` parameters.
 These delegates are used to extract the field name and text from each child object.
 
-### fieldNamePrefix
+### `fieldNamePrefix`
 
 The prefix to use when constructing the field name. This is useful when the dynamic fields can produce the same field name as a static field,
 or a dynamic field from another dynamic field reader.
 
 ### Other `WithDynamicFields` parameters
 
-The `tokenizationOptions`, `textExtractor` and `thesaurusOptions` parameters are equivalent to their `WithField` counterparts.
+The `tokenizationOptions`, `textExtractor`, `thesaurusOptions` and `scoreBoost` parameters are equivalent to their `WithField` counterparts.
+
+## `WithScoreBoosting`
+
+Configures the score boosting options for the object type. These allow you to promote documents associated to objects based on related data.
+
+### `Freshness`
+
+Freshness boosting allows you to boost results based on a date associated to the object. For example, assuming all the documents have exactly the same text
+and a multiplier of 3 is specified, then the score of the newest document will be 3 times higher than the oldest.
+
+### `Magnitude`
+
+Magnitude boosting allows you to boost results based on a numeric value associated to the object. For example, if you used this with a "star rating" property,
+documents with a higher rating will be more likely to appear nearer the top of search results.
 
 ## Indexing multiple object types
 
