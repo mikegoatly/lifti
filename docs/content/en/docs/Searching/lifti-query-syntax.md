@@ -116,6 +116,8 @@ These allow for restricting searches within a given field.
 
 `title=analysis food` Searches for items with `"analysis"` in the title field *and* `"food"` in *any* field.
 
+If your field name contains spaces or other special characters, you can escape it using square brackets `[` and `]`, e.g. `[my field]=chocolate`.
+
 ---
 
 ### Sequential text (`"..."`)
@@ -150,3 +152,8 @@ Same as Near (`~`) except that order is important in the positional intersection
 Same as Near Following (`~>`) except there are no constraints on how far apart the words can be.
 
 `cheese > cake` will match any text where `"cheese"` precedes `"cake"` in a given field.
+
+## Escaping search text
+
+Use a backslash `\` when you want to explicitly search for a character that clashes with the query syntax. For example, `A\=B` will search for a single token containing 
+exactly "A=B", rather than attempting to perform a field restricted search.
