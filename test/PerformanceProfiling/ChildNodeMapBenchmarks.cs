@@ -38,7 +38,7 @@ namespace PerformanceProfiling
         }
 
         [Benchmark(OperationsPerInvoke = OperationCount)]
-        public object SingleEntry_NotMatched()
+        public IndexNode? SingleEntry_NotMatched()
         {
             var success = this.childNodeMapSingleEntry.TryGetValue('Z', out var nextNode);
 
@@ -46,7 +46,7 @@ namespace PerformanceProfiling
         }
 
         [Benchmark(OperationsPerInvoke = OperationCount)]
-        public object SingleEntry_Matched()
+        public IndexNode? SingleEntry_Matched()
         {
             var success = this.childNodeMapSingleEntry.TryGetValue('A', out var nextNode);
 
@@ -54,7 +54,7 @@ namespace PerformanceProfiling
         }
 
         [Benchmark(OperationsPerInvoke = OperationCount)]
-        public object TwoEntries_NotMatched()
+        public IndexNode? TwoEntries_NotMatched()
         {
             var success = this.childNodeMapTwoEntries.TryGetValue('D', out var nextNode);
 
@@ -62,7 +62,7 @@ namespace PerformanceProfiling
         }
 
         [Benchmark(OperationsPerInvoke = OperationCount)]
-        public object TwoEntries_Matched()
+        public IndexNode? TwoEntries_Matched()
         {
             var success = this.childNodeMapTwoEntries.TryGetValue('A', out var nextNode)
                 || this.childNodeMapTwoEntries.TryGetValue('E', out nextNode);
@@ -71,7 +71,7 @@ namespace PerformanceProfiling
         }
 
         [Benchmark(OperationsPerInvoke = OperationCount)]
-        public object MultipleEntries_NotMatched_BeforeStartCharacter()
+        public IndexNode? MultipleEntries_NotMatched_BeforeStartCharacter()
         {
             var success = this.childNodeMapMultipleEntries.TryGetValue('A', out var nextNode);
 
@@ -79,7 +79,7 @@ namespace PerformanceProfiling
         }
 
         [Benchmark(OperationsPerInvoke = OperationCount)]
-        public object MultipleEntries_NotMatched_AfterLastCharacter()
+        public IndexNode? MultipleEntries_NotMatched_AfterLastCharacter()
         {
             var success = this.childNodeMapMultipleEntries.TryGetValue('Z', out var nextNode);
 
@@ -87,7 +87,7 @@ namespace PerformanceProfiling
         }
 
         [Benchmark(OperationsPerInvoke = OperationCount)]
-        public object MultipleEntries_NotMatched_InCharacterSet()
+        public IndexNode? MultipleEntries_NotMatched_InCharacterSet()
         {
             var success = this.childNodeMapMultipleEntries.TryGetValue('U', out var nextNode);
 
@@ -95,7 +95,7 @@ namespace PerformanceProfiling
         }
 
         [Benchmark(OperationsPerInvoke = OperationCount)]
-        public object MultipleEntries_Matched()
+        public IndexNode? MultipleEntries_Matched()
         {
             var success = this.childNodeMapMultipleEntries.TryGetValue('F', out var nextNode)
                 || this.childNodeMapMultipleEntries.TryGetValue('T', out nextNode)

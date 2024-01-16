@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 using Lifti.Serialization.Binary;
 using System;
 using System.IO;
@@ -9,8 +8,8 @@ namespace PerformanceProfiling
 {
     public class SerializationBenchmarks : IndexBenchmarkBase
     {
-        private BinarySerializer<int> serializer;
-        private string fileName;
+        private readonly BinarySerializer<int> serializer = new();
+        private readonly string fileName = $"{Guid.NewGuid()}.dat";
 
         [GlobalSetup]
         public async Task Setup()
@@ -18,8 +17,6 @@ namespace PerformanceProfiling
             var index = CreateNewIndex(2);
             await this.PopulateIndexAsync(index);
 
-            this.serializer = new BinarySerializer<int>();
-            this.fileName = $"{Guid.NewGuid()}.dat";
             using var stream = File.OpenWrite(this.fileName);
             await this.serializer.SerializeAsync(index, stream, true);
         }

@@ -6,12 +6,11 @@ namespace PerformanceProfiling
 {
     public class RemovalFromIndexBenchmarks : IndexBenchmarkBase
     {
-        private IFullTextIndex<int> index;
+        private readonly IFullTextIndex<int> index = CreateNewIndex(4);
 
         [GlobalSetup]
         public async Task SetUp()
         {
-            this.index = CreateNewIndex(4);
             await this.PopulateIndexAsync(this.index);
         }
 
