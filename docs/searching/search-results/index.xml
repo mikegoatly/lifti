@@ -26,15 +26,15 @@
         
         &lt;h2 id=&#34;creatematchphrasesasync-and-creatematchphrases&#34;&gt;&lt;code&gt;CreateMatchPhrasesAsync&lt;/code&gt; and &lt;code&gt;CreateMatchPhrases&lt;/code&gt;&lt;/h2&gt;
 &lt;p&gt;The intent of the &lt;code&gt;ISearchResults&amp;lt;T&amp;gt;.CreateMatchPhrasesAsync&lt;/code&gt; methods is to allow you to provide a mechanism by which
-LIFTI can retrieve the original source text, from items or loosely indexed text, and automatically
+LIFTI can retrieve the original source text, from objects or loosely indexed text, and automatically
 extract phrases for the matched token locations. Where a multiple tokens are matched in a sequence, they will be combined into
 a single phrase.&lt;/p&gt;
-&lt;p&gt;For the &lt;code&gt;CreateMatchPhrasesAsync&amp;lt;TItem&amp;gt;&lt;/code&gt; overloads that create the matched phrases from an indexed item of type &lt;code&gt;TItem&lt;/code&gt;,
-you can either fetch the items one at a time, or be provided with a list of item ids and fetch all the relevant items
+&lt;p&gt;For the &lt;code&gt;CreateMatchPhrasesAsync&amp;lt;TObject&amp;gt;&lt;/code&gt; overloads that create the matched phrases from an indexed object of type &lt;code&gt;TObject&lt;/code&gt;,
+you can either fetch the objects one at a time, or be provided with a list of keys and fetch all the relevant objects
 in bulk. The latter is more efficient if you are having to go to an external source for the data, e.g. using a database
 query.&lt;/p&gt;
 &lt;h3 id=&#34;example&#34;&gt;Example&lt;/h3&gt;
-&lt;p&gt;This example demonstrates searching against an index of &lt;code&gt;Book&lt;/code&gt; items:&lt;/p&gt;
+&lt;p&gt;This example demonstrates searching against an index of &lt;code&gt;Book&lt;/code&gt; objects:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Book&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;BookId&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;get&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;set&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
@@ -69,7 +69,7 @@ query.&lt;/p&gt;
     </item>
     
     <item>
-      <title>Docs: Search Result Scoring</title>
+      <title>Docs: Search result scoring</title>
       <link>https://mikegoatly.github.io/lifti/docs/searching/search-results/scoring/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
@@ -110,7 +110,15 @@ scores for search results depending on the distance between the target word and 
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Output&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// 1&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// 2&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;score-boosting&#34;&gt;Score boosting&lt;/h2&gt;
+&lt;p&gt;You can boost scores in a number of ways:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Boosting search terms as &lt;a href=&#34;../../lifti-query-syntax#score-boosting&#34;&gt;part of the query&lt;/a&gt;: &lt;code&gt;thanks^1.5&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Boosting &lt;a href=&#34;../../../index-construction/withobjecttokenization#scoreboost&#34;&gt;fields&lt;/a&gt; associated to an object: &lt;code&gt;.WithField(&amp;quot;Name&amp;quot;, c =&amp;gt; c.Name, scoreBoost: 1.5D)&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Boosting objects based on a &lt;a href=&#34;../../../index-construction/withobjecttokenization#withscoreboosting&#34;&gt;freshness date&lt;/a&gt;, e.g. the date it was last updated.&lt;/li&gt;
+&lt;li&gt;Boosting objects based on a &lt;a href=&#34;../../../index-construction/withobjecttokenization#withscoreboosting&#34;&gt;magnitude value&lt;/a&gt;, e.g. a star rating.&lt;/li&gt;
+&lt;/ul&gt;
+
       </description>
     </item>
     

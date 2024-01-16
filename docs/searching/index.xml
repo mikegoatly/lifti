@@ -40,6 +40,10 @@
 &lt;td&gt;&lt;strong&gt;West&lt;/strong&gt; must appear in the text &lt;a href=&#34;#exact-word-matches&#34;&gt;exactly&lt;/a&gt;.&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
+&lt;td&gt;West|Wing^2&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;West&lt;/strong&gt; or &lt;strong&gt;Wing&lt;/strong&gt; must appear in the text &lt;a href=&#34;#exact-word-matches&#34;&gt;exactly&lt;/a&gt;, where matches on &lt;strong&gt;Wing&lt;/strong&gt; will have a &lt;a href=&#34;#score-boosting&#34;&gt;score boost&lt;/a&gt; of 2.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
 &lt;td&gt;?Wst&lt;/td&gt;
 &lt;td&gt;Words that &lt;a href=&#34;#fuzzy-match-&#34;&gt;fuzzy match&lt;/a&gt; with &lt;strong&gt;wst&lt;/strong&gt; must appear in the text.&lt;/td&gt;
 &lt;/tr&gt;
@@ -153,11 +157,11 @@ will be treated as a fuzzy match.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h3 id=&#34;and-&#34;&gt;And (&lt;code&gt;&amp;amp;&lt;/code&gt;)&lt;/h3&gt;
 &lt;p&gt;The and operator (&lt;code&gt;&amp;amp;&lt;/code&gt;) Performs an intersection of two intermediate query results, combining word positions for successful matches.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;Food &amp;amp; Burger&lt;/code&gt; searches for items containing both &lt;code&gt;&amp;quot;food&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;burger&amp;quot;&lt;/code&gt; at any position, and in any field.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Food &amp;amp; Burger&lt;/code&gt; searches for documents containing both &lt;code&gt;&amp;quot;food&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;burger&amp;quot;&lt;/code&gt; at any position, and in any field.&lt;/p&gt;
 &lt;p&gt;(Alternatively &lt;code&gt;Food Burger&lt;/code&gt; will have the same effect as the default operator between query parts is an &lt;code&gt;&amp;amp;&lt;/code&gt;.)&lt;/p&gt;
 &lt;hr&gt;
 &lt;h3 id=&#34;or-&#34;&gt;Or (&lt;code&gt;|&lt;/code&gt;)&lt;/h3&gt;
-&lt;p&gt;Performs a union of two intermediate query results. Where an items appears in both sets, word positions are combined into one list.&lt;/p&gt;
+&lt;p&gt;Performs a union of two intermediate query results. Where a document appears in both sets, word positions are combined into one list.&lt;/p&gt;
 &lt;p&gt;Restricts results to same field by default: &lt;strong&gt;false&lt;/strong&gt;&lt;/p&gt;
 &lt;hr&gt;
 &lt;h3 id=&#34;bracketing-expressions&#34;&gt;Bracketing expressions&lt;/h3&gt;
@@ -166,18 +170,19 @@ will be treated as a fuzzy match.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h3 id=&#34;field-restrictions-field&#34;&gt;Field restrictions (&lt;code&gt;field=...&lt;/code&gt;)&lt;/h3&gt;
 &lt;p&gt;These allow for restricting searches within a given field.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;title=analysis | body=(chocolate &amp;amp; cake)&lt;/code&gt; Searches for items with &lt;code&gt;&amp;quot;analysis&amp;quot;&lt;/code&gt; in the title field &lt;em&gt;or both&lt;/em&gt; &lt;code&gt;&amp;quot;chocolate&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;cake&amp;quot;&lt;/code&gt; in the body field.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;title=analysis food&lt;/code&gt; Searches for items with &lt;code&gt;&amp;quot;analysis&amp;quot;&lt;/code&gt; in the title field &lt;em&gt;and&lt;/em&gt; &lt;code&gt;&amp;quot;food&amp;quot;&lt;/code&gt; in &lt;em&gt;any&lt;/em&gt; field.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;title=analysis | body=(chocolate &amp;amp; cake)&lt;/code&gt; Searches for documents with &lt;code&gt;&amp;quot;analysis&amp;quot;&lt;/code&gt; in the title field &lt;em&gt;or both&lt;/em&gt; &lt;code&gt;&amp;quot;chocolate&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;cake&amp;quot;&lt;/code&gt; in the body field.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;title=analysis food&lt;/code&gt; Searches for documents with &lt;code&gt;&amp;quot;analysis&amp;quot;&lt;/code&gt; in the title field &lt;em&gt;and&lt;/em&gt; &lt;code&gt;&amp;quot;food&amp;quot;&lt;/code&gt; in &lt;em&gt;any&lt;/em&gt; field.&lt;/p&gt;
+&lt;p&gt;If your field name contains spaces or other special characters, you can escape it using square brackets &lt;code&gt;[&lt;/code&gt; and &lt;code&gt;]&lt;/code&gt;, e.g. &lt;code&gt;[my field]=chocolate&lt;/code&gt;.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h3 id=&#34;sequential-text-&#34;&gt;Sequential text (&lt;code&gt;&amp;quot;...&amp;quot;&lt;/code&gt;)&lt;/h3&gt;
 &lt;p&gt;Placing quotes around a search phrase will enforce that the words all appear
 immediately next to each other in the source text.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;&amp;quot;cheese burger&amp;quot;&lt;/code&gt; will only match items that have text containing &lt;code&gt;&amp;quot;cheese&amp;quot;&lt;/code&gt; followed immediately by &lt;code&gt;&amp;quot;burger&amp;quot;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&amp;quot;cheese burger&amp;quot;&lt;/code&gt; will only match documents that have text containing &lt;code&gt;&amp;quot;cheese&amp;quot;&lt;/code&gt; followed immediately by &lt;code&gt;&amp;quot;burger&amp;quot;&lt;/code&gt;.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h3 id=&#34;near--and-n&#34;&gt;Near (&lt;code&gt;~&lt;/code&gt; and &lt;code&gt;~n&lt;/code&gt;)&lt;/h3&gt;
 &lt;p&gt;The near operator performs a positional intersection of two results based on the position of the word in a field.&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;~&lt;/code&gt; operator requires that words must be within 5 words of one another. This can value can be controlled by specifying a number, e.g. &lt;code&gt;~4&lt;/code&gt; to restrict to only returning results within 4 words of one another.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;cheese ~ cake&lt;/code&gt; will return items containing the words &lt;code&gt;&amp;quot;cheese&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;cake&amp;quot;&lt;/code&gt; in either order, up to 5 words apart, e.g. &lt;code&gt;&amp;quot;the cake was made with cheese&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;I like cheese and cake&amp;quot;&lt;/code&gt; would both match, but &lt;code&gt;&amp;quot;cake is never to be considered a substitute for cheese&amp;quot;&lt;/code&gt; would not.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;cheese ~ cake&lt;/code&gt; will return documents containing the words &lt;code&gt;&amp;quot;cheese&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;cake&amp;quot;&lt;/code&gt; in either order, up to 5 words apart, e.g. &lt;code&gt;&amp;quot;the cake was made with cheese&amp;quot;&lt;/code&gt; and &lt;code&gt;&amp;quot;I like cheese and cake&amp;quot;&lt;/code&gt; would both match, but &lt;code&gt;&amp;quot;cake is never to be considered a substitute for cheese&amp;quot;&lt;/code&gt; would not.&lt;/p&gt;
 &lt;hr&gt;
 &lt;h3 id=&#34;near-following--and-n&#34;&gt;Near following (&lt;code&gt;~&amp;gt;&lt;/code&gt; and &lt;code&gt;~n&amp;gt;&lt;/code&gt;)&lt;/h3&gt;
 &lt;p&gt;Same as Near (&lt;code&gt;~&lt;/code&gt;) except that order is important in the positional intersection.&lt;/p&gt;
@@ -186,6 +191,51 @@ immediately next to each other in the source text.&lt;/p&gt;
 &lt;h3 id=&#34;following-&#34;&gt;Following (&lt;code&gt;&amp;gt;&lt;/code&gt;)&lt;/h3&gt;
 &lt;p&gt;Same as Near Following (&lt;code&gt;~&amp;gt;&lt;/code&gt;) except there are no constraints on how far apart the words can be.&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;cheese &amp;gt; cake&lt;/code&gt; will match any text where &lt;code&gt;&amp;quot;cheese&amp;quot;&lt;/code&gt; precedes &lt;code&gt;&amp;quot;cake&amp;quot;&lt;/code&gt; in a given field.&lt;/p&gt;
+&lt;h2 id=&#34;score-boosting&#34;&gt;Score boosting&lt;/h2&gt;
+&lt;p&gt;Wildcard, fuzzy match and exact match search terms can have their resulting scores boosted by adding &lt;code&gt;^n&lt;/code&gt; after them. For example, &lt;code&gt;wild^2&lt;/code&gt; will boost matches of &amp;ldquo;wild&amp;rdquo; by 2x.&lt;/p&gt;
+&lt;h2 id=&#34;escaping-search-text&#34;&gt;Escaping search text&lt;/h2&gt;
+&lt;p&gt;Use a backslash &lt;code&gt;\&lt;/code&gt; when you want to explicitly search for a character that clashes with the query syntax. For example, &lt;code&gt;A\=B&lt;/code&gt; will search for a single token containing
+exactly &amp;ldquo;A=B&amp;rdquo;, rather than attempting to perform a field restricted search.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Query execution</title>
+      <link>https://mikegoatly.github.io/lifti/docs/searching/query-execution/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://mikegoatly.github.io/lifti/docs/searching/query-execution/</guid>
+      <description>
+        
+        
+        &lt;p&gt;LIFTI&amp;rsquo;s query execution logic employs a strategic approach to optimize query performance, prioritizing the execution of query parts based on their calculated weights.
+This weight represents the relative cost and effectiveness of executing a particular query part in relation to the overall document set. By assigning these weights,
+LIFTI aims to minimize the number of documents involved early in the query execution, thereby reducing the computational load and improving efficiency.&lt;/p&gt;
+&lt;h3 id=&#34;scoring-mechanism-overview&#34;&gt;Scoring Mechanism Overview&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;General Principle&lt;/strong&gt;: Each query part is assigned a &amp;ldquo;weight&amp;rdquo; based on its expected execution cost and the number of documents it is likely to involve.
+The objective is to execute less costly parts first, reducing the document set size early in the process.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Weighting Calculations for Different Query Parts&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ExactWordQueryPart&lt;/strong&gt;: Uses inverse document count. Weight = &lt;code&gt;Matching Document Count / Total Document Count&lt;/code&gt;. Lower weights will result for words bringing in fewer documents.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WildcardQueryPart&lt;/strong&gt;: A complex calculation involving the count of text matches, multi-character, and single-character wildcard matches, with different multipliers. Weight is reduced if the first query part is a text match, and increased it it has a leading multi-character match.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;FuzzyMatchQueryPart&lt;/strong&gt;: Based on the ExactWordQueryPart&amp;rsquo;s weighting, adding a factor for the number of edits allowed. Weight increases with more permissible edits.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;AdjacentWordsQueryPart&lt;/strong&gt;: Assumes the score of the first part of the query, adjusted by the inverse of the number of parts.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Intersection Query Parts&lt;/strong&gt; (AndQueryPart, PrecedingNearQueryPart, NearQueryPart, PrecedingQueryPart): Promotes parts based on the lowest scoring part of the intersection, encouraging execution of the cheapest part first.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;OrQueryOperator&lt;/strong&gt;: A union operation always requires both sides to be evaluated, so weight = &lt;code&gt;Left Score + Right Score&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;FieldFilterQueryOperator&lt;/strong&gt;: Applies additional filtering, thus promoted. Weight = &lt;code&gt;Child Part Score * 0.5&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;BracketedQueryPart&lt;/strong&gt;: Reflects the score of the child part.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;execution-strategy&#34;&gt;Execution Strategy&lt;/h3&gt;
+&lt;p&gt;The execution order is determined by these weightings, with lower weights prioritized. This approach ensures that the query processor can efficiently
+filter and score documents, avoiding unnecessary computations on documents that would later be excluded. This system is especially beneficial in queries with multiple parts,
+where early reduction in document set size can lead to significant performance improvements.&lt;/p&gt;
 
       </description>
     </item>
@@ -283,7 +333,7 @@ information about the fields that have been indexed.&lt;/p&gt;
 &lt;/ul&gt;
 &lt;h4 id=&#34;methods&#34;&gt;Methods&lt;/h4&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;ReadAsync(object item, CancellationToken cancellationToken)&lt;/strong&gt;: Reads the text for the field from the specified item. The item must be of the type specified by the &lt;code&gt;ObjectType&lt;/code&gt; property.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ReadAsync(object item, CancellationToken cancellationToken)&lt;/strong&gt;: Reads the text for the field from the specified object. The object must be of the type specified by the &lt;code&gt;ObjectType&lt;/code&gt; property.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;isknownfieldtype-objecttype-string-fieldname&#34;&gt;&lt;code&gt;IsKnownField(Type objectType, string fieldName)&lt;/code&gt;&lt;/h2&gt;
 &lt;p&gt;Returns &lt;code&gt;true&lt;/code&gt; if the given field name is known to the index and associated to the given object type, whether statically defined at index creation, or dynamically registered during indexing.&lt;/p&gt;
@@ -368,25 +418,25 @@ information about the fields that have been indexed.&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;&lt;code&gt;field=&lt;/code&gt; in LIFTI query syntax&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;Restricts the resulting item matches to only those that include matching tokens in a specific field.&lt;/p&gt;
+&lt;p&gt;Restricts the resulting document matches to only those that include matching tokens in a specific field.&lt;/p&gt;
 &lt;h4 id=&#34;nearqueryoperatoriquerypart-left-iquerypart-right-int-tolerance--5&#34;&gt;&lt;code&gt;NearQueryOperator(IQueryPart left, IQueryPart right, int tolerance = 5)&lt;/code&gt;&lt;/h4&gt;
 &lt;blockquote&gt;
 &lt;p&gt;&lt;code&gt;~n&lt;/code&gt; in LIFTI query syntax&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;Produces an intersection of two &lt;code&gt;IQueryPart&lt;/code&gt;s, restricting an item&amp;rsquo;s field matches such that the locations are close to one another.&lt;/p&gt;
-&lt;p&gt;Items that result in no field matches are filtered out.&lt;/p&gt;
+&lt;p&gt;Produces an intersection of two &lt;code&gt;IQueryPart&lt;/code&gt;s, restricting an document&amp;rsquo;s field matches such that the locations are close to one another.&lt;/p&gt;
+&lt;p&gt;Documents that result in no field matches are filtered out.&lt;/p&gt;
 &lt;h4 id=&#34;precedingnearqueryoperatoriquerypart-left-iquerypart-right-int-tolerance--5&#34;&gt;&lt;code&gt;PrecedingNearQueryOperator(IQueryPart left, IQueryPart right, int tolerance = 5)&lt;/code&gt;&lt;/h4&gt;
 &lt;blockquote&gt;
 &lt;p&gt;&lt;code&gt;~n&amp;gt;&lt;/code&gt; in LIFTI query syntax&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;Produces an intersection of two &lt;code&gt;IQueryPart&lt;/code&gt;s, restricting an item&amp;rsquo;s field matches such that the locations of the first appear before the locations of the second and within a specified tolerance.&lt;/p&gt;
-&lt;p&gt;Items that result in no field matches are filtered out.&lt;/p&gt;
+&lt;p&gt;Produces an intersection of two &lt;code&gt;IQueryPart&lt;/code&gt;s, restricting an document&amp;rsquo;s field matches such that the locations of the first appear before the locations of the second and within a specified tolerance.&lt;/p&gt;
+&lt;p&gt;Documents that result in no field matches are filtered out.&lt;/p&gt;
 &lt;h4 id=&#34;precedingqueryoperatoriquerypart-left-iquerypart-right&#34;&gt;&lt;code&gt;PrecedingQueryOperator(IQueryPart left, IQueryPart right)&lt;/code&gt;&lt;/h4&gt;
 &lt;blockquote&gt;
 &lt;p&gt;&lt;code&gt;&amp;gt;&lt;/code&gt; in LIFTI query syntax&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;Produces an intersection of two &lt;code&gt;IQueryPart&lt;/code&gt;s, restricting an item&amp;rsquo;s field matches such that the locations of the first appear before the locations of the second.&lt;/p&gt;
-&lt;p&gt;Items that result in no field matches are filtered out.&lt;/p&gt;
+&lt;p&gt;Produces an intersection of two &lt;code&gt;IQueryPart&lt;/code&gt;s, restricting an document&amp;rsquo;s field matches such that the locations of the first appear before the locations of the second.&lt;/p&gt;
+&lt;p&gt;Documents that result in no field matches are filtered out.&lt;/p&gt;
 
       </description>
     </item>
@@ -477,21 +527,21 @@ navigation of the index.&lt;/p&gt;
         
         &lt;h2 id=&#34;search-result-order&#34;&gt;Search result order&lt;/h2&gt;
 &lt;p&gt;Search results are returned sorted according to the total document score, in descending order. See &lt;a href=&#34;./scoring&#34;&gt;scoring&lt;/a&gt; for more information.&lt;/p&gt;
-&lt;h2 id=&#34;searchresultlttgt&#34;&gt;SearchResult&amp;lt;T&amp;gt;&lt;/h2&gt;
-&lt;h3 id=&#34;t-item--get-&#34;&gt;T Item { get; }&lt;/h3&gt;
-&lt;p&gt;The item that matched the search criteria.&lt;/p&gt;
-&lt;h3 id=&#34;ireadonlylistltfieldsearchresultgt-fieldmatches--get-&#34;&gt;IReadOnlyList&amp;lt;FieldSearchResult&amp;gt; FieldMatches { get; }&lt;/h3&gt;
-&lt;p&gt;The fields that were matched for the item. Each of these is scored independently and provides detailed information
+&lt;h2 id=&#34;searchresultlttkeygt&#34;&gt;&lt;code&gt;SearchResult&amp;amp;lt;TKey&amp;amp;gt;&lt;/code&gt;&lt;/h2&gt;
+&lt;h3 id=&#34;tkey-key--get-&#34;&gt;&lt;code&gt;TKey Key { get; }&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;The key for the document that matched the search criteria.&lt;/p&gt;
+&lt;h3 id=&#34;ireadonlylistltfieldsearchresultgt-fieldmatches--get-&#34;&gt;&lt;code&gt;IReadOnlyList&amp;amp;lt;FieldSearchResult&amp;amp;gt; FieldMatches { get; }&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;The fields that were matched for the document. Each of these is scored independently and provides detailed information
 about the location of the words that were matched.&lt;/p&gt;
-&lt;h3 id=&#34;double-score--get-&#34;&gt;double Score { get; }&lt;/h3&gt;
+&lt;h3 id=&#34;double-score--get-&#34;&gt;&lt;code&gt;double Score { get; }&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;The overall score for this match. This is a sum of the scores for this instance&amp;rsquo;s FieldMatches.&lt;/p&gt;
-&lt;h2 id=&#34;fieldsearchresult&#34;&gt;FieldSearchResult&lt;/h2&gt;
-&lt;h3 id=&#34;string-foundin--get-&#34;&gt;string FoundIn { get; }&lt;/h3&gt;
+&lt;h2 id=&#34;fieldsearchresult&#34;&gt;&lt;code&gt;FieldSearchResult&lt;/code&gt;&lt;/h2&gt;
+&lt;h3 id=&#34;string-foundin--get-&#34;&gt;&lt;code&gt;string FoundIn { get; }&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;The name of the field that the search results were found in. This will be one of the field names configured when the index was built, or &lt;code&gt;Unspecified&lt;/code&gt; if no fields were configured.&lt;/p&gt;
-&lt;h3 id=&#34;double-score--get--1&#34;&gt;double Score { get; }&lt;/h3&gt;
+&lt;h3 id=&#34;double-score--get--1&#34;&gt;&lt;code&gt;double Score { get; }&lt;/code&gt;&lt;/h3&gt;
 &lt;p&gt;The score for this particular field.&lt;/p&gt;
-&lt;h3 id=&#34;ireadonlylistltwordlocationgt-locations--get-&#34;&gt;IReadOnlyList&amp;lt;WordLocation&amp;gt; Locations { get; }&lt;/h3&gt;
-&lt;p&gt;The &lt;code&gt;WordLocation&lt;/code&gt; instances for the locations of the matched words in the field.&lt;/p&gt;
+&lt;h3 id=&#34;ireadonlylistlttokenlocationgt-locations--get-&#34;&gt;&lt;code&gt;IReadOnlyList&amp;amp;lt;TokenLocation&amp;amp;gt; Locations { get; }&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;TokenLocation&lt;/code&gt; instances for the locations of the matched tokens in the field.&lt;/p&gt;
 
       </description>
     </item>
