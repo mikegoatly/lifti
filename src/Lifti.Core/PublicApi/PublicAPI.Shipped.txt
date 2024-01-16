@@ -262,8 +262,8 @@ Lifti.Querying.FieldScoreBoostProvider.GetScoreBoost(byte fieldId) -> double
 Lifti.Querying.IFieldScoreBoostProvider
 Lifti.Querying.IFieldScoreBoostProvider.GetScoreBoost(byte fieldId) -> double
 Lifti.Querying.IIndexNavigator
-Lifti.Querying.IIndexNavigator.AddExactAndChildMatches(Lifti.Querying.QueryContext! queryContext, Lifti.Querying.Lifti.Querying.DocumentMatchCollector! documentMatchCollector, double weighting = 1) -> void
-Lifti.Querying.IIndexNavigator.AddExactMatches(Lifti.Querying.QueryContext! queryContext, Lifti.Querying.Lifti.Querying.DocumentMatchCollector! documentMatchCollector, double weighting = 1) -> void
+Lifti.Querying.IIndexNavigator.AddExactAndChildMatches(Lifti.Querying.QueryContext! queryContext, Lifti.Querying.DocumentMatchCollector! documentMatchCollector, double weighting = 1) -> void
+Lifti.Querying.IIndexNavigator.AddExactMatches(Lifti.Querying.QueryContext! queryContext, Lifti.Querying.DocumentMatchCollector! documentMatchCollector, double weighting = 1) -> void
 Lifti.Querying.IIndexNavigator.CreateBookmark() -> Lifti.Querying.IIndexNavigatorBookmark!
 Lifti.Querying.IIndexNavigator.EnumerateIndexedTokens() -> System.Collections.Generic.IEnumerable<string!>!
 Lifti.Querying.IIndexNavigator.EnumerateNextCharacters() -> System.Collections.Generic.IEnumerable<char>!
@@ -296,9 +296,9 @@ Lifti.Querying.IQueryParser
 Lifti.Querying.IQueryParser.Parse(Lifti.IIndexedFieldLookup! fieldLookup, string! queryText, Lifti.IIndexTokenizerProvider! tokenizerProvider) -> Lifti.Querying.IQuery!
 Lifti.Querying.IScorer
 Lifti.Querying.IScorer.CalculateScore(int totalMatchedDocuments, int documentId, byte fieldId, System.Collections.Generic.IReadOnlyList<Lifti.TokenLocation!>! tokenLocations, double weighting) -> double
-Lifti.Querying.Lifti.Querying.DocumentMatchCollector
-Lifti.Querying.Lifti.Querying.DocumentMatchCollector.DocumentMatchCollector() -> void
-Lifti.Querying.Lifti.Querying.DocumentMatchCollector.ToIntermediateQueryResult() -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.DocumentMatchCollector
+Lifti.Querying.DocumentMatchCollector.DocumentMatchCollector() -> void
+Lifti.Querying.DocumentMatchCollector.ToIntermediateQueryResult() -> Lifti.Querying.IntermediateQueryResult
 Lifti.Querying.OkapiBm25ScorerFactory
 Lifti.Querying.OkapiBm25ScorerFactory.CreateIndexScorer(Lifti.IIndexSnapshot! indexSnapshot) -> Lifti.Querying.IScorer!
 Lifti.Querying.OkapiBm25ScorerFactory.OkapiBm25ScorerFactory(double k1 = 1.2, double b = 0.75) -> void

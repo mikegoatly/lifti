@@ -2,7 +2,6 @@
 // Enabling TRACK_MATCH_STATE_TEXT in DEBUG builds will allow you inspect the state of a fuzzy match
 // as it is being processed using the MatchText property. This is not available in release builds for performance.
 
-using Lifti.Querying.Lifti.Querying;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;

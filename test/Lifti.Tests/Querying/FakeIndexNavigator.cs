@@ -1,5 +1,4 @@
 ﻿using Lifti.Querying;
-using Lifti.Querying.Lifti.Querying;
 using Lifti.Tests.Fakes;
 using System;
 using System.Collections.Generic;

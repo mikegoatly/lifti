@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Lifti.Querying.Lifti.Querying;
+using Lifti.Querying;
 using Xunit;
 
 namespace Lifti.Tests.Querying
