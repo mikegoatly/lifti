@@ -25,6 +25,9 @@ namespace Lifti
         }
 
         /// <inheritdoc />
+        public int Count => this.searchResults.Count;
+
+        /// <inheritdoc />
         public ISearchResults<TKey> OrderByField(string fieldName)
         {
             return new SearchResults<TKey>(

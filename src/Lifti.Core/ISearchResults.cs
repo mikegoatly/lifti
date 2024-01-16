@@ -11,6 +11,11 @@ namespace Lifti
     /// <typeparam name="TKey"></typeparam>
     public interface ISearchResults<TKey> : IEnumerable<SearchResult<TKey>>
     {
+        /// <summary>
+        /// Gets the number of results in the set.
+        /// </summary>
+        int Count { get; }
+
         /// <inheritdoc cref="CreateMatchPhrasesAsync{TObject}(Func{TKey, TObject}, CancellationToken)"/>
         /// <param name="loadItems">
         /// A function capable of retrieving all the original objects that were indexed.
