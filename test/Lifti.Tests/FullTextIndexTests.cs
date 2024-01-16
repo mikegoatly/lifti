@@ -8,14 +8,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Lifti.Tests
 {
     public class FullTextIndexTests
     {
         private readonly FullTextIndex<string> index;
+        private readonly ITestOutputHelper testOutput;
 
-        public FullTextIndexTests()
+        public FullTextIndexTests(ITestOutputHelper testOutput)
         {
             this.index = new FullTextIndexBuilder<string>()
                 .WithObjectTokenization<TestObject>(
@@ -32,6 +34,7 @@ namespace Lifti.Tests
                         .WithField("TextAsync", i => Task.Run(() => i.Text))
                         .WithField("MultiTextAsync", i => Task.Run(() => (IEnumerable<string>)i.MultiText)))
                 .Build();
+            this.testOutput = testOutput;
         }
 
         [Fact]
@@ -546,6 +549,43 @@ namespace Lifti.Tests
             // "D" should be returned first, and have 10x the score of "C" because of the 10x boost on the dynamic field
             var results = index.Search("Happy").ToList();
             results.Select(x => x.Key).Should().BeEquivalentTo(new[] { "D", "C" }, o => o.WithStrictOrdering());
+        }
+
+        [Fact]
+        public async Task ReadingIndexWhileWritingToIt_ShouldNotResultInErrors()
+        {
+            var indexing = true;
+
+            // Set up two tasks - one will add a wikipedia page to the index and sleep for 10ms, the other
+            // will continually search the index using a full wildcard search. This should never error.
+            var addTask = Task.Run(async () =>
+            {
+                var wikipediaTests = WikipediaDataLoader.Load(this.GetType());
+                foreach (var (name, text) in wikipediaTests.Take(100))
+                {
+                    await this.index.AddAsync(name, text);
+                }
+
+                // Now remove them again
+                foreach (var (name, _) in wikipediaTests.Take(100))
+                {
+                    await this.index.RemoveAsync(name);
+                }
+
+                indexing = false;
+            });
+
+            var searchTask = Task.Run(async () =>
+            {
+                while (indexing)
+                {
+                    await Task.Delay(2);
+                    var results = this.index.Search("*");
+                    this.testOutput.WriteLine($"Matched {results.Count} results");
+                }
+            });
+
+            await Task.WhenAll(addTask, searchTask);
         }
 
         private static async Task<FullTextIndex<string>> CreateDynamicObjectTestIndexAsync(
