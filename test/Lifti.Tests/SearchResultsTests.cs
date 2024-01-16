@@ -163,39 +163,39 @@ namespace Lifti.Tests
                 async () => await this.sut.CreateMatchPhrasesAsync(async (x, ct) => await Task.Run(() => this.defaultFieldTestData[x], ct), cts.Token));
         }
 
-        private void VerifyDefaultFieldPhrases(IEnumerable<ItemPhrases<int>> phrases)
+        private void VerifyDefaultFieldPhrases(IEnumerable<DocumentPhrases<int>> phrases)
         {
             phrases.Should().BeEquivalentTo(
                 new[]
                 {
-                    new ItemPhrases<int>(
+                    new DocumentPhrases<int>(
                         this.sut.Single(x => x.Key == 101),
                         new[] { new FieldPhrases<int>(IndexedFieldLookup.DefaultFieldName, "quick brown fox") }),
-                    new ItemPhrases<int>(
+                    new DocumentPhrases<int>(
                         this.sut.Single(x => x.Key == 102),
                         new[] { new FieldPhrases<int>(IndexedFieldLookup.DefaultFieldName, "brown") }),
-                    new ItemPhrases<int>(
+                    new DocumentPhrases<int>(
                         this.sut.Single(x => x.Key == 103),
                         new[] { new FieldPhrases<int>(IndexedFieldLookup.DefaultFieldName, "quick fox", "brown") })
                  });
         }
 
-        private void VerifyObjectResults<TItem>(Dictionary<int, TItem> sourceItems, string expectedFieldName, IEnumerable<ItemPhrases<int, TItem>> phrases)
+        private void VerifyObjectResults<TObject>(Dictionary<int, TObject> sourceItems, string expectedFieldName, IEnumerable<DocumentPhrases<int, TObject>> phrases)
         {
             var source = sourceItems.ToList();
 
             phrases.Should().BeEquivalentTo(
                 new[]
                 {
-                    new ItemPhrases<int, TItem>(
+                    new DocumentPhrases<int, TObject>(
                         source[0].Value,
                         this.sut.Single(x => x.Key == source[0].Key),
                         new[] { new FieldPhrases<int>(expectedFieldName, "quick brown fox" )}),
-                    new ItemPhrases<int, TItem>(
+                    new DocumentPhrases<int, TObject>(
                         source[1].Value,
                         this.sut.Single(x => x.Key == source[1].Key),
                         new[] { new FieldPhrases<int>(expectedFieldName,  "brown" )}),
-                    new ItemPhrases<int, TItem>(
+                    new DocumentPhrases<int, TObject>(
                         source[2].Value,
                         this.sut.Single(x => x.Key == source[2].Key),
                         new[] { new FieldPhrases<int>(expectedFieldName,  "quick fox", "brown") })

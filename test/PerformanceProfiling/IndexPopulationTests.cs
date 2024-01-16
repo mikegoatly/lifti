@@ -1,5 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
+
 using System.Threading.Tasks;
 
 namespace PerformanceProfiling

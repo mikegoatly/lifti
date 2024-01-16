@@ -1,13 +1,16 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
-    internal class IndexWriter<TKey> : IIndexWriter<TKey>
+    internal class IndexWriter<TKey> : IndexSerializerBase<TKey>
     {
-        private const ushort Version = 5;
+        private const ushort Version = 6;
         private readonly Stream underlyingStream;
         private readonly bool disposeStream;
         private readonly IKeySerializer<TKey> keySerializer;
@@ -23,37 +26,38 @@ namespace Lifti.Serialization.Binary
             this.writer = new BinaryWriter(this.buffer, Encoding.UTF8);
         }
 
-        public async Task WriteAsync(IIndexSnapshot<TKey> snapshot)
+        protected override void Dispose(bool disposing)
         {
-            await this.WriteHeaderAsync(snapshot).ConfigureAwait(false);
+            base.Dispose(disposing);
 
-            await this.WriteFieldsAsync(snapshot).ConfigureAwait(false);
+            if (disposing)
+            {
+                this.writer.Dispose();
+                this.buffer.Dispose();
 
-            await this.WriteItemsAsync(snapshot).ConfigureAwait(false);
-
-            await this.WriteNodeAsync(snapshot.Root).ConfigureAwait(false);
-
-            await this.WriteTerminatorAsync().ConfigureAwait(false);
+                if (this.disposeStream)
+                {
+                    this.underlyingStream.Dispose();
+                }
+            }
         }
 
-        private async Task WriteFieldsAsync(IIndexSnapshot<TKey> snapshot)
+        protected override ValueTask OnSerializationStart(IIndexSnapshot<TKey> snapshot, CancellationToken cancellationToken)
         {
-            // We need to write information for all the fields in the index so that when 
-            // we deserialize them to a new index we can ensure that the field ids are
-            // mapped correctly to a new index structure as new static fields may be registered
-            // in a new version of the index.
-            var fieldNames = snapshot.FieldLookup.AllFieldNames;
+            return this.WriteHeaderAsync(cancellationToken);
+        }
 
-            this.writer.Write((byte)fieldNames.Count);
+        protected override async ValueTask WriteFieldsAsync(IReadOnlyList<SerializedFieldInfo> fields, CancellationToken cancellationToken)
+        {
+            this.writer.Write((byte)fields.Count);
 
-            foreach (var fieldName in fieldNames)
+            foreach (var field in fields)
             {
-                var field = snapshot.FieldLookup.GetFieldInfo(fieldName);
-                this.writer.Write(field.Id);
-                this.writer.Write((byte)field.FieldKind);
+                this.writer.Write(field.FieldId);
+                this.writer.Write((byte)field.Kind);
                 this.writer.Write(field.Name);
 
-                if (field.FieldKind == FieldKind.Dynamic)
+                if (field.Kind == FieldKind.Dynamic)
                 {
                     if (field.DynamicFieldReaderName == null)
                     {
@@ -64,10 +68,53 @@ namespace Lifti.Serialization.Binary
                 }
             }
 
-            await this.FlushAsync().ConfigureAwait(false);
+            await this.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task WriteNodeAsync(IndexNode node)
+        protected override ValueTask OnSerializationComplete(IIndexSnapshot<TKey> snapshot, CancellationToken cancellationToken)
+        {
+            return this.WriteTerminatorAsync(cancellationToken);
+        }
+
+        protected override async ValueTask WriteIndexMetadataAsync(IIndexSnapshot<TKey> index, CancellationToken cancellationToken)
+        {
+            this.writer.WriteNonNegativeVarInt32(index.Metadata.DocumentCount);
+
+            foreach (var documentMetadata in index.Metadata.GetIndexedDocuments())
+            {
+                // Write the standard information for the document, regardless of whether is was
+                // read from an object
+                this.writer.WriteNonNegativeVarInt32(documentMetadata.Id);
+                this.keySerializer.Write(this.writer, documentMetadata.Key);
+                this.writer.WriteNonNegativeVarInt32(documentMetadata.DocumentStatistics.TokenCountByField.Count);
+                foreach (var fieldTokenCount in documentMetadata.DocumentStatistics.TokenCountByField)
+                {
+                    this.writer.Write(fieldTokenCount.Key);
+                    this.writer.WriteNonNegativeVarInt32(fieldTokenCount.Value);
+                }
+
+                // If the object is associated to an object type, write the object type id and any
+                // associated freshness info
+                if (documentMetadata.ObjectTypeId is byte objectTypeId)
+                {
+                    this.WriteDocumentObjectMetadata(objectTypeId, documentMetadata);
+                }
+                else
+                {
+                    // Write a zero byte to indicate that there is no object type id or metadata
+                    this.writer.Write((byte)0);
+                }
+            }
+
+            await this.FlushAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        protected override async ValueTask WriteNodesAsync(IndexNode rootNode, CancellationToken cancellationToken)
+        {
+            await this.WriteNodeAsync(rootNode, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async ValueTask WriteNodeAsync(IndexNode node, CancellationToken cancellationToken)
         {
             var matchCount = node.Matches.Count;
             var childNodeCount = node.ChildNodes.Count;
@@ -83,10 +130,10 @@ namespace Lifti.Serialization.Binary
 
             if (childNodeCount > 0)
             {
-                foreach (var childNode in node.ChildNodes)
+                foreach (var (character, childNode) in node.ChildNodes.CharacterMap)
                 {
-                    this.writer.WriteVarUInt16(childNode.Key);
-                    await this.WriteNodeAsync(childNode.Value).ConfigureAwait(false);
+                    this.writer.WriteVarUInt16(character);
+                    await this.WriteNodeAsync(childNode, cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -97,18 +144,18 @@ namespace Lifti.Serialization.Binary
 
             if (childNodeCount > 0)
             {
-                await this.FlushAsync().ConfigureAwait(false);
+                await this.FlushAsync(cancellationToken).ConfigureAwait(false);
             }
         }
 
         private void WriteMatchLocations(IndexNode node)
         {
-            foreach (var match in node.Matches)
+            foreach (var (documentId, matches) in node.Matches.Enumerate())
             {
-                this.writer.WriteNonNegativeVarInt32(match.Key);
-                this.writer.WriteNonNegativeVarInt32(match.Value.Count);
+                this.writer.WriteNonNegativeVarInt32(documentId);
+                this.writer.WriteNonNegativeVarInt32(matches.Count);
 
-                foreach (var fieldMatch in match.Value)
+                foreach (var fieldMatch in matches)
                 {
                     this.writer.Write(fieldMatch.FieldId);
                     this.writer.WriteNonNegativeVarInt32(fieldMatch.Locations.Count);
@@ -122,9 +169,9 @@ namespace Lifti.Serialization.Binary
             TokenLocation? lastLocation = null;
             foreach (var location in fieldMatch.Locations)
             {
-                if (lastLocation != null)
+                if (lastLocation is not null)
                 {
-                    var locationData = DeriveEntryStructureInformation(lastLocation.Value, location);
+                    var locationData = DeriveEntryStructureInformation(lastLocation, location);
 
                     if (locationData.structure == LocationEntrySerializationOptimizations.Full)
                     {
@@ -218,55 +265,63 @@ namespace Lifti.Serialization.Binary
             this.writer.WriteVarUInt16(location.Length);
         }
 
-        private async Task WriteTerminatorAsync()
+        private async ValueTask WriteTerminatorAsync(CancellationToken cancellationToken)
         {
             this.writer.Write(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
-            await this.FlushAsync().ConfigureAwait(false);
+            await this.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task WriteItemsAsync(IIndexSnapshot<TKey> index)
+        private void WriteDocumentObjectMetadata(byte objectTypeId, DocumentMetadata<TKey> documentMetadata)
         {
-            this.writer.WriteNonNegativeVarInt32(index.Items.Count);
+            // Write the object info data byte
+            // 0-4: The object type id
+            // 5: 1 - the object has a scoring freshness date
+            // 6: 1 - the object has a scoring magnitude
+            // 7: RESERVED for now
+            var objectInfoData = objectTypeId;
+            Debug.Assert(objectTypeId < 32, "The object type id should be less than 32");
 
-            foreach (var itemMetadata in index.Items.GetIndexedItems())
+            if (documentMetadata.ScoringFreshnessDate != null)
             {
-                this.writer.WriteNonNegativeVarInt32(itemMetadata.Id);
-                this.keySerializer.Write(this.writer, itemMetadata.Item);
-                this.writer.WriteNonNegativeVarInt32(itemMetadata.DocumentStatistics.TokenCountByField.Count);
-                foreach (var fieldTokenCount in itemMetadata.DocumentStatistics.TokenCountByField)
-                {
-                    this.writer.Write(fieldTokenCount.Key);
-                    this.writer.WriteNonNegativeVarInt32(fieldTokenCount.Value);
-                }
+                objectInfoData |= 0x20;
             }
 
-            await this.FlushAsync().ConfigureAwait(false);
+            if (documentMetadata.ScoringMagnitude != null)
+            {
+                objectInfoData |= 0x40;
+            }
+
+            this.writer.Write(objectInfoData);
+
+            if (documentMetadata.ScoringFreshnessDate is DateTime scoringFreshnessDate)
+            {
+                this.writer.Write(scoringFreshnessDate.Ticks);
+            }
+
+            if (documentMetadata.ScoringMagnitude is double scoringMagnitude)
+            {
+                this.writer.Write(scoringMagnitude);
+            }
         }
 
-        private async Task WriteHeaderAsync(IIndexSnapshot<TKey> index)
+        private async ValueTask WriteHeaderAsync(CancellationToken cancellationToken)
         {
             this.writer.Write(new byte[] { 0x4C, 0x49 });
             this.writer.Write(Version);
 
-            await this.FlushAsync().ConfigureAwait(false);
+            await this.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        public void Dispose()
-        {
-            this.writer.Dispose();
-            this.buffer.Dispose();
-
-            if (this.disposeStream)
-            {
-                this.underlyingStream.Dispose();
-            }
-        }
-
-        private async Task FlushAsync()
+        private async ValueTask FlushAsync(CancellationToken cancellationToken)
         {
             this.writer.Flush();
             this.buffer.Position = 0L;
-            await this.buffer.CopyToAsync(this.underlyingStream).ConfigureAwait(false);
+#if NETSTANDARD
+            // 81920 is taken from DefaultCopyBufferSize of GetCopyBufferSize in Stream.cs
+            await this.buffer.CopyToAsync(this.underlyingStream, 81920, cancellationToken).ConfigureAwait(false);
+#else
+            await this.buffer.CopyToAsync(this.underlyingStream, cancellationToken).ConfigureAwait(false);
+#endif
             this.buffer.SetLength(0L);
         }
     }

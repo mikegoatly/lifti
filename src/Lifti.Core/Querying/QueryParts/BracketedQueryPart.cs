@@ -5,7 +5,7 @@ namespace Lifti.Querying.QueryParts
     /// <summary>
     /// An <see cref="IQueryPart"/> that groups other statements together.
     /// </summary>
-    public class BracketedQueryPart : IQueryPart
+    public sealed class BracketedQueryPart : IQueryPart
     {
         /// <summary>
         /// Constructs a new instance of <see cref="BracketedQueryPart"/>.
@@ -25,9 +25,16 @@ namespace Lifti.Querying.QueryParts
         }
 
         /// <inheritdoc/>
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             return this.Statement.Evaluate(navigatorCreator, queryContext);
+        }
+
+        /// <inheritdoc/>
+        public double CalculateWeighting(Func<IIndexNavigator> navigatorCreator)
+        {
+            // Just defer to the weighting of the statement
+            return this.Statement.CalculateWeighting(navigatorCreator);
         }
 
         /// <inheritdoc/>

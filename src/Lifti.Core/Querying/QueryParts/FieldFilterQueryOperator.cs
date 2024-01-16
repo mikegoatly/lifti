@@ -3,10 +3,10 @@
 namespace Lifti.Querying.QueryParts
 {
     /// <summary>
-    /// An <see cref="IQueryPart"/> that restricts the resulting item matches to only those 
+    /// An <see cref="IQueryPart"/> that restricts the resulting matches to only those 
     /// that include matching tokens in a specific field.
     /// </summary>
-    public class FieldFilterQueryOperator : IQueryPart
+    public sealed class FieldFilterQueryOperator : IQueryPart
     {
         /// <summary>
         /// Constructs a new instance of <see cref="FieldFilterQueryOperator"/>.
@@ -34,11 +34,24 @@ namespace Lifti.Querying.QueryParts
         public IQueryPart Statement { get; }
 
         /// <inheritdoc/>
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
+            if (queryContext is null)
+            {
+                throw new ArgumentNullException(nameof(queryContext));
+            }
+
             return this.Statement.Evaluate(
                     navigatorCreator,
-                    QueryContext.Create(queryContext, this.FieldId));
+                    queryContext with { FilterToFieldId = this.FieldId });
+        }
+
+        /// <inheritdoc/>
+        public double CalculateWeighting(Func<IIndexNavigator> navigatorCreator)
+        {
+            // We're applying an additional level of filtering here, so reduce the weighting of the 
+            // child statement by 50% to reflect this.
+            return this.Statement.CalculateWeighting(navigatorCreator) * 0.5D;
         }
 
         /// <inheritdoc/>
@@ -57,8 +70,8 @@ namespace Lifti.Querying.QueryParts
         public static FieldFilterQueryOperator CreateForField(IIndexedFieldLookup fieldLookup, string fieldName, IQueryPart statement)
         {
             return new FieldFilterQueryOperator(
-                fieldName, 
-                fieldLookup?.GetFieldInfo(fieldName).Id ?? throw new ArgumentNullException(nameof(fieldLookup)), 
+                fieldName,
+                fieldLookup?.GetFieldInfo(fieldName).Id ?? throw new ArgumentNullException(nameof(fieldLookup)),
                 statement);
         }
     }

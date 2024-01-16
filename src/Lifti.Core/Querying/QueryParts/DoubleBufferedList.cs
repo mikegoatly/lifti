@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 
 namespace Lifti.Querying.QueryParts
 {
+    /// <summary>
+    /// A list that allows for mutations to take place on a separate list to the one being enumerated, and then swapped.
+    /// </summary>
     internal class DoubleBufferedList<T> : IEnumerable<T>
     {
-        private List<T> current = new List<T>();
-        private List<T> swap = new List<T>();
+        private List<T> current = [];
+        private List<T> swap = [];
 
         public DoubleBufferedList()
         {
@@ -16,6 +18,11 @@ namespace Lifti.Querying.QueryParts
         public DoubleBufferedList(params T[] initialData)
         {
             this.current.AddRange(initialData);
+        }
+
+        public void AddToCurrent(T item)
+        {
+            this.current.Add(item);
         }
 
         public void Add(T item)
@@ -36,6 +43,12 @@ namespace Lifti.Querying.QueryParts
             tempStack.Clear();
             this.current = this.swap;
             this.swap = tempStack;
+        }
+
+        public void Clear()
+        {
+            this.current.Clear();
+            this.swap.Clear();
         }
 
         public IEnumerator<T> GetEnumerator()

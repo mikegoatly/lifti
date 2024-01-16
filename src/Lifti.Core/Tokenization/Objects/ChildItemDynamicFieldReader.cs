@@ -7,29 +7,30 @@ using System.Threading.Tasks;
 
 namespace Lifti.Tokenization.Objects
 {
-    internal abstract class ChildItemDynamicFieldReader<TItem, TChildItem, TValue> : DynamicFieldReader<TItem>
+    internal abstract class ChildItemDynamicFieldReader<TObject, TChildObject, TValue> : DynamicFieldReader<TObject>
     {
-        private readonly Func<TItem, ICollection<TChildItem>?> getChildObjects;
-        private readonly Func<TChildItem, string> getFieldName;
-        private readonly Func<TChildItem, TValue> getFieldText;
+        private readonly Func<TObject, ICollection<TChildObject>?> getChildObjects;
+        private readonly Func<TChildObject, string> getFieldName;
+        private readonly Func<TChildObject, TValue> getFieldText;
 
         protected ChildItemDynamicFieldReader(
-            Func<TItem, ICollection<TChildItem>?> getChildObjects,
-            Func<TChildItem, string> getFieldName,
-            Func<TChildItem, TValue> getFieldText,
+            Func<TObject, ICollection<TChildObject>?> getChildObjects,
+            Func<TChildObject, string> getFieldName,
+            Func<TChildObject, TValue> getFieldText,
             string dynamicFieldReaderName,
             string? fieldNamePrefix,
             IIndexTokenizer tokenizer,
             ITextExtractor textExtractor,
-            Thesaurus thesaurus)
-            : base(tokenizer, textExtractor, thesaurus, dynamicFieldReaderName, fieldNamePrefix)
+            Thesaurus thesaurus,
+            double scoreBoost)
+            : base(tokenizer, textExtractor, thesaurus, dynamicFieldReaderName, fieldNamePrefix, scoreBoost)
         {
             this.getChildObjects = getChildObjects;
             this.getFieldName = getFieldName;
             this.getFieldText = getFieldText;
         }
 
-        public override ValueTask<IEnumerable<(string field, IEnumerable<string> rawText)>> ReadAsync(TItem item, CancellationToken cancellationToken)
+        public override ValueTask<IEnumerable<(string field, IEnumerable<string> rawText)>> ReadAsync(TObject item, CancellationToken cancellationToken)
         {
             var childObjects = this.getChildObjects(item);
             if (childObjects == null)
@@ -43,7 +44,7 @@ namespace Lifti.Tokenization.Objects
                     .ToList());
         }
 
-        public override ValueTask<IEnumerable<string>> ReadAsync(TItem item, string fieldName, CancellationToken cancellationToken)
+        public override ValueTask<IEnumerable<string>> ReadAsync(TObject item, string fieldName, CancellationToken cancellationToken)
         {
             var unprefixedFieldName = this.GetUnprefixedFieldName(fieldName);
 

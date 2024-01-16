@@ -12,6 +12,7 @@ namespace Lifti.Tests.Querying
         private readonly QueryTokenizer sut;
         private readonly IIndexTokenizer defaultIndexTokenizer;
         private readonly IIndexTokenizer fieldIndexTokenizer;
+        private readonly FakeIndexTokenizer alternativeFieldIndexTokenizer;
         private readonly IIndexTokenizerProvider tokenizerProvider;
 
         public QueryTokenizerTests()
@@ -20,7 +21,12 @@ namespace Lifti.Tests.Querying
 
             this.defaultIndexTokenizer = new FakeIndexTokenizer();
             this.fieldIndexTokenizer = new FakeIndexTokenizer(true);
-            this.tokenizerProvider = new FakeIndexTokenizerProvider(this.defaultIndexTokenizer, ("test", this.fieldIndexTokenizer));
+            this.alternativeFieldIndexTokenizer = new FakeIndexTokenizer(true);
+            this.tokenizerProvider = new FakeIndexTokenizerProvider(
+                this.defaultIndexTokenizer,
+                ("test", this.fieldIndexTokenizer),
+                ("test field", this.fieldIndexTokenizer),
+                ("test []", this.alternativeFieldIndexTokenizer));
         }
 
         [Fact]
@@ -40,7 +46,32 @@ namespace Lifti.Tests.Querying
         {
             this.sut.ParseQueryTokens("Testing", this.tokenizerProvider).Should().BeEquivalentTo(new[]
             {
-                QueryToken.ForText("Testing", this.defaultIndexTokenizer)
+                QueryToken.ForText("Testing", this.defaultIndexTokenizer, null)
+            });
+        }
+
+        [Fact]
+        public void ScoreBoostingOnlyAppliedToRequestedToken()
+        {
+            this.sut.ParseQueryTokens("(Testing^2) | Testing", this.tokenizerProvider).Should().BeEquivalentTo(new[]
+            {
+                QueryToken.ForOperator(QueryTokenType.OpenBracket),
+                QueryToken.ForText("Testing", this.defaultIndexTokenizer, 2D),
+                QueryToken.ForOperator(QueryTokenType.CloseBracket),
+                QueryToken.ForOperator(QueryTokenType.OrOperator),
+                QueryToken.ForText("Testing", this.defaultIndexTokenizer, null)
+            });
+        }
+
+        [InlineData("2", 2D)]
+        [InlineData("100.2927", 100.2927D)]
+        [InlineData("001.001", 1.001D)]
+        [Theory]
+        public void SingleWordWithScoreBoostYieldsOneResult(string textScoreBoost, double expectedScoreBoost)
+        {
+            this.sut.ParseQueryTokens($"Testing^{textScoreBoost}", this.tokenizerProvider).Should().BeEquivalentTo(new[]
+            {
+                QueryToken.ForText("Testing", this.defaultIndexTokenizer, expectedScoreBoost)
             });
         }
 
@@ -49,9 +80,9 @@ namespace Lifti.Tests.Querying
         {
             this.sut.ParseQueryTokens("?Testing ?1,2?Test ?,?Test", this.tokenizerProvider).Should().BeEquivalentTo(new[]
             {
-                QueryToken.ForText("?Testing", this.defaultIndexTokenizer),
-                QueryToken.ForText("?1,2?Test", this.defaultIndexTokenizer),
-                QueryToken.ForText("?,?Test", this.defaultIndexTokenizer)
+                QueryToken.ForText("?Testing", this.defaultIndexTokenizer, null),
+                QueryToken.ForText("?1,2?Test", this.defaultIndexTokenizer, null),
+                QueryToken.ForText("?,?Test", this.defaultIndexTokenizer, null)
             });
         }
 
@@ -69,9 +100,21 @@ namespace Lifti.Tests.Querying
         public void FuzzySearchTermsSeparatedByCommasYieldedCorrectly()
         {
             this.sut.ParseQueryTokens("?Testing,?Test2", this.tokenizerProvider).Should().BeEquivalentTo(
-                new[] {
-                QueryToken.ForText("?Testing", this.defaultIndexTokenizer),
-                QueryToken.ForText("?Test2", this.defaultIndexTokenizer)
+                new[]
+                {
+                    QueryToken.ForText("?Testing", this.defaultIndexTokenizer, null),
+                    QueryToken.ForText("?Test2", this.defaultIndexTokenizer, null)
+                });
+        }
+
+        [Fact]
+        public void EscapedCharacters_ShouldBeReturnedAsTokenText()
+        {
+            this.sut.ParseQueryTokens(@"\\hello\=\"" \&\|", this.tokenizerProvider).Should().BeEquivalentTo(
+                new[]
+                {
+                    QueryToken.ForText(@"\hello=""", this.defaultIndexTokenizer, null),
+                    QueryToken.ForText("&|", this.defaultIndexTokenizer, null)
                 });
         }
 
@@ -86,7 +129,7 @@ namespace Lifti.Tests.Querying
         {
             this.sut.ParseQueryTokens("  \t  Testing   \t ", this.tokenizerProvider).Should().BeEquivalentTo(new[]
             {
-                QueryToken.ForText("Testing", this.defaultIndexTokenizer)
+                QueryToken.ForText("Testing", this.defaultIndexTokenizer, null)
             });
         }
 
@@ -96,9 +139,9 @@ namespace Lifti.Tests.Querying
             this.sut.ParseQueryTokens("\"Jack be quick\"", this.tokenizerProvider).Should().BeEquivalentTo(new[]
             {
                 QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator),
-                QueryToken.ForText("Jack", this.defaultIndexTokenizer),
-                QueryToken.ForText("be", this.defaultIndexTokenizer),
-                QueryToken.ForText("quick", this.defaultIndexTokenizer),
+                QueryToken.ForText("Jack", this.defaultIndexTokenizer, null),
+                QueryToken.ForText("be", this.defaultIndexTokenizer, null),
+                QueryToken.ForText("quick", this.defaultIndexTokenizer, null),
                 QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator)
             });
         }
@@ -109,12 +152,12 @@ namespace Lifti.Tests.Querying
             this.sut.ParseQueryTokens(@"""First string"" ""Second string""", this.tokenizerProvider).Should().BeEquivalentTo(new[]
             {
                 QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator),
-                QueryToken.ForText("First", this.defaultIndexTokenizer),
-                QueryToken.ForText("string", this.defaultIndexTokenizer),
+                QueryToken.ForText("First", this.defaultIndexTokenizer, null),
+                QueryToken.ForText("string", this.defaultIndexTokenizer, null),
                 QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator),
                 QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator),
-                QueryToken.ForText("Second", this.defaultIndexTokenizer),
-                QueryToken.ForText("string", this.defaultIndexTokenizer),
+                QueryToken.ForText("Second", this.defaultIndexTokenizer, null),
+                QueryToken.ForText("string", this.defaultIndexTokenizer, null),
                 QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator)
             });
         }
@@ -126,31 +169,84 @@ namespace Lifti.Tests.Querying
                 {
                     QueryToken.ForFieldFilter("test"),
                     QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator),
-                    QueryToken.ForText("test", this.fieldIndexTokenizer),
-                    QueryToken.ForText("string", this.fieldIndexTokenizer),
+                    QueryToken.ForText("test", this.fieldIndexTokenizer, null),
+                    QueryToken.ForText("string", this.fieldIndexTokenizer, null),
                     QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator),
-                    QueryToken.ForText("notfield", this.defaultIndexTokenizer),
+                    QueryToken.ForText("notfield", this.defaultIndexTokenizer, null),
                     QueryToken.ForFieldFilter("test"),
-                    QueryToken.ForText("sim%le", this.fieldIndexTokenizer),
-                    QueryToken.ForText("nofield", this.defaultIndexTokenizer),
+                    QueryToken.ForText("sim%le", this.fieldIndexTokenizer, null),
+                    QueryToken.ForText("nofield", this.defaultIndexTokenizer, null),
                     QueryToken.ForFieldFilter("test"),
                     QueryToken.ForOperator(QueryTokenType.OpenBracket),
-                    QueryToken.ForText("yes*", this.fieldIndexTokenizer),
+                    QueryToken.ForText("yes*", this.fieldIndexTokenizer, null),
                     QueryToken.ForOperator(QueryTokenType.OpenBracket),
                     QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator),
-                    QueryToken.ForText("field", this.fieldIndexTokenizer),
-                    QueryToken.ForText("too", this.fieldIndexTokenizer),
+                    QueryToken.ForText("field", this.fieldIndexTokenizer, null),
+                    QueryToken.ForText("too", this.fieldIndexTokenizer, null),
                     QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator),
                     QueryToken.ForOperator(QueryTokenType.CloseBracket),
-                    QueryToken.ForText("?stillfield", this.fieldIndexTokenizer),
+                    QueryToken.ForText("?stillfield", this.fieldIndexTokenizer, null),
                     QueryToken.ForOperator(QueryTokenType.CloseBracket),
-                    QueryToken.ForText("notinfieldagain", this.defaultIndexTokenizer)
+                    QueryToken.ForText("notinfieldagain", this.defaultIndexTokenizer, null)
                 },
                 options => options
                     .WithStrictOrdering()
                     .Using<QueryToken>(
                     x => x.Subject.IndexTokenizer.Should().BeSameAs(x.Expectation.IndexTokenizer))
                 .WhenTypeIs<QueryToken>());
+        }
+
+        [Fact]
+        public void BracketedFieldNames_ShouldBeTreatedAsFieldNameWithoutSquareBrackets()
+        {
+            this.sut.ParseQueryTokens(@"[test]=foo [test field]=bar", this.tokenizerProvider).Should().BeEquivalentTo(new[]
+                {
+                    QueryToken.ForFieldFilter("test"),
+                    QueryToken.ForText("foo", this.fieldIndexTokenizer, null),
+                    QueryToken.ForFieldFilter("test field"),
+                    QueryToken.ForText("bar", this.fieldIndexTokenizer, null)
+                },
+                options => options
+                    .WithStrictOrdering()
+                    .Using<QueryToken>(
+                    x => x.Subject.IndexTokenizer.Should().BeSameAs(x.Expectation.IndexTokenizer))
+                .WhenTypeIs<QueryToken>());
+        }
+
+        [Fact]
+        public void BracketedFieldNamesWithEscapedCharacters_ShouldReturnUnescapedCharacters()
+        {
+            this.sut.ParseQueryTokens(@"[\t\e\s\t\ \[\]]=foo", this.tokenizerProvider).Should().BeEquivalentTo(new[]
+                {
+                    QueryToken.ForFieldFilter("test []"),
+                    QueryToken.ForText("foo", this.alternativeFieldIndexTokenizer, null)
+                },
+                options => options
+                    .WithStrictOrdering()
+                    .Using<QueryToken>(
+                    x => x.Subject.IndexTokenizer.Should().BeSameAs(x.Expectation.IndexTokenizer))
+                .WhenTypeIs<QueryToken>());
+        }
+
+        [Fact]
+        public void EmptyBracketedFieldName_ShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => this.sut.ParseQueryTokens("[]=foo", this.tokenizerProvider).ToList())
+                .Message.Should().Be("Empty field name encountered");
+        }
+
+        [Fact]
+        public void UnclosedFieldNameBracket_ShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => this.sut.ParseQueryTokens("[test=foo", this.tokenizerProvider).ToList())
+                .Message.Should().Be("Unclosed [ encountered");
+        }
+
+        [Fact]
+        public void BracketFieldNameWithoutFollowingQuery_ShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => this.sut.ParseQueryTokens("[test] foo", this.tokenizerProvider).ToList())
+                .Message.Should().Be("Expected = after bracketed field name");
         }
 
         [Fact]

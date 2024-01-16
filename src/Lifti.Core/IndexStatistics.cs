@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Immutable;
+﻿using System.Collections.Generic;
 
 namespace Lifti
 {
@@ -8,56 +7,70 @@ namespace Lifti
     /// </summary>
     public class IndexStatistics
     {
-        private IndexStatistics()
+        private readonly Dictionary<byte, long> tokenCountByField;
+
+        internal IndexStatistics()
         {
-            this.TokenCountByField = ImmutableDictionary<byte, long>.Empty;
+            this.tokenCountByField = [];
         }
 
-        internal IndexStatistics(ImmutableDictionary<byte, long> tokenCountByField, long totalTokenCount)
+        /// <summary>
+        /// Creates a copy of the specified <see cref="IndexStatistics"/> instance and safe to mutate.
+        /// </summary>
+        internal IndexStatistics(IndexStatistics original)
         {
-            this.TokenCountByField = tokenCountByField;
+            this.tokenCountByField = new(original.tokenCountByField);
+            this.TotalTokenCount = original.TotalTokenCount;
+        }
+
+        internal IndexStatistics(Dictionary<byte, long> tokenCountByField, long totalTokenCount)
+        {
+            this.tokenCountByField = tokenCountByField;
             this.TotalTokenCount = totalTokenCount;
         }
 
-        internal static IndexStatistics Empty { get; } = new IndexStatistics();
-
         /// <summary>
-        /// Gets a dictionary containing the token count for each field indexed in the index.
+        /// Gets the token count for the specified field.
         /// </summary>
-        public ImmutableDictionary<byte, long> TokenCountByField { get; }
+        public long GetFieldTokenCount(byte fieldId)
+        {
+            if (!this.tokenCountByField.TryGetValue(fieldId, out var tokenCount))
+            {
+                throw new LiftiException(ExceptionMessages.UnknownField, fieldId);
+            }
+
+            return tokenCount;
+        }
 
         /// <summary>
         /// Gets the total token count for all documents in the index.
         /// </summary>
-        public long TotalTokenCount { get; }
+        public long TotalTokenCount { get; private set; }
 
-        internal IndexStatistics Remove(DocumentStatistics documentStatistics)
+        /// <summary>
+        /// Gets the total number of tokens stored each field in the index.
+        /// </summary>
+        public IReadOnlyDictionary<byte, long> TokenCountByField => this.tokenCountByField;
+
+        internal void Remove(DocumentStatistics documentStatistics)
         {
-            return Adjust(documentStatistics, -1);
+            this.Adjust(documentStatistics, -1);
         }
 
-        internal IndexStatistics Add(DocumentStatistics documentStatistics)
+        internal void Add(DocumentStatistics documentStatistics)
         {
-            return Adjust(documentStatistics, 1);
+            this.Adjust(documentStatistics, 1);
         }
 
-        private IndexStatistics Adjust(DocumentStatistics documentStatistics, int direction)
+        private void Adjust(DocumentStatistics documentStatistics, int direction)
         {
-            if (documentStatistics is null)
-            {
-                throw new ArgumentNullException(nameof(documentStatistics));
-            }
-
-            var updatedFieldTokenCount = this.TokenCountByField;
             foreach (var fieldTokenCount in documentStatistics.TokenCountByField)
             {
-                updatedFieldTokenCount.TryGetValue(fieldTokenCount.Key, out var previousCount);
-                updatedFieldTokenCount = updatedFieldTokenCount.SetItem(fieldTokenCount.Key, previousCount + (fieldTokenCount.Value * direction));
+                this.tokenCountByField.TryGetValue(fieldTokenCount.Key, out var previousCount);
+                this.tokenCountByField[fieldTokenCount.Key] = previousCount + (fieldTokenCount.Value * direction);
             }
 
-            return new IndexStatistics(
-                updatedFieldTokenCount,
-                this.TotalTokenCount + (documentStatistics.TotalTokenCount * direction));
+            this.TotalTokenCount += documentStatistics.TotalTokenCount * direction;
         }
     }
 }

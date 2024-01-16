@@ -28,11 +28,14 @@ namespace Lifti
                 return string.Empty;
             }
 
+#if NET8_0_OR_GREATER
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+#else 
             if (start < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(start));
             }
-
+#endif
             if (start + length > this.length)
             {
                 // Pin the requested length to the maximum length it can be

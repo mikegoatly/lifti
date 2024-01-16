@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,78 +11,92 @@ namespace Lifti.Querying
     internal class OkapiBm25Scorer : IScorer
     {
         private readonly Dictionary<byte, double> averageTokenCountByField;
+        private readonly ConcurrentDictionary<(int documentId, byte fieldId), (double scoreBoost, double tokensInDocumentWeighting)> documentFieldCache = new();
+        private readonly ConcurrentDictionary<int, double> idfCache = new();
         private readonly double documentCount;
         private readonly double k1;
         private readonly double k1PlusOne;
         private readonly double b;
-        private readonly IItemStore snapshot;
+        private readonly IIndexMetadata indexMetadata;
+        private readonly IFieldScoreBoostProvider fieldScoreBoosts;
 
         /// <summary>
         /// Constructs a new instance of the <see cref="OkapiBm25Scorer"/>.
         /// </summary>
         /// <param name="k1">The "k1" parameter for the scorer.</param>
         /// <param name="b">The "b" parameter for the scorer.</param>
-        /// <param name="snapshot">
-        /// The <see cref="IItemStore"/> of the index snapshot being queried.
+        /// <param name="indexMetadata">
+        /// The <see cref="IIndexMetadata"/> of the index snapshot being queried.
         /// </param>
-        internal OkapiBm25Scorer(double k1, double b, IItemStore snapshot)
+        /// <param name="fieldScoreBoosts">
+        /// The <see cref="IFieldScoreBoostProvider"/> to use to get the score boost for a field.
+        /// </param>
+        internal OkapiBm25Scorer(double k1, double b, IIndexMetadata indexMetadata, IFieldScoreBoostProvider fieldScoreBoosts)
         {
-            if (snapshot is null)
+            if (indexMetadata is null)
             {
-                throw new ArgumentNullException(nameof(snapshot));
+                throw new ArgumentNullException(nameof(indexMetadata));
             }
 
-            var documentCount = (double)snapshot.Count;
-            this.averageTokenCountByField = snapshot.IndexStatistics.TokenCountByField.ToDictionary(k => k.Key, k => k.Value / documentCount);
+            var documentCount = (double)indexMetadata.DocumentCount;
+            this.averageTokenCountByField = indexMetadata.IndexStatistics.TokenCountByField.ToDictionary(k => k.Key, k => k.Value / documentCount);
             this.documentCount = documentCount;
             this.k1 = k1;
             this.k1PlusOne = k1 + 1D;
             this.b = b;
-            this.snapshot = snapshot;
+            this.indexMetadata = indexMetadata;
+            this.fieldScoreBoosts = fieldScoreBoosts;
         }
 
-        /// <inheritdoc />
-        public IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryTokenMatch> tokenMatches, double weighting)
+        public double CalculateScore(int totalMatchedDocuments, int documentId, byte fieldId, IReadOnlyList<TokenLocation> tokenLocations, double weighting)
         {
-            if (tokenMatches is null)
+            var idf = this.CalculateInverseDocumentFrequency(totalMatchedDocuments);
+
+            double scoreBoost;
+            double tokensInDocumentWeighting;
+            if (this.documentFieldCache.TryGetValue((documentId, fieldId), out var cacheEntry))
             {
-                throw new ArgumentNullException(nameof(tokenMatches));
+                (scoreBoost, tokensInDocumentWeighting) = cacheEntry;
             }
-
-            var idf = CalculateInverseDocumentFrequency(tokenMatches);
-
-            return tokenMatches.Select(t =>
+            else
             {
-                var itemTokenCounts = this.snapshot.GetMetadata(t.ItemId).DocumentStatistics.TokenCountByField;
-                var scoredFieldMatches = new List<ScoredFieldMatch>(t.FieldMatches.Count);
-                foreach (var fieldMatch in t.FieldMatches)
+                var documentMetadata = this.indexMetadata.GetDocumentMetadata(documentId);
+                var documentTokenCounts = documentMetadata.DocumentStatistics.TokenCountByField;
+                var tokensInDocument = documentTokenCounts[fieldId];
+                tokensInDocumentWeighting = tokensInDocument / this.averageTokenCountByField[fieldId];
+
+                // We can cache the score boost for the field and object type (if applicable) because it won't
+                // change for the lifetime of the associated index snapshot.
+                scoreBoost = this.fieldScoreBoosts.GetScoreBoost(fieldId);
+                if (documentMetadata.ObjectTypeId is { } objectTypeId)
                 {
-                    var frequencyInDocument = fieldMatch.Locations.Count;
-                    var fieldId = fieldMatch.FieldId;
-                    var tokensInDocument = itemTokenCounts[fieldId];
-                    var tokensInDocumentWeighting = tokensInDocument / this.averageTokenCountByField[fieldId];
-
-                    var numerator = frequencyInDocument * this.k1PlusOne;
-                    var denominator = frequencyInDocument + this.k1 * (1 - this.b + this.b * tokensInDocumentWeighting);
-
-                    var fieldScore = idf * (numerator / denominator);
-
-                    var weightedScore = fieldScore * weighting;
-
-                    scoredFieldMatches.Add(new ScoredFieldMatch(weightedScore, fieldMatch));
+                    var objectScoreBoostMetadata = this.indexMetadata.GetObjectTypeScoreBoostMetadata(objectTypeId);
+                    scoreBoost *= objectScoreBoostMetadata.CalculateScoreBoost(documentMetadata);
                 }
 
-                return new ScoredToken(t.ItemId, scoredFieldMatches);
-            }).ToList();
+                this.documentFieldCache.TryAdd((documentId, fieldId), (scoreBoost, tokensInDocumentWeighting));
+            }
+
+            var frequencyInDocument = tokenLocations.Count;
+            var numerator = frequencyInDocument * this.k1PlusOne;
+            var denominator = frequencyInDocument + (this.k1 * (1 - this.b + (this.b * tokensInDocumentWeighting)));
+
+            var fieldScore = idf * (numerator / denominator);
+
+            return fieldScore * weighting * scoreBoost;
         }
 
-        private double CalculateInverseDocumentFrequency(IReadOnlyList<QueryTokenMatch> tokens)
+        private double CalculateInverseDocumentFrequency(int matchedDocumentCount)
         {
-            var tokenCount = tokens.Count;
-            var idf = (this.documentCount - tokenCount + 0.5D)
-                    / (tokenCount + 0.5D);
+            if (!this.idfCache.TryGetValue(matchedDocumentCount, out var idf))
+            {
+                idf  = (this.documentCount - matchedDocumentCount + 0.5D)
+                    / (matchedDocumentCount + 0.5D);
 
-            idf = Math.Log(1D + idf);
+                idf = Math.Log(1D + idf);
+
+                this.idfCache.TryAdd(matchedDocumentCount, idf);
+            }
 
             return idf;
         }

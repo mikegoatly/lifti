@@ -1,46 +1,76 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace Lifti.Querying
 {
     /// <summary>
     /// Provides logic for unioning the results in two <see cref="IntermediateQueryResult"/>s. The results from
-    /// both parts of the query will be combined into one and field match locations combined where items appear on both sides.
+    /// both parts of the query will be combined into one and field match locations combined where documents appear on both sides.
     /// </summary>
-    public class UnionMerger : IntermediateQueryResultMerger
+    internal sealed class UnionMerger : IntermediateQueryResultMerger
     {
         /// <summary>
         /// Applies the union operation to the <see cref="IntermediateQueryResult"/> instances.
         /// </summary>
-        public static IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
+        public static List<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
-            // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
-            // "left" and "right" have no special meaning when performing an intersection
-            var rightDictionary = right.Matches.ToDictionary(i => i.ItemId);
+            // track two pointers through the lists on each side. The document ids are ordered on both sides, so we can
+            // move through the lists in a single pass
 
-            foreach (var leftMatch in left.Matches)
+            var leftIndex = 0;
+            var rightIndex = 0;
+
+            var leftMatches = left.Matches;
+            var rightMatches = right.Matches;
+            var leftCount = leftMatches.Count;
+            var rightCount = rightMatches.Count;
+
+            List<ScoredToken> result = new(leftCount + rightCount);
+
+            List<ScoredFieldMatch> positionalMatches = [];
+            while (leftIndex < leftCount && rightIndex < rightCount)
             {
-                if (rightDictionary.TryGetValue(leftMatch.ItemId, out var rightMatch))
+                var leftMatch = leftMatches[leftIndex];
+                var rightMatch = rightMatches[rightIndex];
+
+                if (leftMatch.DocumentId == rightMatch.DocumentId)
                 {
                     // Exists in both
-                    yield return new ScoredToken(
-                        leftMatch.ItemId,
-                        MergeFields(leftMatch, rightMatch).ToList());
+                    result.Add(new ScoredToken(
+                        leftMatch.DocumentId,
+                        MergeFields(leftMatch, rightMatch)));
 
-                    rightDictionary.Remove(leftMatch.ItemId);
+                    leftIndex++;
+                    rightIndex++;
+                }
+                else if (leftMatch.DocumentId < rightMatch.DocumentId)
+                {
+                    // Exists only in current
+                    result.Add(leftMatch);
+                    leftIndex++;
                 }
                 else
                 {
-                    // Exists only in current
-                    yield return leftMatch;
+                    // Exists only in next
+                    result.Add(rightMatch);
+                    rightIndex++;
                 }
             }
 
-            // Any items still remaining in nextDictionary exist only in the new results so can just be yielded
-            foreach (var rightMatch in rightDictionary.Values)
+            // Add any remaining matches from the left
+            while (leftIndex < leftCount)
             {
-                yield return rightMatch;
+                result.Add(leftMatches[leftIndex]);
+                leftIndex++;
             }
+
+            // Add any remaining matches from the right
+            while (rightIndex < rightCount)
+            {
+                result.Add(rightMatches[rightIndex]);
+                rightIndex++;
+            }
+
+            return result;
         }
     }
 }

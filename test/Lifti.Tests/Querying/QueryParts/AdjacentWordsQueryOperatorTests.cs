@@ -36,11 +36,11 @@ namespace Lifti.Tests.Querying.QueryParts
                 {
                     ScoredToken(
                         7,
-                        ScoredFieldMatch(9D, 1, CompositeMatch(8, 9, 10))),
+                        ScoredFieldMatch(9D, 1, CompositeTokenLocation(8, 9, 10))),
                     ScoredToken(
                         8,
-                        ScoredFieldMatch(12D, 1, CompositeMatch(101, 102, 103)),
-                        ScoredFieldMatch(306D, 2, CompositeMatch(8, 9, 10)))
+                        ScoredFieldMatch(12D, 1, CompositeTokenLocation(101, 102, 103)),
+                        ScoredFieldMatch(306D, 2, CompositeTokenLocation(8, 9, 10)))
                 },
                 config => config.AllowingInfiniteRecursion());
         }
@@ -60,6 +60,14 @@ namespace Lifti.Tests.Querying.QueryParts
 
             // The first and second query parts should not combine together
             results.Matches.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldReturnWeightOfFirstDividedByPartCount()
+        {
+            var op = new AdjacentWordsQueryOperator(new[] { new FakeQueryPart(9D), new FakeQueryPart(13D), new FakeQueryPart(33D) });
+
+            op.CalculateWeighting(() => new FakeIndexNavigator()).Should().Be(3D);
         }
     }
 }

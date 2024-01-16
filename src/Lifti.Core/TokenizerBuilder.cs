@@ -1,4 +1,5 @@
 ﻿using Lifti.Tokenization;
+using Lifti.Tokenization.Stemming;
 using System;
 
 namespace Lifti
@@ -13,7 +14,7 @@ namespace Lifti
         private bool splitOnPunctuation = true;
         private bool accentInsensitive = true;
         private bool caseInsensitive = true;
-        private bool stemming;
+        private IStemmer? stemmer;
         private char[]? additionalSplitCharacters;
         private Func<TokenizationOptions, IIndexTokenizer> factory = defaultTokenizerFactory;
         private char[]? ignoreCharacters;
@@ -37,9 +38,9 @@ namespace Lifti
         /// be suppressed by passing <c>false</c> to this method, in which case only characters explicitly specified
         /// using <see cref="SplitOnCharacters(char[])" /> will be treated as word breaks.
         /// </summary>
-        public TokenizerBuilder SplitOnPunctuation(bool splitOnPunctionation = true)
+        public TokenizerBuilder SplitOnPunctuation(bool splitOnPunctuation = true)
         {
-            this.splitOnPunctuation = splitOnPunctionation;
+            this.splitOnPunctuation = splitOnPunctuation;
             return this;
         }
 
@@ -65,14 +66,37 @@ namespace Lifti
             return this;
         }
 
-        /// <summary>
-        /// Configures the tokenizer to apply word stemming, e.g. de-pluralizing and stripping
-        /// endings such as ING from words. Enabling this will cause both case and accent 
-        /// insensitivity to be applied.
-        /// </summary>
+        /// <inheritdoc cref="WithStemming()"/>
+        [Obsolete("Use WithStemming() instead.")]
+#pragma warning disable RS0027 // API with optional parameter(s) should have the most parameters amongst its public overloads
         public TokenizerBuilder WithStemming(bool stemming = true)
+#pragma warning restore RS0027 // API with optional parameter(s) should have the most parameters amongst its public overloads
         {
-            this.stemming = stemming;
+            this.stemmer = new PorterStemmer();
+            return this;
+        }
+
+        /// <summary>
+        /// Configures the tokenizer to apply word stemming using the default English Porter Stemmer implementation. 
+        /// Used to reduce English words to a common root form, i.e. de-pluralizing and stripping endings such as ING from words. 
+        /// Enabling this will cause both case and accent insensitivity to be applied.
+        /// </summary>
+        public TokenizerBuilder WithStemming()
+        {
+            this.stemmer = new PorterStemmer();
+            return this;
+        }
+
+        /// <summary>
+        /// Configures the tokenizer to apply word stemming using the specified stemmer. Depending on the <see cref="IStemmer.RequiresAccentInsensitivity"/>
+        /// and <see cref="IStemmer.RequiresCaseInsensitivity"/> properties of the stemmer, accent and case insensitivity may be applied to the index.
+        /// </summary>
+        /// <param name="stemmer">
+        /// The stemmer to use.
+        /// </param>
+        public TokenizerBuilder WithStemming(IStemmer stemmer)
+        {
+            this.stemmer = stemmer;
             return this;
         }
 
@@ -112,7 +136,7 @@ namespace Lifti
                 SplitOnPunctuation = this.splitOnPunctuation,
                 AccentInsensitive = this.accentInsensitive,
                 CaseInsensitive = this.caseInsensitive,
-                Stemming = this.stemming
+                Stemmer = this.stemmer
             };
 
             if (this.ignoreCharacters != null)

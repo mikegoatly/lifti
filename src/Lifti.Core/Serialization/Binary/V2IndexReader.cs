@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
-
-    internal class V2IndexReader<TKey> : IIndexReader<TKey>
+    internal class V2IndexReader<TKey> : IIndexDeserializer<TKey>
         where TKey : notnull
     {
         private readonly Stream underlyingStream;
@@ -39,7 +38,9 @@ namespace Lifti.Serialization.Binary
             }
         }
 
-        public async Task ReadIntoAsync(FullTextIndex<TKey> index)
+        public async ValueTask ReadAsync(
+            FullTextIndex<TKey> index,
+            CancellationToken cancellationToken)
         {
             await this.FillBufferAsync().ConfigureAwait(false);
 
@@ -52,13 +53,14 @@ namespace Lifti.Serialization.Binary
             // Keep track of all the distinct fields ids encountered during deserialization
             var distinctFieldIds = new HashSet<byte>();
 
-            var itemCount = this.reader.ReadInt32();
-            for (var i = 0; i < itemCount; i++)
+            var documentCount = this.reader.ReadInt32();
+            var documentMetadataCollector = new DocumentMetadataCollector<TKey>(documentCount);
+            for (var i = 0; i < documentCount; i++)
             {
                 var id = this.reader.ReadInt32();
                 var key = keyReader(this.reader);
                 var fieldStatCount = this.reader.ReadInt32();
-                var fieldTokenCounts = ImmutableDictionary.CreateBuilder<byte, int>();
+                var fieldTokenCounts = new Dictionary<byte, int>(fieldStatCount);
                 var totalTokenCount = 0;
                 for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
                 {
@@ -70,10 +72,11 @@ namespace Lifti.Serialization.Binary
                     totalTokenCount += wordCount;
                 }
 
-                index.IdPool.Add(
-                    id,
-                    key,
-                    new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount));
+                var documentStatistics = new DocumentStatistics(fieldTokenCounts, totalTokenCount);
+
+                // Using ForLooseText here because we don't know any of the new information associated to an object
+                // type, e.g. its id or score boost options. This is the closest we can get to the old format.
+                documentMetadataCollector.Add(DocumentMetadata.ForLooseText(id, key, documentStatistics));
             }
 
             // Double check that the index structure is aware of all the fields that are being deserialized
@@ -86,7 +89,7 @@ namespace Lifti.Serialization.Binary
                 throw new LiftiException(ExceptionMessages.UnknownFieldsInSerializedIndex);
             }
 
-            index.SetRootWithLock(this.DeserializeNode(index.IndexNodeFactory, 0));
+            var rootNode = this.DeserializeNode(index.IndexNodeFactory, 0);
 
             if (this.reader.ReadInt32() != -1)
             {
@@ -97,6 +100,8 @@ namespace Lifti.Serialization.Binary
             {
                 this.underlyingStream.Position = this.buffer.Position + this.initialUnderlyingStreamOffset;
             }
+
+            index.RestoreIndex(rootNode, documentMetadataCollector);
         }
 
         private IndexNode DeserializeNode(IIndexNodeFactory nodeFactory, int depth)
@@ -105,48 +110,38 @@ namespace Lifti.Serialization.Binary
             var matchCount = this.reader.ReadInt32();
             var childNodeCount = this.reader.ReadInt32();
             var intraNodeText = textLength == 0 ? null : this.ReadIntraNodeText(textLength);
-            var childNodes = childNodeCount > 0 ? ImmutableDictionary.CreateBuilder<char, IndexNode>() : null;
-            var matches = matchCount > 0 ? ImmutableDictionary.CreateBuilder<int, ImmutableList<IndexedToken>>() : null;
+            var childNodes = childNodeCount > 0 ? new ChildNodeMapEntry[childNodeCount] : null;
+            var matches = matchCount > 0 ? new Dictionary<int, IReadOnlyList<IndexedToken>>() : null;
 
             for (var i = 0; i < childNodeCount; i++)
             {
                 var matchChar = this.ReadMatchedCharacter();
-                childNodes!.Add(matchChar, this.DeserializeNode(nodeFactory, depth + 1));
+                childNodes![i] = new(matchChar, this.DeserializeNode(nodeFactory, depth + 1));
             }
 
-            var locationMatches = new List<TokenLocation>(50);
-            for (var itemMatch = 0; itemMatch < matchCount; itemMatch++)
+            for (var documentMatch = 0; documentMatch < matchCount; documentMatch++)
             {
-                var itemId = this.reader.ReadInt32();
+                var documentId = this.reader.ReadInt32();
                 var fieldCount = this.reader.ReadInt32();
-
-                var indexedTokens = ImmutableList.CreateBuilder<IndexedToken>();
+                var indexedTokens = new IndexedToken[fieldCount];
 
                 for (var fieldMatch = 0; fieldMatch < fieldCount; fieldMatch++)
                 {
                     var fieldId = this.reader.ReadByte();
                     var locationCount = this.reader.ReadInt32();
-
-                    locationMatches.Clear();
-
-                    // Resize the collection immediately if required to prevent multiple resizes during deserialization
-                    if (locationMatches.Capacity < locationCount)
-                    {
-                        locationMatches.Capacity = locationCount;
-                    }
-
+                    var locationMatches = new List<TokenLocation>(locationCount);
                     this.ReadLocations(locationCount, locationMatches);
 
-                    indexedTokens.Add(new IndexedToken(fieldId, locationMatches.ToArray()));
+                    indexedTokens[fieldMatch] = new IndexedToken(fieldId, locationMatches);
                 }
 
-                matches!.Add(itemId, indexedTokens.ToImmutable());
+                matches!.Add(documentId, indexedTokens);
             }
 
             return nodeFactory.CreateNode(
                 intraNodeText,
-                childNodes?.ToImmutable() ?? ImmutableDictionary<char, IndexNode>.Empty,
-                matches?.ToImmutable() ?? ImmutableDictionary<int, ImmutableList<IndexedToken>>.Empty);
+                childNodes == null ? ChildNodeMap.Empty : new ChildNodeMap(childNodes),
+                matches == null ? DocumentTokenMatchMap.Empty : new DocumentTokenMatchMap(matches));
         }
 
         /// <summary>
@@ -184,12 +179,12 @@ namespace Lifti.Serialization.Binary
                 }
                 else
                 {
-                    if (lastLocation == null)
+                    if (lastLocation is null)
                     {
                         throw new DeserializationException(ExceptionMessages.MalformedDataExpectedFullLocationEntry);
                     }
 
-                    location = this.DeserializeLocationData(lastLocation.Value, structureType);
+                    location = this.DeserializeLocationData(lastLocation, structureType);
                 }
 
                 locationMatches.Add(location);

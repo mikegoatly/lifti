@@ -13,6 +13,7 @@ description: >
 Example|Meaning
 -|-
 West|**West** must appear in the text [exactly](#exact-word-matches).
+West\|Wing^2|**West** or **Wing** must appear in the text [exactly](#exact-word-matches), where matches on **Wing** will have a [score boost](#score-boosting) of 2.
 ?Wst|Words that [fuzzy match](#fuzzy-match-) with **wst** must appear in the text.
 ?3,2?Wst|Words that [fuzzy match](#fuzzy-match-) with **wst** must appear in the text, with a specified max edit distance and max sequential edits.
 title=West|A [field restricted](#field-restrictions-field) search. **West** must appear in the ***title*** field of an indexed object.
@@ -86,7 +87,7 @@ Examples:
 
 The and operator (`&`) Performs an intersection of two intermediate query results, combining word positions for successful matches.
 
-`Food & Burger` searches for items containing both `"food"` and `"burger"` at any position, and in any field.
+`Food & Burger` searches for documents containing both `"food"` and `"burger"` at any position, and in any field.
 
 (Alternatively `Food Burger` will have the same effect as the default operator between query parts is an `&`.)
 
@@ -94,7 +95,7 @@ The and operator (`&`) Performs an intersection of two intermediate query result
 
 ### Or (`|`)
 
-Performs a union of two intermediate query results. Where an items appears in both sets, word positions are combined into one list.
+Performs a union of two intermediate query results. Where a document appears in both sets, word positions are combined into one list.
 
 Restricts results to same field by default: **false**
 
@@ -112,9 +113,11 @@ e.g. `(food & cake) | (cheese & biscuit)`
 
 These allow for restricting searches within a given field.
 
-`title=analysis | body=(chocolate & cake)` Searches for items with `"analysis"` in the title field *or both* `"chocolate"` and `"cake"` in the body field.
+`title=analysis | body=(chocolate & cake)` Searches for documents with `"analysis"` in the title field *or both* `"chocolate"` and `"cake"` in the body field.
 
-`title=analysis food` Searches for items with `"analysis"` in the title field *and* `"food"` in *any* field.
+`title=analysis food` Searches for documents with `"analysis"` in the title field *and* `"food"` in *any* field.
+
+If your field name contains spaces or other special characters, you can escape it using square brackets `[` and `]`, e.g. `[my field]=chocolate`.
 
 ---
 
@@ -123,7 +126,7 @@ These allow for restricting searches within a given field.
 Placing quotes around a search phrase will enforce that the words all appear
 immediately next to each other in the source text.
 
-`"cheese burger"` will only match items that have text containing `"cheese"` followed immediately by `"burger"`.
+`"cheese burger"` will only match documents that have text containing `"cheese"` followed immediately by `"burger"`.
 
 ---
 
@@ -133,7 +136,7 @@ The near operator performs a positional intersection of two results based on the
 
 The `~` operator requires that words must be within 5 words of one another. This can value can be controlled by specifying a number, e.g. `~4` to restrict to only returning results within 4 words of one another.
 
-`cheese ~ cake` will return items containing the words `"cheese"` and `"cake"` in either order, up to 5 words apart, e.g. `"the cake was made with cheese"` and `"I like cheese and cake"` would both match, but `"cake is never to be considered a substitute for cheese"` would not.
+`cheese ~ cake` will return documents containing the words `"cheese"` and `"cake"` in either order, up to 5 words apart, e.g. `"the cake was made with cheese"` and `"I like cheese and cake"` would both match, but `"cake is never to be considered a substitute for cheese"` would not.
 
 ---
 
@@ -150,3 +153,12 @@ Same as Near (`~`) except that order is important in the positional intersection
 Same as Near Following (`~>`) except there are no constraints on how far apart the words can be.
 
 `cheese > cake` will match any text where `"cheese"` precedes `"cake"` in a given field.
+
+## Score boosting
+
+Wildcard, fuzzy match and exact match search terms can have their resulting scores boosted by adding `^n` after them. For example, `wild^2` will boost matches of "wild" by 2x. 
+
+## Escaping search text
+
+Use a backslash `\` when you want to explicitly search for a character that clashes with the query syntax. For example, `A\=B` will search for a single token containing 
+exactly "A=B", rather than attempting to perform a field restricted search.

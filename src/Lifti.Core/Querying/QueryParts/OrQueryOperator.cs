@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Lifti.Querying.QueryParts
@@ -7,7 +6,7 @@ namespace Lifti.Querying.QueryParts
     /// <summary>
     /// An <see cref="IQueryPart"/> that produces a union of the results in two other <see cref="IQueryPart"/>s.
     /// </summary>
-    public class OrQueryOperator : BinaryQueryOperator
+    public sealed class OrQueryOperator : BinaryQueryOperator
     {
         /// <summary>
         /// Constructs a new <see cref="OrQueryOperator"/>.
@@ -21,7 +20,7 @@ namespace Lifti.Querying.QueryParts
         public override OperatorPrecedence Precedence => OperatorPrecedence.And;
 
         /// <inheritdoc/>
-        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             return this.Left.Evaluate(navigatorCreator, queryContext)
                 .Union(this.Right.Evaluate(navigatorCreator, queryContext));
@@ -31,6 +30,13 @@ namespace Lifti.Querying.QueryParts
         public override string ToString()
         {
             return $"{this.Left} | {this.Right}";
+        }
+
+        /// <inheritdoc/>
+        protected override double RunWeightingCalculation(Func<IIndexNavigator> navigatorCreator)
+        {
+            // Both sides of the OR operator are evaluated, so the weighting is the sum of the two
+            return this.Left.CalculateWeighting(navigatorCreator) + this.Right.CalculateWeighting(navigatorCreator);
         }
 
         /// <summary>

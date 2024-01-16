@@ -21,7 +21,8 @@ namespace Lifti
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus,
-            string? dynamicFieldReaderName)
+            string? dynamicFieldReaderName,
+            double scoreBoost)
         {
             this.Id = id;
             this.Name = name;
@@ -31,6 +32,7 @@ namespace Lifti
             this.Tokenizer = tokenizer;
             this.Thesaurus = thesaurus;
             this.DynamicFieldReaderName = dynamicFieldReaderName;
+            this.ScoreBoost = scoreBoost;
         }
 
         /// <summary>
@@ -74,8 +76,16 @@ namespace Lifti
         public string? DynamicFieldReaderName { get; }
 
         /// <summary>
-        /// Reads the text for the field from the specified item. The item must be of the type specified by the <see cref="ObjectType"/> property.
+        /// Gets the score boost to apply to this field.
         /// </summary>
+        public double ScoreBoost { get; }
+
+        /// <summary>
+        /// Reads the text for the field from the specified object. The object must be of the type specified by the <see cref="ObjectType"/> property.
+        /// </summary>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the <paramref name="item"/> is not of the expected type.
+        /// </exception>
         public abstract ValueTask<IEnumerable<string>> ReadAsync(object item, CancellationToken cancellationToken);
 
         internal void Deconstruct(out byte fieldId, out ITextExtractor textExtractor, out IIndexTokenizer tokenizer, out IThesaurus thesaurus)
@@ -88,32 +98,34 @@ namespace Lifti
     }
 
     /// <inheritdoc />
-    public class IndexedFieldDetails<TItem> : IndexedFieldDetails
+    public class IndexedFieldDetails<TObject> : IndexedFieldDetails
     {
-        private readonly Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader;
+        private readonly Func<TObject, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader;
 
         private IndexedFieldDetails(
             byte id,
             string name,
-            Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
+            Func<TObject, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
             FieldKind fieldKind,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus,
-            string? dynamicFieldReaderName)
-            : base(id, name, typeof(TItem), fieldKind, textExtractor, tokenizer, thesaurus, dynamicFieldReaderName)
+            string? dynamicFieldReaderName,
+            double scoreBoost)
+            : base(id, name, typeof(TObject), fieldKind, textExtractor, tokenizer, thesaurus, dynamicFieldReaderName, scoreBoost)
         {
             this.fieldReader = fieldReader;
         }
 
-        internal static IndexedFieldDetails<TItem> Static(byte id,
+        internal static IndexedFieldDetails<TObject> Static(byte id,
             string name,
-            Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
+            Func<TObject, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
-            IThesaurus thesaurus)
+            IThesaurus thesaurus,
+            double scoreBoost)
         {
-            return new IndexedFieldDetails<TItem>(
+            return new IndexedFieldDetails<TObject>(
                 id,
                 name,
                 fieldReader,
@@ -121,18 +133,20 @@ namespace Lifti
                 textExtractor,
                 tokenizer,
                 thesaurus,
-                null);
+                null,
+                scoreBoost);
         }
 
-        internal static IndexedFieldDetails<TItem> Dynamic(byte id,
+        internal static IndexedFieldDetails<TObject> Dynamic(byte id,
             string name,
             string dynamicFieldReaderName,
-            Func<TItem, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
+            Func<TObject, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
-            IThesaurus thesaurus)
+            IThesaurus thesaurus,
+            double scoreBoost)
         {
-            return new IndexedFieldDetails<TItem>(
+            return new IndexedFieldDetails<TObject>(
                 id,
                 name,
                 fieldReader,
@@ -140,7 +154,8 @@ namespace Lifti
                 textExtractor,
                 tokenizer,
                 thesaurus,
-                dynamicFieldReaderName);
+                dynamicFieldReaderName,
+                scoreBoost);
         }
 
         /// <inheritdoc />
@@ -151,12 +166,12 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(item));
             }
 
-            if (item is TItem typedItem)
+            if (item is TObject typedItem)
             {
                 return this.fieldReader(typedItem, cancellationToken);
             }
 
-            throw new ArgumentException($"Item type {item.GetType().Name} is not expected type {this.ObjectType.Name}");
+            throw new ArgumentException($"Object type {item.GetType().Name} is not expected type {this.ObjectType.Name}");
 
         }
     }

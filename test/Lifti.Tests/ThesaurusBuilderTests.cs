@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
+using Lifti.Tokenization.Stemming;
 using System.Linq;
 using Xunit;
 
@@ -95,7 +96,7 @@ namespace Lifti.Tests
             sut.WithSynonyms("HYPOCRITICAL", "DECEPTIVE", "INSINCERE");
 
             VerifyResults(
-                new IndexTokenizer(new TokenizationOptions { Stemming = true }),
+                new IndexTokenizer(new TokenizationOptions { Stemmer = new PorterStemmer() }),
                 ("HYPOCRIT", new[] { "HYPOCRIT", "DECEPT", "INSINCER" }),
                 ("DECEPT", new[] { "HYPOCRIT", "DECEPT", "INSINCER" }),
                 ("INSINCER", new[] { "HYPOCRIT", "DECEPT", "INSINCER" }));

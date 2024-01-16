@@ -1,6 +1,5 @@
 ﻿using Lifti.Querying;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Lifti.Tests.Fakes
 {
@@ -13,11 +12,9 @@ namespace Lifti.Tests.Fakes
             this.score = score;
         }
 
-        public IReadOnlyList<ScoredToken> Score(IReadOnlyList<QueryTokenMatch> tokens, double weighting)
+        public double CalculateScore(int totalMatchedDocuments, int documentId, byte fieldId, IReadOnlyList<TokenLocation> tokenLocations, double weighting)
         {
-            return tokens.Select(m => new ScoredToken(
-                m.ItemId,
-                m.FieldMatches.Select(fm => new ScoredFieldMatch(this.score, fm)).ToList())).ToList();
+            return this.score;
         }
     }
 }

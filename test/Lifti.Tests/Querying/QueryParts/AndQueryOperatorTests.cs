@@ -18,7 +18,7 @@ namespace Lifti.Tests.Querying.QueryParts
 
             var result = op.Evaluate(() => new FakeIndexNavigator(), QueryContext.Empty);
 
-            result.Matches.Select(m => m.ItemId).Should().BeEquivalentTo(
+            result.Matches.Select(m => m.DocumentId).Should().BeEquivalentTo(
                 new[] { 5, 9 });
         }
 
@@ -58,6 +58,14 @@ namespace Lifti.Tests.Querying.QueryParts
             var op = AndQueryOperator.CombineAll(new[] { new ExactWordQueryPart("test"), new ExactWordQueryPart("test2"), new ExactWordQueryPart("test3") });
 
             op.ToString().Should().Be("test & test2 & test3");
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldReturnSmallestWeightingOfParts()
+        {
+            var op = new AndQueryOperator(new FakeQueryPart(2D), new FakeQueryPart(3D));
+
+            op.CalculateWeighting(() => new FakeIndexNavigator()).Should().Be(2D);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Lifti.Querying;
+using System;
 
 namespace Lifti
 {
@@ -8,18 +9,24 @@ namespace Lifti
     {
         private readonly IIndexNavigatorPool indexNavigatorPool;
 
-        internal IndexSnapshot(IIndexNavigatorPool indexNavigatorPool, FullTextIndex<TKey> index)
+        internal IndexSnapshot(
+            IIndexNavigatorPool indexNavigatorPool,
+            IIndexedFieldLookup fieldLookup,
+            IndexNode rootNode,
+            IIndexMetadata<TKey> indexMetadata)
         {
-            this.Items = index.Items.Snapshot();
-            this.Root = index.Root;
+            this.Metadata = indexMetadata;
+            this.Root = rootNode;
             this.indexNavigatorPool = indexNavigatorPool;
-
-            // Field lookup is read-only once the index is constructed
-            this.FieldLookup = index.FieldLookup;
+            this.FieldLookup = fieldLookup;
         }
 
         /// <inheritdoc />
-        public IItemStore<TKey> Items { get; }
+        [Obsolete("Use Metadata property instead")]
+        public IIndexMetadata<TKey> Items => this.Metadata;
+
+        /// <inheritdoc />
+        public IIndexMetadata<TKey> Metadata { get; }
 
         /// <inheritdoc />
         public IndexNode Root { get; }
@@ -27,7 +34,9 @@ namespace Lifti
         /// <inheritdoc />
         public IIndexedFieldLookup FieldLookup { get; }
 
-        IItemStore IIndexSnapshot.Items => this.Items;
+        IIndexMetadata IIndexSnapshot.Metadata => this.Metadata;
+
+        IIndexMetadata IIndexSnapshot.Items => this.Metadata;
 
         /// <inheritdoc />
         public IIndexNavigator CreateNavigator()

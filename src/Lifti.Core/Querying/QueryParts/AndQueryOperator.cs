@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace Lifti.Querying.QueryParts
 {
     /// <summary>
-    /// A query part that filters matched items to only those matched as an intersection of two <see cref="IQueryPart"/>s.
+    /// A query part that filters matched documents to only those matched as an intersection of two <see cref="IQueryPart"/>s.
     /// </summary>
-    public class AndQueryOperator : BinaryQueryOperator
+    public sealed class AndQueryOperator : BinaryQueryOperator
     {
         /// <summary>
         /// Constructs a new instance of <see cref="AndQueryOperator"/>.
@@ -20,10 +20,11 @@ namespace Lifti.Querying.QueryParts
         public override OperatorPrecedence Precedence => OperatorPrecedence.And;
 
         /// <inheritdoc/>
-        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
-            return this.Left.Evaluate(navigatorCreator, queryContext)
-                .Intersect(this.Right.Evaluate(navigatorCreator, queryContext));
+            var (leftResults, rightResults) = this.EvaluateWithDocumentIntersection(navigatorCreator, queryContext);
+
+            return leftResults.Intersect(rightResults);
         }
 
         /// <inheritdoc/>

@@ -21,5 +21,10 @@ namespace Lifti.Tokenization.Objects
         /// Gets the <see cref="IThesaurus"/> configured for use with this field.
         /// </summary>
         IThesaurus Thesaurus { get; }
+
+        /// <summary>
+        /// Gets the boost to apply to tokens extracted from this field.
+        /// </summary>
+        double ScoreBoost { get; }
     }
 }

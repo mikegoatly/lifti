@@ -5,11 +5,11 @@ namespace Lifti.Querying.QueryParts
 {
     /// <summary>
     /// An <see cref="IQueryPart"/> that produces an intersection of two <see cref="IQueryPart"/>s, restricting
-    /// an item's field matches such that the locations of the first appear before the locations of the second and
+    /// a document's field matches such that the locations of the first appear before the locations of the second and
     /// within a specified tolerance. 
-    /// Items that result in no field matches are filtered out.
+    /// Documents that result in no field matches are filtered out.
     /// </summary>
-    public class PrecedingNearQueryOperator : BinaryQueryOperator
+    public sealed class PrecedingNearQueryOperator : BinaryQueryOperator
     {
         /// <summary>
         /// Constructs a new instance of <see cref="PrecedingNearQueryOperator"/>.
@@ -29,13 +29,12 @@ namespace Lifti.Querying.QueryParts
         public int Tolerance { get; }
 
         /// <inheritdoc/>
-        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
-            return this.Left.Evaluate(navigatorCreator, queryContext)
-                .CompositePositionalIntersect(
-                this.Right.Evaluate(navigatorCreator, queryContext), 
-                    0, 
-                    this.Tolerance);
+            var (leftResults, rightResults) = this.EvaluateWithDocumentIntersection(navigatorCreator, queryContext);
+
+            return leftResults
+                .CompositePositionalIntersect(rightResults, 0, this.Tolerance);
         }
 
         /// <inheritdoc/>

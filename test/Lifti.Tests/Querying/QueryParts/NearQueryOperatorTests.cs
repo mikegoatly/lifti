@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Lifti.Querying;
 using Lifti.Querying.QueryParts;
 using Xunit;
 
@@ -29,12 +30,20 @@ namespace Lifti.Tests.Querying.QueryParts
             {
                 ScoredToken(
                     7,
-                    ScoredFieldMatch(4D, 1, CompositeMatch(8, 6), CompositeMatch(100, 102))),
+                    ScoredFieldMatch(4D, 1, CompositeTokenLocation(8, 6), CompositeTokenLocation(100, 102))),
                 ScoredToken(
                     8,
-                    ScoredFieldMatch(6D, 1, CompositeMatch(101, 106)),
-                    ScoredFieldMatch(13D, 2, CompositeMatch(8, 3), CompositeMatch(104, 105)))
+                    ScoredFieldMatch(6D, 1, CompositeTokenLocation(101, 106)),
+                    ScoredFieldMatch(13D, 2, CompositeTokenLocation(8, 3), CompositeTokenLocation(104, 105)))
             });
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldReturnSmallestWeightingOfParts()
+        {
+            var op = new NearQueryOperator(new FakeQueryPart(3D), new FakeQueryPart(2D));
+
+            op.CalculateWeighting(() => new FakeIndexNavigator()).Should().Be(2D);
         }
     }
 }

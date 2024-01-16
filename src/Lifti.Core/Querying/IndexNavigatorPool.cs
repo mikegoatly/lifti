@@ -4,7 +4,7 @@ namespace Lifti.Querying
 {
     internal sealed class IndexNavigatorPool : IIndexNavigatorPool
     {
-        private readonly ConcurrentBag<IndexNavigator> pool = new ConcurrentBag<IndexNavigator>();
+        private readonly ConcurrentBag<IndexNavigator> pool = [];
         private readonly IIndexScorerFactory scorer;
 
         public IndexNavigatorPool(IIndexScorerFactory scorer)
@@ -14,14 +14,12 @@ namespace Lifti.Querying
 
         public IIndexNavigator Create(IIndexSnapshot indexSnapshot)
         {
-            var node = indexSnapshot.Root;
-
             if (!this.pool.TryTake(out var navigator))
             {
                 navigator = new IndexNavigator();
             }
 
-            navigator.Initialize(node, this, this.scorer.CreateIndexScorer(indexSnapshot));
+            navigator.Initialize(indexSnapshot, this, this.scorer.CreateIndexScorer(indexSnapshot));
             return navigator;
         }
 

@@ -70,7 +70,7 @@ namespace Lifti {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to At least one field must be configured for an item.
+        ///   Looks up a localized string similar to At least one field must be configured for an object type.
         /// </summary>
         internal static string AtLeastOneFieldMustBeIndexed {
             get {
@@ -102,6 +102,15 @@ namespace Lifti {
         internal static string BatchChangeAlreadyStarted {
             get {
                 return ResourceManager.GetString("BatchChangeAlreadyStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot apply a disposed bookmark.
+        /// </summary>
+        internal static string BookmarkDisposed {
+            get {
+                return ResourceManager.GetString("BookmarkDisposed", resourceCulture);
             }
         }
         
@@ -142,7 +151,7 @@ namespace Lifti {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A duplicate field &quot;{0}&quot; was encountered while indexing item {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields..
+        ///   Looks up a localized string similar to A duplicate field &quot;{0}&quot; was encountered while indexing the object with key {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields..
         /// </summary>
         internal static string DuplicateFieldEncounteredOnObject {
             get {
@@ -169,11 +178,29 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot create an empty adjacent words query part.
+        /// </summary>
+        internal static string EmptyAdjacentWordsQueryPart {
+            get {
+                return ResourceManager.GetString("EmptyAdjacentWordsQueryPart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bracketed query parts cannot be empty.
         /// </summary>
         internal static string EmptyBracketedExpressionsAreNotSupported {
             get {
                 return ResourceManager.GetString("EmptyBracketedExpressionsAreNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Empty field name encountered.
+        /// </summary>
+        internal static string EmptyFieldNameEncountered {
+            get {
+                return ResourceManager.GetString("EmptyFieldNameEncountered", resourceCulture);
             }
         }
         
@@ -187,11 +214,29 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot create an empty wildcard query part.
+        /// </summary>
+        internal static string EmptyWildcardQuery {
+            get {
+                return ResourceManager.GetString("EmptyWildcardQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected at least one query part to be parsed.
         /// </summary>
         internal static string ExpectedAtLeastOneQueryPartParsed {
             get {
                 return ResourceManager.GetString("ExpectedAtLeastOneQueryPartParsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected = after bracketed field name.
+        /// </summary>
+        internal static string ExpectedEqualsAfterFieldName {
+            get {
+                return ResourceManager.GetString("ExpectedEqualsAfterFieldName", resourceCulture);
             }
         }
         
@@ -295,7 +340,25 @@ namespace Lifti {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Item already indexed.
+        ///   Looks up a localized string similar to Invalid score boost number encountered: {0}.
+        /// </summary>
+        internal static string InvalidScoreBoost {
+            get {
+                return ResourceManager.GetString("InvalidScoreBoost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected a number to follow a score boost, e.g. &quot;Term^3&quot; would indicate that the search term &quot;Term&quot; should have a score boost of 3..
+        /// </summary>
+        internal static string InvalidScoreBoostExpectedNumber {
+            get {
+                return ResourceManager.GetString("InvalidScoreBoostExpectedNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Document already indexed.
         /// </summary>
         internal static string ItemAlreadyIndexed {
             get {
@@ -349,6 +412,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An index can only have a maximum of 31 unique object types configured against it.
+        /// </summary>
+        internal static string MaximumNumberOfConfiguredObjectTypesReached {
+            get {
+                return ResourceManager.GetString("MaximumNumberOfConfiguredObjectTypesReached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Only tokens up to {0} characters long can be indexed..
         /// </summary>
         internal static string MaxTokenLengthExceeded {
@@ -372,6 +444,15 @@ namespace Lifti {
         internal static string MissingLiftiHeaderIndicatorBytes {
             get {
                 return ResourceManager.GetString("MissingLiftiHeaderIndicatorBytes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiplier values must be greater than one.
+        /// </summary>
+        internal static string MultiplierValueMustBeGreaterThanOne {
+            get {
+                return ResourceManager.GetString("MultiplierValueMustBeGreaterThanOne", resourceCulture);
             }
         }
         
@@ -430,6 +511,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Internal error: no snapshot initialized in navigator.
+        /// </summary>
+        internal static string NoSnapshotInitialized {
+            get {
+                return ResourceManager.GetString("NoSnapshotInitialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not all requested items were returned. Tme missing ids were: {0}.
         /// </summary>
         internal static string NotAllRequestedItemsReturned {
@@ -444,6 +534,15 @@ namespace Lifti {
         internal static string NoTokenizationOptionsProvidedForType {
             get {
                 return ResourceManager.GetString("NoTokenizationOptionsProvidedForType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal error - attempted to calculate an item score boost without initialized score boost stats.
+        /// </summary>
+        internal static string ScoreBoostsNotCalculated {
+            get {
+                return ResourceManager.GetString("ScoreBoostsNotCalculated", resourceCulture);
             }
         }
         
@@ -511,6 +610,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unclosed [ encountered.
+        /// </summary>
+        internal static string UnclosedSquareBracket {
+            get {
+                return ResourceManager.GetString("UnclosedSquareBracket", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unexpected close bracket encountered in query.
         /// </summary>
         internal static string UnexpectedCloseBracket {
@@ -552,6 +660,15 @@ namespace Lifti {
         internal static string UnexpectedOperatorParseStateEncountered {
             get {
                 return ResourceManager.GetString("UnexpectedOperatorParseStateEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal error - unexpected value removal from score boost metadata.
+        /// </summary>
+        internal static string UnexpectedScoreBoostValueRemoval {
+            get {
+                return ResourceManager.GetString("UnexpectedScoreBoostValueRemoval", resourceCulture);
             }
         }
         
@@ -601,6 +718,15 @@ namespace Lifti {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown object type id {0}.
+        /// </summary>
+        internal static string UnknownObjectTypeId {
+            get {
+                return ResourceManager.GetString("UnknownObjectTypeId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown operator encountered: {0}.
         /// </summary>
         internal static string UnknownOperatorEncountered {
@@ -633,6 +759,15 @@ namespace Lifti {
         internal static string ValueMustNotBeLessThanZero {
             get {
                 return ResourceManager.GetString("ValueMustNotBeLessThanZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WithScoreBoosting can only be called once per object builder.
+        /// </summary>
+        internal static string WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition {
+            get {
+                return ResourceManager.GetString("WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition", resourceCulture);
             }
         }
     }

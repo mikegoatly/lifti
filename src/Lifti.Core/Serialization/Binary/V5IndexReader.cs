@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lifti.Serialization.Binary
 {
-    internal class V5IndexReader<TKey> : IIndexReader<TKey>, IDisposable
+    internal class V5IndexReader<TKey> : IndexDeserializerBase<TKey>
         where TKey : notnull
     {
         private readonly Stream underlyingStream;
         private readonly bool disposeStream;
-        private readonly IKeySerializer<TKey> keySerializer;
+        protected readonly IKeySerializer<TKey> keySerializer;
         private readonly MemoryStream buffer;
         private long initialUnderlyingStreamOffset;
         protected readonly BinaryReader reader;
@@ -26,26 +25,29 @@ namespace Lifti.Serialization.Binary
             this.reader = new BinaryReader(this.buffer);
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            this.reader.Dispose();
-            this.buffer.Dispose();
+            base.Dispose(disposing);
 
-            if (this.disposeStream)
+            if (disposing)
             {
-                this.underlyingStream.Dispose();
+                this.reader.Dispose();
+                this.buffer.Dispose();
+
+                if (this.disposeStream)
+                {
+                    this.underlyingStream.Dispose();
+                }
             }
         }
 
-        public async Task ReadIntoAsync(FullTextIndex<TKey> index)
+        protected override async ValueTask OnDeserializationStartingAsync(CancellationToken cancellationToken)
         {
             await this.FillBufferAsync().ConfigureAwait(false);
+        }
 
-            var fieldIdMap = this.ReadFields(index);
-            this.ReadIndexedItems(index);
-
-            index.SetRootWithLock(this.DeserializeNode(fieldIdMap, index.IndexNodeFactory, 0));
-
+        protected override ValueTask OnDeserializationCompleteAsync(FullTextIndex<TKey> index, CancellationToken cancellationToken)
+        {
             if (this.reader.ReadInt32() != -1)
             {
                 throw new DeserializationException(ExceptionMessages.MissingIndexTerminator);
@@ -55,12 +57,14 @@ namespace Lifti.Serialization.Binary
             {
                 this.underlyingStream.Position = this.buffer.Position + this.initialUnderlyingStreamOffset;
             }
+
+            return default;
         }
 
-        private Dictionary<byte, byte> ReadFields(FullTextIndex<TKey> index)
+        protected override ValueTask<SerializedFieldCollector> DeserializeKnownFieldsAsync(CancellationToken cancellationToken)
         {
             var fieldCount = this.reader.ReadNonNegativeVarInt32();
-            var serializedFields = new List<SerializedFieldInfo>(fieldCount);
+            var serializedFields = new SerializedFieldCollector(fieldCount);
 
             for (var i = 0; i < fieldCount; i++)
             {
@@ -71,18 +75,20 @@ namespace Lifti.Serialization.Binary
                 serializedFields.Add(new(fieldId, name, kind, dynamicFieldReaderName));
             }
 
-            return index.RehydrateSerializedFields(serializedFields);
+            return new(serializedFields);
         }
 
-        private void ReadIndexedItems(FullTextIndex<TKey> index)
+        protected override ValueTask<DocumentMetadataCollector<TKey>> DeserializeDocumentMetadataAsync(CancellationToken cancellationToken)
         {
-            var itemCount = this.reader.ReadNonNegativeVarInt32();
-            for (var i = 0; i < itemCount; i++)
+            var documentCount = this.reader.ReadNonNegativeVarInt32();
+            var documentMetadataCollector = new DocumentMetadataCollector<TKey>(documentCount);
+
+            for (var i = 0; i < documentCount; i++)
             {
                 var id = this.reader.ReadNonNegativeVarInt32();
                 var key = this.keySerializer.Read(this.reader);
                 var fieldStatCount = (int)this.reader.ReadByte();
-                var fieldTokenCounts = ImmutableDictionary.CreateBuilder<byte, int>();
+                var fieldTokenCounts = new Dictionary<byte, int>(fieldStatCount);
                 var totalTokenCount = 0;
                 for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
                 {
@@ -92,64 +98,65 @@ namespace Lifti.Serialization.Binary
                     totalTokenCount += wordCount;
                 }
 
-                index.IdPool.Add(
-                    id,
-                    key,
-                    new DocumentStatistics(fieldTokenCounts.ToImmutable(), totalTokenCount));
+                var documentStatistics = new DocumentStatistics(fieldTokenCounts, totalTokenCount);
+
+                // Using ForLooseText here because we don't know any of the new information associated to an object
+                // type, e.g. its id or score boost options. This is the closest we can get to the old format.
+                documentMetadataCollector.Add(DocumentMetadata.ForLooseText(id, key, documentStatistics));
             }
+
+            return new(documentMetadataCollector);
         }
 
-        private IndexNode DeserializeNode(Dictionary<byte, byte> fieldIdMap, IIndexNodeFactory nodeFactory, int depth)
+        protected override ValueTask<IndexNode> DeserializeIndexNodeHierarchyAsync(
+            SerializedFieldIdMap serializedFieldIdMap,
+            IIndexNodeFactory indexNodeFactory,
+            CancellationToken cancellationToken)
+        {
+            return new(this.DeserializeNode(serializedFieldIdMap, indexNodeFactory, 0));
+        }
+
+        private IndexNode DeserializeNode(SerializedFieldIdMap fieldIdMap, IIndexNodeFactory nodeFactory, int depth)
         {
             var textLength = this.reader.ReadNonNegativeVarInt32();
             var matchCount = this.reader.ReadNonNegativeVarInt32();
             var childNodeCount = this.reader.ReadNonNegativeVarInt32();
             var intraNodeText = textLength == 0 ? null : this.ReadIntraNodeText(textLength);
-            var childNodes = childNodeCount > 0 ? ImmutableDictionary.CreateBuilder<char, IndexNode>() : null;
-            var matches = matchCount > 0 ? ImmutableDictionary.CreateBuilder<int, ImmutableList<IndexedToken>>() : null;
+            var childNodes = childNodeCount > 0 ? new ChildNodeMapEntry[childNodeCount] : null;
+            var matches = matchCount > 0 ? new Dictionary<int, IReadOnlyList<IndexedToken>>() : null;
 
             for (var i = 0; i < childNodeCount; i++)
             {
                 var matchChar = (char)this.reader.ReadVarUInt16();
-                childNodes!.Add(matchChar, this.DeserializeNode(fieldIdMap, nodeFactory, depth + 1));
+                childNodes![i] = new(matchChar, this.DeserializeNode(fieldIdMap, nodeFactory, depth + 1));
             }
 
-            var locationMatches = new List<TokenLocation>(50);
-            for (var itemMatch = 0; itemMatch < matchCount; itemMatch++)
+            for (var documentMatch = 0; documentMatch < matchCount; documentMatch++)
             {
-                var itemId = this.reader.ReadNonNegativeVarInt32();
+                var documentId = this.reader.ReadNonNegativeVarInt32();
                 var fieldCount = this.reader.ReadNonNegativeVarInt32();
-
-                var indexedTokens = ImmutableList.CreateBuilder<IndexedToken>();
+                var indexedTokens = new IndexedToken[fieldCount];
 
                 for (var fieldMatch = 0; fieldMatch < fieldCount; fieldMatch++)
                 {
                     // We read the serialized file id and use the mapping that the index has given us to
                     // map it to the field id in the new index.
-                    var fieldId = fieldIdMap[this.reader.ReadByte()];
+                    var fieldId = fieldIdMap.Map(this.reader.ReadByte());
 
                     var locationCount = this.reader.ReadNonNegativeVarInt32();
-
-                    locationMatches.Clear();
-
-                    // Resize the collection immediately if required to prevent multiple resizes during deserialization
-                    if (locationMatches.Capacity < locationCount)
-                    {
-                        locationMatches.Capacity = locationCount;
-                    }
-
+                    var locationMatches = new List<TokenLocation>(locationCount);
                     this.ReadLocations(locationCount, locationMatches);
 
-                    indexedTokens.Add(new IndexedToken(fieldId, locationMatches.ToArray()));
+                    indexedTokens[fieldMatch] = new IndexedToken(fieldId, [.. locationMatches]);
                 }
 
-                matches!.Add(itemId, indexedTokens.ToImmutable());
+                matches!.Add(documentId, indexedTokens);
             }
 
             return nodeFactory.CreateNode(
                 intraNodeText,
-                childNodes?.ToImmutable() ?? ImmutableDictionary<char, IndexNode>.Empty,
-                matches?.ToImmutable() ?? ImmutableDictionary<int, ImmutableList<IndexedToken>>.Empty);
+                childNodes == null ? ChildNodeMap.Empty : new ChildNodeMap(childNodes),
+                matches == null ? DocumentTokenMatchMap.Empty : new DocumentTokenMatchMap(matches));
         }
 
         /// <summary>
@@ -189,12 +196,12 @@ namespace Lifti.Serialization.Binary
                 }
                 else
                 {
-                    if (lastLocation == null)
+                    if (lastLocation is null)
                     {
                         throw new DeserializationException(ExceptionMessages.MalformedDataExpectedFullLocationEntry);
                     }
 
-                    location = this.DeserializeLocationData(lastLocation.Value, structureType);
+                    location = this.DeserializeLocationData(lastLocation, structureType);
                 }
 
                 locationMatches.Add(location);

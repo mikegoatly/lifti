@@ -1,8 +1,8 @@
 ﻿using Lifti;
-using System.Collections.Generic;
 using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace TestConsole
 {
@@ -10,7 +10,12 @@ namespace TestConsole
     {
         public abstract Task RunAsync();
 
-        protected static ISearchResults<T> RunSearch<T>(FullTextIndex<T> index, string query, string message = null)
+        protected static ISearchResults<TKey> RunSearch<TKey>(
+            FullTextIndex<TKey> index,
+            string query,
+            string? message = null,
+            Func<TKey, string>? objectResultText = null)
+            where TKey : notnull
         {
             if (message != null)
             {
@@ -20,29 +25,42 @@ namespace TestConsole
 
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.WriteLine($"Executing query: {query}");
+            Console.WriteLine($"(Query parsed as: {index.ParseQuery(query)})");
             Console.ResetColor();
 
             var results = index.Search(query);
-            PrintSearchResults(results);
+            PrintSearchResults(results, objectResultText);
             return results;
         }
 
-        protected static void PrintSearchResults<T>(IEnumerable<SearchResult<T>> results)
+        protected static void PrintSearchResults<TKey>(
+            IEnumerable<SearchResult<TKey>> results,
+            Func<TKey, string>? objectResultText = null)
         {
-            Console.WriteLine("Matched items total score:");
+            Console.WriteLine("Matched documents total score:");
             foreach (var result in results)
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.Write($"{result.Key} ");
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"({result.Score})");
+                Console.Write($"({result.Score})");
+
+                if (objectResultText != null)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write($" - {objectResultText(result.Key)}");
+                }
+
+                Console.WriteLine();
             }
 
             Console.ResetColor();
             Console.WriteLine();
         }
 
-        protected static async Task<ISearchResults<T>> RunSearchAsync<T, TItem>(FullTextIndex<T> index, string query, Func<T, TItem> readItem, string message = null)
+        protected static async Task<ISearchResults<TKey>> RunSearchAsync<TKey, TObject>(FullTextIndex<TKey> index, string query, Func<TKey, TObject> readItem, string? message = null)
+            where TObject : class
+            where TKey : notnull
         {
             if (message != null)
             {
@@ -59,7 +77,7 @@ namespace TestConsole
             return results;
         }
 
-        protected static async Task PrintSearchResultsAsync<T, TItem>(ISearchResults<T> results, Func<T, TItem> readItem)
+        protected static async Task PrintSearchResultsAsync<TKey, TObject>(ISearchResults<TKey> results, Func<TKey, TObject> readItem)
         {
             Console.WriteLine("Matched items, total score and matched phrases:");
             foreach (var result in await results.CreateMatchPhrasesAsync(readItem))

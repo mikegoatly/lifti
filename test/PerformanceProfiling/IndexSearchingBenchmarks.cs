@@ -7,12 +7,11 @@ namespace PerformanceProfiling
 {
     public class IndexSearchingBenchmarks : IndexBenchmarkBase
     {
-        private IFullTextIndex<int> index;
+        private readonly IFullTextIndex<int> index = CreateNewIndex(4);
 
         [GlobalSetup]
         public async Task SetUp()
         {
-            this.index = CreateNewIndex(4);
             await this.PopulateIndexAsync(this.index);
         }
 
@@ -32,7 +31,7 @@ namespace PerformanceProfiling
             "and | they",
             "and ~ they"
             )]
-        public string SearchCriteria { get; set; }
+        public string SearchCriteria { get; set; } = null!;
 
         [Benchmark]
         public object Searching()

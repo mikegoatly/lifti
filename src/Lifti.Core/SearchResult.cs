@@ -15,11 +15,9 @@ namespace Lifti
         /// <summary>
         /// Constructs a new <see cref="SearchResult{TKey}"/> instance.
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="locations"></param>
-        public SearchResult(TKey item, IReadOnlyList<FieldSearchResult> locations)
+        public SearchResult(TKey key, IReadOnlyList<FieldSearchResult> locations)
         {
-            this.Key = item;
+            this.Key = key;
             this.FieldMatches = locations ?? throw new ArgumentNullException(nameof(locations));
 
             var score = 0D;
@@ -32,12 +30,12 @@ namespace Lifti
         }
 
         /// <summary>
-        /// Gets the item that matched the search criteria.
+        /// Gets the key of the document that matched the search criteria.
         /// </summary>
         public TKey Key { get; }
 
         /// <summary>
-        /// Gets the fields that were matched for the item. Each of these is scored independently and provides detailed information
+        /// Gets the fields that were matched for the document. Each of these is scored independently and provides detailed information
         /// about the location of the tokens that were matched.
         /// </summary>
         public IReadOnlyList<FieldSearchResult> FieldMatches { get; }

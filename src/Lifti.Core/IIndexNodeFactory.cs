@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Immutable;
 
 namespace Lifti
 {
@@ -23,15 +22,15 @@ namespace Lifti
         /// text has been completely processed.
         /// </param>
         /// <param name="childNodes">
-        /// The set of child nodes at this instance, keyed by matching character.
+        /// The <see cref="ChildNodeMap"/> at this instance.
         /// </param>
         /// <param name="matches">
-        /// The tokens that are matched at this instance, keyed by the internal item id.
+        /// The <see cref="DocumentTokenMatchMap"/>, providing access to the tokens that are matched against documents at this point in the index.
         /// </param>
         IndexNode CreateNode(
             ReadOnlyMemory<char> intraNodeText,
-            ImmutableDictionary<char, IndexNode> childNodes,
-            ImmutableDictionary<int, ImmutableList<IndexedToken>> matches);
+            ChildNodeMap childNodes,
+            DocumentTokenMatchMap matches);
 
         /// <summary>
         /// Gets the <see cref="IndexSupportLevelKind"/> for the given <paramref name="depth"/> into the index.

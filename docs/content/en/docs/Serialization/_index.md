@@ -40,9 +40,9 @@ var newIndex = new FullTextIndexBuilder<int>().Build();
 await serializer.DeserializeAsync(newIndex, stream, disposeStream: false);
 
 // Prove that the new index has the same contents
-// Emits: 3 items contain text in the new index
+// Emits: 3 documents contain text in the new index
 var matches = newIndex.Search("text");
-Console.WriteLine($"{matches.Count()} items contain text in the new index");
+Console.WriteLine($"{matches.Count()} documents contain text in the new index");
 ```
 
 If you want to understand how the binary data is laid out, you can have a look at the [Serialization Format](../reference/serialization-format) reference page.

@@ -1,17 +1,18 @@
 ﻿using FluentAssertions;
 using Lifti.Tests.Querying;
 using Lifti.Tokenization;
+using Lifti.Tokenization.Stemming;
 using System;
+using System.Text;
 using Xunit;
 
 namespace Lifti.Tests
 {
     public class TokenizerBuilderTests
     {
-        private static readonly TokenizationOptions expectedDefaultOptions = new TokenizationOptions()
+        private static readonly TokenizationOptions expectedDefaultOptions = new()
         {
             AccentInsensitive = true,
-            Stemming = false,
             AdditionalSplitCharacters = Array.Empty<char>(),
             CaseInsensitive = true,
             SplitOnPunctuation = true
@@ -41,14 +42,49 @@ namespace Lifti.Tests
                 .Options.Should().BeEquivalentTo(expectedDefaultOptions);
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void WithStemming_ShouldSetTheStemmingPropertyCorrectly(bool setting)
+        [Fact]
+        public void WithoutStemming_ShouldLeaveStemmerNull()
         {
             var builder = new TokenizerBuilder();
-            builder.WithStemming(setting);
-            builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options.Stemming.Should().Be(setting);
+            builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options.Stemmer.Should().BeNull();
+        }
+
+        [Fact]
+        public void WithStemming_ShouldSetTheStemmerToAPorterStemmer()
+        {
+            var builder = new TokenizerBuilder();
+            builder.WithStemming();
+            builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options.Stemmer.Should().BeOfType<PorterStemmer>();
+        }
+
+        [Fact]
+        public void WithCustomStemmer_ShouldSetTheStemmerToAProvidedStemmer()
+        {
+            var builder = new TokenizerBuilder();
+            builder.WithStemming(new CustomStemmer(true, true));
+            builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options.Stemmer.Should().BeOfType<CustomStemmer>();
+        }
+
+        [Fact]
+        public void StemmerInsensitivityRequirements_ShouldAffectIndexInsensitivityOptions()
+        {
+            var builder = new TokenizerBuilder()
+                .AccentInsensitive(false)
+                .CaseInsensitive(false)
+                .WithStemming(new CustomStemmer(true, false));
+
+            var options = builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options;
+            options.CaseInsensitive.Should().BeTrue();
+            options.AccentInsensitive.Should().BeFalse();
+
+            builder = new TokenizerBuilder()
+                .AccentInsensitive(false)
+                .CaseInsensitive(false)
+                .WithStemming(new CustomStemmer(false, true));
+
+            options = builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options;
+            options.CaseInsensitive.Should().BeFalse();
+            options.AccentInsensitive.Should().BeTrue();
         }
 
         [Theory]
@@ -95,6 +131,24 @@ namespace Lifti.Tests
             var builder = new TokenizerBuilder();
             builder.IgnoreCharacters('\'', '`');
             builder.Build().Should().BeOfType<IndexTokenizer>().Subject.Options.IgnoreCharacters.Should().BeEquivalentTo(new[] { '\'', '`' });
+        }
+
+        private class CustomStemmer : IStemmer
+        {
+            public CustomStemmer(bool requireCaseInsensitivity, bool requireAccentInsensitivity)
+            {
+                this.RequiresCaseInsensitivity = requireCaseInsensitivity;
+                this.RequiresAccentInsensitivity = requireAccentInsensitivity;
+            }
+
+            public bool RequiresCaseInsensitivity { get; private set; }
+
+            public bool RequiresAccentInsensitivity { get; private set; }
+
+            public void Stem(StringBuilder builder)
+            {
+                builder.Length = 1;
+            }
         }
     }
 }

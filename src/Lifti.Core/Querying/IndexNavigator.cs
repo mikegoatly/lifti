@@ -1,39 +1,58 @@
 ﻿using System;
-using System.Buffers;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Lifti.Querying
 {
     internal sealed class IndexNavigator : IIndexNavigator
     {
-        private readonly StringBuilder navigatedWith = new StringBuilder(16);
+        private readonly Queue<IndexNavigatorBookmark> bookmarkPool = new(10);
+        private readonly StringBuilder navigatedWith = new(16);
         private IIndexNavigatorPool? pool;
         private IScorer? scorer;
+        private IIndexSnapshot? snapshot;
+
         private IndexNode? currentNode;
         private int intraNodeTextPosition;
         private bool bookmarkApplied;
 
-        internal void Initialize(IndexNode node, IIndexNavigatorPool pool, IScorer scorer)
+        internal void Initialize(IIndexSnapshot indexSnapshot, IIndexNavigatorPool pool, IScorer scorer)
         {
             this.pool = pool;
             this.scorer = scorer;
-            this.currentNode = node;
+            this.snapshot = indexSnapshot;
+            this.currentNode = indexSnapshot.Root;
             this.intraNodeTextPosition = 0;
             this.navigatedWith.Length = 0;
             this.bookmarkApplied = false;
         }
 
-        private bool HasIntraNodeTextLeftToProcess => this.currentNode != null && this.intraNodeTextPosition < this.currentNode.IntraNodeText.Length;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool HasIntraNodeTextLeftToProcess(int intraNodeTextPosition, IndexNode node) => intraNodeTextPosition < node.IntraNodeText.Length;
+
+        public int ExactMatchCount()
+        {
+            return this.HasExactMatches ? this.currentNode!.Matches.Count : 0;
+        }
+
+        /// <inheritdoc />
+        public IIndexSnapshot Snapshot
+        {
+            get
+            {
+                return this.snapshot ?? throw new LiftiException(ExceptionMessages.NoSnapshotInitialized);
+            }
+        }
 
         public bool HasExactMatches
         {
             get
             {
-                if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess || !this.currentNode.HasMatches)
+                if (this.currentNode == null || HasIntraNodeTextLeftToProcess(this.intraNodeTextPosition, this.currentNode) || !this.currentNode.HasMatches)
                 {
                     return false;
                 }
@@ -44,61 +63,58 @@ namespace Lifti.Querying
 
         public IntermediateQueryResult GetExactMatches(double weighting = 1D)
         {
-            if (this.currentNode == null || this.HasIntraNodeTextLeftToProcess || !this.currentNode.HasMatches)
+            return this.GetExactMatches(QueryContext.Empty, weighting);
+        }
+
+        public IntermediateQueryResult GetExactMatches(QueryContext queryContext, double weighting = 1D)
+        {
+            if (this.currentNode == null || HasIntraNodeTextLeftToProcess(this.intraNodeTextPosition, this.currentNode) || !this.currentNode.HasMatches)
             {
                 return IntermediateQueryResult.Empty;
             }
 
-            var matches = this.currentNode.Matches.Select(CreateQueryTokenMatch);
+            var collector = new DocumentMatchCollector();
 
-            return CreateIntermediateQueryResult(matches, weighting);
+            this.AddExactMatches(this.currentNode, queryContext, collector, weighting);
+
+            return collector.ToIntermediateQueryResult();
+        }
+
+        public void AddExactMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1D)
+        {
+            if (this.currentNode == null || HasIntraNodeTextLeftToProcess(this.intraNodeTextPosition, this.currentNode) || !this.currentNode.HasMatches)
+            {
+                return;
+            }
+
+            this.AddExactMatches(this.currentNode, queryContext, documentMatchCollector, weighting);
         }
 
         public IntermediateQueryResult GetExactAndChildMatches(double weighting = 1D)
+        {
+            return this.GetExactAndChildMatches(QueryContext.Empty, weighting);
+        }
+
+        public IntermediateQueryResult GetExactAndChildMatches(QueryContext queryContext, double weighting = 1D)
         {
             if (this.currentNode == null)
             {
                 return IntermediateQueryResult.Empty;
             }
 
-            var matches = new Dictionary<int, List<FieldMatch>>();
-            var childNodeStack = new Queue<IndexNode>();
-            childNodeStack.Enqueue(this.currentNode);
+            var collector = new DocumentMatchCollector();
 
-            while (childNodeStack.Count > 0)
+            this.AddExactAndChildMatches(this.currentNode, queryContext, collector, weighting);
+
+            return collector.ToIntermediateQueryResult();
+        }
+
+        public void AddExactAndChildMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1)
+        {
+            if (this.currentNode != null)
             {
-                var node = childNodeStack.Dequeue();
-                if (node.HasMatches)
-                {
-                    foreach (var match in node.Matches)
-                    {
-                        var fieldMatches = match.Value.Select(v => new FieldMatch(v));
-                        if (!matches.TryGetValue(match.Key, out var mergedItemResults))
-                        {
-                            mergedItemResults = new List<FieldMatch>(fieldMatches);
-                            matches[match.Key] = mergedItemResults;
-                        }
-                        else
-                        {
-                            mergedItemResults.AddRange(fieldMatches);
-                        }
-                    }
-                }
-
-                if (node.HasChildNodes)
-                {
-                    foreach (var childNode in node.ChildNodes.Values)
-                    {
-                        childNodeStack.Enqueue(childNode);
-                    }
-                }
+                this.AddExactAndChildMatches(this.currentNode, queryContext, documentMatchCollector, weighting);
             }
-
-            var queryTokenMatches = matches.Select(m => new QueryTokenMatch(
-                    m.Key,
-                    MergeItemMatches(m.Value).ToList()));
-
-            return CreateIntermediateQueryResult(queryTokenMatches, weighting);
         }
 
         public bool Process(string text)
@@ -131,7 +147,7 @@ namespace Lifti.Querying
                 this.navigatedWith.Append(value);
             }
 
-            if (this.HasIntraNodeTextLeftToProcess)
+            if (HasIntraNodeTextLeftToProcess(this.intraNodeTextPosition, this.currentNode))
             {
                 if (value == this.currentNode.IntraNodeText.Span[this.intraNodeTextPosition])
                 {
@@ -189,23 +205,31 @@ namespace Lifti.Querying
         {
             if (this.currentNode != null)
             {
-                if (this.HasIntraNodeTextLeftToProcess)
+                if (HasIntraNodeTextLeftToProcess(this.intraNodeTextPosition, this.currentNode))
                 {
-                    yield return this.currentNode.IntraNodeText.Span[this.intraNodeTextPosition];
+                    return MemoryMarshal.ToEnumerable(this.currentNode.IntraNodeText.Slice(this.intraNodeTextPosition, 1));
                 }
                 else if (this.currentNode.HasChildNodes)
                 {
-                    foreach (var character in this.currentNode.ChildNodes.Keys)
-                    {
-                        yield return character;
-                    }
+                    return this.currentNode.ChildNodes.CharacterMap.Select(static x => x.ChildChar);
                 }
             }
+
+            return Array.Empty<char>();
         }
 
         public IIndexNavigatorBookmark CreateBookmark()
         {
-            return new IndexNavigatorBookmark(this);
+            var bookmark = this.GetCachedBookmarkOrCreate();
+            bookmark.Capture();
+            return bookmark;
+        }
+
+        private IndexNavigatorBookmark GetCachedBookmarkOrCreate()
+        {
+            return this.bookmarkPool.Count == 0
+                ? new IndexNavigatorBookmark(this)
+                : this.bookmarkPool.Dequeue();
         }
 
         public void Dispose()
@@ -217,18 +241,6 @@ namespace Lifti.Querying
             }
 
             this.pool.Return(this);
-        }
-
-        private IntermediateQueryResult CreateIntermediateQueryResult(IEnumerable<QueryTokenMatch> matches, double weighting)
-        {
-            if (this.scorer == null)
-            {
-                throw new InvalidOperationException(ExceptionMessages.NoScorerInitialized);
-            }
-
-            var matchList = matches as IReadOnlyList<QueryTokenMatch> ?? matches.ToList();
-            var scoredMatches = this.scorer.Score(matchList, weighting);
-            return new IntermediateQueryResult(scoredMatches);
         }
 
         private IEnumerable<string> EnumerateIndexedTokens(IndexNode node)
@@ -245,10 +257,10 @@ namespace Lifti.Querying
 
             if (node.HasChildNodes)
             {
-                foreach (var childNode in node.ChildNodes)
+                foreach (var (character, childNode) in node.ChildNodes.CharacterMap)
                 {
-                    this.navigatedWith.Append(childNode.Key);
-                    foreach (var result in this.EnumerateIndexedTokens(childNode.Value))
+                    this.navigatedWith.Append(character);
+                    foreach (var result in this.EnumerateIndexedTokens(childNode))
                     {
                         yield return result;
                     }
@@ -263,41 +275,108 @@ namespace Lifti.Querying
             }
         }
 
-        private static IEnumerable<FieldMatch> MergeItemMatches(List<FieldMatch> fieldMatches)
+        private void AddExactAndChildMatches(IndexNode startNode, QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting)
         {
-            return fieldMatches.ToLookup(m => m.FieldId)
-                .Select(m => new FieldMatch(
-                    m.Key,
-                    m.SelectMany(w => w.Locations)));
+            var childNodeStack = new Queue<IndexNode>();
+            childNodeStack.Enqueue(startNode);
+
+            while (childNodeStack.Count > 0)
+            {
+                var node = childNodeStack.Dequeue();
+                if (node.HasMatches)
+                {
+                    AddExactMatches(node, queryContext, documentMatchCollector, weighting);
+                }
+
+                if (node.HasChildNodes)
+                {
+                    foreach (var (_, childNode) in node.ChildNodes.CharacterMap)
+                    {
+                        childNodeStack.Enqueue(childNode);
+                    }
+                }
+            }
         }
 
-        private static QueryTokenMatch CreateQueryTokenMatch(
-            KeyValuePair<int, ImmutableList<IndexedToken>> match)
+        private void AddExactMatches(IndexNode node, QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting)
         {
-            return new QueryTokenMatch(
-                match.Key,
-                match.Value.Select(v => new FieldMatch(v)).ToList());
+            if (this.scorer == null)
+            {
+                throw new InvalidOperationException(ExceptionMessages.NoScorerInitialized);
+            }
+
+            var documentMatches = node.Matches.Enumerate();
+            if (queryContext.FilterToDocumentIds != null)
+            {
+                documentMatches = documentMatches.Where(m => queryContext.FilterToDocumentIds.Contains(m.documentId));
+            }
+
+            var filterToFieldId = queryContext.FilterToFieldId;
+            var matchedDocumentCount = node.Matches.Count;
+            var scorer = this.scorer;
+            foreach (var (documentId, indexedTokens) in documentMatches)
+            {
+                foreach (var indexedToken in indexedTokens)
+                {
+                    var fieldId = indexedToken.FieldId;
+                    if (filterToFieldId.HasValue && filterToFieldId.GetValueOrDefault() != fieldId)
+                    {
+                        continue;
+                    }
+
+                    var score = scorer.CalculateScore(
+                        matchedDocumentCount,
+                        documentId,
+                        fieldId,
+                        indexedToken.Locations,
+                        weighting);
+
+                    documentMatchCollector.Add(documentId, fieldId, indexedToken.Locations, score);
+                }
+            }
         }
 
-        internal readonly struct IndexNavigatorBookmark : IIndexNavigatorBookmark, IEquatable<IndexNavigatorBookmark>
+        internal sealed class IndexNavigatorBookmark : IIndexNavigatorBookmark, IEquatable<IndexNavigatorBookmark>
         {
             private readonly IndexNavigator indexNavigator;
-            private readonly IndexNode? currentNode;
-            private readonly int intraNodeTextPosition;
+            private IndexNode? currentNode;
+            private int intraNodeTextPosition;
+            private bool disposed;
 
             public IndexNavigatorBookmark(IndexNavigator indexNavigator)
             {
+                this.indexNavigator = indexNavigator;
+            }
+
+            public void Capture()
+            {
                 this.currentNode = indexNavigator.currentNode;
                 this.intraNodeTextPosition = indexNavigator.intraNodeTextPosition;
-                this.indexNavigator = indexNavigator;
+                this.disposed = false;
             }
 
             /// <inheritdoc />
             public void Apply()
             {
-                this.indexNavigator.bookmarkApplied = true;
-                this.indexNavigator.currentNode = this.currentNode;
-                this.indexNavigator.intraNodeTextPosition = this.intraNodeTextPosition;
+                if (this.disposed)
+                {
+                    throw new LiftiException(ExceptionMessages.BookmarkDisposed);
+                }
+
+                var indexNavigator = this.indexNavigator;
+                indexNavigator.bookmarkApplied = true;
+                indexNavigator.currentNode = this.currentNode;
+                indexNavigator.intraNodeTextPosition = this.intraNodeTextPosition;
+            }
+
+            public void Dispose()
+            {
+                if (this.indexNavigator.bookmarkPool.Count < 10)
+                {
+                    this.indexNavigator.bookmarkPool.Enqueue(this);
+                }
+
+                this.disposed = true;
             }
 
             public override bool Equals(object? obj)
@@ -312,12 +391,12 @@ namespace Lifti.Querying
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(this.indexNavigator, this.currentNode, this.intraNodeTextPosition);
+                return HashCode.Combine(this.currentNode, this.intraNodeTextPosition);
             }
 
-            public bool Equals(IndexNavigatorBookmark bookmark)
+            public bool Equals(IndexNavigatorBookmark? bookmark)
             {
-                return this.indexNavigator == bookmark.indexNavigator &&
+                return bookmark != null &&
                        this.currentNode == bookmark.currentNode &&
                        this.intraNodeTextPosition == bookmark.intraNodeTextPosition;
             }

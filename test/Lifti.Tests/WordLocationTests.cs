@@ -24,9 +24,10 @@ namespace Lifti.Tests
             (firstWord >= secondWord).Should().BeFalse();
             (secondWord >= firstWord).Should().BeTrue();
 
-            firstWord.Should().BeLessThan(secondWord);
-            secondWord.Should().BeGreaterThan(firstWord);
-            firstWord.Should().NotBe(secondWord);
+            firstWord.CompareTo(secondWord).Should().Be(-1);
+            secondWord.CompareTo(firstWord).Should().Be(1);
+
+            firstWord.Equals(secondWord).Should().Be(false);
         }
 
         [Fact]

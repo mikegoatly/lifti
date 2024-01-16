@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lifti.Tokenization;
 using Lifti.Tokenization.Objects;
+using Lifti.Tokenization.Stemming;
 using Lifti.Tokenization.TextExtraction;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace Lifti.Tests
             fieldInfo.FieldKind.Should().Be(FieldKind.Static);
             fieldInfo.Tokenizer.Should().NotBeNull();
             var readField = await fieldInfo.ReadAsync("foo", default);
-            readField.Should().BeEquivalentTo(new[] { "foo" });
+            readField.Should().BeEquivalentTo(["foo"]);
         }
 
         [Fact]
@@ -56,7 +57,7 @@ namespace Lifti.Tests
             fieldInfo.FieldKind.Should().Be(FieldKind.Dynamic);
             fieldInfo.Tokenizer.Should().NotBeNull();
             var readField = await fieldInfo.ReadAsync(new TestObject(), default);
-            readField.Should().BeEquivalentTo(new[] { "bar" });
+            readField.Should().BeEquivalentTo(["bar"]);
         }
 
         [Fact]
@@ -94,8 +95,8 @@ namespace Lifti.Tests
         {
             this.WithBasicConfig();
 
-            ((IndexTokenizer)this.sut.GetFieldInfo("FieldX").Tokenizer).Options.Stemming.Should().BeTrue();
-            ((IndexTokenizer)this.sut.GetFieldInfo("FieldY").Tokenizer).Options.Stemming.Should().BeFalse();
+            ((IndexTokenizer)this.sut.GetFieldInfo("FieldX").Tokenizer).Options.Stemmer.Should().BeOfType<PorterStemmer>();
+            ((IndexTokenizer)this.sut.GetFieldInfo("FieldY").Tokenizer).Options.Stemmer.Should().BeNull();
         }
 
         [Fact]
@@ -157,25 +158,31 @@ namespace Lifti.Tests
                 this.sut);
         }
 
-        private IObjectTokenization Build(ObjectTokenizationBuilder<string, string> objectTokenizationBuilder, IndexedFieldLookup fieldLookup)
+        private IObjectTypeConfiguration Build(ObjectTokenizationBuilder<string, string> objectTokenizationBuilder, IndexedFieldLookup fieldLookup)
         {
             return (objectTokenizationBuilder as IObjectTokenizationBuilder)
-                .Build(IndexTokenizer.Default, new ThesaurusBuilder(), new PlainTextExtractor(), fieldLookup);
+                .Build(
+                    1,
+                    IndexTokenizer.Default,
+                    new ThesaurusBuilder(),
+                    new PlainTextExtractor(),
+                    fieldLookup);
         }
 
-        private static DynamicFieldReader<T> CreateDynamicFieldReader<T>()
-            where T : new()
+        private static DynamicFieldReader<TObject> CreateDynamicFieldReader<TObject>()
+            where TObject : new()
         {
-            var reader = new StringDictionaryDynamicFieldReader<T>(
+            var reader = new StringDictionaryDynamicFieldReader<TObject>(
                 x => new Dictionary<string, string> { { "foo", "bar" } },
                 "Test",
                 null,
                 IndexTokenizer.Default,
                 new PlainTextExtractor(),
-                new ThesaurusBuilder().Build(IndexTokenizer.Default));
+                new ThesaurusBuilder().Build(IndexTokenizer.Default),
+                1D);
 
             // Force the reader to first produce (and cache) the field names
-            reader.ReadAsync(new T(), default);
+            reader.ReadAsync(new TObject(), default);
 
             return reader;
         }

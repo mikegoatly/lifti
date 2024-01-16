@@ -121,7 +121,7 @@
     <value>When fields are configured with async access methods the async Add methods must be used on the index</value>
   </data>
   <data name="AtLeastOneFieldMustBeIndexed" xml:space="preserve">
-    <value>At least one field must be configured for an item</value>
+    <value>At least one field must be configured for an object type</value>
   </data>
   <data name="AttemptToReadFieldUnknownToDynamicFieldReader" xml:space="preserve">
     <value>An attempt was made to read a dynamic field ("{0}") from a provider that did not produce it.</value>
@@ -131,6 +131,9 @@
   </data>
   <data name="BatchChangeAlreadyStarted" xml:space="preserve">
     <value>Cannot start a new batch change while another is already in progress.</value>
+  </data>
+  <data name="BookmarkDisposed" xml:space="preserve">
+    <value>Cannot apply a disposed bookmark</value>
   </data>
   <data name="CannotCombineAnEmptySetOfQueryParts" xml:space="preserve">
     <value>Cannot combine an empty set of query parts</value>
@@ -145,7 +148,7 @@
     <value>Duplicate dynamic field reader name encountered: {0}. Dynamic field readers must have unique names.</value>
   </data>
   <data name="DuplicateFieldEncounteredOnObject" xml:space="preserve">
-    <value>A duplicate field "{0}" was encountered while indexing item {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields.</value>
+    <value>A duplicate field "{0}" was encountered while indexing the object with key {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields.</value>
   </data>
   <data name="EarlierVersionSerializedIndexNotSupported" xml:space="preserve">
     <value>The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI.</value>
@@ -153,14 +156,26 @@
   <data name="EmptyAdjacentTextPartsAreNotSupported" xml:space="preserve">
     <value>Adjacent text query parts cannot be empty</value>
   </data>
+  <data name="EmptyAdjacentWordsQueryPart" xml:space="preserve">
+    <value>Cannot create an empty adjacent words query part</value>
+  </data>
   <data name="EmptyBracketedExpressionsAreNotSupported" xml:space="preserve">
     <value>Bracketed query parts cannot be empty</value>
+  </data>
+  <data name="EmptyFieldNameEncountered" xml:space="preserve">
+    <value>Empty field name encountered</value>
   </data>
   <data name="EmptyOrMissingTextQueryFragmentValue" xml:space="preserve">
     <value>Internal error - missing text value</value>
   </data>
+  <data name="EmptyWildcardQuery" xml:space="preserve">
+    <value>Cannot create an empty wildcard query part</value>
+  </data>
   <data name="ExpectedAtLeastOneQueryPartParsed" xml:space="preserve">
     <value>Expected at least one query part to be parsed</value>
+  </data>
+  <data name="ExpectedEqualsAfterFieldName" xml:space="preserve">
+    <value>Expected = after bracketed field name</value>
   </data>
   <data name="ExpectedFuzzyMatchToken" xml:space="preserve">
     <value>Expected a fuzzy match token - got {0}</value>
@@ -195,8 +210,14 @@
   <data name="IndexMustBeEmptyForDeserialization" xml:space="preserve">
     <value>An index must be empty when attempting to deserialize its contents.</value>
   </data>
+  <data name="InvalidScoreBoost" xml:space="preserve">
+    <value>Invalid score boost number encountered: {0}</value>
+  </data>
+  <data name="InvalidScoreBoostExpectedNumber" xml:space="preserve">
+    <value>Expected a number to follow a score boost, e.g. "Term^3" would indicate that the search term "Term" should have a score boost of 3.</value>
+  </data>
   <data name="ItemAlreadyIndexed" xml:space="preserve">
-    <value>Item already indexed</value>
+    <value>Document already indexed</value>
   </data>
   <data name="ItemNotFound" xml:space="preserve">
     <value>Item not found</value>
@@ -213,6 +234,9 @@
   <data name="MaximumDistinctFieldsIndexReached" xml:space="preserve">
     <value>Only 255 distinct fields can currently be indexed</value>
   </data>
+  <data name="MaximumNumberOfConfiguredObjectTypesReached" xml:space="preserve">
+    <value>An index can only have a maximum of 31 unique object types configured against it</value>
+  </data>
   <data name="MaxTokenLengthExceeded" xml:space="preserve">
     <value>Only tokens up to {0} characters long can be indexed.</value>
   </data>
@@ -221,6 +245,9 @@
   </data>
   <data name="MissingLiftiHeaderIndicatorBytes" xml:space="preserve">
     <value>The expected header bytes could not be found in the stream - this is probably not a serialized index.</value>
+  </data>
+  <data name="MultiplierValueMustBeGreaterThanOne" xml:space="preserve">
+    <value>Multiplier values must be greater than one</value>
   </data>
   <data name="NoBatchChangeInProgress" xml:space="preserve">
     <value>No batch change in progress.</value>
@@ -240,11 +267,17 @@
   <data name="NoScorerInitialized" xml:space="preserve">
     <value>Attempting to score a query result with no scorer initialized</value>
   </data>
+  <data name="NoSnapshotInitialized" xml:space="preserve">
+    <value>Internal error: no snapshot initialized in navigator</value>
+  </data>
   <data name="NotAllRequestedItemsReturned" xml:space="preserve">
     <value>Not all requested items were returned. Tme missing ids were: {0}</value>
   </data>
   <data name="NoTokenizationOptionsProvidedForType" xml:space="preserve">
     <value>No tokenization options have been provided for type {0}</value>
+  </data>
+  <data name="ScoreBoostsNotCalculated" xml:space="preserve">
+    <value>Internal error - attempted to calculate an item score boost without initialized score boost stats</value>
   </data>
   <data name="SingleCharacterWildcardsFollowingMultiCharacterNotSupported" xml:space="preserve">
     <value>Single character wildcards (%) following a multi-character wildcard (*) are not currently supported.</value>
@@ -267,6 +300,9 @@
   <data name="UnableToReadHeaderInformation" xml:space="preserve">
     <value>Unable to read header data from serialized index content.</value>
   </data>
+  <data name="UnclosedSquareBracket" xml:space="preserve">
+    <value>Unclosed [ encountered</value>
+  </data>
   <data name="UnexpectedCloseBracket" xml:space="preserve">
     <value>Unexpected close bracket encountered in query</value>
   </data>
@@ -281,6 +317,9 @@
   </data>
   <data name="UnexpectedOperatorParseStateEncountered" xml:space="preserve">
     <value>Unexpected OperatorParseState {0} encountered while tokenizing a query</value>
+  </data>
+  <data name="UnexpectedScoreBoostValueRemoval" xml:space="preserve">
+    <value>Internal error - unexpected value removal from score boost metadata</value>
   </data>
   <data name="UnexpectedTokenEncountered" xml:space="preserve">
     <value>Unexpected token encountered: {0}</value>
@@ -297,6 +336,9 @@
   <data name="UnknownFieldsInSerializedIndex" xml:space="preserve">
     <value>Serialized index contains unknown field ids. Fields have most likely been removed from the FullTextIndexBuilder configuration.</value>
   </data>
+  <data name="UnknownObjectTypeId" xml:space="preserve">
+    <value>Unknown object type id {0}</value>
+  </data>
   <data name="UnknownOperatorEncountered" xml:space="preserve">
     <value>Unknown operator encountered: {0}</value>
   </data>
@@ -308,5 +350,8 @@
   </data>
   <data name="ValueMustNotBeLessThanZero" xml:space="preserve">
     <value>Value must not be less than zero</value>
+  </data>
+  <data name="WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition" xml:space="preserve">
+    <value>WithScoreBoosting can only be called once per object builder</value>
   </data>
 </root>

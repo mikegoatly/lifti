@@ -29,7 +29,3 @@ var query = new Query(
         new ExactWordQueryPart(tokenizer.Normalize("hello")), 
         new ExactWordQueryPart(tokenizer.Normalize("there"))));
 ```
-
-
-
-

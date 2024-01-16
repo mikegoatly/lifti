@@ -52,7 +52,7 @@ namespace Lifti.Tests.Tokenization.Preprocessing
         {
             var input = 'Ч';
 
-            var pipeline = CreatePipeline(ignoreCharacters: new[] { input });
+            var pipeline = CreatePipeline(ignoreCharacters: [input]);
 
             pipeline.Process(input).Should().BeEmpty();
 

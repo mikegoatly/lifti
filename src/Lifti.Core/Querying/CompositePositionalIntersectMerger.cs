@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lifti.Querying
@@ -7,27 +8,36 @@ namespace Lifti.Querying
     /// Provides logic for intersecting the results in two <see cref="IntermediateQueryResult"/>s where the fields 
     /// locations on the left must be within a specified positional tolerance of the the matching field locations on the right.
     /// </summary>
-    public class CompositePositionalIntersectMerger : IntermediateQueryResultMerger
+    internal sealed class CompositePositionalIntersectMerger : IntermediateQueryResultMerger
     {
         /// <summary>
         /// Applies the intersection to the <see cref="IntermediateQueryResult"/> instances.
         /// </summary>
-        public static IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right, int leftTolerance, int rightTolerance)
+        public static List<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right, int leftTolerance, int rightTolerance)
         {
-            // Swap over the variables to ensure we're performing as few iterations as possible in the intersection
-            // Also swap the tolerance values around, otherwise we reverse the tolerance directionality.
-            var swapLeftAndRight = left.Matches.Count > right.Matches.Count;
-            SwapIf(swapLeftAndRight, ref left, ref right);
-            SwapIf(swapLeftAndRight, ref leftTolerance, ref rightTolerance);
+            // track two pointers through the lists on each side. The document ids are ordered on both sides, so we can
+            // move through the lists in a single pass
 
-            var rightItems = right.Matches.ToDictionary(m => m.ItemId);
+            var leftIndex = 0;
+            var rightIndex = 0;
 
-            foreach (var leftMatch in left.Matches)
+            var leftMatches = left.Matches;
+            var rightMatches = right.Matches;
+            var leftCount = leftMatches.Count;
+            var rightCount = rightMatches.Count;
+
+            List<ScoredToken> results = new(Math.Min(leftCount, rightCount));
+
+            List<ScoredFieldMatch> positionalMatches = [];
+            while (leftIndex < leftCount && rightIndex < rightCount)
             {
-                if (rightItems.TryGetValue(leftMatch.ItemId, out var rightMatch))
+                var leftMatch = leftMatches[leftIndex];
+                var rightMatch = rightMatches[rightIndex];
+
+                if (leftMatch.DocumentId == rightMatch.DocumentId)
                 {
-                    var positionalMatches = PositionallyMatchAndCombineTokens(
-                        swapLeftAndRight,
+                    PositionallyMatchAndCombineTokens(
+                        positionalMatches,
                         leftMatch.FieldMatches,
                         rightMatch.FieldMatches,
                         leftTolerance,
@@ -35,37 +45,38 @@ namespace Lifti.Querying
 
                     if (positionalMatches.Count > 0)
                     {
-                        yield return new ScoredToken(leftMatch.ItemId, positionalMatches);
+                        results.Add(new ScoredToken(leftMatch.DocumentId, positionalMatches.ToList()));
+                        positionalMatches.Clear();
                     }
+
+                    leftIndex++;
+                    rightIndex++;
+                }
+                else if (leftMatch.DocumentId < rightMatch.DocumentId)
+                {
+                    leftIndex++;
+                }
+                else
+                {
+                    rightIndex++;
                 }
             }
+
+            return results;
         }
 
-        private static List<ScoredFieldMatch> PositionallyMatchAndCombineTokens(
-            bool leftAndRightSwapped,
-            IEnumerable<ScoredFieldMatch> leftFields,
-            IEnumerable<ScoredFieldMatch> rightFields,
+        private static void PositionallyMatchAndCombineTokens(
+            List<ScoredFieldMatch> positionalMatches,
+            IReadOnlyList<ScoredFieldMatch> leftFields,
+            IReadOnlyList<ScoredFieldMatch> rightFields,
             int leftTolerance,
             int rightTolerance)
         {
             var matchedFields = JoinFields(leftFields, rightFields);
 
-            var fieldResults = new List<ScoredFieldMatch>(matchedFields.Count);
-            var fieldTokenMatches = new List<ITokenLocationMatch>();
+            var fieldTokenMatches = new List<ITokenLocation>();
             foreach (var (fieldId, score, leftLocations, rightLocations) in matchedFields)
             {
-                fieldTokenMatches.Clear();
-
-                static CompositeTokenMatchLocation CreateCompositeTokenMatchLocation(bool swapTokens, ITokenLocationMatch currentToken, ITokenLocationMatch nextToken)
-                {
-                    if (swapTokens)
-                    {
-                        return new CompositeTokenMatchLocation(nextToken, currentToken);
-                    }
-
-                    return new CompositeTokenMatchLocation(currentToken, nextToken);
-                }
-
                 var leftIndex = 0;
                 var rightIndex = 0;
 
@@ -78,7 +89,7 @@ namespace Lifti.Querying
                     {
                         if ((currentToken.MinTokenIndex - nextToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(leftTolerance))
                         {
-                            fieldTokenMatches.Add(CreateCompositeTokenMatchLocation(leftAndRightSwapped, currentToken, nextToken));
+                            fieldTokenMatches.Add(currentToken.ComposeWith(nextToken));
                         }
                     }
 
@@ -86,7 +97,7 @@ namespace Lifti.Querying
                     {
                         if ((nextToken.MinTokenIndex - currentToken.MaxTokenIndex).IsPositiveAndLessThanOrEqualTo(rightTolerance))
                         {
-                            fieldTokenMatches.Add(CreateCompositeTokenMatchLocation(leftAndRightSwapped, currentToken, nextToken));
+                            fieldTokenMatches.Add(currentToken.ComposeWith(nextToken));
                         }
                     }
 
@@ -102,14 +113,15 @@ namespace Lifti.Querying
 
                 if (fieldTokenMatches.Count > 0)
                 {
-                    fieldResults.Add(
-                        new ScoredFieldMatch(
-                            score,
-                            new FieldMatch(fieldId, fieldTokenMatches)));
+                    positionalMatches.Add(
+                        ScoredFieldMatch.CreateFromPresorted(
+                            score, 
+                            fieldId, 
+                            fieldTokenMatches));
+
+                    fieldTokenMatches = [];
                 }
             }
-
-            return fieldResults;
         }
     }
 }

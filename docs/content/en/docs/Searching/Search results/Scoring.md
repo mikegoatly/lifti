@@ -1,6 +1,6 @@
 ---
-title: "Search Result Scoring"
-linkTitle: "Result Scoring"
+title: "Search result scoring"
+linkTitle: "Scoring"
 weight: 2
 description: >
   Explains how  the results provided in `ISearchResults<T>` are ordered, and how LIFTI calculates its scores.
@@ -44,3 +44,12 @@ PrintSearchResults(results);
 // 1
 // 2
 ```
+
+## Score boosting
+
+You can boost scores in a number of ways:
+
+* Boosting search terms as [part of the query](../../lifti-query-syntax#score-boosting): `thanks^1.5`.
+* Boosting [fields](../../../index-construction/withobjecttokenization#scoreboost) associated to an object: `.WithField("Name", c => c.Name, scoreBoost: 1.5D)`.
+* Boosting objects based on a [freshness date](../../../index-construction/withobjecttokenization#withscoreboosting), e.g. the date it was last updated.
+* Boosting objects based on a [magnitude value](../../../index-construction/withobjecttokenization#withscoreboosting), e.g. a star rating.

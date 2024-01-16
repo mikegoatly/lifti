@@ -26,7 +26,7 @@ Where you want users to be able to search for text in all three Title, Abstract 
 // Books are indexed by their BookId property, which is an int.
 var bookIndex = new FullTextIndexBuilder<int>()
     .WithObjectTokenization<Book>(
-        itemOptions => itemOptions
+        options => options
             .WithKey(b => b.BookId)
             .WithField("Title", b => b.Title,
                 tokenOptions => tokenOptions.WithStemming())
@@ -63,15 +63,15 @@ await bookIndex.AddRangeAsync(books);
 When you get search results back, they will be against the key stored in the index, i.e. the book's id:
 
 ``` csharp
-// Both books contain "first" - prints "Matched items: 1, 2 with respective scores 0.274884808704732, 0.265418822719626"
+// Both books contain "first" - prints "Matched documents: 1, 2 with respective scores 0.274884808704732, 0.265418822719626"
 var results = bookIndex.Search("first");
 Console.WriteLine(
-    "Matched items: " + 
+    "Matched documents: " + 
     string.Join(", ", results.Select(i => i.Key)) +
     " with respective scores: " +
     string.Join(", ", results.Select(i => i.Score)));
 
-// Only first book contains "the" in the title - prints "Matched items: 1"
+// Only first book contains "the" in the title - prints "Matched documents: 1"
 results = bookIndex.Search("title=the");
-Console.WriteLine("Matched items: " + string.Join(", ", results.Select(i => i.Key)));
+Console.WriteLine("Matched documents: " + string.Join(", ", results.Select(i => i.Key)));
 ```

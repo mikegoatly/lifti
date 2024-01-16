@@ -3,20 +3,20 @@
 namespace Lifti.Querying.QueryParts
 {
     /// <summary>
-    /// An <see cref="IQueryPart"/> that only matches items that contain an exact match for the given text.
+    /// An <see cref="IQueryPart"/> that only matches documents that contain an exact match for the given text.
     /// </summary>
-    public class ExactWordQueryPart : WordQueryPart
+    public sealed class ExactWordQueryPart : WordQueryPart
     {
         /// <summary>
         /// Constructs a new instance of <see cref="ExactWordQueryPart"/>.
         /// </summary>
-        public ExactWordQueryPart(string word)
-            : base(word)
+        public ExactWordQueryPart(string word, double? scoreBoost = null)
+            : base(word, scoreBoost)
         {
         }
 
         /// <inheritdoc/>
-        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             if (navigatorCreator == null)
             {
@@ -30,13 +30,13 @@ namespace Lifti.Querying.QueryParts
 
             using var navigator = navigatorCreator();
             navigator.Process(this.Word.AsSpan());
-            return queryContext.ApplyTo(navigator.GetExactMatches());
+            return navigator.GetExactMatches(queryContext, this.ScoreBoost ?? 1D);
         }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return this.Word;
+            return base.ToString(this.Word);
         }
     }
 }

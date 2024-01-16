@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lifti.Querying;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -39,7 +40,7 @@ namespace Lifti.Tests.Querying
         public void GettingExactMatches_WithNoExactMatch_ShouldReturnEmptyResults(string test)
         {
             this.sut.Process(test).Should().BeTrue();
-            var results = this.sut.GetExactMatches();
+            var results = this.sut.GetExactMatches(QueryContext.Empty);
             results.Should().NotBeNull();
             results.Matches.Should().BeEmpty();
         }
@@ -50,7 +51,7 @@ namespace Lifti.Tests.Querying
         public void GettingExactMatches_WithNonMatchingTextProcessed_ShouldReturnEmptyResults(string test)
         {
             this.sut.Process(test).Should().BeFalse();
-            var results = this.sut.GetExactMatches();
+            var results = this.sut.GetExactMatches(QueryContext.Empty);
             results.Should().NotBeNull();
             results.Matches.Should().BeEmpty();
         }
@@ -59,18 +60,94 @@ namespace Lifti.Tests.Querying
         public void GettingExactMatches_WithMatchingTextProcessed_ShouldReturnResults()
         {
             this.sut.Process("INDIFFERENCE").Should().BeTrue();
-            var results = this.sut.GetExactMatches();
+            var results = this.sut.GetExactMatches(QueryContext.Empty);
             results.Should().NotBeNull();
             results.Matches.Should().BeEquivalentTo(
                 new[]
                 {
                     ScoredToken(
                         0,
-                        ScoredFieldMatch(double.Epsilon, 0, new SingleTokenLocationMatch(new TokenLocation(5, 42, 12))))
+                        ScoredFieldMatch(double.Epsilon, 0, new TokenLocation(5, 42, 12)))
                 },
                 o => o.ComparingByMembers<ScoredToken>()
                       .ComparingByMembers<ScoredFieldMatch>()
                       .Excluding(i => i.Path.EndsWith("Score")));
+        }
+
+        [Fact]
+        public async Task GettingExactMatches_WithDocumentFilter_ShouldOnlyReturnFilteredDocuments()
+        {
+            await this.index.AddAsync(("B", "Elephant", "Ellie"));
+            await this.index.AddAsync(("C", "Elephant", "Elon"));
+
+            this.sut = this.index.Snapshot.CreateNavigator();
+
+            this.sut.Process("ELEPHANT").Should().BeTrue();
+
+            var documentId = this.index.Metadata.GetMetadata("B").Id;
+
+            var results = this.sut.GetExactMatches(new QueryContext(FilterToDocumentIds: new HashSet<int> { documentId }));
+
+            results.Matches.Should().HaveCount(1);
+            results.Matches[0].DocumentId.Should().Be(documentId);
+        }
+
+        [Fact]
+        public async Task GettingExactMatches_WithFieldFilter_ShouldOnlyReturnFilteredDocuments()
+        {
+            await this.index.AddAsync(("B", "Elephant", "Ellie"));
+            await this.index.AddAsync(("C", "Elephant", "Elephant"));
+
+            this.sut = this.index.Snapshot.CreateNavigator();
+
+            this.sut.Process("ELEPHANT").Should().BeTrue();
+
+            var fieldId = this.index.FieldLookup.GetFieldInfo("Field2").Id;
+            var expectedDocumentId = this.index.Metadata.GetMetadata("C").Id;
+
+            var results = this.sut.GetExactMatches(new QueryContext(FilterToFieldId: fieldId));
+
+            results.Matches.Should().HaveCount(1);
+            results.Matches[0].DocumentId.Should().Be(expectedDocumentId);
+            results.Matches[0].FieldMatches.Should().AllSatisfy(x => x.FieldId.Should().Be(fieldId));
+        }
+
+        [Fact]
+        public async Task GettingExactAndChildMatches_WithDocumentFilter_ShouldOnlyReturnFilteredDocuments()
+        {
+            await this.index.AddAsync(("B", "Elephant", "Ellie"));
+            await this.index.AddAsync(("C", "Elephant", "Elon"));
+
+            this.sut = this.index.Snapshot.CreateNavigator();
+
+            this.sut.Process("ELE").Should().BeTrue();
+
+            var documentId = this.index.Metadata.GetMetadata("B").Id;
+
+            var results = this.sut.GetExactAndChildMatches(new QueryContext(FilterToDocumentIds: new HashSet<int> { documentId }));
+
+            results.Matches.Should().HaveCount(1);
+            results.Matches[0].DocumentId.Should().Be(documentId);
+        }
+
+        [Fact]
+        public async Task GettingExactAndChildMatches_WithFieldFilter_ShouldOnlyReturnFilteredDocuments()
+        {
+            await this.index.AddAsync(("B", "Elephant", "Ellie"));
+            await this.index.AddAsync(("C", "Elephant", "Elephant"));
+
+            this.sut = this.index.Snapshot.CreateNavigator();
+
+            this.sut.Process("ELE").Should().BeTrue();
+
+            var fieldId = this.index.FieldLookup.GetFieldInfo("Field2").Id;
+            var expectedDocumentId = this.index.Metadata.GetMetadata("C").Id;
+
+            var results = this.sut.GetExactAndChildMatches(new QueryContext(FilterToFieldId: fieldId));
+
+            results.Matches.Should().HaveCount(1);
+            results.Matches[0].DocumentId.Should().Be(expectedDocumentId);
+            results.Matches[0].FieldMatches.Should().AllSatisfy(x => x.FieldId.Should().Be(fieldId));
         }
 
         [Theory]
@@ -82,7 +159,7 @@ namespace Lifti.Tests.Querying
         public void GettingExactAndChildMatches_WithNoExactMatch_ShouldReturnNonEmptyResults(string test)
         {
             this.sut.Process(test).Should().BeTrue();
-            var results = this.sut.GetExactAndChildMatches();
+            var results = this.sut.GetExactAndChildMatches(QueryContext.Empty);
             results.Should().NotBeNull();
             results.Matches.Should().NotBeEmpty();
         }
@@ -146,26 +223,24 @@ namespace Lifti.Tests.Querying
             await this.index.AddAsync(("B", "Zoopla Zoo Zammo", "Zany Zippy Llamas"));
             await this.index.AddAsync(("C", "Zak", "Ziggy Stardust"));
 
-            var navigator = this.index.Snapshot.CreateNavigator();
-            navigator.Process("Z").Should().BeTrue();
-            var results = navigator.GetExactAndChildMatches();
+            this.sut = this.index.Snapshot.CreateNavigator();
+            this.sut.Process("Z").Should().BeTrue();
+            var results = this.sut.GetExactAndChildMatches(QueryContext.Empty);
             results.Should().NotBeNull();
 
             var expectedTokens = new[] {
                 ScoredToken(
                     1,
-                    new[]
-                    {
-                        ScoredFieldMatch(0D, 1, SingleTokenLocationMatch(0, 0, 6), SingleTokenLocationMatch(1, 7, 3), SingleTokenLocationMatch(2, 11, 5)),
-                        ScoredFieldMatch(0D, 2, SingleTokenLocationMatch(0, 0, 4), SingleTokenLocationMatch(1, 5, 5))
-                    }),
+                    [
+                        ScoredFieldMatch(0D, 1, TokenLocation(0, 0, 6), TokenLocation(1, 7, 3), TokenLocation(2, 11, 5)),
+                        ScoredFieldMatch(0D, 2, TokenLocation(0, 0, 4), TokenLocation(1, 5, 5))
+                    ]),
                 ScoredToken(
                     2,
-                    new[]
-                    {
-                        ScoredFieldMatch(0D, 1, SingleTokenLocationMatch(0, 0, 3)),
-                        ScoredFieldMatch(0D, 2, SingleTokenLocationMatch(0, 0, 5))
-                    })
+                    [
+                        ScoredFieldMatch(0D, 1, TokenLocation(0, 0, 3)),
+                        ScoredFieldMatch(0D, 2, TokenLocation(0, 0, 5))
+                    ])
                 };
 
             results.Matches.Should().BeEquivalentTo(
@@ -181,7 +256,7 @@ namespace Lifti.Tests.Querying
         public void GettingExactAndChildMatches_WithNonMatchingTextProcessed_ShouldReturnEmptyResults(string test)
         {
             this.sut.Process(test).Should().BeFalse();
-            var results = this.sut.GetExactAndChildMatches();
+            var results = this.sut.GetExactAndChildMatches(QueryContext.Empty);
             results.Should().NotBeNull();
             results.Matches.Should().BeEmpty();
         }
@@ -227,20 +302,41 @@ namespace Lifti.Tests.Querying
             var bookmark = this.sut.CreateBookmark();
 
             this.sut.Process("VIDUAL");
-            VerifyMatchedWordIndexes(13);
+            this.VerifyMatchedWordIndexes(13);
 
             bookmark.Apply();
 
             this.sut.Process("F");
-            VerifyMatchedWordIndexes(5);
+            this.VerifyMatchedWordIndexes(5);
 
             bookmark.Apply();
-            VerifyMatchedWordIndexes(5, 13);
+            this.VerifyMatchedWordIndexes(5, 13);
+        }
+
+        [Fact]
+        public void Bookmarking_ShouldReuseDisposedBookmark()
+        {
+            this.sut.Process("INDI");
+
+            var bookmark = this.sut.CreateBookmark();
+
+            bookmark.Dispose();
+
+            this.sut.Process("VIDUAL");
+
+            var nextBookmark = this.sut.CreateBookmark();
+
+            nextBookmark.Should().BeSameAs(bookmark);
+
+            // And the new bookmark should be usable at the current location, not the old
+            this.sut.Process("S");
+            nextBookmark.Apply();
+            this.VerifyMatchedWordIndexes(13);
         }
 
         private void VerifyMatchedWordIndexes(params int[] indexes)
         {
-            var results = this.sut.GetExactAndChildMatches();
+            var results = this.sut.GetExactAndChildMatches(QueryContext.Empty);
             results.Matches.Should().HaveCount(1);
             results.Matches[0].FieldMatches.Should().HaveCount(1);
             var fieldMatch = results.Matches[0].FieldMatches[0];

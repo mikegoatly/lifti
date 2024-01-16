@@ -91,28 +91,28 @@ A query part requiring that a series of matches must appear in a document in seq
 
 > `field=` in LIFTI query syntax
 
-Restricts the resulting item matches to only those that include matching tokens in a specific field.
+Restricts the resulting document matches to only those that include matching tokens in a specific field.
 
 #### `NearQueryOperator(IQueryPart left, IQueryPart right, int tolerance = 5)`
 
 > `~n` in LIFTI query syntax
 
-Produces an intersection of two `IQueryPart`s, restricting an item's field matches such that the locations are close to one another. 
+Produces an intersection of two `IQueryPart`s, restricting an document's field matches such that the locations are close to one another. 
 
-Items that result in no field matches are filtered out.
+Documents that result in no field matches are filtered out.
 
 #### `PrecedingNearQueryOperator(IQueryPart left, IQueryPart right, int tolerance = 5)`
 
 > `~n>` in LIFTI query syntax
 
-Produces an intersection of two `IQueryPart`s, restricting an item's field matches such that the locations of the first appear before the locations of the second and within a specified tolerance. 
+Produces an intersection of two `IQueryPart`s, restricting an document's field matches such that the locations of the first appear before the locations of the second and within a specified tolerance. 
 
-Items that result in no field matches are filtered out.
+Documents that result in no field matches are filtered out.
 
 #### `PrecedingQueryOperator(IQueryPart left, IQueryPart right)`
 
 > `>` in LIFTI query syntax
 
-Produces an intersection of two `IQueryPart`s, restricting an item's field matches such that the locations of the first appear before the locations of the second. 
+Produces an intersection of two `IQueryPart`s, restricting an document's field matches such that the locations of the first appear before the locations of the second. 
 
-Items that result in no field matches are filtered out.
+Documents that result in no field matches are filtered out.

@@ -41,7 +41,7 @@ namespace Lifti.Querying
                 return Enumerable.Empty<SearchResult<TKey>>();
             }
 
-            var idLookup = index.Items;
+            var indexMetadata = index.Metadata;
             var fieldLookup = index.FieldLookup;
             var evaluationResult = this.Root.Evaluate(index.CreateNavigator, QueryContext.Empty);
             var matches = evaluationResult.Matches;
@@ -49,27 +49,27 @@ namespace Lifti.Querying
 
             foreach (var match in matches)
             {
-                if (!results.TryGetValue(match.ItemId, out var itemResults))
+                if (!results.TryGetValue(match.DocumentId, out var documentResults))
                 {
-                    itemResults = new List<ScoredFieldMatch>();
-                    results[match.ItemId] = itemResults;
+                    documentResults = [];
+                    results[match.DocumentId] = documentResults;
                 }
 
-                itemResults.AddRange(match.FieldMatches);
+                documentResults.AddRange(match.FieldMatches);
             }
 
             var searchResults = new List<SearchResult<TKey>>(matches.Count);
-            foreach (var itemResults in matches)
+            foreach (var documentResults in matches)
             {
-                var item = idLookup.GetMetadata(itemResults.ItemId);
+                var documentMetadata = indexMetadata.GetDocumentMetadata(documentResults.DocumentId);
 
                 searchResults.Add(
                     new SearchResult<TKey>(
-                        item.Item,
-                        itemResults.FieldMatches.Select(m => new FieldSearchResult(
+                        documentMetadata.Key,
+                        documentResults.FieldMatches.Select(m => new FieldSearchResult(
                             fieldLookup.GetFieldForId(m.FieldId),
                             m.Score,
-                            m.FieldMatch.GetTokenLocations()))
+                            m.GetTokenLocations()))
                         .ToList()));
             }
 

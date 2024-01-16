@@ -1,0 +1,93 @@
+﻿using System;
+
+namespace Lifti
+{
+    /// <summary>
+    /// Describes metadata for an indexed document.
+    /// </summary>
+    public abstract class DocumentMetadata(
+        byte? objectTypeId,
+        int documentId,
+        DocumentStatistics documentStatistics,
+        DateTime? scoringFreshnessDate,
+        double? scoringMagnitude)
+    {
+        /// <summary>
+        /// Gets the id of the object type configured for the indexed document. This will be null if the document source was loose
+        /// indexed text, or the index was deserialized from an older version without object type id awareness.
+        /// </summary>
+        public byte? ObjectTypeId { get; } = objectTypeId;
+
+        /// <summary>
+        /// Gets the document ID of the document used internally in the index.
+        /// </summary>
+        public int Id { get; } = documentId;
+
+        /// <summary>
+        /// Gets the statistics for the indexed document, including token count.
+        /// </summary>
+        public DocumentStatistics DocumentStatistics { get; } = documentStatistics;
+
+        /// <summary>
+        /// Gets the freshness date of the indexed document for scoring purposes, if one was specified.
+        /// </summary>
+        public DateTime? ScoringFreshnessDate { get; } = scoringFreshnessDate;
+
+        /// <summary>
+        /// Gets the magnitude weighting for the indexed document, if one was specified.
+        /// </summary>
+        public double? ScoringMagnitude { get; } = scoringMagnitude;
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="DocumentMetadata{TKey}"/> class for the given document id and key.
+        /// This should be used when the text is not associated with an object.
+        /// </summary>
+        public static DocumentMetadata<TKey> ForLooseText<TKey>(int documentId, TKey key, DocumentStatistics documentStatistics)
+        {
+            return new DocumentMetadata<TKey>(documentId, key, documentStatistics);
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="DocumentMetadata{TKey}"/> class for the given document id and key.
+        /// This should be used when the text is associated with an object.
+        /// </summary>
+        public static DocumentMetadata<TKey> ForObject<TKey>(
+            byte objectTypeId,
+            int documentId,
+            TKey key,
+            DocumentStatistics documentStatistics,
+            DateTime? scoringFreshnessDate,
+            double? scoringMagnitude)
+        {
+            return new DocumentMetadata<TKey>(documentId, key, documentStatistics, objectTypeId, scoringFreshnessDate, scoringMagnitude);
+        }
+    }
+
+    /// <inheritdoc cref="DocumentMetadata" />
+    /// <typeparam name="TKey">The type of the key in the index.</typeparam>
+    public class DocumentMetadata<TKey> : DocumentMetadata
+    {
+        /// <summary>
+        /// Gets the key of the indexed document.
+        /// </summary>
+        [Obsolete("Use Key property instead")]
+        public TKey Item => this.Key;
+
+        /// <summary>
+        /// Gets the key of the indexed document.
+        /// </summary>
+        public TKey Key { get; }
+
+        internal DocumentMetadata(
+            int documentId,
+            TKey key,
+            DocumentStatistics documentStatistics,
+            byte? objectTypeId = null,
+            DateTime? scoringFreshnessDate = null,
+            double? scoringMagnitude = null)
+            : base(objectTypeId, documentId, documentStatistics, scoringFreshnessDate, scoringMagnitude)
+        {
+            this.Key = key;
+        }
+    }
+}

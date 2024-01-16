@@ -10,6 +10,8 @@ namespace Lifti.Querying
         private readonly double k1;
         private readonly double b;
 
+        private (IIndexSnapshot snapshot, IScorer scorer)? cachedScorer;
+
         /// <summary>
         /// Constructs a new instance of the <see cref="OkapiBm25ScorerFactory"/> class.
         /// </summary>
@@ -29,7 +31,21 @@ namespace Lifti.Querying
                 throw new ArgumentNullException(nameof(indexSnapshot));
             }
 
-            return new OkapiBm25Scorer(this.k1, this.b,  indexSnapshot.Items);
+            var cached = this.cachedScorer.GetValueOrDefault();
+            if (cached.snapshot == indexSnapshot)
+            {
+                return cached.scorer;
+            }
+
+            var scorer = new OkapiBm25Scorer(
+                this.k1,
+                this.b,
+                indexSnapshot.Metadata,
+                new FieldScoreBoostProvider(indexSnapshot.FieldLookup));
+
+            this.cachedScorer = (indexSnapshot, scorer);
+
+            return scorer;
         }
     }
 }

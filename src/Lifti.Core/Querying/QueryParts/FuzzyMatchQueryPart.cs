@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Lifti.Querying.QueryParts
 {
@@ -25,10 +26,15 @@ namespace Lifti.Querying.QueryParts
     }
 
     /// <summary>
-    /// An <see cref="IQueryPart"/> that matches items that contain an fuzzy match for the given text.
+    /// An <see cref="IQueryPart"/> that matches documents that contain a fuzzy match for the given text.
     /// </summary>
-    public class FuzzyMatchQueryPart : WordQueryPart
+    public sealed class FuzzyMatchQueryPart : WordQueryPart
     {
+        private static readonly SharedPool<FuzzyMatchStateStore> fuzzyMatchStateStorePool = new(
+            static () => new(), 
+            static s => s.Clear(),
+            3);
+
         internal const ushort DefaultMaxEditDistance = 4;
         internal const ushort DefaultMaxSequentialEdits = 1;
 
@@ -37,31 +43,53 @@ namespace Lifti.Querying.QueryParts
 
         private class FuzzyMatchStateStore
         {
-            private readonly ushort maxEditDistance;
-            private readonly ushort maxSequentialEdits;
-            private readonly DoubleBufferedList<FuzzyMatchState> state;
+            private ushort maxEditDistance;
+            private ushort maxSequentialEdits;
+            private readonly DoubleBufferedList<FuzzyMatchState> state = [];
 
             // It's very likely that we'll encounter the same point in the index multiple times while processing a fuzzy match.
             // There's no point in traversing the same part multiple times for a given point in the search term, so this hashset keeps track of each logical
             // location that has been reached at each index within the search term.
-            private readonly HashSet<(int wordIndex, IIndexNavigatorBookmark bookmark)> processedBookmarks = new();
+            // Note that because we're reusing bookmarks, we can't use the bookmark itself as the hashcode as it will change as the bookmark is reused,
+            // so instead we use the hashcode of the bookmark directly. Although this is not guaranteed to be unique, it's good enough for our purposes and
+            // saves thousands of allocations per query.
+            private readonly HashSet<(int wordIndex, int bookmarkHash)> processedBookmarks = [];
 
-            public FuzzyMatchStateStore(IIndexNavigator navigator, ushort maxEditDistance, ushort maxSequentialEdits)
+            public FuzzyMatchStateStore()
             {
-                this.state = new DoubleBufferedList<FuzzyMatchState>(new FuzzyMatchState(navigator.CreateBookmark()));
+            }
+
+            public void Initialize(IIndexNavigator navigator, ushort maxEditDistance, ushort maxSequentialEdits)
+            {
+                this.state.AddToCurrent(new FuzzyMatchState(navigator.CreateBookmark()));
                 this.maxEditDistance = maxEditDistance;
                 this.maxSequentialEdits = maxSequentialEdits;
             }
 
-            public bool HasEntries => this.state.Count > 0;
+            public bool HasEntries
+            {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                get { return this.state.Count > 0; }
+            }
 
-            public void Add(FuzzyMatchState state)
+            public bool Add(FuzzyMatchState state, bool disposeIfNotUsed)
             {
                 if (state.TotalEditCount <= this.maxEditDistance &&
                     state.SequentialEdits <= this.maxSequentialEdits &&
-                    this.processedBookmarks.Add((state.WordIndex, state.Bookmark)))
+                    this.processedBookmarks.Add((state.WordIndex, state.Bookmark.GetHashCode())))
                 {
                     this.state.Add(state);
+                    return true;
+                }
+                else
+                {
+                    if (disposeIfNotUsed)
+                    {
+                        // Dispose of the bookmark as we're not going to use it
+                        state.Dispose();
+                    }
+
+                    return false;
                 }
             }
 
@@ -74,16 +102,22 @@ namespace Lifti.Querying.QueryParts
             {
                 this.state.Swap();
             }
+
+            public void Clear()
+            {
+                this.state.Clear();
+                this.processedBookmarks.Clear();
+            }
         }
 
-        private readonly struct FuzzyMatchState
+        private readonly struct FuzzyMatchState : IDisposable
         {
             /// <summary>
             /// Creates a new <see cref="FuzzyMatchState"/> instance.
             /// </summary>
             /// <param name="bookmark">The <see cref="IIndexNavigatorBookmark"/> for the state of the index that this instance is for.</param>
             /// <param name="totalEditCount">The current number number of edits this required to reach this point in the match.</param>
-            /// <param name="levenshteinDistance">The Levelshtein distance accumulated so far. This will differ from <paramref name="totalEditCount"/> 
+            /// <param name="levenshteinDistance">The Levenshtein distance accumulated so far. This will differ from <paramref name="totalEditCount"/> 
             /// only when substitutions are encountered, in which case an extra 1 per substitution will be accumulated here.</param>
             /// <param name="sequentialEdits">The number of sequential edits that have accumulated so far to reach this point. When
             /// an exact match is processed, this will be reset to zero.</param>
@@ -221,6 +255,11 @@ namespace Lifti.Querying.QueryParts
 #endif
                     );
             }
+
+            public void Dispose()
+            {
+                this.Bookmark.Dispose();
+            }
         }
 
         /// <summary>
@@ -231,18 +270,30 @@ namespace Lifti.Querying.QueryParts
         /// matches will be.</param>
         /// <param name="maxSequentialEdits">The maximum number of edits that are allowed to appear sequentially. By default this is 1,
         /// which forces matches to be more similar to the search criteria.</param>
+        /// <param name="scoreBoost">
+        /// The score boost to apply to any matches of the search term. This is multiplied with any score boosts
+        /// applied to matching fields. A null value indicates that no additional score boost should be applied.
+        /// </param>
         /// <remarks>
-        /// A transposition of neighboring characters is considered as single edit, not two distinct substitutions.
+        /// A transposition of neighbouring characters is considered as single edit, not two distinct substitutions.
         /// </remarks>
-        public FuzzyMatchQueryPart(string word, ushort maxEditDistance = DefaultMaxEditDistance, ushort maxSequentialEdits = DefaultMaxSequentialEdits)
-            : base(word)
+        public FuzzyMatchQueryPart(string word, ushort maxEditDistance = DefaultMaxEditDistance, ushort maxSequentialEdits = DefaultMaxSequentialEdits, double? scoreBoost = null)
+            : base(word, scoreBoost)
         {
             this.maxEditDistance = maxEditDistance;
             this.maxSequentialEdits = maxSequentialEdits;
         }
 
         /// <inheritdoc/>
-        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        protected override double RunWeightingCalculation(Func<IIndexNavigator> navigatorCreator)
+        {
+            return base.RunWeightingCalculation(navigatorCreator)
+                + this.maxEditDistance
+                + ((this.maxSequentialEdits - 1) << 1);
+        }
+
+        /// <inheritdoc/>
+        public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             if (navigatorCreator == null)
             {
@@ -255,18 +306,21 @@ namespace Lifti.Querying.QueryParts
             }
 
             using var navigator = navigatorCreator();
-            var results = IntermediateQueryResult.Empty;
-            var stateStore = new FuzzyMatchStateStore(navigator, this.maxEditDistance, this.maxSequentialEdits);
+            var resultCollector = new DocumentMatchCollector();
+            var stateStore = fuzzyMatchStateStorePool.Take();
+            stateStore.Initialize(navigator, this.maxEditDistance, this.maxSequentialEdits);
 
             var characterCount = 0;
             var searchTermLength = this.Word.Length;
+            var scoreBoost = this.ScoreBoost ?? 1D;
+
             do
             {
                 foreach (var state in stateStore.GetNextStateEntries())
                 {
                     var wordIndex = state.WordIndex;
-                    var bookmark = state.Bookmark;
-                    bookmark.Apply();
+                    state.Bookmark.Apply();
+                    var disposeBookmark = true;
 
                     if (state.WordIndex == searchTermLength)
                     {
@@ -285,7 +339,9 @@ namespace Lifti.Querying.QueryParts
                                 // All other weightings will be less than 1, with more edits drawing the weighting towards zero
                                 var lengthTotal = searchTermLength + characterCount;
                                 var weighting = (double)(lengthTotal - state.LevenshteinDistance) / lengthTotal;
-                                results = results.Union(navigator.GetExactMatches(weighting));
+                                weighting *= scoreBoost;
+
+                                navigator.AddExactMatches(queryContext, resultCollector, weighting);
                             }
 
                             // Always assume there could be missing characters at the end
@@ -303,16 +359,18 @@ namespace Lifti.Querying.QueryParts
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                                 , currentCharacter
 #endif
-                                ));
+                                ), true);
                         }
                         else
                         {
                             // First skip this character (assume extra character inserted), but don't move the navigator on
-                            stateStore.Add(state.ApplyInsertion(
+                            // We'll handle this case specially if the state wasn't added as this will allow us to dispose of the
+                            // current bookmark after it has been used to add new deletion bookmarks
+                            disposeBookmark = !stateStore.Add(state.ApplyInsertion(
 #if DEBUG && TRACK_MATCH_STATE_TEXT
                                 currentCharacter
 #endif
-                                ));
+                                ), false);
 
                             // Also try skipping this character (assume omission) by just moving on in the navigator
                             AddDeletionBookmarks(navigator, stateStore, state);
@@ -320,6 +378,13 @@ namespace Lifti.Querying.QueryParts
 
                         // Always assume this could be a substituted character
                         AddSubstitutionBookmarks(navigator, stateStore, currentCharacter, state);
+                    }
+
+                    // We're done with this entry now. Disposing it causes the bookmark to get disposed and returned
+                    // to the pool in the index navigator for reuse.
+                    if (disposeBookmark)
+                    {
+                        state.Dispose();
                     }
                 }
 
@@ -329,7 +394,9 @@ namespace Lifti.Querying.QueryParts
             }
             while (stateStore.HasEntries);
 
-            return queryContext.ApplyTo(results);
+            fuzzyMatchStateStorePool.Return(stateStore);
+
+            return resultCollector.ToIntermediateQueryResult();
         }
 
         private static void AddSubstitutionBookmarks(IIndexNavigator navigator, FuzzyMatchStateStore stateStore, char currentCharacter, FuzzyMatchState currentState)
@@ -347,7 +414,11 @@ namespace Lifti.Querying.QueryParts
 
                 bookmark.Apply();
                 navigator.Process(c);
-                stateStore.Add(currentState.ApplySubstitution(navigator.CreateBookmark(), new SubstitutedCharacters(currentCharacter, c)));
+                stateStore.Add(
+                    currentState.ApplySubstitution(
+                        navigator.CreateBookmark(), 
+                        new SubstitutedCharacters(currentCharacter, c)),
+                    true);
             }
         }
 
@@ -360,12 +431,14 @@ namespace Lifti.Querying.QueryParts
             {
                 bookmark.Apply();
                 navigator.Process(c);
-                stateStore.Add(currentState.ApplyDeletion(
-                    navigator.CreateBookmark()
+                stateStore.Add(
+                    currentState.ApplyDeletion(
+                        navigator.CreateBookmark()
 #if DEBUG && TRACK_MATCH_STATE_TEXT
-                    , c
+                        , c
 #endif
-                    ));
+                    ),
+                    true);
             }
         }
 
@@ -373,12 +446,17 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public override string ToString()
         {
+            string searchTerm;
             if (this.maxEditDistance != DefaultMaxEditDistance || this.maxSequentialEdits != DefaultMaxSequentialEdits)
             {
-                return $"?{(this.maxEditDistance != DefaultMaxEditDistance ? this.maxEditDistance : "")},{(this.maxSequentialEdits != DefaultMaxSequentialEdits ? this.maxSequentialEdits : "")}?{this.Word}";
+                searchTerm = $"?{(this.maxEditDistance != DefaultMaxEditDistance ? this.maxEditDistance : "")},{(this.maxSequentialEdits != DefaultMaxSequentialEdits ? this.maxSequentialEdits : "")}?{this.Word}";
+            }
+            else
+            {
+                searchTerm = "?" + this.Word;
             }
 
-            return "?" + this.Word;
+            return base.ToString(searchTerm);
         }
     }
 }

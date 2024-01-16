@@ -40,6 +40,25 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public void WithObjectConfiguration_ShouldAllocateUniqueObjectTypeIds()
+        {
+            this.sut.WithObjectTokenization<TestObject1>(
+                o => o
+                    .WithKey(i => i.Id)
+                    .WithField("TextField", i => i.Text))
+                .WithObjectTokenization<TestObject2>(
+                o => o
+                    .WithKey(i => i.Id)
+                    .WithField("Content", i => i.Content)
+                    .WithField("Title", i => i.Title));
+
+            var index = this.sut.Build();
+
+            index.ObjectTypeConfiguration.AllConfigurations.Select(x => x.Id)
+                .Should().BeEquivalentTo(new[] { 1, 2 });
+        }
+
+        [Fact]
         public void WithObjectConfiguration_ShouldUseDefaultTokenizationOptionsIfNotProvided()
         {
             this.sut.WithDefaultTokenization(o => o.CaseInsensitive(false))
@@ -102,7 +121,7 @@ namespace Lifti.Tests
         [Fact]
         public void WithConfiguredExplicitFuzzyMatchParameters_ShouldPassParametersToConstructedQueryParsers()
         {
-            var passedOptions = BuildSutAndGetPassedOptions(o => o.WithFuzzySearchDefaults(10, 4));
+            var passedOptions = this.BuildSutAndGetPassedOptions(o => o.WithFuzzySearchDefaults(10, 4));
 
             passedOptions.Should().NotBeNull();
             passedOptions!.FuzzySearchMaxEditDistance(1000).Should().Be(10);
@@ -112,7 +131,7 @@ namespace Lifti.Tests
         [Fact]
         public void WithNoDefaultJoiningOperatorConfigured_ShouldPassAndOperatorToIndex()
         {
-            var passedOptions = BuildSutAndGetPassedOptions(o => o);
+            var passedOptions = this.BuildSutAndGetPassedOptions(o => o);
             passedOptions.Should().NotBeNull();
             passedOptions!.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.And);
         }
@@ -120,7 +139,7 @@ namespace Lifti.Tests
         [Fact]
         public void WithDefaultJoiningOperatorConfigured_ShouldPassDefaultOperatorToIndex()
         {
-            var passedOptions = BuildSutAndGetPassedOptions(o => o.WithDefaultJoiningOperator(QueryTermJoinOperatorKind.Or));
+            var passedOptions = this.BuildSutAndGetPassedOptions(o => o.WithDefaultJoiningOperator(QueryTermJoinOperatorKind.Or));
             passedOptions.Should().NotBeNull();
             passedOptions!.DefaultJoiningOperator.Should().Be(QueryTermJoinOperatorKind.Or);
         }
@@ -161,7 +180,7 @@ namespace Lifti.Tests
 
             index.Search("test").Should().BeEmpty();
 
-            parser.ParsedQueries.Should().BeEquivalentTo(new[] { "test" });
+            parser.ParsedQueries.Should().BeEquivalentTo(["test"]);
         }
 
         [Fact]
@@ -235,21 +254,21 @@ namespace Lifti.Tests
             var action1 = new List<string>();
             var action2 = new List<int>();
 
-            this.sut.WithIndexModificationAction(i => action1.Add(i.Items.Count.ToString()))
-                .WithIndexModificationAction(i => action2.Add(i.Items.Count));
+            this.sut.WithIndexModificationAction(i => action1.Add(i.Metadata.DocumentCount.ToString()))
+                .WithIndexModificationAction(i => action2.Add(i.Metadata.DocumentCount));
 
             var index = this.sut.Build();
 
             await index.AddAsync(9, "Test");
 
-            action1.Should().BeEquivalentTo(new[] { "1" });
+            action1.Should().BeEquivalentTo(["1"]);
             action2.Should().BeEquivalentTo(new[] { 1 });
         }
 
         [Fact]
         public async Task WithDuplicateItemKeysThrowingExceptions_ShouldPassOptionToIndex()
         {
-            var index = this.sut.WithDuplicateItemBehavior(DuplicateItemBehavior.ThrowException)
+            var index = this.sut.WithDuplicateKeyBehavior(DuplicateKeyBehavior.ThrowException)
                 .Build();
 
             await index.AddAsync(1, "Test");
@@ -261,7 +280,7 @@ namespace Lifti.Tests
         [Fact]
         public async Task WithDuplicateItemKeysReplacingItems_ShouldPassOptionToIndex()
         {
-            var index = this.sut.WithDuplicateItemBehavior(DuplicateItemBehavior.ReplaceItem)
+            var index = this.sut.WithDuplicateKeyBehavior(DuplicateKeyBehavior.Replace)
                 .Build();
 
             await index.AddAsync(1, "Test");

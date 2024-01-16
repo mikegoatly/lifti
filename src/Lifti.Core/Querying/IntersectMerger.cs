@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lifti.Querying
@@ -6,28 +7,51 @@ namespace Lifti.Querying
     /// <summary>
     /// Provides logic for intersecting the results in two <see cref="IntermediateQueryResult"/>s.
     /// </summary>
-    public class IntersectMerger : IntermediateQueryResultMerger
+    internal sealed class IntersectMerger : IntermediateQueryResultMerger
     {
         /// <summary>
         /// Applies the intersection to the two <see cref="IntermediateQueryResult"/>s.
         /// </summary>
-        public static IEnumerable<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
+        public static List<ScoredToken> Apply(IntermediateQueryResult left, IntermediateQueryResult right)
         {
-            // Swap over left and right to ensure we're performing as few iterations as possible in the intersection
-            // The trade-off here is that we're building a larger dictionary
-            SwapIf(left.Matches.Count > right.Matches.Count, ref left, ref right);
+            // track two pointers through the lists on each side. The document ids are ordered on both sides, so we can
+            // move through the lists in a single pass
 
-            var rightItems = right.Matches.ToDictionary(m => m.ItemId);
+            var leftIndex = 0;
+            var rightIndex = 0;
 
-            foreach (var leftMatch in left.Matches)
+            var leftMatches = left.Matches;
+            var rightMatches = right.Matches;
+            var leftCount = leftMatches.Count;
+            var rightCount = rightMatches.Count;
+
+            var results = new List<ScoredToken>(Math.Min(leftCount, rightCount));
+
+            while (leftIndex < leftCount && rightIndex < rightCount)
             {
-                if (rightItems.TryGetValue(leftMatch.ItemId, out var rightMatch))
+                var leftMatch = leftMatches[leftIndex];
+                var rightMatch = rightMatches[rightIndex];
+
+                if (leftMatch.DocumentId == rightMatch.DocumentId)
                 {
-                    yield return new ScoredToken(
-                        leftMatch.ItemId,
-                        MergeFields(leftMatch, rightMatch).ToList());
+                    results.Add(new ScoredToken(
+                        leftMatch.DocumentId,
+                        MergeFields(leftMatch, rightMatch)));
+
+                    leftIndex++;
+                    rightIndex++;
+                }
+                else if (leftMatch.DocumentId < rightMatch.DocumentId)
+                {
+                    leftIndex++;
+                }
+                else
+                {
+                    rightIndex++;
                 }
             }
+
+            return results;
         }
     }
 }

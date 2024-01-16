@@ -4,7 +4,6 @@ using Lifti.Tokenization.Stemming;
 using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 
 namespace Lifti.Tokenization
@@ -17,7 +16,7 @@ namespace Lifti.Tokenization
         private readonly InputPreprocessorPipeline inputPreprocessorPipeline;
         private readonly HashSet<char> additionalSplitChars;
         private readonly HashSet<char> ignoreChars;
-        private readonly PorterStemmer? stemmer;
+        private readonly IStemmer? stemmer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IndexTokenizer"/> class.
@@ -26,11 +25,7 @@ namespace Lifti.Tokenization
         public IndexTokenizer(TokenizationOptions tokenizationOptions)
         {
             this.Options = tokenizationOptions ?? throw new ArgumentNullException(nameof(tokenizationOptions));
-
-            if (tokenizationOptions.Stemming)
-            {
-                this.stemmer = new PorterStemmer();
-            }
+            this.stemmer = tokenizationOptions.Stemmer;
 
             this.additionalSplitChars = new HashSet<char>(tokenizationOptions.AdditionalSplitCharacters);
             this.ignoreChars = new HashSet<char>(tokenizationOptions.IgnoreCharacters);
@@ -159,7 +154,7 @@ namespace Lifti.Tokenization
 
             if (length > ushort.MaxValue)
             {
-                throw new LiftiException(string.Format(CultureInfo.InvariantCulture, ExceptionMessages.MaxTokenLengthExceeded, ushort.MaxValue));
+                throw new LiftiException(ExceptionMessages.MaxTokenLengthExceeded, ushort.MaxValue);
             }
 
             this.stemmer?.Stem(tokenBuilder);

@@ -9,7 +9,7 @@ namespace Lifti.Tokenization
     /// </summary>
     internal class TokenStore
     {
-        private readonly Dictionary<string, Token> materializedTokens = new();
+        private readonly Dictionary<string, Token> materializedTokens = [];
 
         /// <summary>
         /// Captures a token at a location, merging the token with any locations

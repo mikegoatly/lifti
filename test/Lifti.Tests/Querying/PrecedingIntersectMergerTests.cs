@@ -6,8 +6,8 @@ namespace Lifti.Tests.Querying
 {
     public class PrecedingIntersectMergerTests : QueryTestBase
     {
-        private static readonly ScoredToken[] expectedResults = new[]
-            {
+        private static readonly ScoredToken[] expectedResults =
+            [
                 ScoredToken(
                     7,
                     ScoredFieldMatch(5D, 1, 34, 35, 99, 100),
@@ -15,7 +15,7 @@ namespace Lifti.Tests.Querying
                 ScoredToken(
                     8,
                     ScoredFieldMatch(10D, 2, 80, 85))
-            };
+            ];
 
         [Fact]
         public void ForMatchingItemsAndFields_ShouldOnlyReturnWordsWhereTheEarliestLeftWordIsBeforeTheWordsOnTheRight()

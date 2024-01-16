@@ -21,8 +21,10 @@ namespace Lifti.Serialization.Binary
         /// <inheritdoc/>
         public DeserializationException(string message, Exception inner) : base(message, inner) { }
 
+#if NETSTANDARD
         private DeserializationException(
           SerializationInfo info,
           StreamingContext context) : base(info, context) { }
+#endif
     }
 }

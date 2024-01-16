@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Lifti.Querying;
 using Lifti.Querying.QueryParts;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,11 +33,11 @@ namespace Lifti.Tests.Querying.QueryParts
                 {
                     ScoredToken(
                         7,
-                        ScoredFieldMatch(4D, 1, CompositeMatch(100, 102))),
+                        ScoredFieldMatch(4D, 1, CompositeTokenLocation(100, 102))),
                     ScoredToken(
                         8,
-                        ScoredFieldMatch(6D, 1, CompositeMatch(101, 106)),
-                        ScoredFieldMatch(13D, 2, CompositeMatch(104, 105)))
+                        ScoredFieldMatch(6D, 1, CompositeTokenLocation(101, 106)),
+                        ScoredFieldMatch(13D, 2, CompositeTokenLocation(104, 105)))
                 });
         }
 
@@ -58,6 +59,14 @@ namespace Lifti.Tests.Querying.QueryParts
                     new TokenLocation(11, 67, 8),
                     new TokenLocation(12, 76, 7)
                 });
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldReturnSmallestWeightingOfParts()
+        {
+            var op = new PrecedingNearQueryOperator(new FakeQueryPart(3D), new FakeQueryPart(2D));
+
+            op.CalculateWeighting(() => new FakeIndexNavigator()).Should().Be(2D);
         }
 
         protected static async Task<IFullTextIndex<int>> CreateTestIndexAsync()

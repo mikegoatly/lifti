@@ -1,4 +1,5 @@
 ﻿using Lifti.Querying;
+using Lifti.Tests.Fakes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,41 +10,55 @@ namespace Lifti.Tests.Querying
     {
         public FakeIndexNavigator()
         {
+            this.Snapshot = new FakeIndexSnapshot(new FakeIndexMetadata<int>(10));
         }
 
-        private FakeIndexNavigator(bool exactAndChildMatchOnly, params int[] matchedItems)
+        private FakeIndexNavigator(bool exactAndChildMatchOnly, params int[] matchedDocumentIds)
+            : this()
         {
             this.ExpectedExactAndChildMatches = new IntermediateQueryResult(
-                matchedItems.Select(
+                matchedDocumentIds.Select(
                     m => ScoredToken(
-                        m, 
-                        new[] { ScoredFieldMatch(1D, (byte)m, m) })));
+                        m,
+                        [ScoredFieldMatch(1D, (byte)m, m)]))
+                .ToList(),
+                false);
 
             this.ExpectedExactMatches = exactAndChildMatchOnly ? Lifti.Querying.IntermediateQueryResult.Empty : this.ExpectedExactAndChildMatches;
         }
 
         private FakeIndexNavigator(bool exactAndChildMatchOnly, params ScoredToken[] matches)
+            : this()
         {
-            this.ExpectedExactAndChildMatches = new IntermediateQueryResult(matches);
+            this.ExpectedExactAndChildMatches = new IntermediateQueryResult(matches.ToList(), false);
 
             this.ExpectedExactMatches = exactAndChildMatchOnly ? Lifti.Querying.IntermediateQueryResult.Empty : this.ExpectedExactAndChildMatches;
         }
 
         public IntermediateQueryResult ExpectedExactMatches { get; set; }
         public IntermediateQueryResult ExpectedExactAndChildMatches { get; set; }
-        public List<char> NavigatedCharacters { get; } = new List<char>();
-        public List<string> NavigatedStrings { get; } = new List<string>();
+        public List<char> NavigatedCharacters { get; } = [];
+        public List<string> NavigatedStrings { get; } = [];
+        public List<double> ProvidedWeightings { get; } = [];
+        public List<QueryContext> ProvidedQueryContexts { get; } = [];
+
+        public int ExactMatchCount()
+        {
+            return this.ExpectedExactMatches.Matches.Count;
+        }
 
         public bool HasExactMatches => this.ExpectedExactMatches.Matches.Count > 0;
 
-        public static FakeIndexNavigator ReturningExactMatches(params int[] matchedItems)
+        public IIndexSnapshot Snapshot { get; set; }
+
+        public static FakeIndexNavigator ReturningExactMatches(params int[] matchedDocumentIds)
         {
-            return new FakeIndexNavigator(false, matchedItems);
+            return new FakeIndexNavigator(false, matchedDocumentIds);
         }
 
-        public static FakeIndexNavigator ReturningExactAndChildMatches(params int[] matchedItems)
+        public static FakeIndexNavigator ReturningExactAndChildMatches(params int[] matchedDocumentIds)
         {
-            return new FakeIndexNavigator(true, matchedItems);
+            return new FakeIndexNavigator(true, matchedDocumentIds);
         }
 
         public static FakeIndexNavigator ReturningExactMatches(params ScoredToken[] matches)
@@ -58,11 +73,25 @@ namespace Lifti.Tests.Querying
 
         public IntermediateQueryResult GetExactAndChildMatches(double weighting = 1D)
         {
-            return this.ExpectedExactAndChildMatches;
+            return this.GetExactAndChildMatches(QueryContext.Empty, weighting);
         }
 
         public IntermediateQueryResult GetExactMatches(double weighting = 1D)
         {
+            return this.GetExactMatches(QueryContext.Empty, weighting);
+        }
+
+        public IntermediateQueryResult GetExactAndChildMatches(QueryContext queryContext, double weighting = 1D)
+        {
+            this.ProvidedWeightings.Add(weighting);
+            this.ProvidedQueryContexts.Add(queryContext);
+            return this.ExpectedExactAndChildMatches;
+        }
+
+        public IntermediateQueryResult GetExactMatches(QueryContext queryContext, double weighting = 1D)
+        {
+            this.ProvidedWeightings.Add(weighting);
+            this.ProvidedQueryContexts.Add(queryContext);
             return this.ExpectedExactMatches;
         }
 
@@ -91,6 +120,7 @@ namespace Lifti.Tests.Querying
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
         }
 
         public IIndexNavigatorBookmark CreateBookmark()
@@ -99,6 +129,16 @@ namespace Lifti.Tests.Querying
         }
 
         public IEnumerable<char> EnumerateNextCharacters()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddExactAndChildMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddExactMatches(QueryContext queryContext, DocumentMatchCollector documentMatchCollector, double weighting = 1)
         {
             throw new NotImplementedException();
         }

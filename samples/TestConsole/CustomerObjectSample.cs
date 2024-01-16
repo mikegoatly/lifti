@@ -7,12 +7,7 @@ namespace TestConsole
 {
     public class CustomerObjectSample : SampleBase
     {
-        public class Customer
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public string ProfileHtml { get; set; }
-        }
+        public record Customer(int Id, string Name, string ProfileHtml);
 
         public override async Task RunAsync()
         {
@@ -26,12 +21,12 @@ namespace TestConsole
                 )
                 .Build();
 
-            await index.AddAsync(new Customer { Id = 1, Name = "Joe Bloggs", ProfileHtml = "<a>Something else something</a>" });
-            await index.AddAsync(new Customer { Id = 2, Name = "Joe Something", ProfileHtml = "<a>Something else</a>" });
+            await index.AddAsync(new Customer(1, "Joe Bloggs", "<a>Something else something</a>"));
+            await index.AddAsync(new Customer(2, "Joe Something", "<a>Something else</a>"));
 
             var results = RunSearch(
-                index, 
-                "something", 
+                index,
+                "something",
                 @"Searching for 'Something' will result in ID 2 being ordered before ID 1.  
 'Something' appears twice in each document overall, however document 2 has fewer words, therefore the matches are more statistically significant");
 

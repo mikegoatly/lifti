@@ -13,11 +13,11 @@ namespace Lifti.Tests.Querying.QueryParts
 {
     public class FuzzyWordQueryPartTestsFixture : IAsyncLifetime
     {
-        public string[] IndexedText { get; } = {
+        public string[] IndexedText { get; } = [
             "Some sample comics text to match on",
             "Samples sounds like a solid plan to me",
             "Odius ogres obey Mobius"
-        };
+        ];
 
         public FullTextIndex<int> Index { get; private set; } = null!;
 
@@ -44,7 +44,7 @@ namespace Lifti.Tests.Querying.QueryParts
 
     public class FuzzyWordQueryPartTests : IClassFixture<FuzzyWordQueryPartTestsFixture>
     {
-
+        private static readonly Regex expectedMatchRegex = new Regex(@"(^|\s)*((?<word>[^\s]*)($|\s))+", RegexOptions.Compiled);
         private readonly ITestOutputHelper outputHelper;
         private readonly FuzzyWordQueryPartTestsFixture fixture;
 
@@ -103,12 +103,6 @@ namespace Lifti.Tests.Querying.QueryParts
         }
 
         [Fact]
-        public void ToString_WithDefaultParameters_ShouldReturnSimpleExpression()
-        {
-            new FuzzyMatchQueryPart("Test").ToString().Should().Be("?Test");
-        }
-
-        [Fact]
         public async Task WithFieldFilteredInContext_ShouldOnlyMatchOnRequestedField()
         {
             var index = new FullTextIndexBuilder<int>()
@@ -125,11 +119,49 @@ namespace Lifti.Tests.Querying.QueryParts
                 new TestObject(3, "Item number 3", "Item number three content")
             });
 
-            var query = new Query(FieldFilterQueryOperator.CreateForField(index.FieldLookup, "title", new FuzzyMatchQueryPart("NUMBE", 1, 1)));
+            var query = new Query(
+                FieldFilterQueryOperator.CreateForField(
+                    index.FieldLookup,
+                    "title",
+                    new FuzzyMatchQueryPart("NUMBE", 1, 1)));
 
             var results = index.Search(query).ToList();
 
             results.Select(x => x.Key).Should().BeEquivalentTo(new[] { 1, 3 });
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldTakeIntoAccountNumberOfExactlyMatchedDocuments()
+        {
+            var part = new FuzzyMatchQueryPart("SOUNDS", 1, 1);
+            var weight = part.CalculateWeighting(this.fixture.Index.CreateNavigator);
+
+            // With a max distance of 1, it should be 1 + the base exact word score
+            // Base score would be approx 0.3 because only one document contains the word
+            weight.Should().BeApproximately(1.3D, 0.1D);
+
+            part = new FuzzyMatchQueryPart("TO", 1, 1);
+            weight = part.CalculateWeighting(this.fixture.Index.CreateNavigator);
+
+            // The base score here would be approx 0.6 because 2/3 documents contain the text
+            weight.Should().BeApproximately(1.6D, 0.1D);
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldBeMoreExpensiveWithHigherMaxEditDistance()
+        {
+            var part = new FuzzyMatchQueryPart("SOUNDS", 3, 2);
+            var weight = part.CalculateWeighting(this.fixture.Index.CreateNavigator);
+
+            // 3 edits, 2 sequential edits = 3 + ((2 - 1) * 2) = 5
+            // Add the base exact word score of approx 0.3
+            weight.Should().BeApproximately(5.3D, 0.1D);
+        }
+
+        [Fact]
+        public void ToString_WithDefaultParameters_ShouldReturnSimpleExpression()
+        {
+            new FuzzyMatchQueryPart("Test").ToString().Should().Be("?Test");
         }
 
         [Theory]
@@ -140,6 +172,12 @@ namespace Lifti.Tests.Querying.QueryParts
         {
             new FuzzyMatchQueryPart("Test", (ushort?)maxEditDistance ?? FuzzyMatchQueryPart.DefaultMaxEditDistance, (ushort?)maxSequentialEdits ?? FuzzyMatchQueryPart.DefaultMaxSequentialEdits)
                 .ToString().Should().Be(expectedOutput);
+        }
+
+        [Fact]
+        public void ToString_WithScoreBoost_ShouldReturnCorrectlyFormattedExpression()
+        {
+            new FuzzyMatchQueryPart("Test", 1, 3, 5.123).ToString().Should().Be("?1,3?Test^5.123");
         }
 
         [Fact]
@@ -155,9 +193,18 @@ namespace Lifti.Tests.Querying.QueryParts
             expectedScoreOrders.Should().BeInDescendingOrder();
         }
 
-        private double GetScore(string search, ushort maxDistance, ushort maxSequentialEdits)
+        [Fact]
+        public void WhenScoreBoosting_ShouldApplyBoostToScore()
         {
-            var part = new FuzzyMatchQueryPart(search, maxDistance, maxSequentialEdits);
+            var baseScore = this.GetScore("SAMPLE", 1, 1);
+            var boostedScore = this.GetScore("SAMPLE", 1, 1, 2D);
+
+            boostedScore.Should().Be(baseScore * 2D);
+        }
+
+        private double GetScore(string search, ushort maxDistance, ushort maxSequentialEdits, double? scoreBoost = null)
+        {
+            var part = new FuzzyMatchQueryPart(search, maxDistance, maxSequentialEdits, scoreBoost);
             var results = this.fixture.Index.Search(new Query(part)).ToList();
             return results.Where(r => r.FieldMatches.Any(m => m.Locations.Any(l => l.TokenIndex == 1)) && r.Key == 0)
                 .Select(s => s.Score)
@@ -167,7 +214,6 @@ namespace Lifti.Tests.Querying.QueryParts
         private void RunTest(string word, ushort maxEditDistance, ushort maxSequentialEdits, params string[] expectedWords)
         {
             var expectedWordLookup = expectedWords.ToHashSet(StringComparer.OrdinalIgnoreCase);
-            var expectedMatchRegex = new Regex(@"(^|\s)*((?<word>[^\s]*)($|\s))+");
             var expectedResultCaptures = this.fixture.IndexedText.Select(
                 (text, id) =>
                     (
@@ -187,7 +233,7 @@ namespace Lifti.Tests.Querying.QueryParts
 
             var expectedResults = expectedResultCaptures.Select(
                 r => Tuple.Create(
-                    r.id, 
+                    r.id,
                     r.Item2.Select(
                         x => new TokenLocation(x.index, x.startLocation, (ushort)x.Value.Length)).ToList()
                     ))

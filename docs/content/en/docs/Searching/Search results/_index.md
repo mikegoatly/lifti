@@ -9,31 +9,31 @@ description: "`FullTextIndex<T>.Search` returns `ISearchResults<T>`, which imple
 
 Search results are returned sorted according to the total document score, in descending order. See [scoring](./scoring) for more information.
 
-## SearchResult&lt;T&gt;
+## `SearchResult&lt;TKey&gt;`
 
-### T Item { get; }
+### `TKey Key { get; }`
 
-The item that matched the search criteria.
+The key for the document that matched the search criteria.
 
-### IReadOnlyList&lt;FieldSearchResult&gt; FieldMatches { get; }
+### `IReadOnlyList&lt;FieldSearchResult&gt; FieldMatches { get; }`
 
-The fields that were matched for the item. Each of these is scored independently and provides detailed information
+The fields that were matched for the document. Each of these is scored independently and provides detailed information
 about the location of the words that were matched.
 
-### double Score { get; }
+### `double Score { get; }`
 
 The overall score for this match. This is a sum of the scores for this instance's FieldMatches.
 
-## FieldSearchResult
+## `FieldSearchResult`
 
-### string FoundIn { get; }
+### `string FoundIn { get; }`
 
 The name of the field that the search results were found in. This will be one of the field names configured when the index was built, or `Unspecified` if no fields were configured.
 
-### double Score { get; }
+### `double Score { get; }`
 
 The score for this particular field.
 
-### IReadOnlyList&lt;WordLocation&gt; Locations { get; }
+### `IReadOnlyList&lt;TokenLocation&gt; Locations { get; }`
 
-The `WordLocation` instances for the locations of the matched words in the field.
+The `TokenLocation` instances for the locations of the matched tokens in the field.

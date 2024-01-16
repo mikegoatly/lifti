@@ -8,8 +8,13 @@ namespace Lifti.Tokenization.Objects
 {
     internal abstract class DynamicFieldReader : FieldConfig
     {
-        protected DynamicFieldReader(IIndexTokenizer tokenizer, ITextExtractor textExtractor, IThesaurus thesaurus, string dynamicFieldReaderName)
-            : base(tokenizer, textExtractor, thesaurus)
+        protected DynamicFieldReader(
+            IIndexTokenizer tokenizer,
+            ITextExtractor textExtractor,
+            IThesaurus thesaurus,
+            string dynamicFieldReaderName,
+            double scoreBoost)
+            : base(tokenizer, textExtractor, thesaurus, scoreBoost)
         {
             this.Name = dynamicFieldReaderName;
         }
@@ -23,10 +28,10 @@ namespace Lifti.Tokenization.Objects
     /// <summary>
     /// Implemented by classes that can read an object's fields dynamically during indexing.
     /// </summary>
-    internal abstract class DynamicFieldReader<TItem> : DynamicFieldReader
+    internal abstract class DynamicFieldReader<TObject> : DynamicFieldReader
     {
-        private readonly Dictionary<string, string> prefixedFields = new();
-        private readonly Dictionary<string, string> prefixedFieldsReverseLookup = new();
+        private readonly Dictionary<string, string> prefixedFields = [];
+        private readonly Dictionary<string, string> prefixedFieldsReverseLookup = [];
         private readonly string? fieldNamePrefix;
 
         protected DynamicFieldReader(
@@ -34,8 +39,9 @@ namespace Lifti.Tokenization.Objects
             ITextExtractor textExtractor,
             IThesaurus thesaurus,
             string dynamicFieldReaderName,
-            string? fieldNamePrefix)
-            : base(tokenizer, textExtractor, thesaurus, dynamicFieldReaderName)
+            string? fieldNamePrefix,
+            double scoreBoost)
+            : base(tokenizer, textExtractor, thesaurus, dynamicFieldReaderName, scoreBoost)
         {
             this.fieldNamePrefix = fieldNamePrefix;
         }
@@ -43,13 +49,13 @@ namespace Lifti.Tokenization.Objects
         /// <summary>
         /// Provides a delegate capable of reading all fields and associated text from an object.
         /// </summary>
-        public abstract ValueTask<IEnumerable<(string field, IEnumerable<string> rawText)>> ReadAsync(TItem item, CancellationToken cancellationToken);
+        public abstract ValueTask<IEnumerable<(string field, IEnumerable<string> rawText)>> ReadAsync(TObject item, CancellationToken cancellationToken);
 
         /// <summary>
         /// Provides a delegate capable of reading a specific dynamic field from an object. If the field is not found on the given
         /// object, an empty enumerable will be returned and no error thrown.
         /// </summary>
-        public abstract ValueTask<IEnumerable<string>> ReadAsync(TItem item, string fieldName, CancellationToken cancellationToken);
+        public abstract ValueTask<IEnumerable<string>> ReadAsync(TObject item, string fieldName, CancellationToken cancellationToken);
 
         protected string GetPrefixedFieldName(string unprefixedFieldName)
         {

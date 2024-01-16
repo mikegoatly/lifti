@@ -5,7 +5,7 @@ namespace Lifti.Querying.QueryParts
     /// <summary>
     /// A special case <see cref="IQueryPart"/> used to represent an empty query.
     /// </summary>
-    public class EmptyQueryPart : IQueryPart
+    public sealed class EmptyQueryPart : IQueryPart
     {
         private EmptyQueryPart()
         {
@@ -17,9 +17,15 @@ namespace Lifti.Querying.QueryParts
         public static EmptyQueryPart Instance { get; } = new EmptyQueryPart();
 
         /// <inheritdoc />
-        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, IQueryContext queryContext)
+        public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
             return IntermediateQueryResult.Empty;
+        }
+
+        /// <inheritdoc />
+        public double CalculateWeighting(Func<IIndexNavigator> navigatorCreator)
+        {
+            return 0;
         }
     }
 }

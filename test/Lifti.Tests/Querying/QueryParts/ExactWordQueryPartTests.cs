@@ -17,8 +17,23 @@ namespace Lifti.Tests.Querying.QueryParts
             var actual = part.Evaluate(() => navigator, QueryContext.Empty);
 
             actual.Should().BeEquivalentTo(navigator.ExpectedExactMatches);
-            navigator.NavigatedStrings.Should().BeEquivalentTo(new[] { "test" });
+            navigator.NavigatedStrings.Should().BeEquivalentTo(["test"]);
             navigator.NavigatedCharacters.Should().BeEmpty();
+            navigator.ProvidedWeightings.Should().BeEquivalentTo(new[] { 1D });
+        }
+
+        [Fact]
+        public void Evaluating_ShouldPassThroughScoreBoostToNavigator()
+        {
+            var part = new ExactWordQueryPart("test", 5D);
+            var navigator = FakeIndexNavigator.ReturningExactMatches(1, 2);
+
+            var actual = part.Evaluate(() => navigator, QueryContext.Empty);
+
+            actual.Should().BeEquivalentTo(navigator.ExpectedExactMatches);
+            navigator.NavigatedStrings.Should().BeEquivalentTo(["test"]);
+            navigator.NavigatedCharacters.Should().BeEmpty();
+            navigator.ProvidedWeightings.Should().BeEquivalentTo(new[] { 5D });
         }
 
         [Fact]
@@ -26,12 +41,56 @@ namespace Lifti.Tests.Querying.QueryParts
         {
             var part = new ExactWordQueryPart("test");
             var navigator = FakeIndexNavigator.ReturningExactMatches(1, 2);
+            var queryContext = new QueryContext();
 
-            var contextResults = new IntermediateQueryResult();
-            var queryContext = new FakeQueryContext(contextResults);
-            var result = part.Evaluate(() => new FakeIndexNavigator(), queryContext);
+            var result = part.Evaluate(() => navigator, queryContext);
 
-            result.Should().Be(contextResults);
+            navigator.ProvidedQueryContexts.Should().BeEquivalentTo(new[] { queryContext });
+        }
+
+        [Fact]
+        public void ToString_ShouldReturnCorrectRepresentation()
+        {
+            var part = new ExactWordQueryPart("test");
+            part.ToString().Should().Be("test");
+        }
+
+        [Fact]
+        public void ToString_WithScoreBoost_ShouldReturnCorrectRepresentation()
+        {
+            var part = new ExactWordQueryPart("test", 5.123);
+            part.ToString().Should().Be("test^5.123");
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldReturnWeightingBasedOnNumberOfMatchedDocuments()
+        {
+            var navigator = FakeIndexNavigator.ReturningExactMatches(1, 2);
+            navigator.Snapshot = new FakeIndexSnapshot(new FakeIndexMetadata<int>(10));
+            var part = new ExactWordQueryPart("test", 5.123);
+
+            // 2 matches out of 10 documents results in a weighting of 0.2
+            part.CalculateWeighting(() => navigator).Should().Be(0.2D);
+
+            navigator.Snapshot = new FakeIndexSnapshot(new FakeIndexMetadata<int>(2));
+            part = new ExactWordQueryPart("test", 5.123);
+
+            // 2 matches out of 2 documents results in a weighting of 1
+            part.CalculateWeighting(() => navigator).Should().Be(1D);
+        }
+
+        [Fact]
+        public void CalculateWeighting_ShouldCacheWeighting()
+        {
+            var navigator = FakeIndexNavigator.ReturningExactMatches(1, 2);
+            navigator.Snapshot = new FakeIndexSnapshot(new FakeIndexMetadata<int>(10));
+            var part = new ExactWordQueryPart("test", 5.123);
+            part.CalculateWeighting(() => navigator).Should().Be(0.2D);
+
+            // Changing the snapshot is a hacky way of checking that the score is cached - 
+            // if it isn't, the weighting will be recalculated and will be different
+            navigator.Snapshot = new FakeIndexSnapshot(new FakeIndexMetadata<int>(2));
+            part.CalculateWeighting(() => navigator).Should().Be(0.2D);
         }
     }
 }

@@ -7,23 +7,51 @@ using System.Text;
 namespace Lifti.Querying
 {
     /// <summary>
-    /// Provides information about an item that was matched and scored whilst executing a query.
+    /// Provides information about a document's tokens that were matched and scored whilst executing a query.
     /// </summary>
     public readonly struct ScoredToken : IEquatable<ScoredToken>
     {
         /// <summary>
         /// Constructs a new instance of <see cref="ScoredToken"/>.
         /// </summary>
-        public ScoredToken(int itemId, IReadOnlyList<ScoredFieldMatch> fieldMatches)
+        public ScoredToken(int documentId, IReadOnlyList<ScoredFieldMatch> fieldMatches)
         {
-            this.ItemId = itemId;
+            this.DocumentId = documentId;
             this.FieldMatches = fieldMatches;
+
+#if DEBUG
+            // Verify that we are in field id order, and that there are no duplicates
+            // This is fairly safe to assume as the fields are indexed in order for any
+            // given document.
+#pragma warning disable CA1062 // Validate arguments of public methods
+            for (var i = 0; i < fieldMatches.Count; i++)
+#pragma warning restore CA1062 // Validate arguments of public methods
+            {
+                if (i > 0)
+                {
+                    var previous = this.FieldMatches[i - 1].FieldId;
+                    var next = this.FieldMatches[i].FieldId;
+                    if (previous > next)
+                    {
+                        System.Diagnostics.Debug.Fail("Intermediate query results must be in field id order");
+                    }
+                    else if (previous == next)
+                    {
+                        System.Diagnostics.Debug.Fail("Duplicate field id encountered in intermediate query results");
+                    }
+                }
+            }
+#endif
         }
 
+        /// <inheritdoc cref="DocumentId" />
+        [Obsolete("Use DocumentId property instead")]
+        public int ItemId => this.DocumentId;
+
         /// <summary>
-        /// Gets the id of the item that was matched.
+        /// Gets the id of the document that was matched.
         /// </summary>
-        public int ItemId { get; }
+        public int DocumentId { get; }
 
         /// <summary>
         /// Gets the fields in which the tokens were matched.
@@ -40,7 +68,7 @@ namespace Lifti.Querying
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.ItemId, this.FieldMatches);
+            return HashCode.Combine(this.DocumentId, this.FieldMatches);
         }
 
         /// <inheritdoc />
@@ -58,7 +86,7 @@ namespace Lifti.Querying
         /// <inheritdoc />
         public bool Equals(ScoredToken other)
         {
-            return this.ItemId == other.ItemId &&
+            return this.DocumentId == other.DocumentId &&
                    this.FieldMatches.SequenceEqual(other.FieldMatches);
         }
 
@@ -69,7 +97,7 @@ namespace Lifti.Querying
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Append("Item: ").AppendLine(this.ItemId.ToString(CultureInfo.InvariantCulture));
+            builder.Append("Document: ").AppendLine(this.DocumentId.ToString(CultureInfo.InvariantCulture));
             builder.AppendLine("Field matches:");
             foreach (var fieldMatch in this.FieldMatches)
             {
