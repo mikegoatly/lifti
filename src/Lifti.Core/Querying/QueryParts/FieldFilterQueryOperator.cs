@@ -41,6 +41,7 @@ namespace Lifti.Querying.QueryParts
                 throw new ArgumentNullException(nameof(queryContext));
             }
 
+            // A field filter query part doesn't actually contribute anything to timings or measurements, so we don't bother recording it.
             return this.Statement.Evaluate(
                     navigatorCreator,
                     queryContext with { FilterToFieldId = this.FieldId });

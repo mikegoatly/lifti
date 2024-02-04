@@ -6,7 +6,7 @@ using System.Linq;
 namespace Lifti.Querying
 {
     /// <inheritdoc />
-    public class Query : IQuery
+    public sealed class Query : IQuery
     {
         /// <summary>
         /// Constructs a new <see cref="Query"/> object capable of searching against an index.
@@ -36,6 +36,31 @@ namespace Lifti.Querying
                 throw new ArgumentNullException(nameof(index));
             }
 
+            return this.Execute(index, QueryContext.Empty);
+        }
+
+        internal SearchResults<TKey> ExecuteWithTimings<TKey>(FullTextIndex<TKey> index)
+            where TKey : notnull
+        {
+            if (index is null)
+            {
+                throw new ArgumentNullException(nameof(index));
+            }
+
+            var queryContext = new QueryContext();
+            var results = this.Execute(index.Snapshot, queryContext);
+
+            return new SearchResults<TKey>(index, results, queryContext.ExecutionTimings);
+        }
+
+        /// <inheritdoc />
+        public override string? ToString()
+        {
+            return this.Root.ToString();
+        }
+
+        private IEnumerable<SearchResult<TKey>> Execute<TKey>(IIndexSnapshot<TKey> index, QueryContext queryContext)
+        {
             if (this.Root == EmptyQueryPart.Instance)
             {
                 return Enumerable.Empty<SearchResult<TKey>>();
@@ -43,7 +68,7 @@ namespace Lifti.Querying
 
             var indexMetadata = index.Metadata;
             var fieldLookup = index.FieldLookup;
-            var evaluationResult = this.Root.Evaluate(index.CreateNavigator, QueryContext.Empty);
+            var evaluationResult = this.Root.Evaluate(index.CreateNavigator, queryContext);
             var matches = evaluationResult.Matches;
             var results = new Dictionary<int, List<ScoredFieldMatch>>();
 
@@ -74,12 +99,6 @@ namespace Lifti.Querying
             }
 
             return searchResults.OrderByDescending(r => r.Score);
-        }
-
-        /// <inheritdoc />
-        public override string? ToString()
-        {
-            return this.Root.ToString();
         }
     }
 

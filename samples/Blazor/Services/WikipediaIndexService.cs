@@ -77,9 +77,9 @@ namespace BlazorApp.Services
             return this.loadedPages[key].Text.Content;
         }
 
-        public IList<SearchResult<string>> Search(string query)
+        public ISearchResults<string> Search(string query)
         {
-            return this.Index.Search(query).ToList();
+            return this.Index.Search(query);
         }
 
         public IEnumerable<string> GetIndexedKeys()

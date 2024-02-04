@@ -1,1 +1,22 @@
-
+Lifti.ISearchResults<TKey>.GetExecutionPlan() -> Lifti.QueryExecutionPlan!
+Lifti.QueryExecutionPlan
+Lifti.QueryExecutionPlan.Root.get -> Lifti.QueryExecutionPlanNode!
+Lifti.QueryExecutionPlanNode
+Lifti.QueryExecutionPlanNode.Children.get -> (Lifti.QueryExecutionPlanNode! left, Lifti.QueryExecutionPlanNode! right)?
+Lifti.QueryExecutionPlanNode.DocumentFiltersApplied.get -> int?
+Lifti.QueryExecutionPlanNode.ExclusiveTiming.get -> System.TimeSpan
+Lifti.QueryExecutionPlanNode.ExecutionOrder.get -> int
+Lifti.QueryExecutionPlanNode.FieldFiltersApplied.get -> int?
+Lifti.QueryExecutionPlanNode.InclusiveTiming.get -> System.TimeSpan
+Lifti.QueryExecutionPlanNode.Kind.get -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNode.ResultingDocumentCount.get -> int
+Lifti.QueryExecutionPlanNode.Text.get -> string?
+Lifti.QueryExecutionPlanNode.Weighting.get -> double?
+Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.CompositePositionalIntersect = 5 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.Intersect = 3 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.PositionalIntersect = 4 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.PrecedingIntersect = 6 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.QueryPart = 1 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.Union = 2 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.Unknown = 0 -> Lifti.QueryExecutionPlanNodeKind

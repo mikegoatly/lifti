@@ -305,6 +305,7 @@ namespace Lifti.Querying.QueryParts
                 throw new ArgumentNullException(nameof(queryContext));
             }
 
+            var timing = queryContext.ExecutionTimings.Start(this, queryContext);
             using var navigator = navigatorCreator();
             var resultCollector = new DocumentMatchCollector();
             var stateStore = fuzzyMatchStateStorePool.Take();
@@ -396,7 +397,7 @@ namespace Lifti.Querying.QueryParts
 
             fuzzyMatchStateStorePool.Return(stateStore);
 
-            return resultCollector.ToIntermediateQueryResult();
+            return timing.Complete(resultCollector.ToIntermediateQueryResult());
         }
 
         private static void AddSubstitutionBookmarks(IIndexNavigator navigator, FuzzyMatchStateStore stateStore, char currentCharacter, FuzzyMatchState currentState)

@@ -291,7 +291,12 @@ namespace Lifti
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return new SearchResults<TKey>(this, query.Execute(this.currentSnapshot));
+            if (query is Query actualQuery)
+            {
+                return actualQuery.ExecuteWithTimings(this);
+            }
+
+            return new SearchResults<TKey>(this, query.Execute(this.currentSnapshot), null);
         }
 
         /// <inheritdoc />

@@ -19,10 +19,10 @@ namespace Blazor.Pages
         //    new PageSummary(0, "Fantastic_Mr_Fox", "")
         //};
         private IList<SearchResult<string>>? results;
+        private QueryExecutionPlan? executionPlan;
         private bool errored;
         private bool indexing;
-        private string? selectedContent;
-        private IReadOnlyList<TokenLocation>? wordLocations;
+        private SearchResult<string>? selectedSearchResult;
         private bool stemmingEnabled;
         private bool fuzzyMatchByDefault;
 
@@ -81,28 +81,14 @@ namespace Blazor.Pages
             this.StateHasChanged();
         }
 
-        private void ShowItem(SearchResult<string> searchResult)
-        {
-            var builder = new System.Text.StringBuilder(this.IndexService.GetSourceText(searchResult.Key));
-            var locations = searchResult.FieldMatches.SelectMany(m => m.Locations).ToList();
-            foreach (var location in locations.OrderByDescending(l => l.Start))
-            {
-                builder.Insert(location.Start + location.Length, "</span>");
-                builder.Insert(location.Start, "<span class='bg-warning'>");
-            }
-
-            this.wordLocations = locations;
-            this.selectedContent = builder.ToString();
-        }
-
-        private async Task IndexRandomPagesAsync()
+        private async Task IndexRandomPagesAsync(int count = 10)
         {
             this.errored = false;
-            this.Message = "Getting 10 random Wikipedia pages...";
+            this.Message = $"Getting {count} random Wikipedia pages...";
             try
             {
-                var randomList = await this.WikipediaPageProvider.GetRandomPagesAsync();
-                await this.FetchPagesAsync(randomList);
+                var randomList = await this.WikipediaPageProvider.GetRandomPagesAsync(count);
+                await this.FetchPagesAsync(randomList, count);
             }
             catch (Exception ex)
             {
@@ -111,7 +97,7 @@ namespace Blazor.Pages
             }
         }
 
-        private async Task FetchPagesAsync(IEnumerable<PageSummary> pages)
+        private async Task FetchPagesAsync(IEnumerable<PageSummary> pages, int count)
         {
             this.indexing = true;
             this.errored = false;
@@ -120,7 +106,7 @@ namespace Blazor.Pages
                 var i = 1;
                 foreach (var result in pages)
                 {
-                    var counter = $"[{i++}/10]";
+                    var counter = $"[{i++}/{count}]";
                     this.Message = $"{counter} Fetching page " + ((result.Title?.Length ?? 0) > 0 ? result.Title : result.Slug);
                     StateHasChanged();
                     var pageContent = await this.WikipediaPageProvider.GetPageContentAsync(result);
@@ -169,7 +155,9 @@ namespace Blazor.Pages
 
                 this.IndexText = null;
                 this.SyntaxError = null;
-                this.results = this.IndexService.Search(this.SearchText);
+                var searchResults = this.IndexService.Search(this.SearchText);
+                this.results = searchResults.ToList();
+                this.executionPlan = searchResults.GetExecutionPlan();
             }
             catch (Exception ex)
             {

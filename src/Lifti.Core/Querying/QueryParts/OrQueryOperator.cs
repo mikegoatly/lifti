@@ -22,8 +22,13 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
-            return this.Left.Evaluate(navigatorCreator, queryContext)
-                .Union(this.Right.Evaluate(navigatorCreator, queryContext));
+            var childQueryContext = queryContext with { ParentQueryPart = this };
+            var leftResults = this.Left.Evaluate(navigatorCreator, childQueryContext);
+            var rightResults = this.Right.Evaluate(navigatorCreator, childQueryContext);
+
+            var timing = queryContext.ExecutionTimings.Start(this, queryContext);
+            var results = leftResults.Union(rightResults);
+            return timing.Complete(results);
         }
 
         /// <inheritdoc/>

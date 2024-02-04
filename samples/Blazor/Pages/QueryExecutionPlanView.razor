@@ -1,0 +1,14 @@
+﻿@using System.Text.Json;
+@inject IJSRuntime JSRuntime
+
+@if (ExecutionPlan != null)
+{
+    <div class="execution-plan">
+        <ExecutionPlanNode Node="@ExecutionPlan.Root" />
+    </div>
+}
+
+@code {
+    [Parameter]
+    public QueryExecutionPlan? ExecutionPlan { get; set; }
+}

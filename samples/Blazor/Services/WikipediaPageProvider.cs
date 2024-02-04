@@ -12,9 +12,9 @@ namespace BlazorApp.Services
             this.httpClient = httpClient;
         }
 
-        public async Task<IReadOnlyList<PageSummary>> GetRandomPagesAsync()
+        public async Task<IReadOnlyList<PageSummary>> GetRandomPagesAsync(int count)
         {
-            var randomList = await this.httpClient.GetFromJsonAsync<RandomResult>("https://en.wikipedia.org/w/api.php?action=query&list=random&rnlimit=10&rnnamespace=0&format=json&&origin=*");
+            var randomList = await this.httpClient.GetFromJsonAsync<RandomResult>($"https://en.wikipedia.org/w/api.php?action=query&list=random&rnlimit={count}&rnnamespace=0&format=json&&origin=*");
 
             if (randomList == null)
             {
