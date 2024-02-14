@@ -63,6 +63,57 @@ a, .btn-link {
         content: "An error has occurred."
     }
 
+ul.search-results {
+    list-style-type: none;
+    padding: 0;
+}
+
+    ul.search-results li {
+        cursor: pointer;
+    }
+
+    ul.search-results li.selected {
+        background: #DDD;
+    }
+
+    ul.search-results li:hover {
+        background: #EEE;
+    }
+
+
+    ul.search-results li span:first-of-type {
+        color: #0071c1;
+    }
+
+    ul.search-results li span:last-of-type {
+        font-size: 0.8em;
+    }
+
+.result-content {
+    border: 1px solid #CCC;
+    background: #EEE;
+    margin: 0 1em 1em 0;
+    padding: 0 1em;
+    border-radius: 1em;
+}
+
+.word-matches {
+    max-width: 150px;
+    width: 150px;
+    min-width: 150px;
+    font-size: 0.9em;
+}
+
+.btn.tab {
+    border-end-end-radius: 0 !important;
+    border-end-start-radius: 0 !important;
+}
+
+.tab-content {
+    border-top: 1px solid #1b6ec2;
+    padding-top: 1rem;
+}
+
 .execution-plan .node {
     display: flex;
     flex-direction: row;
@@ -128,22 +179,22 @@ a, .btn-link {
             margin: 0 0.4em;
         }
 
-        /* Adjust the color of the text */
+    /* Adjust the color of the text */
     .execution-plan .node-header.operator .node-info .primary .node-name {
         color: #1861ac;
     }
 
-        .execution-plan .node-header .node-info .primary svg {
-            width: 20px;
-            height: 20px;
-            max-width: 20px;
-            max-height: 20px;
-        }
+    .execution-plan .node-header .node-info .primary svg {
+        width: 20px;
+        height: 20px;
+        max-width: 20px;
+        max-height: 20px;
+    }
 
-        .execution-plan .node-header .node-info .primary span:last-of-type {
-            font-size: 0.8em;
-            margin-left: 0.2rem;
-        }
+    .execution-plan .node-header .node-info .primary span:last-of-type {
+        font-size: 0.8em;
+        margin-left: 0.2rem;
+    }
 
     .execution-plan .node-header .node-info {
         display: flex;

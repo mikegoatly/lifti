@@ -33,7 +33,7 @@
         <div class="flex-fill d-flex align-items-center">
             <span class="me-2 flex-fill text-end">@IndexService.IndexCount pages indexed.</span>
             <button disabled=@indexing class="btn btn-secondary" @onclick="() => IndexRandomPagesAsync(10)">Index 10 more...</button>
-            <button disabled=@indexing class="btn btn-secondary ms-2" @onclick="() => IndexRandomPagesAsync(100)">Index 100 more...</button>
+            <button disabled=@indexing class="btn btn-secondary ms-2" @onclick="() => IndexRandomPagesAsync(90)">Index 100 more...</button>
         </div>
     </div>
 
@@ -63,32 +63,41 @@
     else if (results != null)
     {
         <div class="container-fluid border-primary border-top flex-fill overflow-auto pt-3">
-            <div class="row">
-                <QueryExecutionPlanView ExecutionPlan="@executionPlan" />
-            </div>
-            <div class="row">
+            <Blazor.Controls.TabControl>
+                <Blazor.Controls.TabPage Text="Results">
+                    <div class="row">
 
-                @if (results.Count == 0)
-                {
-                    <div class="alert alert-info d-flex">
-                        <span class="align-self-center">No matches!</span>
+                        @if (results.Count == 0)
+                        {
+                            <div class="alert alert-info d-flex">
+                                <span class="align-self-center">No matches!</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="container-fluid flex-fill">
+                                <div class="row">
+                                    <ul class="col-3 search-results pe-2 pt-2 border-primary border-right">
+                                        @foreach (var result in results)
+                                        {
+                                            <li class="p-1 @(result == this.selectedSearchResult ? "selected" : "")" @onclick="() => this.selectedSearchResult = result">
+                                                <span>@result.Key</span>
+                                                <span>Score @result.Score.ToString("0.####")</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                    <ResultView SelectedSearchResult="@selectedSearchResult" />
+                                </div>
+                            </div>
+                        }
                     </div>
-                }
-                else
-                {
-                    <div class="container-fluid flex-fill">
-                        <div class="row">
-                            <ul class="col-3 search-results pe-2 pt-2 border-primary border-right">
-                                @foreach (var result in results)
-                                {
-                                    <li class="p-1" @onclick="() => this.selectedSearchResult = result">@result.Key <br /> Score @result.Score.ToString("0.####")</li>
-                                }
-                            </ul>
-                            <ResultView SelectedSearchResult="@selectedSearchResult" />
-                        </div>
+                </Blazor.Controls.TabPage>
+                <Blazor.Controls.TabPage Text="Execution Plan">
+                    <div class="row">
+                        <QueryExecutionPlanView ExecutionPlan="@executionPlan" />
                     </div>
-                }
-            </div>
+                </Blazor.Controls.TabPage>
+            </Blazor.Controls.TabControl>
         </div>
     }
     else
