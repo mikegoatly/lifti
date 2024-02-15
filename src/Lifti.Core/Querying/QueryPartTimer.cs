@@ -6,17 +6,18 @@ namespace Lifti.Querying
 {
     internal class QueryPartTimer
     {
-        private static readonly SharedPool<QueryPartTimer> pool = new(static () => new QueryPartTimer(), static (o) => { }, 10);
+        private static readonly SharedPool<QueryPartTimer> queryPartTimerPool = new(static () => new QueryPartTimer(), static (o) => { }, 10);
         private static readonly double timestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
         private ExecutionTimings timingsContainer = null!;
-
-        public int? DocumentFiltersApplied { get; private set; }
-        public int? FieldFiltersApplied { get; private set; }
-        private QueryContext queryContext = null!;
         private IQueryPart queryPart = null!;
         private long startTimestamp;
 
-        private QueryPartTimer()
+        public static readonly QueryPartTimer NullTimer = new NullQueryPartTimer();
+
+        public int? DocumentFiltersApplied { get; private set; }
+        public int? FieldFiltersApplied { get; private set; }
+
+        protected QueryPartTimer()
         {
         }
 
@@ -27,12 +28,11 @@ namespace Lifti.Querying
 
         private static QueryPartTimer Start(ExecutionTimings parent, IQueryPart queryPart, QueryContext currentContext)
         {
-            var timer = pool.Take();
+            var timer = queryPartTimerPool.Take();
             timer.timingsContainer = parent;
             timer.DocumentFiltersApplied = currentContext.FilterToDocumentIds?.Count ?? null;
             timer.FieldFiltersApplied = currentContext.FilterToFieldId.HasValue ? 1 : null;
             timer.queryPart = queryPart;
-            timer.queryContext = currentContext;
             timer.startTimestamp = Stopwatch.GetTimestamp();
             return timer;
         }
@@ -47,7 +47,7 @@ namespace Lifti.Querying
             this.startTimestamp = Stopwatch.GetTimestamp();
         }
 
-        public IntermediateQueryResult Complete(IntermediateQueryResult result)
+        public virtual IntermediateQueryResult Complete(IntermediateQueryResult result)
         {
             var totalTicks = CalculateTicks();
             var timeTaken = TimeSpan.FromTicks((long)(totalTicks * timestampToTicks));
@@ -55,14 +55,22 @@ namespace Lifti.Querying
             this.timingsContainer.Timings.Add(
                 new(
                     this.queryPart,
-                    timeTaken, 
+                    timeTaken,
                     result.Matches.Count,
                     this.DocumentFiltersApplied,
                     this.FieldFiltersApplied));
 
-            pool.Return(this);
+            queryPartTimerPool.Return(this);
 
             return result;
+        }
+
+        private sealed class NullQueryPartTimer : QueryPartTimer
+        {
+            public override IntermediateQueryResult Complete(IntermediateQueryResult result)
+            {
+                return result;
+            }
         }
     }
 }

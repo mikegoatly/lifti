@@ -47,7 +47,7 @@ namespace Lifti.Querying
                 throw new ArgumentNullException(nameof(index));
             }
 
-            var queryContext = new QueryContext();
+            var queryContext = new QueryContext() { ExecutionTimings = new() };
             var results = this.Execute(index.Snapshot, queryContext);
 
             return new SearchResults<TKey>(index, results, queryContext.ExecutionTimings);
@@ -63,7 +63,7 @@ namespace Lifti.Querying
         {
             if (this.Root == EmptyQueryPart.Instance)
             {
-                return Enumerable.Empty<SearchResult<TKey>>();
+                return Array.Empty<SearchResult<TKey>>();
             }
 
             var indexMetadata = index.Metadata;

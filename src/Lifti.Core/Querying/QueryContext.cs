@@ -23,6 +23,6 @@ namespace Lifti.Querying
 
         internal IQueryPart? ParentQueryPart { get; init; }
 
-        internal ExecutionTimings ExecutionTimings { get; init; } = new();
+        internal ExecutionTimings ExecutionTimings { get; init; } = ExecutionTimings.NullTimings;
     }
 }
