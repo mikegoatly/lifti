@@ -79,7 +79,7 @@ namespace BlazorApp.Services
 
         public ISearchResults<string> Search(string query)
         {
-            return this.Index.Search(query);
+            return this.Index.Search(query, QueryExecutionOptions.IncludeExecutionPlan);
         }
 
         public IEnumerable<string> GetIndexedKeys()

@@ -75,6 +75,7 @@
             QueryExecutionPlanNodeKind.PositionalIntersect => $"Intersect {Node.Text}",
             QueryExecutionPlanNodeKind.CompositePositionalIntersect => $"Composite intersect {Node.Text}",
             QueryExecutionPlanNodeKind.PrecedingIntersect => "Preceding intersect",
+            QueryExecutionPlanNodeKind.ResultsOnly => "Query executed without plan recorded",
             _ => throw new InvalidOperationException($"Unknown node kind: {Node.Kind}")
         };
     }

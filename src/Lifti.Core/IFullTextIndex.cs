@@ -42,7 +42,7 @@ namespace Lifti
 
         /// <summary>
         /// Gets the configured <see cref="IQueryParser"/> for the index. If you need to execute the same query against the index multiple
-        /// times, you can use this to parse a query as an <see cref="IQuery"/>, and then execute that against the index's <see cref="Search(IQuery)"/> method.
+        /// times, you can use this to parse a query as an <see cref="IQuery"/>, and then execute that against the index's <see cref="Search(IQuery, QueryExecutionOptions)"/> method.
         /// </summary>
         IQueryParser QueryParser { get; }
 
@@ -126,10 +126,13 @@ namespace Lifti
         /// <param name="searchText">
         /// The query to use when searching in the index.
         /// </param>
+        /// <param name="options">
+        /// The options to apply when executing the query.
+        /// </param>
         /// <returns>
         /// The matching search results.
         /// </returns>
-        ISearchResults<TKey> Search(string searchText);
+        ISearchResults<TKey> Search(string searchText, QueryExecutionOptions options = QueryExecutionOptions.None);
 
         /// <summary>
         /// Performs a search against this index.
@@ -137,10 +140,13 @@ namespace Lifti
         /// <param name="query">
         /// The query to use when searching in the index.
         /// </param>
+        /// <param name="options">
+        /// The options to apply when executing the query.
+        /// </param>
         /// <returns>
         /// The matching search results.
         /// </returns>
-        ISearchResults<TKey> Search(IQuery query);
+        ISearchResults<TKey> Search(IQuery query, QueryExecutionOptions options = QueryExecutionOptions.None);
 
         /// <summary>
         /// Starts a batch change within the index so that any subsequent mutations that are made using AddAsync and RemoveAsync will

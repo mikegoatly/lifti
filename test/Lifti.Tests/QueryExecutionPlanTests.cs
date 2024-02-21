@@ -29,9 +29,18 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public void ShouldReturnNestedHierarchyForPositionalIntersectQueries()
+        public void ShouldReturnSingleNodeWhenNoQueryPlanRequestedWithQuery()
         {
             var plan = this.index.Search("\"two three four\"").GetExecutionPlan();
+
+            plan.Root.Should().BeEquivalentTo(
+                new QueryExecutionPlanNode(1, QueryExecutionPlanNodeKind.ResultsOnly, resultingDocumentCount: 2, "Results"));
+        }
+
+        [Fact]
+        public void ShouldReturnNestedHierarchyForPositionalIntersectQueries()
+        {
+            var plan = this.index.Search("\"two three four\"", QueryExecutionOptions.IncludeExecutionPlan).GetExecutionPlan();
 
             plan.Root.Should().BeEquivalentTo(
                 new QueryExecutionPlanNode(
@@ -61,7 +70,7 @@ namespace Lifti.Tests
         {
             // One document matches "seven" and 2 documents match "two three four". A union of the two
             // should result in 3 documents because the documents are unique.
-            var plan = this.index.Search("seven | (two three four)").GetExecutionPlan();
+            var plan = this.index.Search("seven | (two three four)", QueryExecutionOptions.IncludeExecutionPlan).GetExecutionPlan();
 
             AssertionOptions.FormattingOptions.MaxDepth = 10;
 

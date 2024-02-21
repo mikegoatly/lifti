@@ -48,7 +48,7 @@ namespace Lifti
             // Create the final root node
             if (children.Count == 0)
             {
-                throw new InvalidOperationException("No execution timings were recorded");
+                this.Root = new QueryExecutionPlanNode(1, resultCount, null, null);
             }
             else if (children.Count == 1)
             {
@@ -117,6 +117,11 @@ namespace Lifti
         /// when the positions of the matched tokens on the left are preceding the tokens on the right.
         /// </summary>
         PrecedingIntersect = 6,
+
+        /// <summary>
+        /// No execution plan was recorded during execution - this node is a placeholder for the final results.
+        /// </summary>
+        ResultsOnly = 7,
     }
 
     /// <summary>
@@ -146,6 +151,7 @@ namespace Lifti
             {
                 this.Text = "Results";
                 this.ExclusiveTiming = TimeSpan.Zero;
+                this.Kind = QueryExecutionPlanNodeKind.ResultsOnly;
             }
 
             this.InclusiveTiming = this.ExclusiveTiming;

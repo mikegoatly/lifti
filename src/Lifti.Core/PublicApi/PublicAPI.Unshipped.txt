@@ -1,4 +1,15 @@
+*REMOVED*Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query) -> Lifti.ISearchResults<TKey>!
+*REMOVED*Lifti.FullTextIndex<TKey>.Search(string! searchText) -> Lifti.ISearchResults<TKey>!
+*REMOVED*Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query) -> Lifti.ISearchResults<TKey>!
+*REMOVED*Lifti.IFullTextIndex<TKey>.Search(string! searchText) -> Lifti.ISearchResults<TKey>!
+Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
+Lifti.IFullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
+Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
+Lifti.FullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
 Lifti.ISearchResults<TKey>.GetExecutionPlan() -> Lifti.QueryExecutionPlan!
+Lifti.QueryExecutionOptions
+Lifti.QueryExecutionOptions.IncludeExecutionPlan = 1 -> Lifti.QueryExecutionOptions
+Lifti.QueryExecutionOptions.None = 0 -> Lifti.QueryExecutionOptions
 Lifti.QueryExecutionPlan
 Lifti.QueryExecutionPlan.Root.get -> Lifti.QueryExecutionPlanNode!
 Lifti.QueryExecutionPlanNode
@@ -18,5 +29,6 @@ Lifti.QueryExecutionPlanNodeKind.Intersect = 3 -> Lifti.QueryExecutionPlanNodeKi
 Lifti.QueryExecutionPlanNodeKind.PositionalIntersect = 4 -> Lifti.QueryExecutionPlanNodeKind
 Lifti.QueryExecutionPlanNodeKind.PrecedingIntersect = 6 -> Lifti.QueryExecutionPlanNodeKind
 Lifti.QueryExecutionPlanNodeKind.QueryPart = 1 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.ResultsOnly = 7 -> Lifti.QueryExecutionPlanNodeKind
 Lifti.QueryExecutionPlanNodeKind.Union = 2 -> Lifti.QueryExecutionPlanNodeKind
 Lifti.QueryExecutionPlanNodeKind.Unknown = 0 -> Lifti.QueryExecutionPlanNodeKind
