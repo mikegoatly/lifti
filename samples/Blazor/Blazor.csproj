@@ -9,7 +9,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="Services\InitialPages.json" />
+	  <None Remove="Services\InitialPages.dat" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Services\InitialPages.dat" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Services\InitialPages.json" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -28,7 +28,7 @@ namespace Blazor.Pages
 
         private bool IndexRebuildRequired => this.fuzzyMatchByDefault != this.IndexService.FuzzyMatchByDefault || this.stemmingEnabled != this.IndexService.StemmingEnabled;
 
-        private string? IndexText { get; set; }
+        private IndexNode? ShowingRootNode { get; set; }
 
         private string? SyntaxError { get; set; }
 
@@ -135,12 +135,12 @@ namespace Blazor.Pages
 
         private void ShowIndex()
         {
-            this.IndexText = this.IndexService.GetIndexTextualRepresentation();
+            this.ShowingRootNode = this.IndexService.GetIndexRoot();
         }
 
         private void Clear()
         {
-            this.IndexText = null;
+            this.ShowingRootNode = null;
             this.results = null;
         }
 
@@ -153,7 +153,8 @@ namespace Blazor.Pages
                     return;
                 }
 
-                this.IndexText = null;
+                this.selectedSearchResult = null;
+                this.ShowingRootNode = null;
                 this.SyntaxError = null;
                 var searchResults = this.IndexService.Search(this.SearchText);
                 this.results = searchResults.ToList();
@@ -167,7 +168,7 @@ namespace Blazor.Pages
 
         private void ShowAll()
         {
-            this.IndexText = null;
+            this.ShowingRootNode = null;
             this.results = this.IndexService.GetIndexedKeys().Select(k => new SearchResult<string>(k, Array.Empty<FieldSearchResult>())).ToList();
         }
     }

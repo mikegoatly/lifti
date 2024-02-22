@@ -1,0 +1,55 @@
+﻿<div class="index-node-header">
+    @if (Node.HasChildNodes)
+    {
+        <button type="button" @onclick="ToggleExpand">
+            @if (this.expanded)
+            {
+                <span>-</span>
+            }
+            else
+            {
+                <span>+</span>
+            }
+        </button>
+    }
+    @Name @if (!string.IsNullOrEmpty(ParentName))
+    {
+        <span class="text-muted">(@ParentName@Name)</span>
+    }
+
+    @if (this.Node.HasMatches)
+    {
+        <span class="badge bg-primary">@this.Node.Matches.Count documents</span>
+    }
+</div>
+<div class="index-node-children">
+    @if (expanded && Node.HasChildNodes)
+    {
+        <ul>
+            @foreach (var child in Node.ChildNodes.CharacterMap)
+            {
+                <li>
+                    <IndexNodeElement Node="@child.ChildNode" Name="@child.ChildChar.ToString()" ParentName="@(ParentName + Name)" />
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    private bool expanded = false;
+
+    [Parameter]
+    public IndexNode Node { get; set; } = null!;
+
+    [Parameter]
+    public string Name { get; set; } = null!;
+
+    [Parameter]
+    public string ParentName { get; set; } = null!;
+
+    private void ToggleExpand()
+    {
+        this.expanded = !this.expanded;
+    }
+}

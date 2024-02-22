@@ -1,6 +1,7 @@
 ﻿using BlazorApp.Shared;
 using Lifti;
 using Lifti.Tokenization.TextExtraction;
+using System.IO.Compression;
 using System.Reflection;
 using System.Text.Json;
 
@@ -13,13 +14,14 @@ namespace BlazorApp.Services
 
         public WikipediaIndexService()
         {
-            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Blazor.Services.InitialPages.json");
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Blazor.Services.InitialPages.dat");
             if (stream == null)
             {
                 throw new Exception("Unable to load initial pages from embedded resource");
             }
 
-            var deserializedPages = JsonSerializer.Deserialize<Dictionary<string, WikipediaPage>>(stream);
+            using var gzipStream = new GZipStream(stream, CompressionMode.Decompress);
+            var deserializedPages = JsonSerializer.Deserialize<Dictionary<string, WikipediaPage>>(gzipStream);
             if (deserializedPages == null)
             {
                 throw new Exception("Unable to deserialize initial pages");
@@ -89,9 +91,14 @@ namespace BlazorApp.Services
 
         public string GetIndexTextualRepresentation()
         {
-            //return this.Index.ToString();
+            return this.Index.ToString();
 
-            return JsonSerializer.Serialize(this.loadedPages);
+            //return JsonSerializer.Serialize(this.loadedPages, new JsonSerializerOptions() { WriteIndented = true });
+        }
+
+        internal IndexNode? GetIndexRoot()
+        {
+            return this.index?.Root;
         }
     }
 }

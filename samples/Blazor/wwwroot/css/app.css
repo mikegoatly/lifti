@@ -89,6 +89,10 @@ ul.search-results {
         font-size: 0.8em;
     }
 
+pre {
+    max-width: calc(100vw - 250px);
+}
+
 .result-content {
     border: 1px solid #CCC;
     background: #EEE;

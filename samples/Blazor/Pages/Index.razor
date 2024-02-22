@@ -50,9 +50,12 @@
         </div>
     </div>
 
-    @if (this.IndexText != null)
+    @if (this.ShowingRootNode != null)
     {
-        <pre>@this.IndexText</pre>
+        foreach (var child in this.ShowingRootNode.ChildNodes.CharacterMap)
+        {
+            <IndexNodeElement Name="@child.ChildChar.ToString()" Node="@child.ChildNode" ParentName="" />
+        }
     }
     else if (this.SyntaxError != null)
     {
@@ -64,7 +67,7 @@
     {
         <div class="container-fluid border-primary border-top flex-fill overflow-auto pt-3">
             <Blazor.Controls.TabControl>
-                <Blazor.Controls.TabPage Text="Results">
+                <Blazor.Controls.TabPage Text="@("Results (" + results.Count + ")")">
                     <div class="row">
 
                         @if (results.Count == 0)
