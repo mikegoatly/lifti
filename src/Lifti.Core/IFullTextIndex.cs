@@ -120,6 +120,12 @@ namespace Lifti
         /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
         Task<bool> RemoveAsync(TKey key, CancellationToken cancellationToken = default);
 
+        /// <inheritdoc cref="Search(string, QueryExecutionOptions)" />
+        ISearchResults<TKey> Search(string searchText);
+
+        /// <inheritdoc cref="Search(IQuery, QueryExecutionOptions)" />
+        ISearchResults<TKey> Search(IQuery query);
+
         /// <summary>
         /// Performs a search against this index.
         /// </summary>

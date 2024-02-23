@@ -277,6 +277,18 @@ namespace Lifti
         }
 
         /// <inheritdoc />
+        public ISearchResults<TKey> Search(string searchText)
+        {
+            return this.Search(searchText, QueryExecutionOptions.None);
+        }
+
+        /// <inheritdoc />
+        public ISearchResults<TKey> Search(IQuery query)
+        {
+            return this.Search(query, QueryExecutionOptions.None);
+        }
+
+        /// <inheritdoc />
         public ISearchResults<TKey> Search(string searchText, QueryExecutionOptions options = QueryExecutionOptions.None)
         {
             var query = this.QueryParser.Parse(this.FieldLookup, searchText, this);

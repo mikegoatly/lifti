@@ -1,7 +1,3 @@
-*REMOVED*Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query) -> Lifti.ISearchResults<TKey>!
-*REMOVED*Lifti.FullTextIndex<TKey>.Search(string! searchText) -> Lifti.ISearchResults<TKey>!
-*REMOVED*Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query) -> Lifti.ISearchResults<TKey>!
-*REMOVED*Lifti.IFullTextIndex<TKey>.Search(string! searchText) -> Lifti.ISearchResults<TKey>!
 Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
 Lifti.IFullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
 Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
