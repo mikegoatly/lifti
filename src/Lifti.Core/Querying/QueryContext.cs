@@ -21,8 +21,6 @@ namespace Lifti.Querying
         /// </summary>
         public static QueryContext Empty => new();
 
-        internal IQueryPart? ParentQueryPart { get; init; }
-
         internal ExecutionTimings ExecutionTimings { get; init; } = ExecutionTimings.NullTimings;
     }
 }

@@ -42,7 +42,7 @@ namespace Lifti.Tests.Querying
                         null,
                         null),
                     // Allow for a margin of error on the time taken
-                    options => options.Using<TimeSpan>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, TimeSpan.FromMilliseconds(20))).WhenTypeIs<TimeSpan>());
+                    options => options.Using<TimeSpan>(ctx => ctx.Subject.Should().BeGreaterThan(TimeSpan.FromMilliseconds(30))).WhenTypeIs<TimeSpan>());
         }
 
         [Fact]

@@ -49,7 +49,7 @@ namespace Lifti.Querying.QueryParts
 
             var parentQueryContext = queryContext;
             
-            var childQueryContext = queryContext with { ParentQueryPart = this };
+            var childQueryContext = queryContext;
 
             do
             {

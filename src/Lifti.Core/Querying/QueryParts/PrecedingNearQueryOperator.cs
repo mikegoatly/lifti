@@ -31,7 +31,7 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
-            var (leftResults, rightResults) = this.EvaluateWithDocumentIntersection(navigatorCreator, queryContext with { ParentQueryPart = this });
+            var (leftResults, rightResults) = this.EvaluateWithDocumentIntersection(navigatorCreator, queryContext);
 
             var timing = queryContext.ExecutionTimings.Start(this, queryContext);
             var results = leftResults
