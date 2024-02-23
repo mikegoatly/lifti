@@ -27,13 +27,13 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/searching/query-execution/" /><meta property="article:section" content="docs" />
 
-<meta property="article:modified_time" content="2024-01-16T22:43:44+00:00" />
+<meta property="article:modified_time" content="2024-02-23T16:03:28+00:00" />
 
 <meta itemprop="name" content="Query execution">
 <meta itemprop="description" content="LIFTI attempts to optimize the order that query parts are executed to make queries as efficient as possible.
 ">
-<meta itemprop="dateModified" content="2024-01-16T22:43:44+00:00" />
-<meta itemprop="wordCount" content="351">
+<meta itemprop="dateModified" content="2024-02-23T16:03:28+00:00" />
+<meta itemprop="wordCount" content="423">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Query execution"/>
 <meta name="twitter:description" content="LIFTI attempts to optimize the order that query parts are executed to make queries as efficient as possible.
 "/>
@@ -79,7 +79,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.3edff441e8da4ea1c8495044f31febb6.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.8b2433efc103644c6df3e189478d0464.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -103,7 +103,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.3edff441e8da4ea1c8495044f31febb6.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.8b2433efc103644c6df3e189478d0464.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -170,6 +170,8 @@
   <a href="/lifti/docs/searching/manually-constructing-queries/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingmanually-constructing-queries"><span class="">Manually Constructing Query Objects</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingusing-the-index-navigator-li">
   <a href="/lifti/docs/searching/using-the-index-navigator/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingusing-the-index-navigator"><span class="">IndexNavigator</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingunderstanding-query-plan-li">
+  <a href="/lifti/docs/searching/understanding-query-plan/" title="Understanding Query Execution Plans" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingunderstanding-query-plan"><span class="">Understanding query plans</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-liftidocssearchingsearch-results-li">
   <a href="/lifti/docs/searching/search-results/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocssearchingsearch-results"><span class="">Search Results</span></a>
   <ul class="ul-3 foldable">
@@ -231,8 +233,9 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#scoring-mechanism-overview">Scoring Mechanism Overview</a></li>
-        <li><a href="#execution-strategy">Execution Strategy</a></li>
+        <li><a href="#scoring-mechanism-overview">Scoring mechanism overview</a></li>
+        <li><a href="#execution-strategy">Execution strategy</a></li>
+        <li><a href="#execution-plans">Execution plans</a></li>
       </ul>
     </li>
   </ul>
@@ -266,7 +269,7 @@
 	<p>LIFTI&rsquo;s query execution logic employs a strategic approach to optimize query performance, prioritizing the execution of query parts based on their calculated weights.
 This weight represents the relative cost and effectiveness of executing a particular query part in relation to the overall document set. By assigning these weights,
 LIFTI aims to minimize the number of documents involved early in the query execution, thereby reducing the computational load and improving efficiency.</p>
-<h3 id="scoring-mechanism-overview">Scoring Mechanism Overview</h3>
+<h3 id="scoring-mechanism-overview">Scoring mechanism overview</h3>
 <ol>
 <li>
 <p><strong>General Principle</strong>: Each query part is assigned a &ldquo;weight&rdquo; based on its expected execution cost and the number of documents it is likely to involve.
@@ -286,13 +289,21 @@ The objective is to execute less costly parts first, reducing the document set s
 </ul>
 </li>
 </ol>
-<h3 id="execution-strategy">Execution Strategy</h3>
+<h3 id="execution-strategy">Execution strategy</h3>
 <p>The execution order is determined by these weightings, with lower weights prioritized. This approach ensures that the query processor can efficiently
 filter and score documents, avoiding unnecessary computations on documents that would later be excluded. This system is especially beneficial in queries with multiple parts,
 where early reduction in document set size can lead to significant performance improvements.</p>
+<h3 id="execution-plans">Execution plans</h3>
+<p>To get more insight into how a query is executed, including the weighting scores that were calculated you can get LIFTI to generate the actual execution plan for a query.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Execute the query, indicating that timings and other details should be included</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">results</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Search</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;find something&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">QueryExecutionOptions</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">IncludeExecutionPlan</span><span style="color:#000;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Calculate and return the execution plan details</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">actualExecutionPlan</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">results</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">GetExecutionPlan</span><span style="color:#000;font-weight:bold">();</span>
+</span></span></code></pre></div><p>See <a href="./understanding-query-plan">Understanding LIFTI query execution plans</a> for more details.</p>
 
 	<div class="text-muted mt-5 pt-3 border-top">
-  Last modified January 16, 2024: <a href="https://github.com/mikegoatly/lifti/commit/125ae879f9e8153516e5e815ca9caff19dce72d6">V6.0.0 (#107) (125ae87)</a>
+  Last modified February 23, 2024: <a href="https://github.com/mikegoatly/lifti/commit/16dc5af57b1129b1123c61cb3c51c9fafd251c5f">Query execution plans (#111) (16dc5af)</a>
 </div>
 
 </div>

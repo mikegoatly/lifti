@@ -75,7 +75,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.3edff441e8da4ea1c8495044f31febb6.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.8b2433efc103644c6df3e189478d0464.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -99,7 +99,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.3edff441e8da4ea1c8495044f31febb6.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.8b2433efc103644c6df3e189478d0464.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -166,6 +166,8 @@
   <a href="/lifti/docs/searching/manually-constructing-queries/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingmanually-constructing-queries"><span class="">Manually Constructing Query Objects</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingusing-the-index-navigator-li">
   <a href="/lifti/docs/searching/using-the-index-navigator/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingusing-the-index-navigator"><span class="">IndexNavigator</span></a>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingunderstanding-query-plan-li">
+  <a href="/lifti/docs/searching/understanding-query-plan/" title="Understanding Query Execution Plans" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingunderstanding-query-plan"><span class="">Understanding query plans</span></a>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-liftidocssearchingsearch-results-li">
   <a href="/lifti/docs/searching/search-results/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocssearchingsearch-results"><span class="">Search Results</span></a>
   <ul class="ul-3 foldable">
@@ -227,6 +229,7 @@
   <ul>
     <li><a href="#searching-with-text">Searching with text</a></li>
     <li><a href="#searching-with-a-query">Searching with a <code>Query</code></a></li>
+    <li><a href="#obtaining-query-execution-plans">Obtaining query execution plans</a></li>
   </ul>
 </nav>
       </div>
@@ -265,7 +268,12 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">AndQueryPart</span><span style="color:#000;font-weight:bold">(</span>
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">ExactWordQueryPart</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">tokenizer</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Normalize</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;hello&#34;</span><span style="color:#000;font-weight:bold">)),</span> 
 </span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">ExactWordQueryPart</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">tokenizer</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Normalize</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;there&#34;</span><span style="color:#000;font-weight:bold">))));</span>
-</span></span></code></pre></div>
+</span></span></code></pre></div><h2 id="obtaining-query-execution-plans">Obtaining query execution plans</h2>
+<p>By specifying <code>QueryExecutionOptions.IncludeExecutionPlan</code> when searching, LIFTI will collect timing information during the execution of the various query parts:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Search</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;find something&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">QueryExecutionOptions</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">IncludeExecutionPlan</span><span style="color:#000;font-weight:bold">);</span>
+</span></span></code></pre></div><p>This enables <code>ISearchResults.GetExecutionPlan</code> to return the actual execution plan for the query. If <code>QueryExecutionOptions.IncludeExecutionPlan</code> is not specified, <code>GetExecutionPlan</code> returns a placeholder execution plan.</p>
+<p>See <a href="./understanding-query-plan">Understanding LIFTI query execution plans</a> for more details.</p>
+
   <div class="section-index">
     
     
@@ -336,6 +344,14 @@
             
             <div class="entry">
                 <h5>
+                    <a href="/lifti/docs/searching/understanding-query-plan/">Understanding Query Execution Plans</a>
+                </h5>
+                <p>LIFTI&rsquo;s Query Execution Plan provides detailed insights into the execution of a query, including the order, timing, and the structure of the query parts.</p>
+            </div>
+        
+            
+            <div class="entry">
+                <h5>
                     <a href="/lifti/docs/searching/search-results/">Search Results</a>
                 </h5>
                 <p><code>FullTextIndex&lt;T&gt;.Search</code> returns <code>ISearchResults&lt;T&gt;</code>, which implements <code>IEnumerable&lt;SearchResult&lt;T&gt;&gt;</code> and provides other utilities for processing the matched search locations further.</p>
@@ -344,7 +360,7 @@
     
 </div>
 <div class="text-muted mt-5 pt-3 border-top">
-  Last modified January 16, 2024: <a href="https://github.com/mikegoatly/lifti/commit/125ae879f9e8153516e5e815ca9caff19dce72d6">V6.0.0 (#107) (125ae87)</a>
+  Last modified February 23, 2024: <a href="https://github.com/mikegoatly/lifti/commit/16dc5af57b1129b1123c61cb3c51c9fafd251c5f">Query execution plans (#111) (16dc5af)</a>
 </div>
 </div>
 

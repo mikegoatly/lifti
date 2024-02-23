@@ -568,7 +568,7 @@ documents with a higher rating will be more likely to appear nearer the top of s
         &lt;p&gt;LIFTI&amp;rsquo;s query execution logic employs a strategic approach to optimize query performance, prioritizing the execution of query parts based on their calculated weights.
 This weight represents the relative cost and effectiveness of executing a particular query part in relation to the overall document set. By assigning these weights,
 LIFTI aims to minimize the number of documents involved early in the query execution, thereby reducing the computational load and improving efficiency.&lt;/p&gt;
-&lt;h3 id=&#34;scoring-mechanism-overview&#34;&gt;Scoring Mechanism Overview&lt;/h3&gt;
+&lt;h3 id=&#34;scoring-mechanism-overview&#34;&gt;Scoring mechanism overview&lt;/h3&gt;
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;General Principle&lt;/strong&gt;: Each query part is assigned a &amp;ldquo;weight&amp;rdquo; based on its expected execution cost and the number of documents it is likely to involve.
@@ -588,10 +588,18 @@ The objective is to execute less costly parts first, reducing the document set s
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;h3 id=&#34;execution-strategy&#34;&gt;Execution Strategy&lt;/h3&gt;
+&lt;h3 id=&#34;execution-strategy&#34;&gt;Execution strategy&lt;/h3&gt;
 &lt;p&gt;The execution order is determined by these weightings, with lower weights prioritized. This approach ensures that the query processor can efficiently
 filter and score documents, avoiding unnecessary computations on documents that would later be excluded. This system is especially beneficial in queries with multiple parts,
 where early reduction in document set size can lead to significant performance improvements.&lt;/p&gt;
+&lt;h3 id=&#34;execution-plans&#34;&gt;Execution plans&lt;/h3&gt;
+&lt;p&gt;To get more insight into how a query is executed, including the weighting scores that were calculated you can get LIFTI to generate the actual execution plan for a query.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Execute the query, indicating that timings and other details should be included&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;results&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;index&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Search&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;find something&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;QueryExecutionOptions&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;IncludeExecutionPlan&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Calculate and return the execution plan details&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;actualExecutionPlan&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;results&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;GetExecutionPlan&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;See &lt;a href=&#34;./understanding-query-plan&#34;&gt;Understanding LIFTI query execution plans&lt;/a&gt; for more details.&lt;/p&gt;
 
       </description>
     </item>
@@ -1126,6 +1134,74 @@ navigation of the index.&lt;/p&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WithSimpleQueryParser&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;o&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;o&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;AssumeFuzzySearch&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;())&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Build&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Understanding Query Execution Plans</title>
+      <link>https://mikegoatly.github.io/lifti/docs/searching/understanding-query-plan/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://mikegoatly.github.io/lifti/docs/searching/understanding-query-plan/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;overview&#34;&gt;Overview&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;QueryExecutionPlan&lt;/code&gt; class represents the execution strategy for a given query. It includes information about the sequence of operations, their timings, and the number of documents affected at each stage of the query.&lt;/p&gt;
+&lt;h2 id=&#34;properties&#34;&gt;Properties&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Root&lt;/strong&gt;: The root node of the execution plan, representing the final result of the query. The entire execution plan can be navigated from this node, providing a hierarchical view of the query execution process.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;nodes-and-kinds&#34;&gt;Nodes and Kinds&lt;/h2&gt;
+&lt;p&gt;The execution plan is structured as a tree of &lt;code&gt;QueryExecutionPlanNode&lt;/code&gt; instances, each representing a part of the query execution process. Nodes are categorized by their &lt;code&gt;QueryExecutionPlanNodeKind&lt;/code&gt;, which describes the type of operation:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Unknown&lt;/strong&gt;: The operation type is not recognized.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;QueryPart&lt;/strong&gt;: Represents a discrete part of the query.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Union&lt;/strong&gt;: Combines results from both child nodes into one set.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Intersect&lt;/strong&gt;: Returns documents present in both child nodes.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;PositionalIntersect&lt;/strong&gt;: Like &lt;code&gt;Intersect&lt;/code&gt;, but only for documents where matched tokens are within a specified distance.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;CompositePositionalIntersect&lt;/strong&gt;: A specialized form of &lt;code&gt;PositionalIntersect&lt;/code&gt; that maintains relational information for subsequent operations.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;PrecedingIntersect&lt;/strong&gt;: Returns documents where tokens in the left node precede those in the right node.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ResultsOnly&lt;/strong&gt;: A placeholder node representing the final query results without a specific operation.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;node-properties&#34;&gt;Node Properties&lt;/h2&gt;
+&lt;p&gt;Each &lt;code&gt;QueryExecutionPlanNode&lt;/code&gt; includes details about its part of the query execution:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ExecutionOrder&lt;/strong&gt;: The sequence number of the node within the execution plan.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Kind&lt;/strong&gt;: The type of operation (as outlined above).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ResultingDocumentCount&lt;/strong&gt;: The number of documents returned by this part of the query.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Weighting&lt;/strong&gt;: The weighting score calculated for this part of the query.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DocumentFiltersApplied&lt;/strong&gt;: The number of document filters applied at this stage.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;FieldFiltersApplied&lt;/strong&gt;: The number of field filters applied.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Text&lt;/strong&gt;: A textual representation of the node, providing insight into the specific operation or query part.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;InclusiveTiming&lt;/strong&gt;: The total time taken by this node and its children.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ExclusiveTiming&lt;/strong&gt;: The time taken by this node, excluding its children.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Children&lt;/strong&gt;: Child nodes of this node, representing subsequent operations in the query execution process.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;usage-example&#34;&gt;Usage Example&lt;/h2&gt;
+&lt;p&gt;To analyze a query execution plan, start with the &lt;code&gt;Root&lt;/code&gt; node and explore its properties and children. This allows you to trace the execution path, understand the impact of each operation, and identify potential areas for optimization.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-csharp&#34; data-lang=&#34;csharp&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Assume `results` is obtained from a LIFTI search operation&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;executionPlan&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;results&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;GetExecutionPlan&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Accessing the root node&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;rootNode&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;executionPlan&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Root&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Example: iterating through the node hierarchy&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;PrintNodeDetails&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;QueryExecutionPlanNode&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;node&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;string&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;indent&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;Console&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;WriteLine&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;$&amp;#34;{indent}Node: {node.Text}, Kind: {node.Kind}, Docs: {node.ResultingDocumentCount}, Timing: {node.InclusiveTiming.TotalMilliseconds} ms&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;node&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Children&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;HasValue&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;PrintNodeDetails&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;node&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Children&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Value&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;left&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;indent&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;  &amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;PrintNodeDetails&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;node&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Children&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Value&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;right&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;indent&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;  &amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;PrintNodeDetails&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;rootNode&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This documentation provides a foundation for developers to leverage the &lt;code&gt;QueryExecutionPlan&lt;/code&gt; in LIFTI, enabling detailed analysis and optimization of full-text search queries.&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&#34;../../../blazor-sample/&#34;&gt;Blazor sample&lt;/a&gt; provides a way to visualize the query execution plan:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../../../images/query-execution-plan.png&#34; alt=&#34;Visualization of a query execution plan&#34;&gt;&lt;/p&gt;
+
       </description>
     </item>
     
