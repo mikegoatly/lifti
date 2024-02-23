@@ -27,6 +27,7 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
+            // A bracketed query part doesn't actually contribute anything interesting to timings or measurements, so we don't bother recording it.
             return this.Statement.Evaluate(navigatorCreator, queryContext);
         }
 

@@ -179,7 +179,7 @@ namespace Lifti.Querying
 
             if (this.currentNode == null)
             {
-                return Enumerable.Empty<string>();
+                return Array.Empty<string>();
             }
 
             if (this.intraNodeTextPosition > 0)

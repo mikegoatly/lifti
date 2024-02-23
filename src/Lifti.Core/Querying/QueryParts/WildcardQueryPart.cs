@@ -56,6 +56,7 @@ namespace Lifti.Querying.QueryParts
                 throw new ArgumentNullException(nameof(queryContext));
             }
 
+            var timing = queryContext.ExecutionTimings.Start(this, queryContext);
             using var navigator = navigatorCreator();
             var resultCollector = new DocumentMatchCollector();
             var bookmarks = new DoubleBufferedList<IIndexNavigatorBookmark>(navigator.CreateBookmark());
@@ -84,7 +85,7 @@ namespace Lifti.Querying.QueryParts
                 bookmarks.Swap();
             }
 
-            return resultCollector.ToIntermediateQueryResult();
+            return timing.Complete(resultCollector.ToIntermediateQueryResult());
         }
 
         /// <inheritdoc />

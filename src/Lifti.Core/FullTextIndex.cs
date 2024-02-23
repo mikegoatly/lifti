@@ -279,19 +279,36 @@ namespace Lifti
         /// <inheritdoc />
         public ISearchResults<TKey> Search(string searchText)
         {
-            var query = this.QueryParser.Parse(this.FieldLookup, searchText, this);
-            return this.Search(query);
+            return this.Search(searchText, QueryExecutionOptions.None);
         }
 
         /// <inheritdoc />
         public ISearchResults<TKey> Search(IQuery query)
+        {
+            return this.Search(query, QueryExecutionOptions.None);
+        }
+
+        /// <inheritdoc />
+        public ISearchResults<TKey> Search(string searchText, QueryExecutionOptions options = QueryExecutionOptions.None)
+        {
+            var query = this.QueryParser.Parse(this.FieldLookup, searchText, this);
+            return this.Search(query, options);
+        }
+
+        /// <inheritdoc />
+        public ISearchResults<TKey> Search(IQuery query, QueryExecutionOptions options = QueryExecutionOptions.None)
         {
             if (query is null)
             {
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return new SearchResults<TKey>(this, query.Execute(this.currentSnapshot));
+            if (query is Query actualQuery && (options & QueryExecutionOptions.IncludeExecutionPlan) == QueryExecutionOptions.IncludeExecutionPlan)
+            {
+                return actualQuery.ExecuteWithTimings(this);
+            }
+
+            return new SearchResults<TKey>(this, query.Execute(this.currentSnapshot), null);
         }
 
         /// <inheritdoc />

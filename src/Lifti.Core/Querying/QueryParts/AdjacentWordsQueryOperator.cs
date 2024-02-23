@@ -46,9 +46,14 @@ namespace Lifti.Querying.QueryParts
 
             var i = 0;
             var results = IntermediateQueryResult.Empty;
+
+            var parentQueryContext = queryContext;
+            
+            var childQueryContext = queryContext;
+
             do
             {
-                var nextResults = this.Words[i].Evaluate(navigatorCreator, queryContext);
+                var nextResults = this.Words[i].Evaluate(navigatorCreator, childQueryContext);
                 if (results.Matches.Count == 0)
                 {
                     // Special case the first word, as we don't want to intersect with the initial empty set
@@ -56,11 +61,13 @@ namespace Lifti.Querying.QueryParts
                 }
                 else
                 {
+                    var timing = parentQueryContext.ExecutionTimings.Start(this, parentQueryContext);
                     results = results.CompositePositionalIntersect(nextResults, 0, 1);
+                    timing.Complete(results);
                 }
 
                 // Filter subsequent words to only those that match the document ids we have so far
-                queryContext = queryContext with { FilterToDocumentIds = results.ToDocumentIdLookup() };
+                childQueryContext = childQueryContext with { FilterToDocumentIds = results.ToDocumentIdLookup() };
 
                 i++;
 

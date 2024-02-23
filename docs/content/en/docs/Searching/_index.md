@@ -29,3 +29,15 @@ var query = new Query(
         new ExactWordQueryPart(tokenizer.Normalize("hello")), 
         new ExactWordQueryPart(tokenizer.Normalize("there"))));
 ```
+
+## Obtaining query execution plans
+
+By specifying `QueryExecutionOptions.IncludeExecutionPlan` when searching, LIFTI will collect timing information during the execution of the various query parts:
+
+``` csharp
+index.Search("find something", QueryExecutionOptions.IncludeExecutionPlan);
+```
+
+This enables `ISearchResults.GetExecutionPlan` to return the actual execution plan for the query. If `QueryExecutionOptions.IncludeExecutionPlan` is not specified, `GetExecutionPlan` returns a placeholder execution plan.
+
+See [Understanding LIFTI query execution plans](./understanding-query-plan) for more details.

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lifti.Querying;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,27 +13,42 @@ namespace Lifti
     /// Contains search results returned from an index, with additional operations that can be performed, 
     /// e.g. re-ordering them and extracting search phrases from the original source text.
     /// </summary>
-    internal class SearchResults<TKey> : ISearchResults<TKey>
+    internal record SearchResults<TKey> : ISearchResults<TKey>
         where TKey : notnull
     {
-        private readonly IReadOnlyCollection<SearchResult<TKey>> searchResults;
         private readonly FullTextIndex<TKey> index;
+        private readonly Lazy<QueryExecutionPlan> executionPlan;
 
-        internal SearchResults(FullTextIndex<TKey> index, IEnumerable<SearchResult<TKey>> searchResults)
+        internal SearchResults(
+            FullTextIndex<TKey> index,
+            IEnumerable<SearchResult<TKey>> searchResults,
+            ExecutionTimings? executionTimings)
         {
-            this.searchResults = searchResults as IReadOnlyCollection<SearchResult<TKey>> ?? searchResults.ToList();
+            var searchResultsList = searchResults as IReadOnlyCollection<SearchResult<TKey>> ?? searchResults.ToList();
+            this.Results = searchResultsList;
             this.index = index;
+            this.executionPlan = new Lazy<QueryExecutionPlan>(
+                () => new QueryExecutionPlan(searchResultsList.Count, executionTimings ?? new ExecutionTimings()));
         }
 
+        private IReadOnlyCollection<SearchResult<TKey>> Results { get; init; }
+
         /// <inheritdoc />
-        public int Count => this.searchResults.Count;
+        public int Count => this.Results.Count;
 
         /// <inheritdoc />
         public ISearchResults<TKey> OrderByField(string fieldName)
         {
-            return new SearchResults<TKey>(
-                this.index,
-                this.searchResults.OrderByDescending(r => r.FieldMatches.Sum(f => f.FoundIn == fieldName ? f.Score : 0D)));
+            return this with
+            {
+                Results = this.Results.OrderBy(r => r.FieldMatches.Sum(f => f.FoundIn == fieldName ? f.Score : 0D)).ToList()
+            };
+        }
+
+        /// <inheritdoc />
+        public QueryExecutionPlan GetExecutionPlan()
+        {
+            return this.executionPlan.Value;
         }
 
         /// <inheritdoc />
@@ -145,7 +161,7 @@ namespace Lifti
             CancellationToken cancellationToken)
         {
             var phraseBuilder = new StringBuilder();
-            var matchedPhrases = new List<DocumentPhrases<TKey>>(this.searchResults.Count);
+            var matchedPhrases = new List<DocumentPhrases<TKey>>(this.Results.Count);
 
             // Create an array that can be used on each call to VirtualString
             var textArray = new string[1];
@@ -172,7 +188,7 @@ namespace Lifti
             CancellationToken cancellationToken)
         {
             var phraseBuilder = new StringBuilder();
-            var matchedPhrases = new List<DocumentPhrases<TKey, TObject>>(this.searchResults.Count);
+            var matchedPhrases = new List<DocumentPhrases<TKey, TObject>>(this.Results.Count);
             foreach (var (searchResult, fieldMatches) in objectResults)
             {
                 var item = await loadItemAsync(searchResult.Key, cancellationToken).ConfigureAwait(false);
@@ -205,7 +221,7 @@ namespace Lifti
         {
             // Technically an index can contain fields from multiple object types, so not all results may
             // be appropriate for the requested object type.
-            return this.searchResults
+            return this.Results
                 .Select(x =>
                     (
                         SearchResult: x,
@@ -224,7 +240,7 @@ namespace Lifti
             if (matchLocations.Count == 0)
             {
                 // This shouldn't really happen - we should always match a field at one location
-                return new FieldPhrases<TKey>(fieldMatch.FoundIn, Array.Empty<string>());
+                return new FieldPhrases<TKey>(fieldMatch.FoundIn, []);
             }
 
             var startLocation = matchLocations[0];
@@ -284,7 +300,7 @@ namespace Lifti
         /// <inheritdoc />
         public IEnumerator<SearchResult<TKey>> GetEnumerator()
         {
-            return this.searchResults.GetEnumerator();
+            return this.Results.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

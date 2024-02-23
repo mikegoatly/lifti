@@ -28,9 +28,11 @@ namespace Lifti.Querying.QueryParts
                 throw new ArgumentNullException(nameof(queryContext));
             }
 
+            var timing = queryContext.ExecutionTimings.Start(this, queryContext);
             using var navigator = navigatorCreator();
             navigator.Process(this.Word.AsSpan());
-            return navigator.GetExactMatches(queryContext, this.ScoreBoost ?? 1D);
+            var results = navigator.GetExactMatches(queryContext, this.ScoreBoost ?? 1D);
+            return timing.Complete(results);
         }
 
         /// <inheritdoc/>

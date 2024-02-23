@@ -1,0 +1,82 @@
+﻿@using System.Globalization
+<div class="node">
+    <div class="node-header @(hasChildren ? "operator" : "")">
+        <span class="info result-count" title="@Node.ResultingDocumentCount documents returned by this step">@Node.ResultingDocumentCount</span>
+        <div class="node-info">
+            <span class="primary">
+                <span class="execution-order">#@Node.ExecutionOrder</span>
+
+                @switch (Node.Kind)
+                {
+                    case QueryExecutionPlanNodeKind.QueryPart:
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>database-search</title><path d="M18.68,12.32C16.92,10.56 14.07,10.57 12.32,12.33C10.56,14.09 10.56,16.94 12.32,18.69C13.81,20.17 16.11,20.43 17.89,19.32L21,22.39L22.39,21L19.3,17.89C20.43,16.12 20.17,13.8 18.68,12.32M17.27,17.27C16.29,18.25 14.71,18.24 13.73,17.27C12.76,16.29 12.76,14.71 13.74,13.73C14.71,12.76 16.29,12.76 17.27,13.73C18.24,14.71 18.24,16.29 17.27,17.27M10.9,20.1C10.25,19.44 9.74,18.65 9.42,17.78C6.27,17.25 4,15.76 4,14V17C4,19.21 7.58,21 12,21V21C11.6,20.74 11.23,20.44 10.9,20.1M4,9V12C4,13.68 6.07,15.12 9,15.7C9,15.63 9,15.57 9,15.5C9,14.57 9.2,13.65 9.58,12.81C6.34,12.3 4,10.79 4,9M12,3C7.58,3 4,4.79 4,7C4,9 7,10.68 10.85,11H10.9C12.1,9.74 13.76,9 15.5,9C16.41,9 17.31,9.19 18.14,9.56C19.17,9.09 19.87,8.12 20,7C20,4.79 16.42,3 12,3Z" /></svg>
+                        break;
+                    case QueryExecutionPlanNodeKind.Union:
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>set-all</title><path d="M9,5C10.04,5 11.06,5.24 12,5.68C12.94,5.24 13.96,5 15,5A7,7 0 0,1 22,12A7,7 0 0,1 15,19C13.96,19 12.94,18.76 12,18.32C11.06,18.76 10.04,19 9,19A7,7 0 0,1 2,12A7,7 0 0,1 9,5M8.5,12C8.5,13.87 9.29,15.56 10.56,16.75L11.56,16.29C10.31,15.29 9.5,13.74 9.5,12C9.5,10.26 10.31,8.71 11.56,7.71L10.56,7.25C9.29,8.44 8.5,10.13 8.5,12M15.5,12C15.5,10.13 14.71,8.44 13.44,7.25L12.44,7.71C13.69,8.71 14.5,10.26 14.5,12C14.5,13.74 13.69,15.29 12.44,16.29L13.44,16.75C14.71,15.56 15.5,13.87 15.5,12Z" /></svg>
+                        break;
+                    case QueryExecutionPlanNodeKind.Intersect:
+                    case QueryExecutionPlanNodeKind.PositionalIntersect:
+                    case QueryExecutionPlanNodeKind.CompositePositionalIntersect:
+                    case QueryExecutionPlanNodeKind.PrecedingIntersect:
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>set-center</title><path d="M9,5A7,7 0 0,0 2,12A7,7 0 0,0 9,19C10.04,19 11.06,18.76 12,18.32C12.94,18.76 13.96,19 15,19A7,7 0 0,0 22,12A7,7 0 0,0 15,5C13.96,5 12.94,5.24 12,5.68C11.06,5.24 10.04,5 9,5M9,7C9.34,7 9.67,7.03 10,7.1C8.72,8.41 8,10.17 8,12C8,13.83 8.72,15.59 10,16.89C9.67,16.96 9.34,17 9,17A5,5 0 0,1 4,12A5,5 0 0,1 9,7M15,7A5,5 0 0,1 20,12A5,5 0 0,1 15,17C14.66,17 14.33,16.97 14,16.9C15.28,15.59 16,13.83 16,12C16,10.17 15.28,8.41 14,7.11C14.33,7.04 14.66,7 15,7Z" /></svg>
+                        break;
+                }
+
+                <span class="node-name">@nodeText</span>
+            </span>
+            <span class="exclusive-timing">
+                @Node.ExclusiveTiming.TotalMilliseconds.ToString("0.##", CultureInfo.CurrentCulture)ms @if (hasChildren) {<span>exclusive</span>}
+            </span>
+            @if (hasChildren)
+            {
+                <span class="inclusive-timing">
+                        @Node.InclusiveTiming.TotalMilliseconds.ToString("0.##", CultureInfo.CurrentCulture)ms inclusive
+                </span>
+            }
+            @if (@Node.DocumentFiltersApplied != null)
+            {
+                <span class="document-filter-count">Document filters: @Node.DocumentFiltersApplied</span>
+            }
+            @if (@Node.FieldFiltersApplied != null)
+            {
+                <span class="field-filter-count">Field filters: @Node.FieldFiltersApplied</span>
+            }
+            @if (Node.Weighting != null)
+            {
+                <span class="node-weighting">Weighting: @Node.Weighting.Value.ToString("0.##", CultureInfo.CurrentCulture)</span>
+            }
+        </div>
+    </div>
+    @if (Node.Children is (var left, var right))
+    {
+        <div class="node-children">
+            <ExecutionPlanNode Node="@left" />
+            <ExecutionPlanNode Node="@right" />
+        </div>
+    }
+</div>
+
+@code {
+    private string? nodeText;
+    private bool hasChildren;
+
+    [Parameter]
+    public QueryExecutionPlanNode Node { get; set; } = null!;
+
+    protected override void OnParametersSet()
+    {
+        this.hasChildren = Node.Children != null;
+
+        nodeText = Node.Kind switch
+        {
+            QueryExecutionPlanNodeKind.QueryPart => Node.Text,
+            QueryExecutionPlanNodeKind.Intersect => "Intersect",
+            QueryExecutionPlanNodeKind.Union => "Union",
+            QueryExecutionPlanNodeKind.PositionalIntersect => $"Intersect {Node.Text}",
+            QueryExecutionPlanNodeKind.CompositePositionalIntersect => $"Composite intersect {Node.Text}",
+            QueryExecutionPlanNodeKind.PrecedingIntersect => "Preceding intersect",
+            QueryExecutionPlanNodeKind.ResultsOnly => "Query executed without plan recorded",
+            _ => throw new InvalidOperationException($"Unknown node kind: {Node.Kind}")
+        };
+    }
+}

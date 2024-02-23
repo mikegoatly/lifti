@@ -1,0 +1,53 @@
+﻿@inject WikipediaIndexService IndexService
+
+@if (this.selectedContent is not null)
+{
+    <div class="col-9 ps-4 pt-2 d-flex flex-row">
+        <div class="result-content">
+            @((MarkupString)this.selectedContent)
+        </div>
+        @if (this.wordLocations != null)
+        {
+            <div class="word-matches" >
+                <strong>Word matches:</strong>
+                <em>#token [offset,length]</em>
+                @foreach (var location in this.wordLocations!)
+                {
+                    <div>@location</div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private string? selectedContent;
+    private IReadOnlyList<TokenLocation>? wordLocations;
+
+    [Parameter]
+    public SearchResult<string>? SelectedSearchResult { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (this.SelectedSearchResult == null)
+        {
+            this.selectedContent = null;
+            this.wordLocations = null;
+        }
+        else
+        {
+            var builder = new System.Text.StringBuilder(this.IndexService.GetSourceText(this.SelectedSearchResult.Key));
+            var locations = this.SelectedSearchResult.FieldMatches.SelectMany(m => m.Locations).ToList();
+            foreach (var location in locations.OrderByDescending(l => l.Start))
+            {
+                builder.Insert(location.Start + location.Length, "</span>");
+                builder.Insert(location.Start, "<span class='bg-warning'>");
+            }
+
+            this.wordLocations = locations;
+            this.selectedContent = builder.ToString();
+        }
+    }
+}

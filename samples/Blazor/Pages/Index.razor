@@ -32,7 +32,8 @@
 
         <div class="flex-fill d-flex align-items-center">
             <span class="me-2 flex-fill text-end">@IndexService.IndexCount pages indexed.</span>
-            <button disabled=@indexing class="btn btn-secondary" @onclick="IndexRandomPagesAsync">Index more...</button>
+            <button disabled=@indexing class="btn btn-secondary" @onclick="() => IndexRandomPagesAsync(10)">Index 10 more...</button>
+            <button disabled=@indexing class="btn btn-secondary ms-2" @onclick="() => IndexRandomPagesAsync(100)">Index 100 more...</button>
         </div>
     </div>
 
@@ -49,9 +50,12 @@
         </div>
     </div>
 
-    @if (this.IndexText != null)
+    @if (this.ShowingRootNode != null)
     {
-        <pre>@this.IndexText</pre>
+        foreach (var child in this.ShowingRootNode.ChildNodes.CharacterMap)
+        {
+            <IndexNodeElement Name="@child.ChildChar.ToString()" Node="@child.ChildNode" ParentName="" />
+        }
     }
     else if (this.SyntaxError != null)
     {
@@ -61,44 +65,43 @@
     }
     else if (results != null)
     {
-        if (results.Count == 0)
-        {
-            <div class="alert alert-info d-flex">
-                <span class="align-self-center">No matches!</span>
-            </div>
-        }
-        else
-        {
-            <div class="container-fluid border-primary border-top flex-fill overflow-auto">
-                <div class="row">
-                    <ul class="col-3 search-results pe-2 pt-2 border-primary border-right">
-                        @foreach (var result in results)
+        <div class="container-fluid border-primary border-top flex-fill overflow-auto pt-3">
+            <Blazor.Controls.TabControl>
+                <Blazor.Controls.TabPage Text="@("Results (" + results.Count + ")")">
+                    <div class="row">
+
+                        @if (results.Count == 0)
                         {
-                            <li class="p-1" @onclick="() => this.ShowItem(result)">@result.Key <br /> Score @result.Score.ToString("0.####")</li>
-                        }
-                    </ul>
-                    @if (this.selectedContent != null)
-                    {
-                        <div class="col-9 ps-4 pt-2 d-flex flex-row">
-                            <div>
-                                @((MarkupString)this.selectedContent)
+                            <div class="alert alert-info d-flex">
+                                <span class="align-self-center">No matches!</span>
                             </div>
-                            @if (this.wordLocations != null)
-                            {
-                                <div style="max-width:150px;width:150px;min-width:150px;">
-                                    <strong>Word matches:</strong>
-                                    <em>#token [offset,length]</em>
-                                    @foreach (var location in this.wordLocations!)
-                                    {
-                                        <div>@location</div>
-                                    }
+                        }
+                        else
+                        {
+                            <div class="container-fluid flex-fill">
+                                <div class="row">
+                                    <ul class="col-3 search-results pe-2 pt-2 border-primary border-right">
+                                        @foreach (var result in results)
+                                        {
+                                            <li class="p-1 @(result == this.selectedSearchResult ? "selected" : "")" @onclick="() => this.selectedSearchResult = result">
+                                                <span>@result.Key</span>
+                                                <span>Score @result.Score.ToString("0.####")</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                    <ResultView SelectedSearchResult="@selectedSearchResult" />
                                 </div>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-        }
+                            </div>
+                        }
+                    </div>
+                </Blazor.Controls.TabPage>
+                <Blazor.Controls.TabPage Text="Execution Plan">
+                    <div class="row">
+                        <QueryExecutionPlanView ExecutionPlan="@executionPlan" />
+                    </div>
+                </Blazor.Controls.TabPage>
+            </Blazor.Controls.TabControl>
+        </div>
     }
     else
     {

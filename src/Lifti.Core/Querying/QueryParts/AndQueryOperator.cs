@@ -24,7 +24,9 @@ namespace Lifti.Querying.QueryParts
         {
             var (leftResults, rightResults) = this.EvaluateWithDocumentIntersection(navigatorCreator, queryContext);
 
-            return leftResults.Intersect(rightResults);
+            var timing = queryContext.ExecutionTimings.Start(this, queryContext);
+            var intersected = leftResults.Intersect(rightResults);
+            return timing.Complete(intersected);
         }
 
         /// <inheritdoc/>

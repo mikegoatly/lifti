@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Lifti.Querying.QueryParts;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Lifti.Querying
 {
@@ -13,11 +12,15 @@ namespace Lifti.Querying
     /// <summary>
     /// Manages context during the execution of a query, allowing for aspects like field filters to be applied.
     /// </summary>
-    public sealed record QueryContext(byte? FilterToFieldId = null, DocumentIdSet? FilterToDocumentIds = null)
+    public sealed record QueryContext(
+        byte? FilterToFieldId = null, 
+        DocumentIdSet? FilterToDocumentIds = null)
     {
         /// <summary>
         /// Gets an empty query context.
         /// </summary>
-        public static QueryContext Empty { get; } = new();
+        public static QueryContext Empty => new();
+
+        internal ExecutionTimings ExecutionTimings { get; init; } = ExecutionTimings.NullTimings;
     }
 }

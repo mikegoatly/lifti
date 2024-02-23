@@ -25,6 +25,12 @@ namespace Lifti.Querying.QueryParts
         /// </summary>
         public double? ScoreBoost { get; }
 
+        /// <summary>
+        /// Gets the weighting calculated for this query part. If the weighting did not need to be calculated, this will
+        /// be <c>null</c>.
+        /// </summary>
+        internal double? CalculatedWeighting => this.weighting;
+
         /// <inheritdoc />
         public double CalculateWeighting(Func<IIndexNavigator> navigatorCreator)
         {

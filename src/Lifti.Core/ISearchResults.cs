@@ -110,5 +110,10 @@ namespace Lifti
         /// </summary>
         /// <param name="fieldName">The name of the field to order the search results by.</param>
         ISearchResults<TKey> OrderByField(string fieldName);
+
+        /// <summary>
+        /// Builds an actual execution plan for the query.
+        /// </summary>
+        QueryExecutionPlan GetExecutionPlan();
     }
 }

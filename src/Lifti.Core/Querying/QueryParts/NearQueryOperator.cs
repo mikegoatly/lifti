@@ -32,8 +32,11 @@ namespace Lifti.Querying.QueryParts
         {
             var (leftResults, rightResults) = this.EvaluateWithDocumentIntersection(navigatorCreator, queryContext);
 
-            return leftResults
+            var timing = queryContext.ExecutionTimings.Start(this, queryContext);
+            var results = leftResults
                 .CompositePositionalIntersect(rightResults, this.Tolerance, this.Tolerance);
+
+            return timing.Complete(results);
         }
 
         /// <inheritdoc/>
