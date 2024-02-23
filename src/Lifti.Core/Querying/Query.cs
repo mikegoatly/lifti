@@ -6,7 +6,7 @@ using System.Linq;
 namespace Lifti.Querying
 {
     /// <inheritdoc />
-    public sealed class Query : IQuery
+    public class Query : IQuery
     {
         /// <summary>
         /// Constructs a new <see cref="Query"/> object capable of searching against an index.
