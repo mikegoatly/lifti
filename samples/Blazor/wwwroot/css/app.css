@@ -118,6 +118,37 @@ pre {
     padding-top: 1rem;
 }
 
+.index-node-header {
+    display: flex;
+    flex-direction: row;
+    gap: 0.2rem;
+    align-items: center;
+}
+
+    .index-node-header > span:first-of-type {
+        font-size: 0.8rem;
+        margin: 0 0.5rem;
+    }
+
+    .index-node-header button {
+        border-radius: 50%;
+        max-width: 2em;
+        max-height: 2em;
+        min-width: 2em;
+        min-height: 2em;
+        margin: 0.2em;
+        font-size: 0.7rem;
+        border: 1px solid #444;
+    }
+
+    .index-node-header button:disabled {
+        visibility: hidden;
+    }
+
+.index-node-children ul li {
+    list-style-type: none;
+}
+
 .execution-plan .node {
     display: flex;
     flex-direction: row;

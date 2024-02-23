@@ -1,17 +1,15 @@
 ﻿<div class="index-node-header">
-    @if (Node.HasChildNodes)
-    {
-        <button type="button" @onclick="ToggleExpand">
-            @if (this.expanded)
-            {
-                <span>-</span>
-            }
-            else
-            {
-                <span>+</span>
-            }
-        </button>
-    }
+    <button type="button" @onclick="ToggleExpand" disabled="@(!Node.HasChildNodes)">
+        @if (this.expanded)
+        {
+            <span>-</span>
+        }
+        else
+        {
+            <span>+</span>
+        }
+    </button>
+
     @Name @if (!string.IsNullOrEmpty(ParentName))
     {
         <span class="text-muted">(@ParentName@Name)</span>
