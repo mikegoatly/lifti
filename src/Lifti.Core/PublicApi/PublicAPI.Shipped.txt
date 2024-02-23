@@ -98,7 +98,9 @@ Lifti.FullTextIndex<TKey>.QueryParser.get -> Lifti.Querying.IQueryParser!
 Lifti.FullTextIndex<TKey>.RemoveAsync(TKey key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Lifti.FullTextIndex<TKey>.Root.get -> Lifti.IndexNode!
 Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query) -> Lifti.ISearchResults<TKey>!
+Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
 Lifti.FullTextIndex<TKey>.Search(string! searchText) -> Lifti.ISearchResults<TKey>!
+Lifti.FullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
 Lifti.FullTextIndex<TKey>.Snapshot.get -> Lifti.IIndexSnapshot<TKey>!
 Lifti.FullTextIndexBuilder<TKey>
 Lifti.FullTextIndexBuilder<TKey>.Build() -> Lifti.FullTextIndex<TKey>!
@@ -136,7 +138,9 @@ Lifti.IFullTextIndex<TKey>.Metadata.get -> Lifti.IIndexMetadata<TKey>!
 Lifti.IFullTextIndex<TKey>.QueryParser.get -> Lifti.Querying.IQueryParser!
 Lifti.IFullTextIndex<TKey>.RemoveAsync(TKey key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query) -> Lifti.ISearchResults<TKey>!
+Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
 Lifti.IFullTextIndex<TKey>.Search(string! searchText) -> Lifti.ISearchResults<TKey>!
+Lifti.IFullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
 Lifti.IFullTextIndex<TKey>.Snapshot.get -> Lifti.IIndexSnapshot<TKey>!
 Lifti.IIndexedFieldLookup
 Lifti.IIndexedFieldLookup.AllFieldNames.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
@@ -243,6 +247,7 @@ Lifti.ISearchResults<TKey>.CreateMatchPhrasesAsync<TObject>(System.Func<System.C
 Lifti.ISearchResults<TKey>.CreateMatchPhrasesAsync<TObject>(System.Func<TKey, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<TObject>>! loadItemAsync, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Lifti.DocumentPhrases<TKey, TObject>!>!>!
 Lifti.ISearchResults<TKey>.CreateMatchPhrasesAsync<TObject>(System.Func<TKey, System.Threading.Tasks.ValueTask<TObject>>! loadItemAsync, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Lifti.DocumentPhrases<TKey, TObject>!>!>!
 Lifti.ISearchResults<TKey>.CreateMatchPhrasesAsync<TObject>(System.Func<TKey, TObject>! loadItem, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Lifti.DocumentPhrases<TKey, TObject>!>!>!
+Lifti.ISearchResults<TKey>.GetExecutionPlan() -> Lifti.QueryExecutionPlan!
 Lifti.ISearchResults<TKey>.OrderByField(string! fieldName) -> Lifti.ISearchResults<TKey>!
 Lifti.LiftiException
 Lifti.LiftiException.LiftiException() -> void
@@ -256,6 +261,34 @@ Lifti.PreprocessedInput.PreprocessedInput(char value) -> void
 Lifti.PreprocessedInput.PreprocessedInput(string! replacement) -> void
 Lifti.PreprocessedInput.Replacement.get -> string?
 Lifti.PreprocessedInput.Value.get -> char
+Lifti.QueryExecutionOptions
+Lifti.QueryExecutionOptions.IncludeExecutionPlan = 1 -> Lifti.QueryExecutionOptions
+Lifti.QueryExecutionOptions.None = 0 -> Lifti.QueryExecutionOptions
+Lifti.QueryExecutionPlan
+Lifti.QueryExecutionPlan.Root.get -> Lifti.QueryExecutionPlanNode!
+Lifti.QueryExecutionPlanNode
+Lifti.QueryExecutionPlanNode.Children.get -> (Lifti.QueryExecutionPlanNode! left, Lifti.QueryExecutionPlanNode! right)?
+Lifti.QueryExecutionPlanNode.DocumentFiltersApplied.get -> int?
+Lifti.QueryExecutionPlanNode.ExclusiveTiming.get -> System.TimeSpan
+Lifti.QueryExecutionPlanNode.ExecutionOrder.get -> int
+Lifti.QueryExecutionPlanNode.FieldFiltersApplied.get -> int?
+Lifti.QueryExecutionPlanNode.InclusiveTiming.get -> System.TimeSpan
+Lifti.QueryExecutionPlanNode.Kind.get -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNode.ResultingDocumentCount.get -> int
+Lifti.QueryExecutionPlanNode.Text.get -> string?
+Lifti.QueryExecutionPlanNode.Weighting.get -> double?
+Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.CompositePositionalIntersect = 5 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.Intersect = 3 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.PositionalIntersect = 4 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.PrecedingIntersect = 6 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.QueryPart = 1 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.ResultsOnly = 7 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.Union = 2 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.QueryExecutionPlanNodeKind.Unknown = 0 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.Querying.DocumentMatchCollector
+Lifti.Querying.DocumentMatchCollector.DocumentMatchCollector() -> void
+Lifti.Querying.DocumentMatchCollector.ToIntermediateQueryResult() -> Lifti.Querying.IntermediateQueryResult
 Lifti.Querying.FieldScoreBoostProvider
 Lifti.Querying.FieldScoreBoostProvider.FieldScoreBoostProvider(Lifti.IIndexedFieldLookup! fieldLookup) -> void
 Lifti.Querying.FieldScoreBoostProvider.GetScoreBoost(byte fieldId) -> double
@@ -296,9 +329,6 @@ Lifti.Querying.IQueryParser
 Lifti.Querying.IQueryParser.Parse(Lifti.IIndexedFieldLookup! fieldLookup, string! queryText, Lifti.IIndexTokenizerProvider! tokenizerProvider) -> Lifti.Querying.IQuery!
 Lifti.Querying.IScorer
 Lifti.Querying.IScorer.CalculateScore(int totalMatchedDocuments, int documentId, byte fieldId, System.Collections.Generic.IReadOnlyList<Lifti.TokenLocation!>! tokenLocations, double weighting) -> double
-Lifti.Querying.DocumentMatchCollector
-Lifti.Querying.DocumentMatchCollector.DocumentMatchCollector() -> void
-Lifti.Querying.DocumentMatchCollector.ToIntermediateQueryResult() -> Lifti.Querying.IntermediateQueryResult
 Lifti.Querying.OkapiBm25ScorerFactory
 Lifti.Querying.OkapiBm25ScorerFactory.CreateIndexScorer(Lifti.IIndexSnapshot! indexSnapshot) -> Lifti.Querying.IScorer!
 Lifti.Querying.OkapiBm25ScorerFactory.OkapiBm25ScorerFactory(double k1 = 1.2, double b = 0.75) -> void
