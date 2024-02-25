@@ -10,14 +10,16 @@
         }
     </button>
 
-    @Name @if (!string.IsNullOrEmpty(ParentName))
+    @NodeCharacter 
+    
+    @if (@Node.IntraNodeText.Length > 0)
     {
-        <span class="text-muted">(@ParentName@Name)</span>
+        <span class="intranode-text">@Node.IntraNodeText</span>
     }
 
     @if (this.Node.HasMatches)
     {
-        <span class="badge bg-primary">@this.Node.Matches.Count documents</span>
+        <span class="badge bg-primary">"@($"{ParentName}{NodeCharacter}{@Node.IntraNodeText}")" - @this.Node.Matches.Count documents</span>
     }
 </div>
 <div class="index-node-children">
@@ -27,7 +29,9 @@
             @foreach (var child in Node.ChildNodes.CharacterMap)
             {
                 <li>
-                    <IndexNodeElement Node="@child.ChildNode" Name="@child.ChildChar.ToString()" ParentName="@(ParentName + Name)" />
+                    <IndexNodeElement Node="@child.ChildNode"
+                                      NodeCharacter="@child.ChildChar.ToString()"
+                                      ParentName="@($"{ParentName}{NodeCharacter}{Node.IntraNodeText}")" />
                 </li>
             }
         </ul>
@@ -41,7 +45,7 @@
     public IndexNode Node { get; set; } = null!;
 
     [Parameter]
-    public string Name { get; set; } = null!;
+    public string NodeCharacter { get; set; } = null!;
 
     [Parameter]
     public string ParentName { get; set; } = null!;

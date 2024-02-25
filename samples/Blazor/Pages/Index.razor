@@ -54,7 +54,10 @@
     {
         foreach (var child in this.ShowingRootNode.ChildNodes.CharacterMap)
         {
-            <IndexNodeElement Name="@child.ChildChar.ToString()" Node="@child.ChildNode" ParentName="" />
+            <IndexNodeElement 
+                NodeCharacter="@child.ChildChar.ToString()" 
+                Node="@child.ChildNode" 
+                ParentName="" />
         }
     }
     else if (this.SyntaxError != null)

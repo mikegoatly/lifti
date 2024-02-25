@@ -125,7 +125,12 @@ pre {
     align-items: center;
 }
 
-    .index-node-header > span:first-of-type {
+    .index-node-header > .intranode-text {
+        color: #444;
+        margin: 0 0.5rem;
+    }
+
+    .index-node-header > .badge {
         font-size: 0.8rem;
         margin: 0 0.5rem;
     }
@@ -144,6 +149,12 @@ pre {
     .index-node-header button:disabled {
         visibility: hidden;
     }
+
+.index-node-children ul {
+    margin-left: 0.5em;
+    border-left: 1px solid #AAA;
+    padding-left: 0.5em;    
+}
 
 .index-node-children ul li {
     list-style-type: none;
