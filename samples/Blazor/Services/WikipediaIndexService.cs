@@ -4,12 +4,13 @@ using Lifti.Tokenization.TextExtraction;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace BlazorApp.Services
 {
-
     public class WikipediaIndexService
     {
+        private static readonly Regex styleRegexReplacer = new Regex(@"<style[^>]*>[\s\S]*?</style>", RegexOptions.Compiled);
         private readonly Dictionary<string, WikipediaPage> loadedPages;
 
         public WikipediaIndexService()
@@ -45,7 +46,7 @@ namespace BlazorApp.Services
                     page => page.WithKey(i => i.Title)
                         .WithField(
                             name: "Content",
-                            fieldTextReader: i => i.Text.Content,
+                            fieldTextReader: i => styleRegexReplacer.Replace(i.Text.Content, ""),
                             tokenizationOptions: o => (this.StemmingEnabled ? o.WithStemming() : o).IgnoreCharacters('\''),
                             textExtractor: new XmlTextExtractor()))
                 .WithQueryParser(o => this.FuzzyMatchByDefault ? o.AssumeFuzzySearchTerms() : o)
