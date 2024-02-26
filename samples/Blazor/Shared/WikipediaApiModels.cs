@@ -35,7 +35,7 @@ namespace BlazorApp.Shared
         }
 
         [JsonPropertyName("*")]
-        public string Content { get; }
+        public string Content { get; set; }
     }
 
 

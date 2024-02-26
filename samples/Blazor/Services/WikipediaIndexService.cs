@@ -46,7 +46,7 @@ namespace BlazorApp.Services
                     page => page.WithKey(i => i.Title)
                         .WithField(
                             name: "Content",
-                            fieldTextReader: i => styleRegexReplacer.Replace(i.Text.Content, ""),
+                            fieldTextReader: i => i.Text.Content,
                             tokenizationOptions: o => (this.StemmingEnabled ? o.WithStemming() : o).IgnoreCharacters('\''),
                             textExtractor: new XmlTextExtractor()))
                 .WithQueryParser(o => this.FuzzyMatchByDefault ? o.AssumeFuzzySearchTerms() : o)
@@ -58,7 +58,7 @@ namespace BlazorApp.Services
 
                 foreach (var page in this.loadedPages.Values)
                 {
-                    await this.AddAsync(page);
+                    await this.index.AddAsync(page);
                 }
 
                 await this.index.CommitBatchChangeAsync();
@@ -69,6 +69,8 @@ namespace BlazorApp.Services
 
         public async Task AddAsync(WikipediaPage page)
         {
+            page.Text.Content = styleRegexReplacer.Replace(page.Text.Content, string.Empty);
+
             var index = this.Index;
 
             this.loadedPages[page.Title] = page;
@@ -92,9 +94,9 @@ namespace BlazorApp.Services
 
         public string GetIndexTextualRepresentation()
         {
-            return this.Index.ToString();
+            // return this.Index.ToString();
 
-            //return JsonSerializer.Serialize(this.loadedPages, new JsonSerializerOptions() { WriteIndented = true });
+            return JsonSerializer.Serialize(this.loadedPages, new JsonSerializerOptions() { WriteIndented = true });
         }
 
         internal IndexNode? GetIndexRoot()
