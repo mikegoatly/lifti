@@ -33,7 +33,7 @@
 <meta itemprop="description" content="LIFTI&#39;s Query Execution Plan provides detailed insights into the execution of a query, including the order, timing, and the structure of the query parts. 
 ">
 <meta itemprop="dateModified" content="2024-02-23T16:03:28+00:00" />
-<meta itemprop="wordCount" content="452">
+<meta itemprop="wordCount" content="534">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Understanding Query Execution Plans"/>
 <meta name="twitter:description" content="LIFTI&#39;s Query Execution Plan provides detailed insights into the execution of a query, including the order, timing, and the structure of the query parts. 
 "/>
@@ -79,7 +79,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.8b2433efc103644c6df3e189478d0464.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.87765500554449b49d698b709e424b12.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -103,7 +103,7 @@
     aria-label="Search this site…"
     autocomplete="off"
     
-    data-offline-search-index-json-src="/lifti/offline-search-index.8b2433efc103644c6df3e189478d0464.json"
+    data-offline-search-index-json-src="/lifti/offline-search-index.87765500554449b49d698b709e424b12.json"
     data-offline-search-base-href="/"
     data-offline-search-max-results="10"
   >
@@ -232,9 +232,12 @@
         <nav id="TableOfContents">
   <ul>
     <li><a href="#overview">Overview</a></li>
-    <li><a href="#properties">Properties</a></li>
-    <li><a href="#nodes-and-kinds">Nodes and Kinds</a></li>
-    <li><a href="#node-properties">Node Properties</a></li>
+    <li><a href="#query-execution-plan-nodes">Query execution plan nodes</a>
+      <ul>
+        <li><a href="#node-properties">Node properties</a></li>
+        <li><a href="#node-kinds">Node kinds</a></li>
+      </ul>
+    </li>
     <li><a href="#usage-example">Usage Example</a></li>
   </ul>
 </nav>
@@ -266,57 +269,50 @@
 </header>
 	<h2 id="overview">Overview</h2>
 <p>The <code>QueryExecutionPlan</code> class represents the execution strategy for a given query. It includes information about the sequence of operations, their timings, and the number of documents affected at each stage of the query.</p>
-<h2 id="properties">Properties</h2>
-<ul>
-<li><strong>Root</strong>: The root node of the execution plan, representing the final result of the query. The entire execution plan can be navigated from this node, providing a hierarchical view of the query execution process.</li>
-</ul>
-<h2 id="nodes-and-kinds">Nodes and Kinds</h2>
-<p>The execution plan is structured as a tree of <code>QueryExecutionPlanNode</code> instances, each representing a part of the query execution process. Nodes are categorized by their <code>QueryExecutionPlanNodeKind</code>, which describes the type of operation:</p>
-<ul>
-<li><strong>Unknown</strong>: The operation type is not recognized.</li>
-<li><strong>QueryPart</strong>: Represents a discrete part of the query.</li>
-<li><strong>Union</strong>: Combines results from both child nodes into one set.</li>
-<li><strong>Intersect</strong>: Returns documents present in both child nodes.</li>
-<li><strong>PositionalIntersect</strong>: Like <code>Intersect</code>, but only for documents where matched tokens are within a specified distance.</li>
-<li><strong>CompositePositionalIntersect</strong>: A specialized form of <code>PositionalIntersect</code> that maintains relational information for subsequent operations.</li>
-<li><strong>PrecedingIntersect</strong>: Returns documents where tokens in the left node precede those in the right node.</li>
-<li><strong>ResultsOnly</strong>: A placeholder node representing the final query results without a specific operation.</li>
-</ul>
-<h2 id="node-properties">Node Properties</h2>
-<p>Each <code>QueryExecutionPlanNode</code> includes details about its part of the query execution:</p>
+<h2 id="query-execution-plan-nodes">Query execution plan nodes</h2>
+<h3 id="node-properties">Node properties</h3>
+<p>The execution plan is structured as a tree of <code>QueryExecutionPlanNode</code> instances, each representing a part of the query execution process. Each <code>QueryExecutionPlanNode</code> includes details about its part of the query execution:</p>
 <ul>
 <li><strong>ExecutionOrder</strong>: The sequence number of the node within the execution plan.</li>
-<li><strong>Kind</strong>: The type of operation (as outlined above).</li>
+<li><strong>Kind</strong>: The type of operation performed at the node - see the examples below.</li>
 <li><strong>ResultingDocumentCount</strong>: The number of documents returned by this part of the query.</li>
-<li><strong>Weighting</strong>: The weighting score calculated for this part of the query.</li>
-<li><strong>DocumentFiltersApplied</strong>: The number of document filters applied at this stage.</li>
+<li><strong>Weighting</strong>: The weighting score calculated for this part of the query. If the execution of the query didn&rsquo;t necessitate the score to be calculated, this will be null.</li>
+<li><strong>DocumentFiltersApplied</strong>: The number of document filters applied at this stage. This will be non-null if the results from a preceding evaluation can be used to pre-filter
+the results at this node, mitigating the need for scoring matches that will just be discarded in a subsequent node.</li>
 <li><strong>FieldFiltersApplied</strong>: The number of field filters applied.</li>
 <li><strong>Text</strong>: A textual representation of the node, providing insight into the specific operation or query part.</li>
 <li><strong>InclusiveTiming</strong>: The total time taken by this node and its children.</li>
 <li><strong>ExclusiveTiming</strong>: The time taken by this node, excluding its children.</li>
 <li><strong>Children</strong>: Child nodes of this node, representing subsequent operations in the query execution process.</li>
 </ul>
+<h3 id="node-kinds">Node kinds</h3>
+<h4 id="querypart">QueryPart</h4>
+<p>Represents a textual query that was evaluated against the index. The text of the node will contain the query.</p>
+<p><img src="../../../images//QueryPlanImages/QueryPart.png" alt="8 documents returned for the query &ldquo;?2,2?CRITICAL&rdquo; in 16.4ms"></p>
+<h4 id="union">Union</h4>
+<p>Typically introduced by an OR (|) operator. Results from the child nodes are combined into one set. Where documents are present in both nodes, their field matches are combined.</p>
+<p><img src="../../../images//QueryPlanImages/Union.png" alt="Union between two searches, &ldquo;CRITICAL&rdquo; returning 5 documents and &ldquo;HIT&rdquo; returning 1. Union results in 6 documents total"></p>
+<h4 id="intersect">Intersect</h4>
+<p>Typically introduced by an AND (&amp;) operator. Only document results that are present in both child nodes are returned. Field matches for the intersected documents are combined.</p>
+<p><img src="../../../images//QueryPlanImages/Intersect.png" alt="Intersection between two searches, &ldquo;ANIMAL&rdquo; (3 documents) and &ldquo;SPECIES&rdquo; (1 document). Intersection results in only 1 matching document"></p>
+<blockquote>
+<p>Note the 3 document filters applied to the second search (SPECIES) - these are the 3 documents that were returned from the first search (ANIMAL). Without those document filters applied, searching for SPECIES would have returned many more documents.</p>
+</blockquote>
+<h4 id="positionalintersect">PositionalIntersect</h4>
+<p>Introduced by the near (~), preceding near (~&gt;) and adjacent words (&quot;&quot;) operators. Like <code>Intersect</code>, but the locations of the matched tokens are taken into
+consideration and combined into a composite matched location which allows for the results of multiple positional matches to be combined in sequence.
+Intersected documents that have no appropriate tokens matching are filtered out.</p>
+<p><img src="../../../images//QueryPlanImages/PositionalIntersect.png" alt="alt text"></p>
+<h4 id="precedingintersect">PrecedingIntersect</h4>
+<p>Introduced by the preceding (&gt;) operator. Intersects matched documents but only where the matched tokens in the left node precede those in the right node.
+Intersected documents that have no appropriate tokens matching are filtered out.</p>
+<p><img src="../../../images//QueryPlanImages/PrecedingIntersect.png" alt="alt text"></p>
+<h4 id="resultsonly">ResultsOnly</h4>
+<p>A placeholder node representing the final query results without a specific operation. This will only ever appear if the index
+was queried without the <code>QueryExecutionOptions.IncludeExecutionPlan</code> option specified.</p>
 <h2 id="usage-example">Usage Example</h2>
 <p>To analyze a query execution plan, start with the <code>Root</code> node and explore its properties and children. This allows you to trace the execution path, understand the impact of each operation, and identify potential areas for optimization.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Assume `results` is obtained from a LIFTI search operation</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">executionPlan</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">results</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">GetExecutionPlan</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Accessing the root node</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">rootNode</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">executionPlan</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Root</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Example: iterating through the node hierarchy</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">void</span> <span style="color:#000">PrintNodeDetails</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">QueryExecutionPlanNode</span> <span style="color:#000">node</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000">indent</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">$&#34;{indent}Node: {node.Text}, Kind: {node.Kind}, Docs: {node.ResultingDocumentCount}, Timing: {node.InclusiveTiming.TotalMilliseconds} ms&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">node</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Children</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">HasValue</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">PrintNodeDetails</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">node</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Children</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Value</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">left</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">indent</span> <span style="color:#000;font-weight:bold">+</span> <span style="color:#4e9a06">&#34;  &#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">PrintNodeDetails</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">node</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Children</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Value</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">right</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">indent</span> <span style="color:#000;font-weight:bold">+</span> <span style="color:#4e9a06">&#34;  &#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000">PrintNodeDetails</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">rootNode</span><span style="color:#000;font-weight:bold">);</span>
-</span></span></code></pre></div><p>This documentation provides a foundation for developers to leverage the <code>QueryExecutionPlan</code> in LIFTI, enabling detailed analysis and optimization of full-text search queries.</p>
+<iframe width="100%" height="600" src="https://dotnetfiddle.net/Widget/slhurS" frameborder="0"></iframe>
 <p>The <a href="../../../blazor-sample/">Blazor sample</a> provides a way to visualize the query execution plan:</p>
 <p><img src="../../../images/query-execution-plan.png" alt="Visualization of a query execution plan"></p>
 
