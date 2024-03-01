@@ -45,13 +45,13 @@ namespace Lifti.Tests
             plan.Root.Should().BeEquivalentTo(
                 new QueryExecutionPlanNode(
                     5,
-                    QueryExecutionPlanNodeKind.CompositePositionalIntersect,
+                    QueryExecutionPlanNodeKind.PositionalIntersect,
                     resultingDocumentCount: 2,
                     "~1>",
                     children: (
                         new QueryExecutionPlanNode(
                             3,
-                            QueryExecutionPlanNodeKind.CompositePositionalIntersect,
+                            QueryExecutionPlanNodeKind.PositionalIntersect,
                             resultingDocumentCount: 2,
                             "~1>",
                             children: (

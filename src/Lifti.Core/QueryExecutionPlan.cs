@@ -100,16 +100,18 @@ namespace Lifti
         /// <summary>
         /// The node intersects the results from its children, only returning results for documents
         /// that are present on both sides of the intersection, and are within the specified distance
-        /// of each other.
+        /// of each other. Intersected matches are combined into a single logical match, maintaining
+        /// their relationship for subsequent positional intersect operations.
         /// </summary>
         PositionalIntersect = 4,
-    
+
         /// <summary>
         /// The node intersects the results from its children, only returning results for documents
         /// that are present on both sides of the intersection, and are within the specified distance
         /// of each other. Intersected matches are combined into a single logical match, maintaining
         /// their relationship for subsequent positional intersect operations.
         /// </summary>
+        [Obsolete("No longer used. PositionalIntersect should always be used - CompositePositionalIntersect was technically no different from that.")]
         CompositePositionalIntersect = 5,
 
         /// <summary>
@@ -195,10 +197,10 @@ namespace Lifti
             return queryPart switch
             {
                 ScoreBoostedQueryPart sbqp => (QueryExecutionPlanNodeKind.QueryPart, sbqp.ToString(), sbqp.CalculatedWeighting),
-                PrecedingNearQueryOperator pnq => (QueryExecutionPlanNodeKind.CompositePositionalIntersect, $"~{pnq.Tolerance}>", null),
+                PrecedingNearQueryOperator pnq => (QueryExecutionPlanNodeKind.PositionalIntersect, $"~{pnq.Tolerance}>", null),
                 NearQueryOperator nq => (QueryExecutionPlanNodeKind.PositionalIntersect, $"~{nq.Tolerance}", null),
                 PrecedingQueryOperator => (QueryExecutionPlanNodeKind.PrecedingIntersect, $">", null),
-                AdjacentWordsQueryOperator => (QueryExecutionPlanNodeKind.CompositePositionalIntersect, $"~1>", null),
+                AdjacentWordsQueryOperator => (QueryExecutionPlanNodeKind.PositionalIntersect, $"~1>", null),
                 AndQueryOperator => (QueryExecutionPlanNodeKind.Intersect, null, null),
                 OrQueryOperator => (QueryExecutionPlanNodeKind.Union, null, null),
                 _ => (QueryExecutionPlanNodeKind.Unknown, "UNKNOWN", null),
