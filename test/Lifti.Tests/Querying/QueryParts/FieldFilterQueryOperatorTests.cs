@@ -29,5 +29,16 @@ namespace Lifti.Tests.Querying.QueryParts
 
             op.CalculateWeighting(() => new FakeIndexNavigator()).Should().Be(2D);
         }
+
+        [Theory]
+        [InlineData("Field", "[Field]=FOO")]
+        [InlineData("Field[1]", @"[Field\[1\]]=FOO")]
+        [InlineData("Field name", @"[Field name]=FOO")]
+        public void ToString_ShouldReturnExpectedString(string fieldName, string expectedResult)
+        {
+            var op = new FieldFilterQueryOperator(fieldName, 1, new ExactWordQueryPart("FOO"));
+
+            op.ToString().Should().Be(expectedResult);
+        }
     }
 }

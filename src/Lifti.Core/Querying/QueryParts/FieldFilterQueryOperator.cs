@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Lifti.Querying.QueryParts
 {
@@ -8,6 +9,8 @@ namespace Lifti.Querying.QueryParts
     /// </summary>
     public sealed class FieldFilterQueryOperator : IQueryPart
     {
+        private static readonly char[] escapableChars = new[] { '[', ']' };
+
         /// <summary>
         /// Constructs a new instance of <see cref="FieldFilterQueryOperator"/>.
         /// </summary>
@@ -58,7 +61,15 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public override string ToString()
         {
-            return $"{this.FieldName}={this.Statement}";
+            var fieldName = this.FieldName;
+
+            // Make sure to escape any [ or ] characters in the field name.
+            if (fieldName.IndexOfAny(escapableChars) >= 0)
+            {
+                fieldName = Regex.Replace(fieldName, @"[\[\]]", @"\$0");
+            }
+
+            return $"[{fieldName}]={this.Statement}";
         }
 
         /// <summary>
