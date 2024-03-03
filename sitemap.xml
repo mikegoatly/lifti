@@ -47,6 +47,9 @@
     <loc>https://mikegoatly.github.io/lifti/docs/searching/simple-queries/</loc>
     <lastmod>2022-10-03T22:57:25+01:00</lastmod>
   </url><url>
+    <loc>https://mikegoatly.github.io/lifti/docs/searching/manually-constructing-queries/</loc>
+    <lastmod>2024-01-16T22:43:44+00:00</lastmod>
+  </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/searching/field-information/</loc>
     <lastmod>2024-01-16T22:43:44+00:00</lastmod>
   </url><url>
@@ -60,9 +63,6 @@
     <lastmod>2024-02-23T16:03:28+00:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withdefaultthesaurus/</loc>
-    <lastmod>2024-01-16T22:43:44+00:00</lastmod>
-  </url><url>
-    <loc>https://mikegoatly.github.io/lifti/docs/searching/manually-constructing-queries/</loc>
     <lastmod>2024-01-16T22:43:44+00:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/searching/using-the-index-navigator/</loc>
@@ -81,7 +81,7 @@
     <lastmod>2024-01-16T22:43:44+00:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/searching/understanding-query-plan/</loc>
-    <lastmod>2024-02-23T16:03:28+00:00</lastmod>
+    <lastmod>2024-03-01T23:20:46+00:00</lastmod>
   </url><url>
     <loc>https://mikegoatly.github.io/lifti/docs/index-construction/withindexmodificationaction/</loc>
     <lastmod>2024-01-16T22:43:44+00:00</lastmod>
