@@ -287,12 +287,31 @@ Lifti.QueryExecutionPlanNodeKind.QueryPart = 1 -> Lifti.QueryExecutionPlanNodeKi
 Lifti.QueryExecutionPlanNodeKind.ResultsOnly = 7 -> Lifti.QueryExecutionPlanNodeKind
 Lifti.QueryExecutionPlanNodeKind.Union = 2 -> Lifti.QueryExecutionPlanNodeKind
 Lifti.QueryExecutionPlanNodeKind.Unknown = 0 -> Lifti.QueryExecutionPlanNodeKind
+Lifti.Querying.AdjacentSearchTermFluentQueryBuilder<TKey>
+Lifti.Querying.BaseAdjacentSearchTermFluentQueryBuilder<TKey>
+Lifti.Querying.BaseAdjacentSearchTermFluentQueryBuilder<TKey>.ExactMatch(string! text, double? scoreBoost = null) -> Lifti.Querying.AdjacentSearchTermFluentQueryBuilder<TKey>!
+Lifti.Querying.BaseAdjacentSearchTermFluentQueryBuilder<TKey>.FuzzyMatch(string! text, ushort maxEditDistance = 4, ushort maxSequentialEdits = 1, double? scoreBoost = null) -> Lifti.Querying.AdjacentSearchTermFluentQueryBuilder<TKey>!
+Lifti.Querying.BaseAdjacentSearchTermFluentQueryBuilder<TKey>.WildcardMatch(string! text, double? scoreBoost = null) -> Lifti.Querying.AdjacentSearchTermFluentQueryBuilder<TKey>!
+Lifti.Querying.BaseAdjacentSearchTermFluentQueryBuilder<TKey>.WildcardMatch(System.Func<Lifti.Querying.BaseWildcardBuilder<TKey>!, Lifti.Querying.WildcardBuilder<TKey>!>! wildcardBuilder, double? scoreBoost = null) -> Lifti.Querying.AdjacentSearchTermFluentQueryBuilder<TKey>!
+Lifti.Querying.BaseWildcardBuilder<TKey>
+Lifti.Querying.BaseWildcardBuilder<TKey>.MultipleCharacters() -> Lifti.Querying.WildcardBuilder<TKey>!
+Lifti.Querying.BaseWildcardBuilder<TKey>.SingleCharacter() -> Lifti.Querying.WildcardBuilder<TKey>!
+Lifti.Querying.BaseWildcardBuilder<TKey>.Text(string! text) -> Lifti.Querying.WildcardBuilder<TKey>!
+Lifti.Querying.BinaryOperatorFluentQueryBuilder<TKey>
 Lifti.Querying.DocumentMatchCollector
 Lifti.Querying.DocumentMatchCollector.DocumentMatchCollector() -> void
 Lifti.Querying.DocumentMatchCollector.ToIntermediateQueryResult() -> Lifti.Querying.IntermediateQueryResult
 Lifti.Querying.FieldScoreBoostProvider
 Lifti.Querying.FieldScoreBoostProvider.FieldScoreBoostProvider(Lifti.IIndexedFieldLookup! fieldLookup) -> void
 Lifti.Querying.FieldScoreBoostProvider.GetScoreBoost(byte fieldId) -> double
+Lifti.Querying.FluentQueryBuilder<TKey>
+Lifti.Querying.FluentQueryBuilder<TKey>.And.get -> Lifti.Querying.BinaryOperatorFluentQueryBuilder<TKey>!
+Lifti.Querying.FluentQueryBuilder<TKey>.Build() -> Lifti.Querying.IQuery!
+Lifti.Querying.FluentQueryBuilder<TKey>.CloselyPreceding(int tolerance = 5) -> Lifti.Querying.BinaryOperatorFluentQueryBuilder<TKey>!
+Lifti.Querying.FluentQueryBuilder<TKey>.Execute() -> Lifti.ISearchResults<TKey>!
+Lifti.Querying.FluentQueryBuilder<TKey>.Near(int tolerance = 5) -> Lifti.Querying.BinaryOperatorFluentQueryBuilder<TKey>!
+Lifti.Querying.FluentQueryBuilder<TKey>.Or.get -> Lifti.Querying.BinaryOperatorFluentQueryBuilder<TKey>!
+Lifti.Querying.FluentQueryBuilder<TKey>.Preceding.get -> Lifti.Querying.BinaryOperatorFluentQueryBuilder<TKey>!
 Lifti.Querying.IFieldScoreBoostProvider
 Lifti.Querying.IFieldScoreBoostProvider.GetScoreBoost(byte fieldId) -> double
 Lifti.Querying.IIndexNavigator
@@ -464,9 +483,18 @@ Lifti.Querying.ScoredToken.FieldMatches.get -> System.Collections.Generic.IReadO
 Lifti.Querying.ScoredToken.ItemId.get -> int
 Lifti.Querying.ScoredToken.ScoredToken() -> void
 Lifti.Querying.ScoredToken.ScoredToken(int documentId, System.Collections.Generic.IReadOnlyList<Lifti.Querying.ScoredFieldMatch!>! fieldMatches) -> void
+Lifti.Querying.SearchTermFluentQueryBuilder<TKey>
+Lifti.Querying.SearchTermFluentQueryBuilder<TKey>.Adjacent(System.Func<Lifti.Querying.BaseAdjacentSearchTermFluentQueryBuilder<TKey>!, Lifti.Querying.AdjacentSearchTermFluentQueryBuilder<TKey>!>! sequentialBuilder) -> Lifti.Querying.FluentQueryBuilder<TKey>!
+Lifti.Querying.SearchTermFluentQueryBuilder<TKey>.Bracketed(System.Func<Lifti.Querying.SearchTermFluentQueryBuilder<TKey>!, Lifti.Querying.FluentQueryBuilder<TKey>!>! bracketedQueryBuilder) -> Lifti.Querying.FluentQueryBuilder<TKey>!
+Lifti.Querying.SearchTermFluentQueryBuilder<TKey>.ExactMatch(string! text, double? scoreBoost = null) -> Lifti.Querying.FluentQueryBuilder<TKey>!
+Lifti.Querying.SearchTermFluentQueryBuilder<TKey>.FuzzyMatch(string! text, ushort maxEditDistance = 4, ushort maxSequentialEdits = 1, double? scoreBoost = null) -> Lifti.Querying.FluentQueryBuilder<TKey>!
+Lifti.Querying.SearchTermFluentQueryBuilder<TKey>.InField(string! fieldName, System.Func<Lifti.Querying.SearchTermFluentQueryBuilder<TKey>!, Lifti.Querying.FluentQueryBuilder<TKey>!>! fieldQueryBuilder) -> Lifti.Querying.FluentQueryBuilder<TKey>!
+Lifti.Querying.SearchTermFluentQueryBuilder<TKey>.WildcardMatch(string! text, double? scoreBoost = null) -> Lifti.Querying.FluentQueryBuilder<TKey>!
+Lifti.Querying.SearchTermFluentQueryBuilder<TKey>.WildcardMatch(System.Func<Lifti.Querying.BaseWildcardBuilder<TKey>!, Lifti.Querying.WildcardBuilder<TKey>!>! wildcardBuilder, double? scoreBoost = null) -> Lifti.Querying.FluentQueryBuilder<TKey>!
 Lifti.Querying.SimpleQueryParser
 Lifti.Querying.SimpleQueryParser.Parse(Lifti.IIndexedFieldLookup! fieldLookup, string! queryText, Lifti.IIndexTokenizerProvider! tokenizerProvider) -> Lifti.Querying.IQuery!
 Lifti.Querying.SimpleQueryParser.SimpleQueryParser(Lifti.Querying.QueryParserOptions! options) -> void
+Lifti.Querying.WildcardBuilder<TKey>
 Lifti.ScoreBoostMetadata
 Lifti.SearchResult<TKey>
 Lifti.SearchResult<TKey>.FieldMatches.get -> System.Collections.Generic.IReadOnlyList<Lifti.FieldSearchResult!>!
@@ -709,6 +737,7 @@ static Lifti.DocumentTokenMatchMap.Empty.get -> Lifti.DocumentTokenMatchMap
 static Lifti.DocumentTokenMatchMap.operator !=(Lifti.DocumentTokenMatchMap left, Lifti.DocumentTokenMatchMap right) -> bool
 static Lifti.DocumentTokenMatchMap.operator ==(Lifti.DocumentTokenMatchMap left, Lifti.DocumentTokenMatchMap right) -> bool
 static Lifti.FullTextIndexExtensions.ParseQuery<TKey>(this Lifti.IFullTextIndex<TKey>! index, string! queryText) -> Lifti.Querying.IQuery!
+static Lifti.FullTextIndexExtensions.Query<TKey>(this Lifti.IFullTextIndex<TKey>! index) -> Lifti.Querying.SearchTermFluentQueryBuilder<TKey>!
 static Lifti.IndexedToken.operator !=(Lifti.IndexedToken left, Lifti.IndexedToken right) -> bool
 static Lifti.IndexedToken.operator ==(Lifti.IndexedToken left, Lifti.IndexedToken right) -> bool
 static Lifti.PreprocessedInput.Empty.get -> Lifti.PreprocessedInput

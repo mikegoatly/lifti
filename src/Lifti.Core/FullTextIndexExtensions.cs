@@ -19,5 +19,17 @@ namespace Lifti
                 ? throw new ArgumentNullException(nameof(index))
                 : index.QueryParser.Parse(index.FieldLookup, queryText, index);
         }
+
+        /// <summary>
+        /// Creates a new fluent query builder against the index.
+        /// <code>
+        /// var results = index.Query().ExactMatch("hello").And.ExactMatch("world").Execute();
+        /// </code>
+        /// </summary>
+        public static SearchTermFluentQueryBuilder<TKey> Query<TKey>(this IFullTextIndex<TKey> index)
+            where TKey : notnull
+        {
+            return FluentQueryBuilder<TKey>.StartQuery(index);
+        }
     }
 }
