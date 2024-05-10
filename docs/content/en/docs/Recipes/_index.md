@@ -52,6 +52,8 @@ Console.WriteLine($"{results.Count}");
 
 ## Indexing text from an object
 
+> [.NET Fiddle](https://dotnetfiddle.net/d6bq05)
+
 Scenario: You have an object with string properties that you need to index:
 
 ```csharp
