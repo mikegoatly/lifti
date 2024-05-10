@@ -6,7 +6,7 @@ description: >
   This cookbook provides a collection of examples to help you get started with LIFTI. Whether you're building a search engine, a knowledge base, or any application that deals with large volumes of textual data, these recipes will guide you through common tasks and scenarios.
 ---
 
-Each recipe in this cookbook provides a self-contained code example, along with detailed explanations, background information, and step-by-step instructions. You'll find solutions for common challenges, best practices, and time-saving techniques contributed.
+Each recipe in this cookbook provides a self-contained code example, along with detailed explanations for each line of code. You'll find solutions for common challenges, best practices, and time-saving techniques contributed.
 
 To contribute, see [Documentation Contributions](https://github.com/mikegoatly/lifti?tab=readme-ov-file#contribute) for more details.
 
@@ -14,7 +14,7 @@ To contribute, see [Documentation Contributions](https://github.com/mikegoatly/l
 
 > [.NET Fiddle](https://dotnetfiddle.net/ih1O1X)
 
-Scenario: You just have a list of strings that you need to search across.
+This recipe demonstrates the basic steps for creating a LIFTI full-text index, adding text documents to the index, and performing searches.
 
 ```csharp
 string[] strings = [
@@ -54,7 +54,7 @@ Console.WriteLine($"{results.Count}");
 
 > [.NET Fiddle](https://dotnetfiddle.net/d6bq05)
 
-Scenario: You have an object with string properties that you need to index:
+This recipe demonstrates how to use LIFTI to extract and index text from properties within your objects. This will enable you to search for content based on the data stored in your objects, instead of using separate IDs. Each property you configure for indexing is called a "field."
 
 ```csharp
 var bookIndex = new FullTextIndexBuilder<int>()
