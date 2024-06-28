@@ -1,0 +1,39 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>LIFTI – Reference</title>
+    <link>https://mikegoatly.github.io/lifti/docs/reference/</link>
+    <description>Recent content in Reference on LIFTI</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    
+	  <atom:link href="https://mikegoatly.github.io/lifti/docs/reference/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: Serialization File Format</title>
+      <link>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/</link>
+      <pubDate>Sun, 14 Jan 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;version-6-v600&#34;&gt;Version 6 (v6.0.0)&lt;/h2&gt;
+&lt;p&gt;&lt;img alt=&#34;LIFTI Serialization Format&#34; src=&#34;../../../images/v6-serialization.svg&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Notes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Versions 2 to 5 are readable as a one-time conversion but always written back as version 6.&lt;/li&gt;
+&lt;li&gt;Int32s are written as &lt;em&gt;positive&lt;/em&gt; values using 7-bit encoding. This means that the maximum value is 2,147,483,647, apart from Int32s written by the &lt;code&gt;IntFormatterKeySerializer&lt;/code&gt; which can&amp;rsquo;t make the assumption that the value is always positive. For these, values are written using zig-zag encoding.&lt;/li&gt;
+&lt;li&gt;New in version 6 is the storage of object type and scoring metadata information for a document in the index, including an internal object type id it was extracted for, freshness date and scoring magnitude, if applicable.&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>
