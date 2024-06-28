@@ -51,11 +51,11 @@ anchor = "smart"
 
 # Language configuration
 
+description = "A Lightweight Full Text Indexer for .NET"
+title = "LIFTI"
 [languages]
 [languages.en]
-title = "LIFTI"
-description = "A Lightweight Full Text Indexer for .NET"
-languageName ="English"
+
 # Weight used for sorting.
 weight = 1
 
