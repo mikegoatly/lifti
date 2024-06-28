@@ -8,7 +8,7 @@ description: >
 
 ## Indexing text
 
-As shown in [this example](../getting-started), if all you have is a key and text to be indexed for it, you can just make use one of the `AddAsync` overloads that operate on `string`s - there is no need to construct any artificial objects in order to populate the index.
+As shown in [this example](..recipes/#creating-a-simple-lifti-index), if all you have is a key and text to be indexed for it, you can just make use one of the `AddAsync` overloads that operate on `string`s - there is no need to construct any artificial objects in order to populate the index.
 
 Each of these methods will use the default text extraction and tokenization configured for the index and the default field id, `IFullTextIndex.FieldLookup.DefaultField`.
 
@@ -26,7 +26,7 @@ It's worth noting that each fragment is processed independently, so an implicit 
 
 In order to index an object against the index it needs to have first been configured when the index was built, using [WithObjectTokenization](../index-construction/withobjecttokenization). This allows for multiple properties of a single object to be extracted as different fields of the same document.
 
-See the [Indexing objects](../getting-started/indexing-objects) quick start for an example of this in action. 
+See the [Indexing objects](../recipes/#indexing-text-from-object-properties) quick start for an example of this in action. 
 
 ### `Task AddAsync<TObject>(TObject item)`
 

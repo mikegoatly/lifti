@@ -36,3 +36,12 @@ It would be great to have more people contributing to LIFTI - how can you help?
 * Create feature suggestions - **level 2**
 * Create pull requests for documentation changes - **level 3**
 * Create pull requests for bug fixes or features - **boss level**
+
+### Documentation contributions
+
+1. Install [hugo-extended](https://gohugo.io/installation/), e.g. by using `winget install Hugo.Hugo.Extended` on Windows.
+1. Fork the LIFTI repo and clone your fork locally
+1. Initialize the docsy theme git submodule using `git submodule update --recursive --init`
+1. Edit the documentation
+1. Test the site locally by running `hugo server` from the `docs` folder
+1. Create a pull request for your changes
