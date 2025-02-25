@@ -16,7 +16,8 @@ Key features:
 
 ## Getting started
 
-[📖 Read the documentation](https://mikegoatly.github.io/lifti/docs) - there's lots of useful information and examples there, along with some [getting started guides](https://mikegoatly.github.io/lifti/docs/getting-started/).
+[📖 Read the documentation](https://mikegoatly.github.io/lifti/docs) - there's lots of useful information and examples there, along 
+with some [getting started guides](https://mikegoatly.github.io/lifti/docs/getting-started/) and [recipes](https://mikegoatly.github.io/lifti/docs/recipes/).
 
 [🧑‍💻 Check out some sample code](https://github.com/mikegoatly/lifti/tree/master/samples/TestConsole) - the repo contains examples that can be run as a console application.
 

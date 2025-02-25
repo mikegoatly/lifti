@@ -24,6 +24,7 @@
 		<AnalysisLevel>latest-all</AnalysisLevel>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 		<NoWarn>RS0026</NoWarn>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -67,6 +68,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Include="..\..\docs\static\favicons\favicon-256.png">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
@@ -85,6 +90,10 @@
 		</PackageReference>
 		<PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFramework)' == 'netstandard2'" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" Condition="'$(TargetFramework)' == 'netstandard2'" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Include="README.md" />
 	</ItemGroup>
 
 	<ItemGroup>
