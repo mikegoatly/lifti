@@ -91,6 +91,12 @@ namespace Lifti
             Func<TKey, string> loadText);
 
         /// <inheritdoc cref="CreateMatchPhrasesAsync{TObject}(Func{TKey, TObject}, CancellationToken)"/>
+        /// <param name="loadText">A function capable of retrieving the original text that was indexed against the key. The loaded text will be assumed to be 
+        /// unchanged since it was indexed.</param>
+        IEnumerable<DocumentPhrases<TKey>> CreateMatchPhrases(
+            Func<TKey, ReadOnlyMemory<char>> loadText);
+
+        /// <inheritdoc cref="CreateMatchPhrasesAsync{TObject}(Func{TKey, TObject}, CancellationToken)"/>
         /// <param name="loadTextAsync">A function capable of asynchronously retrieving the original text that was indexed against the key. The loaded text will be 
         /// assumed to be unchanged since it was indexed.</param>
         /// <param name="cancellationToken">
@@ -100,9 +106,25 @@ namespace Lifti
             Func<TKey, CancellationToken, ValueTask<string>> loadTextAsync,
             CancellationToken cancellationToken = default);
 
+        /// <inheritdoc cref="CreateMatchPhrasesAsync{TObject}(Func{TKey, TObject}, CancellationToken)"/>
+        /// <param name="loadTextAsync">A function capable of asynchronously retrieving the original text that was indexed against the key. The loaded text will be 
+        /// assumed to be unchanged since it was indexed.</param>
+        /// <param name="cancellationToken">
+        /// The optional <see cref="CancellationToken"/> to use.
+        /// </param>
+        Task<IEnumerable<DocumentPhrases<TKey>>> CreateMatchPhrasesAsync(
+            Func<TKey, CancellationToken, ValueTask<ReadOnlyMemory<char>>> loadTextAsync,
+            CancellationToken cancellationToken = default);
+
         /// <inheritdoc cref="CreateMatchPhrasesAsync(Func{TKey, CancellationToken, ValueTask{string}}, CancellationToken)"/>
         Task<IEnumerable<DocumentPhrases<TKey>>> CreateMatchPhrasesAsync(
             Func<TKey, ValueTask<string>> loadTextAsync,
+            CancellationToken cancellationToken = default);
+
+
+        /// <inheritdoc cref="CreateMatchPhrasesAsync(Func{TKey, CancellationToken, ValueTask{string}}, CancellationToken)"/>
+        Task<IEnumerable<DocumentPhrases<TKey>>> CreateMatchPhrasesAsync(
+            Func<TKey, ValueTask<ReadOnlyMemory<char>>> loadTextAsync,
             CancellationToken cancellationToken = default);
 
         /// <summary>

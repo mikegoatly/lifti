@@ -86,7 +86,7 @@ namespace Lifti
         /// <exception cref="ArgumentException">
         /// Thrown when the <paramref name="item"/> is not of the expected type.
         /// </exception>
-        public abstract ValueTask<IEnumerable<string>> ReadAsync(object item, CancellationToken cancellationToken);
+        public abstract ValueTask<IEnumerable<ReadOnlyMemory<char>>> ReadAsync(object item, CancellationToken cancellationToken);
 
         internal void Deconstruct(out byte fieldId, out ITextExtractor textExtractor, out IIndexTokenizer tokenizer, out IThesaurus thesaurus)
         {
@@ -100,12 +100,12 @@ namespace Lifti
     /// <inheritdoc />
     public class IndexedFieldDetails<TObject> : IndexedFieldDetails
     {
-        private readonly Func<TObject, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader;
+        private readonly Func<TObject, CancellationToken, ValueTask<IEnumerable<ReadOnlyMemory<char>>>> fieldReader;
 
         private IndexedFieldDetails(
             byte id,
             string name,
-            Func<TObject, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
+            Func<TObject, CancellationToken, ValueTask<IEnumerable<ReadOnlyMemory<char>>>> fieldReader,
             FieldKind fieldKind,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
@@ -117,9 +117,10 @@ namespace Lifti
             this.fieldReader = fieldReader;
         }
 
-        internal static IndexedFieldDetails<TObject> Static(byte id,
+        internal static IndexedFieldDetails<TObject> Static(
+            byte id,
             string name,
-            Func<TObject, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
+            Func<TObject, CancellationToken, ValueTask<IEnumerable<ReadOnlyMemory<char>>>> fieldReader,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus,
@@ -137,10 +138,11 @@ namespace Lifti
                 scoreBoost);
         }
 
-        internal static IndexedFieldDetails<TObject> Dynamic(byte id,
+        internal static IndexedFieldDetails<TObject> Dynamic(
+            byte id,
             string name,
             string dynamicFieldReaderName,
-            Func<TObject, CancellationToken, ValueTask<IEnumerable<string>>> fieldReader,
+            Func<TObject, CancellationToken, ValueTask<IEnumerable<ReadOnlyMemory<char>>>> fieldReader,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus,
@@ -159,7 +161,7 @@ namespace Lifti
         }
 
         /// <inheritdoc />
-        public override ValueTask<IEnumerable<string>> ReadAsync(object item, CancellationToken cancellationToken)
+        public override ValueTask<IEnumerable<ReadOnlyMemory<char>>> ReadAsync(object item, CancellationToken cancellationToken)
         {
             if (item is null)
             {

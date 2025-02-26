@@ -130,7 +130,14 @@ namespace Lifti
         /// <inheritdoc />
         public IEnumerable<DocumentPhrases<TKey>> CreateMatchPhrases(Func<TKey, string> loadText)
         {
-            return this.CreateMatchPhrasesAsync((key, ct) => new ValueTask<string>(loadText(key)))
+            return this.CreateMatchPhrasesAsync((key, ct) => new ValueTask<ReadOnlyMemory<char>>(loadText(key).AsMemory()))
+                .GetAwaiter().GetResult();
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<DocumentPhrases<TKey>> CreateMatchPhrases(Func<TKey, ReadOnlyMemory<char>> loadText)
+        {
+            return this.CreateMatchPhrasesAsync((key, ct) => new ValueTask<ReadOnlyMemory<char>>(loadText(key)))
                 .GetAwaiter().GetResult();
         }
 
@@ -142,7 +149,10 @@ namespace Lifti
             var objectTokenization = this.index.DefaultTokenizer;
             var objectResults = this.FilterFieldMatches(field => field == IndexedFieldLookup.DefaultFieldName);
 
-            return await this.CreateMatchPhrasesAsync(loadTextAsync, objectResults, cancellationToken).ConfigureAwait(false);
+            return await this.CreateMatchPhrasesAsync(
+                async (key, ct) => (await loadTextAsync(key, ct).ConfigureAwait(false)).AsMemory(),
+                objectResults,
+                cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -151,12 +161,33 @@ namespace Lifti
             CancellationToken cancellationToken = default)
         {
             return this.CreateMatchPhrasesAsync(
+                async (key, ct) => (await loadTextAsync(key).ConfigureAwait(false)).AsMemory(),
+                cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<DocumentPhrases<TKey>>> CreateMatchPhrasesAsync(
+            Func<TKey, CancellationToken, ValueTask<ReadOnlyMemory<char>>> loadTextAsync,
+            CancellationToken cancellationToken = default)
+        {
+            var objectTokenization = this.index.DefaultTokenizer;
+            var objectResults = this.FilterFieldMatches(field => field == IndexedFieldLookup.DefaultFieldName);
+
+            return await this.CreateMatchPhrasesAsync(loadTextAsync, objectResults, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public Task<IEnumerable<DocumentPhrases<TKey>>> CreateMatchPhrasesAsync(
+            Func<TKey, ValueTask<ReadOnlyMemory<char>>> loadTextAsync,
+            CancellationToken cancellationToken = default)
+        {
+            return this.CreateMatchPhrasesAsync(
                 (key, ct) => loadTextAsync(key),
                 cancellationToken);
         }
 
         private async Task<IEnumerable<DocumentPhrases<TKey>>> CreateMatchPhrasesAsync(
-            Func<TKey, CancellationToken, ValueTask<string>> loadTextAsync,
+            Func<TKey, CancellationToken, ValueTask<ReadOnlyMemory<char>>> loadTextAsync,
             List<(SearchResult<TKey> searchResult, List<FieldSearchResult> fieldMatches)> objectResults,
             CancellationToken cancellationToken)
         {
@@ -164,7 +195,7 @@ namespace Lifti
             var matchedPhrases = new List<DocumentPhrases<TKey>>(this.Results.Count);
 
             // Create an array that can be used on each call to VirtualString
-            var textArray = new string[1];
+            var textArray = new ReadOnlyMemory<char>[1];
             foreach (var (searchResult, fieldMatches) in objectResults)
             {
                 textArray[0] = await loadTextAsync(searchResult.Key, cancellationToken).ConfigureAwait(false);

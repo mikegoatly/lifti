@@ -10,13 +10,13 @@ namespace Lifti
     /// </summary>
     internal class VirtualString
     {
-        private readonly IList<string> strings;
+        private readonly IList<ReadOnlyMemory<char>> strings;
         private readonly int length;
         private readonly StringBuilder stringBuilder;
 
-        public VirtualString(IEnumerable<string> strings)
+        public VirtualString(IEnumerable<ReadOnlyMemory<char>> strings)
         {
-            this.strings = strings as IList<string> ?? strings.ToList();
+            this.strings = strings as IList<ReadOnlyMemory<char>> ?? [.. strings];
             this.length = this.strings.Sum(s => s.Length);
             this.stringBuilder = new StringBuilder();
         }
@@ -51,12 +51,7 @@ namespace Lifti
                 {
                     // Calculate the substring length for the current string
                     var substringLength = Math.Min(currentLength - start, length);
-
-#if NET6_0_OR_GREATER
-                    this.stringBuilder.Append(currentString.AsSpan(start, substringLength));
-#else
-                    this.stringBuilder.Append(currentString.Substring(start, substringLength));
-#endif
+                    this.stringBuilder.Append(currentString.Span.Slice(start, substringLength));
 
                     // Update the start index and length for the next string
                     start = 0;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lifti.Tokenization.Objects
 {
-    internal class StringDictionaryDynamicFieldReader<TObject> : DictionaryDynamicFieldReader<TObject, string>
+    internal sealed class StringDictionaryDynamicFieldReader<TObject> : DictionaryDynamicFieldReader<TObject, string>
     {
         public StringDictionaryDynamicFieldReader(
             Func<TObject, IDictionary<string, string>?> reader,
@@ -18,9 +18,9 @@ namespace Lifti.Tokenization.Objects
         {
         }
 
-        protected override IEnumerable<string> ReadFieldValueAsEnumerable(string fieldValue)
+        protected override IEnumerable<ReadOnlyMemory<char>> ReadFieldValueAsEnumerable(string fieldValue)
         {
-            return new[] { fieldValue };
+            return [fieldValue.AsMemory()];
         }
     }
 }

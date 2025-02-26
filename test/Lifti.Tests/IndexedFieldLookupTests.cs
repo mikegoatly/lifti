@@ -3,6 +3,7 @@ using Lifti.Tokenization;
 using Lifti.Tokenization.Objects;
 using Lifti.Tokenization.Stemming;
 using Lifti.Tokenization.TextExtraction;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -41,7 +42,7 @@ namespace Lifti.Tests
             fieldInfo.FieldKind.Should().Be(FieldKind.Static);
             fieldInfo.Tokenizer.Should().NotBeNull();
             var readField = await fieldInfo.ReadAsync("foo", default);
-            readField.Should().BeEquivalentTo(["foo"]);
+            readField.Should().BeEquivalentTo(["foo".AsMemory()]);
         }
 
         [Fact]
@@ -57,7 +58,7 @@ namespace Lifti.Tests
             fieldInfo.FieldKind.Should().Be(FieldKind.Dynamic);
             fieldInfo.Tokenizer.Should().NotBeNull();
             var readField = await fieldInfo.ReadAsync(new TestObject(), default);
-            readField.Should().BeEquivalentTo(["bar"]);
+            readField.Should().BeEquivalentTo(["bar".AsMemory()]);
         }
 
         [Fact]

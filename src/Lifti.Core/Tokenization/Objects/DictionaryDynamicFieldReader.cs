@@ -24,7 +24,7 @@ namespace Lifti.Tokenization.Objects
         }
 
         /// <inheritdoc />
-        public override ValueTask<IEnumerable<(string field, IEnumerable<string> rawText)>> ReadAsync(TObject item, CancellationToken cancellationToken)
+        public override ValueTask<IEnumerable<(string field, IEnumerable<ReadOnlyMemory<char>> rawText)>> ReadAsync(TObject item, CancellationToken cancellationToken)
         {
             var fields = this.reader(item);
             if (fields == null)
@@ -32,7 +32,7 @@ namespace Lifti.Tokenization.Objects
                 return EmptyFieldSet();
             }
 
-            var results = new List<(string field, IEnumerable<string> rawText)>();
+            var results = new List<(string field, IEnumerable<ReadOnlyMemory<char>> rawText)>();
 
             foreach (var field in fields)
             {
@@ -41,24 +41,24 @@ namespace Lifti.Tokenization.Objects
                 results.Add((fieldName, this.ReadFieldValueAsEnumerable(field.Value)));
             }
 
-            return new ValueTask<IEnumerable<(string, IEnumerable<string>)>>(results);
+            return new ValueTask<IEnumerable<(string, IEnumerable<ReadOnlyMemory<char>>)>>(results);
         }
 
         /// <inheritdoc />
-        public override ValueTask<IEnumerable<string>> ReadAsync(TObject item, string fieldName, CancellationToken cancellationToken)
+        public override ValueTask<IEnumerable<ReadOnlyMemory<char>>> ReadAsync(TObject item, string fieldName, CancellationToken cancellationToken)
         {
             var unprefixedName = this.GetUnprefixedFieldName(fieldName);
 
             var fields = this.reader(item);
             if (fields != null && fields.TryGetValue(unprefixedName, out var field))
             {
-                return new ValueTask<IEnumerable<string>>(this.ReadFieldValueAsEnumerable(field));
+                return new ValueTask<IEnumerable<ReadOnlyMemory<char>>>(this.ReadFieldValueAsEnumerable(field));
             }
 
             // The field is known to this reader, but not present for the given instance.
             return EmptyField();
         }
 
-        protected abstract IEnumerable<string> ReadFieldValueAsEnumerable(TValue field);
+        protected abstract IEnumerable<ReadOnlyMemory<char>> ReadFieldValueAsEnumerable(TValue field);
     }
 }
