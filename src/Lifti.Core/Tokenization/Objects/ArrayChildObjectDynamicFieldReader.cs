@@ -4,12 +4,12 @@ using System.Collections.Generic;
 
 namespace Lifti.Tokenization.Objects
 {
-    internal class StringArrayChildObjectDynamicFieldReader<TItem, TChildItem> : ChildItemDynamicFieldReader<TItem, TChildItem, IEnumerable<string>>
+    internal sealed class ArrayChildObjectDynamicFieldReader<TItem, TChildItem> : ChildItemDynamicFieldReader<TItem, TChildItem, IEnumerable<ReadOnlyMemory<char>>>
     {
-        public StringArrayChildObjectDynamicFieldReader(
+        internal ArrayChildObjectDynamicFieldReader(
             Func<TItem, ICollection<TChildItem>?> getChildObjects,
             Func<TChildItem, string> getFieldName,
-            Func<TChildItem, IEnumerable<string>> getFieldText,
+            Func<TChildItem, IEnumerable<ReadOnlyMemory<char>>> getFieldText,
             string dynamicFieldReaderName,
             string? fieldNamePrefix,
             IIndexTokenizer tokenizer,
@@ -29,7 +29,7 @@ namespace Lifti.Tokenization.Objects
         {
         }
 
-        protected override IEnumerable<string> ReadFieldValueAsEnumerable(IEnumerable<string> fieldValue)
+        protected override IEnumerable<ReadOnlyMemory<char>> ReadFieldValueAsEnumerable(IEnumerable<ReadOnlyMemory<char>> fieldValue)
         {
             return fieldValue;
         }

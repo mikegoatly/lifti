@@ -19,6 +19,6 @@ namespace Lifti.Tokenization.Objects
         public string Name { get; }
 
         /// <inheritdoc />
-        public abstract ValueTask<IEnumerable<string>> ReadAsync(TObject item, CancellationToken cancellationToken);
+        public abstract ValueTask<IEnumerable<ReadOnlyMemory<char>>> ReadAsync(TObject item, CancellationToken cancellationToken);
     }
 }

@@ -9,7 +9,7 @@ namespace Lifti.Tests
 
         public VirtualStringTests()
         {
-            this.sut = new VirtualString(new string[] { "test", "string", "test" });
+            this.sut = new VirtualString(["test".AsMemory(), "string".AsMemory(), "test".AsMemory()]);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace Lifti.Tests
         [Fact]
         public void Substring_WithEmptySourceText_ReturnsEmptyString()
         {
-            var sut = new VirtualString(Array.Empty<string>());
+            var sut = new VirtualString([]);
             var result = sut.Substring(0, 10);
             Assert.Equal(string.Empty, result);
         }

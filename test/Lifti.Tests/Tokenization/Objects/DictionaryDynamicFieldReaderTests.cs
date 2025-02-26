@@ -24,10 +24,10 @@ namespace Lifti.Tests.Tokenization.Objects
 
             var result = await sut.ReadAsync(new TestObject(fieldValues), default);
 
-            result.Should().BeEquivalentTo(new[]
+            result.Should().BeEquivalentTo(new (string, IEnumerable<ReadOnlyMemory<char>>)[]
             {
-                ("Foo", new[] { "Bar" }),
-                ("Baz", new[] { "Bam" })
+                ("Foo", ["Bar".AsMemory()]),
+                ("Baz", ["Bam".AsMemory()])
             });
         }
 
@@ -38,10 +38,10 @@ namespace Lifti.Tests.Tokenization.Objects
 
             var result = await sut.ReadAsync(new TestObject(fieldValues), default);
 
-            result.Should().BeEquivalentTo(new[]
+            result.Should().BeEquivalentTo(new (string, IEnumerable<ReadOnlyMemory<char>>)[]
             {
-                ("Test_Foo", new[] { "Bar" }),
-                ("Test_Baz", new[] { "Bam" })
+                ("Test_Foo", ["Bar".AsMemory()]),
+                ("Test_Baz", ["Bam".AsMemory()])
             });
         }
 
@@ -52,8 +52,8 @@ namespace Lifti.Tests.Tokenization.Objects
 
             await sut.ReadAsync(new TestObject(fieldValues), default);
 
-            (await sut.ReadAsync(new TestObject(fieldValues), "Foo", default)).Should().BeEquivalentTo(["Bar"]);
-            (await sut.ReadAsync(new TestObject(fieldValues), "Baz", default)).Should().BeEquivalentTo(["Bam"]);
+            (await sut.ReadAsync(new TestObject(fieldValues), "Foo", default)).Should().BeEquivalentTo(["Bar".AsMemory()]);
+            (await sut.ReadAsync(new TestObject(fieldValues), "Baz", default)).Should().BeEquivalentTo(["Bam".AsMemory()]);
         }
 
         [Fact]
@@ -63,8 +63,8 @@ namespace Lifti.Tests.Tokenization.Objects
 
             await sut.ReadAsync(new TestObject(fieldValues), default);
 
-            (await sut.ReadAsync(new TestObject(fieldValues), "Test_Foo", default)).Should().BeEquivalentTo(["Bar"]);
-            (await sut.ReadAsync(new TestObject(fieldValues), "Test_Baz", default)).Should().BeEquivalentTo(["Bam"]);
+            (await sut.ReadAsync(new TestObject(fieldValues), "Test_Foo", default)).Should().BeEquivalentTo(["Bar".AsMemory()]);
+            (await sut.ReadAsync(new TestObject(fieldValues), "Test_Baz", default)).Should().BeEquivalentTo(["Bam".AsMemory()]);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace Lifti.Tests.Tokenization.Objects
             await sut.ReadAsync(new TestObject(new Dictionary<string, string> { { "Zod", "Doz" } }), default);
 
             // Attempting to read that field from an object that doesn't have the field should not error
-            (await sut.ReadAsync(new TestObject(fieldValues), "Zod", default)).Should().BeEquivalentTo(Array.Empty<string>());
+            (await sut.ReadAsync(new TestObject(fieldValues), "Zod", default)).Should().BeEmpty();
         }
 
         private static StringDictionaryDynamicFieldReader<TestObject> CreateSut(string? fieldPrefix = null)

@@ -49,13 +49,13 @@ namespace Lifti.Tokenization.Objects
         /// <summary>
         /// Provides a delegate capable of reading all fields and associated text from an object.
         /// </summary>
-        public abstract ValueTask<IEnumerable<(string field, IEnumerable<string> rawText)>> ReadAsync(TObject item, CancellationToken cancellationToken);
+        public abstract ValueTask<IEnumerable<(string field, IEnumerable<ReadOnlyMemory<char>> rawText)>> ReadAsync(TObject item, CancellationToken cancellationToken);
 
         /// <summary>
         /// Provides a delegate capable of reading a specific dynamic field from an object. If the field is not found on the given
         /// object, an empty enumerable will be returned and no error thrown.
         /// </summary>
-        public abstract ValueTask<IEnumerable<string>> ReadAsync(TObject item, string fieldName, CancellationToken cancellationToken);
+        public abstract ValueTask<IEnumerable<ReadOnlyMemory<char>>> ReadAsync(TObject item, string fieldName, CancellationToken cancellationToken);
 
         protected string GetPrefixedFieldName(string unprefixedFieldName)
         {
@@ -82,14 +82,14 @@ namespace Lifti.Tokenization.Objects
             return unprefixedName;
         }
 
-        protected static ValueTask<IEnumerable<string>> EmptyField()
+        protected static ValueTask<IEnumerable<ReadOnlyMemory<char>>> EmptyField()
         {
-            return new ValueTask<IEnumerable<string>>(Array.Empty<string>());
+            return new ValueTask<IEnumerable<ReadOnlyMemory<char>>>(Array.Empty<ReadOnlyMemory<char>>());
         }
 
-        protected static ValueTask<IEnumerable<(string field, IEnumerable<string> rawText)>> EmptyFieldSet()
+        protected static ValueTask<IEnumerable<(string field, IEnumerable<ReadOnlyMemory<char>> rawText)>> EmptyFieldSet()
         {
-            return new ValueTask<IEnumerable<(string field, IEnumerable<string> rawText)>>(Array.Empty<(string, IEnumerable<string>)>());
+            return new ValueTask<IEnumerable<(string field, IEnumerable<ReadOnlyMemory<char>> rawText)>>(Array.Empty<(string, IEnumerable<ReadOnlyMemory<char>>)>());
         }
     }
 }

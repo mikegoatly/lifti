@@ -30,7 +30,10 @@ namespace Lifti.Tests.Querying
             this.field2Tokenizer = new FakeIndexTokenizer();
             var textExtractor = new PlainTextExtractor();
 
-            var nullFieldReader = (TestObject x, CancellationToken token) => new ValueTask<IEnumerable<string>>(Array.Empty<string>());
+            static ValueTask<IEnumerable<ReadOnlyMemory<char>>> nullFieldReader(TestObject x, CancellationToken token)
+            {
+                return new ValueTask<IEnumerable<ReadOnlyMemory<char>>>([]);
+            }
 
             this.fieldLookup = new FakeIndexedFieldLookup(
                 ("testfield", IndexedFieldDetails<TestObject>.Static(testFieldId, "testfield", nullFieldReader, textExtractor, this.field1Tokenizer, thesaurus, 1D)),

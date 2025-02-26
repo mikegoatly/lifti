@@ -184,6 +184,44 @@ namespace Lifti
                     await this.MutateAsync(
                         m =>
                         {
+                            var tokens = ExtractDocumentTokens(text.Select(t => t.AsMemory()), this.DefaultTextExtractor, this.DefaultTokenizer, this.DefaultThesaurus);
+                            this.AddForDefaultField(m, key, tokens);
+                        },
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                },
+                cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public async Task AddAsync(TKey key, IEnumerable<ReadOnlyMemory<char>> text, CancellationToken cancellationToken = default)
+        {
+            await this.PerformWriteLockedActionAsync(
+                async () =>
+                {
+                    await this.MutateAsync(
+                        m =>
+                        {
+                            var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer, this.DefaultThesaurus);
+                            this.AddForDefaultField(m, key, tokens);
+                        },
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                },
+                cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public async Task AddAsync(TKey key, ReadOnlyMemory<char> text, CancellationToken cancellationToken = default)
+        {
+            await this.PerformWriteLockedActionAsync(
+                async () =>
+                {
+                    await this.MutateAsync(
+                        m =>
+                        {
                             var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer, this.DefaultThesaurus);
                             this.AddForDefaultField(m, key, tokens);
                         },
@@ -203,7 +241,7 @@ namespace Lifti
                     await this.MutateAsync(
                         m =>
                         {
-                            var tokens = ExtractDocumentTokens(text, this.DefaultTextExtractor, this.DefaultTokenizer, this.DefaultThesaurus);
+                            var tokens = ExtractDocumentTokens(text.AsMemory(), this.DefaultTextExtractor, this.DefaultTokenizer, this.DefaultThesaurus);
                             this.AddForDefaultField(m, key, tokens);
                         },
                         cancellationToken)
@@ -318,7 +356,7 @@ namespace Lifti
         }
 
         private static List<Token> ExtractDocumentTokens(
-            IEnumerable<string> documentTextFragments,
+            IEnumerable<ReadOnlyMemory<char>> documentTextFragments,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus)
@@ -327,7 +365,7 @@ namespace Lifti
             var fragments = Enumerable.Empty<DocumentTextFragment>();
             foreach (var documentText in documentTextFragments)
             {
-                fragments = fragments.Concat(textExtractor.Extract(documentText.AsMemory(), documentOffset));
+                fragments = fragments.Concat(textExtractor.Extract(documentText, documentOffset));
                 documentOffset += documentText.Length;
             }
 
@@ -335,12 +373,12 @@ namespace Lifti
         }
 
         private static List<Token> ExtractDocumentTokens(
-            string documentText,
+            ReadOnlyMemory<char> documentText,
             ITextExtractor textExtractor,
             IIndexTokenizer tokenizer,
             IThesaurus thesaurus)
         {
-            var fragments = textExtractor.Extract(documentText.AsMemory(), 0);
+            var fragments = textExtractor.Extract(documentText, 0);
             return TokenizeFragments(tokenizer, thesaurus, fragments);
         }
 

@@ -73,6 +73,10 @@ namespace Lifti
         /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
         Task AddAsync(TKey key, string text, CancellationToken cancellationToken = default);
 
+
+        /// <inheritdoc cref="AddAsync(TKey, string, CancellationToken)" />
+        Task AddAsync(TKey key, ReadOnlyMemory<char> text, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Indexes some text against a given key.
         /// </summary>
@@ -80,6 +84,9 @@ namespace Lifti
         /// <param name="text">The text to index against the document.</param>
         /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> for the operation.</param>
         Task AddAsync(TKey key, IEnumerable<string> text, CancellationToken cancellationToken = default);
+
+        /// <inheritdoc cref="AddAsync(TKey, IEnumerable{string}, CancellationToken)" />
+        Task AddAsync(TKey key, IEnumerable<ReadOnlyMemory<char>> text, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Indexes a single document extracted from type <typeparamref name="TObject"/>. This type must have been

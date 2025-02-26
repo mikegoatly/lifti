@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,6 +22,6 @@ namespace Lifti.Tokenization.Objects
         /// <summary>
         /// Reads the field's text from the given item.
         /// </summary>
-        ValueTask<IEnumerable<string>> ReadAsync(TObject item, CancellationToken cancellationToken);
+        ValueTask<IEnumerable<ReadOnlyMemory<char>>> ReadAsync(TObject item, CancellationToken cancellationToken);
     }
 }

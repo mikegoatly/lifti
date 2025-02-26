@@ -69,6 +69,16 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task IndexingReadOnlyMemory_ShouldBeSearchable()
+        {
+            await this.index.AddAsync("A", "foo".AsMemory());
+
+            var results = this.index.Search("foo");
+
+            results.Should().HaveCount(1);
+        }
+
+        [Fact]
         public async Task IndexedEmoji_ShouldBeSearchable()
         {
             await this.index.AddAsync("A", new[] { "🎶" });
@@ -90,6 +100,22 @@ namespace Lifti.Tests
         public async Task IndexingMultipleStringsAgainstOneItem_ShouldStoreLocationsOfWordsCorrectlyAcrossFragments()
         {
             await this.index.AddAsync("A", new[] { "test test", "  test" });
+
+            var results = this.index.Search("test");
+            results.Should().HaveCount(1);
+            results.Single().FieldMatches.Single().Locations.Should().BeEquivalentTo(
+                new[]
+                {
+                    new TokenLocation(0, 0, 4),
+                    new TokenLocation(1, 5, 4),
+                    new TokenLocation(2, 11, 4)
+                });
+        }
+
+        [Fact]
+        public async Task IndexingMultipleReadOnlyMemoryAgainstOneItem_ShouldStoreLocationsOfWordsCorrectlyAcrossFragments()
+        {
+            await this.index.AddAsync("A", new[] { "test test".AsMemory(), "  test".AsMemory() });
 
             var results = this.index.Search("test");
             results.Should().HaveCount(1);
@@ -651,13 +677,13 @@ namespace Lifti.Tests
                 this.Id = id;
                 this.Text1 = text1;
                 this.Text2 = text2;
-                this.Text3 = text3;
+                this.Text3 = text3.AsMemory();
             }
 
             public string Id { get; }
             public string Text1 { get; }
             public string Text2 { get; }
-            public string Text3 { get; }
+            public ReadOnlyMemory<char> Text3 { get; }
         }
 
         public record TestObject2(string Id, params string[] Text);

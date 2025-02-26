@@ -30,7 +30,7 @@ namespace Lifti.Tokenization.Objects
             this.getFieldText = getFieldText;
         }
 
-        public override ValueTask<IEnumerable<(string field, IEnumerable<string> rawText)>> ReadAsync(TObject item, CancellationToken cancellationToken)
+        public override ValueTask<IEnumerable<(string field, IEnumerable<ReadOnlyMemory<char>> rawText)>> ReadAsync(TObject item, CancellationToken cancellationToken)
         {
             var childObjects = this.getChildObjects(item);
             if (childObjects == null)
@@ -38,13 +38,13 @@ namespace Lifti.Tokenization.Objects
                 return EmptyFieldSet();
             }
 
-            return new ValueTask<IEnumerable<(string, IEnumerable<string>)>>(
+            return new ValueTask<IEnumerable<(string, IEnumerable<ReadOnlyMemory<char>>)>>(
                 childObjects
                     .Select(x => (this.GetPrefixedFieldName(this.getFieldName(x)), this.ReadFieldValueAsEnumerable(this.getFieldText(x))))
                     .ToList());
         }
 
-        public override ValueTask<IEnumerable<string>> ReadAsync(TObject item, string fieldName, CancellationToken cancellationToken)
+        public override ValueTask<IEnumerable<ReadOnlyMemory<char>>> ReadAsync(TObject item, string fieldName, CancellationToken cancellationToken)
         {
             var unprefixedFieldName = this.GetUnprefixedFieldName(fieldName);
 
@@ -62,9 +62,9 @@ namespace Lifti.Tokenization.Objects
                 return EmptyField();
             }
 
-            return new ValueTask<IEnumerable<string>>(this.ReadFieldValueAsEnumerable(this.getFieldText(childObject)));
+            return new ValueTask<IEnumerable<ReadOnlyMemory<char>>>(this.ReadFieldValueAsEnumerable(this.getFieldText(childObject)));
         }
 
-        protected abstract IEnumerable<string> ReadFieldValueAsEnumerable(TValue fieldValue);
+        protected abstract IEnumerable<ReadOnlyMemory<char>> ReadFieldValueAsEnumerable(TValue fieldValue);
     }
 }

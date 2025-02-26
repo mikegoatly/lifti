@@ -105,10 +105,28 @@ namespace Lifti.Tokenization.Objects
             Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
             double scoreBoost = 1D)
         {
+            return this.WithField(
+                name,
+                item => fieldTextReader(item).AsMemory(),
+                tokenizationOptions,
+                textExtractor,
+                thesaurusOptions,
+                scoreBoost);
+        }
+
+        /// <inheritdoc cref="WithField(string, Func{TObject, string}, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?, double)"/>"
+        public ObjectTokenizationBuilder<TObject, TKey> WithField(
+            string name,
+            Func<TObject, ReadOnlyMemory<char>> fieldTextReader,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
+        {
             ValidateFieldParameters(name, fieldTextReader);
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.fieldReaderBuilders.Add(
-                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringFieldReader<TObject>(
+                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new TextFieldReader<TObject>(
                     name,
                     fieldTextReader,
                     tokenizer ?? defaultTokenizer,
@@ -257,6 +275,30 @@ namespace Lifti.Tokenization.Objects
             Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
             double scoreBoost = 1D)
         {
+            return this.WithDynamicFields(
+                dynamicFieldReaderName,
+                dynamicFieldReader,
+                getFieldName,
+                item => getFieldText(item).AsMemory(),
+                fieldNamePrefix,
+                tokenizationOptions,
+                textExtractor,
+                thesaurusOptions,
+                scoreBoost);
+        }
+
+        /// <inheritdoc cref="WithDynamicFields{TChild}(string, Func{TObject, ICollection{TChild}}, Func{TChild, string}, Func{TChild, string}, string?, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?, double)"/>
+        public ObjectTokenizationBuilder<TObject, TKey> WithDynamicFields<TChild>(
+           string dynamicFieldReaderName,
+           Func<TObject, ICollection<TChild>?> dynamicFieldReader,
+           Func<TChild, string> getFieldName,
+           Func<TChild, ReadOnlyMemory<char>> getFieldText,
+           string? fieldNamePrefix = null,
+           Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+           ITextExtractor? textExtractor = null,
+           Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+           double scoreBoost = 1D)
+        {
             if (dynamicFieldReader == null)
             {
                 throw new ArgumentNullException(nameof(dynamicFieldReader));
@@ -290,6 +332,30 @@ namespace Lifti.Tokenization.Objects
             Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
             double scoreBoost = 1D)
         {
+            return this.WithDynamicFields(
+                dynamicFieldReaderName,
+                dynamicFieldReader,
+                getFieldName,
+                item => getFieldText(item).Select(s => s.AsMemory()),
+                fieldNamePrefix,
+                tokenizationOptions,
+                textExtractor,
+                thesaurusOptions,
+                scoreBoost);
+        }
+
+        /// <inheritdoc cref="WithDynamicFields{TChild}(string, Func{TObject, ICollection{TChild}}, Func{TChild, string}, Func{TChild, string}, string?, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?, double)"/>
+        public ObjectTokenizationBuilder<TObject, TKey> WithDynamicFields<TChild>(
+            string dynamicFieldReaderName,
+            Func<TObject, ICollection<TChild>?> dynamicFieldReader,
+            Func<TChild, string> getFieldName,
+            Func<TChild, IEnumerable<ReadOnlyMemory<char>>> getFieldText,
+            string? fieldNamePrefix = null,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
+        {
             if (dynamicFieldReader == null)
             {
                 throw new ArgumentNullException(nameof(dynamicFieldReader));
@@ -297,7 +363,7 @@ namespace Lifti.Tokenization.Objects
 
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.dynamicFieldReaderBuilders.Add(
-                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new StringArrayChildObjectDynamicFieldReader<TObject, TChild>(
+                (defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) => new ArrayChildObjectDynamicFieldReader<TObject, TChild>(
                     dynamicFieldReader,
                     getFieldName,
                     getFieldText,
@@ -343,10 +409,28 @@ namespace Lifti.Tokenization.Objects
             Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
             double scoreBoost = 1D)
         {
+            return this.WithField(
+                name,
+                item => reader(item).Select(s => s.AsMemory()),
+                tokenizationOptions,
+                textExtractor,
+                thesaurusOptions,
+                scoreBoost);
+        }
+
+        /// <inheritdoc cref="WithField(string, Func{TObject, IEnumerable{string}}, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?, double)"/>
+        public ObjectTokenizationBuilder<TObject, TKey> WithField(
+            string name,
+            Func<TObject, IEnumerable<ReadOnlyMemory<char>>> reader,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
+        {
             ValidateFieldParameters(name, reader);
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.fieldReaderBuilders.Add((defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) =>
-                new StringArrayFieldReader<TObject>(
+                new ArrayFieldReader<TObject>(
                     name,
                     reader,
                     tokenizer ?? defaultTokenizer,
@@ -389,10 +473,28 @@ namespace Lifti.Tokenization.Objects
             Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
             double scoreBoost = 1D)
         {
+            return this.WithField(
+                name,
+                async (item, ctx) => (await fieldTextReader(item, ctx).ConfigureAwait(false)).AsMemory(),
+                tokenizationOptions,
+                textExtractor,
+                thesaurusOptions,
+                scoreBoost);
+        }
+
+        /// <inheritdoc cref="WithField(string, Func{TObject, CancellationToken, Task{string}}, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?, double)"/>
+        public ObjectTokenizationBuilder<TObject, TKey> WithField(
+            string name,
+            Func<TObject, CancellationToken, Task<ReadOnlyMemory<char>>> fieldTextReader,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
+        {
             ValidateFieldParameters(name, fieldTextReader);
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.fieldReaderBuilders.Add((defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) =>
-                new AsyncStringFieldReader<TObject>(
+                new AsyncFieldReader<TObject>(
                     name,
                     fieldTextReader,
                     tokenizer ?? defaultTokenizer,
@@ -414,7 +516,7 @@ namespace Lifti.Tokenization.Objects
         {
             return this.WithField(
                 name,
-                (item, ctx) => fieldTextReader(item),
+                async (item, ctx) => (await fieldTextReader(item).ConfigureAwait(false)).AsMemory(),
                 tokenizationOptions,
                 textExtractor,
                 thesaurusOptions,
@@ -453,10 +555,28 @@ namespace Lifti.Tokenization.Objects
             Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
             double scoreBoost = 1D)
         {
+            return this.WithField(
+                name,
+                async (item, ctx) => (await fieldTextReader(item, ctx).ConfigureAwait(false)).Select(s => s.AsMemory()),
+                tokenizationOptions,
+                textExtractor,
+                thesaurusOptions,
+                scoreBoost);
+        }
+
+        /// <inheritdoc cref="WithField(string, Func{TObject, CancellationToken, Task{IEnumerable{string}}}, Func{TokenizerBuilder, TokenizerBuilder}?, ITextExtractor?, Func{ThesaurusBuilder, ThesaurusBuilder}?, double)" />
+        public ObjectTokenizationBuilder<TObject, TKey> WithField(
+            string name,
+            Func<TObject, CancellationToken, Task<IEnumerable<ReadOnlyMemory<char>>>> fieldTextReader,
+            Func<TokenizerBuilder, TokenizerBuilder>? tokenizationOptions = null,
+            ITextExtractor? textExtractor = null,
+            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
+            double scoreBoost = 1D)
+        {
             ValidateFieldParameters(name, fieldTextReader);
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.fieldReaderBuilders.Add((defaultTokenizer, defaultThesaurusBuilder, defaultTextExtractor) =>
-                new AsyncStringArrayFieldReader<TObject>(
+                new AsyncArrayFieldReader<TObject>(
                     name,
                     fieldTextReader,
                     tokenizer ?? defaultTokenizer,
