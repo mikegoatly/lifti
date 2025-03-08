@@ -15,3 +15,5 @@ Lifti.Tokenization.Objects.ObjectTokenizationBuilder<TObject, TKey>.WithField(st
 override Lifti.IndexedFieldDetails<TObject>.ReadAsync(object! item, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IEnumerable<System.ReadOnlyMemory<char>>!>
 *REMOVED*abstract Lifti.IndexedFieldDetails.ReadAsync(object! item, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IEnumerable<string!>!>
 *REMOVED*override Lifti.IndexedFieldDetails<TObject>.ReadAsync(object! item, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IEnumerable<string!>!>
+override Lifti.QueryExecutionPlan.ToString() -> string!
+override Lifti.QueryExecutionPlanNode.ToString() -> string!

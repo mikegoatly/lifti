@@ -2,7 +2,9 @@
 using Lifti.Querying.QueryParts;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
+using System.Globalization;
+using System.Text;
 
 namespace Lifti
 {
@@ -10,6 +12,7 @@ namespace Lifti
     /// The execution plan for a query. Can be used to determine the order and timing of the query parts,
     /// along with information such as the number of documents returned at each stage.
     /// </summary>
+    [DebuggerDisplay("{Root}")]
     public class QueryExecutionPlan
     {
         internal QueryExecutionPlan(int resultCount, ExecutionTimings executionTimings)
@@ -21,7 +24,7 @@ namespace Lifti
 
             // We're going to loop through the timings. Each time the parent node changes, we'll create
             // a new node and add it to the graph.
-            int executionOrder = 1;
+            var executionOrder = 1;
             Stack<QueryExecutionPlanNode> children = new(2);
 
             (QueryExecutionPlanNode left, QueryExecutionPlanNode right)? PopChildren()
@@ -69,6 +72,12 @@ namespace Lifti
         /// contribute towards the final result.
         /// </summary>
         public QueryExecutionPlanNode Root { get; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return this.Root.ToString();
+        }
     }
 
     /// <summary>
@@ -140,7 +149,7 @@ namespace Lifti
             this.ExecutionOrder = executionOrder;
             this.ResultingDocumentCount = resultCount;
 
-            if (currentPart != null)
+            if (currentPart is not null)
             {
                 this.ExclusiveTiming = currentPart.ExecutionTime;
 
@@ -256,5 +265,47 @@ namespace Lifti
         /// Any child nodes of this node.
         /// </summary>
         public (QueryExecutionPlanNode left, QueryExecutionPlanNode right)? Children { get; }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            BuildString(sb, this, 0);
+            return sb.ToString();
+        }
+
+        private static void BuildString(StringBuilder sb, QueryExecutionPlanNode node, int indentLevel)
+        {
+            var indent = new string(' ', indentLevel * 2);
+            sb.AppendLine(CultureInfo.InvariantCulture, $"{indent}Node: {node.Text}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"{indent}  Kind: {node.Kind}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"{indent}  Execution Order: {node.ExecutionOrder}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"{indent}  Resulting Document Count: {node.ResultingDocumentCount}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"{indent}  Exclusive Timing: {node.ExclusiveTiming.TotalMilliseconds.ToString("0.##", CultureInfo.CurrentCulture)}ms");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"{indent}  Inclusive Timing: {node.InclusiveTiming.TotalMilliseconds.ToString("0.##", CultureInfo.CurrentCulture)}ms");
+
+            if (node.DocumentFiltersApplied is not null)
+            {
+                sb.AppendLine(CultureInfo.InvariantCulture, $"{indent}  Document Filters Applied: {node.DocumentFiltersApplied}");
+            }
+
+            if (node.FieldFiltersApplied is not null)
+            {
+                sb.AppendLine(CultureInfo.InvariantCulture, $"{indent}  Field Filters Applied: {node.FieldFiltersApplied}");
+            }
+
+            if (node.Weighting is not null)
+            {
+                sb.AppendLine(CultureInfo.InvariantCulture, $"{indent}  Weighting: {node.Weighting.Value.ToString("0.##", CultureInfo.CurrentCulture)}");
+            }
+
+            if (node.Children is (var left, var right))
+            {
+                sb.AppendLine(CultureInfo.InvariantCulture, $"{indent}  Children:");
+                var nextIndent = indentLevel + 1;
+                BuildString(sb, left, nextIndent);
+                BuildString(sb, right, nextIndent);
+            }
+        }
     }
 }
