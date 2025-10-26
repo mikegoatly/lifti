@@ -17,7 +17,7 @@ namespace Lifti.Tests.Querying
                 10,
                 new IndexStatistics(new Dictionary<byte, long>() { { 1, 100 } }, 100), // 100 total tokens in 1 field
                 Enumerable.Range(0, 10)
-                    .Select(id => (id, DocumentMetadata.ForLooseText(id, id, new DocumentStatistics(1, id * 3))))
+                    .Select(id => (id, DocumentMetadata.ForLooseText(id, id, new DocumentStatistics(1, id * 3, id * 3 - 1))))
                     .ToArray(), // Each item will have (id * 3) tokens in it
                 Array.Empty<(byte, Func<DocumentMetadata, double>)>());
 
@@ -29,7 +29,7 @@ namespace Lifti.Tests.Querying
                         (byte)((id % 3) + 1), // Each item will be assigned to object type 1, 2, or 3 
                         id,
                         id,
-                        new DocumentStatistics(1, id * 3),
+                        new DocumentStatistics(1, id * 3, id * 3 - 1),
                         null,
                         null)))
                     .ToArray(), // Each item will have (id * 3) tokens in it

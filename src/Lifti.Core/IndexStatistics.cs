@@ -64,10 +64,10 @@ namespace Lifti
 
         private void Adjust(DocumentStatistics documentStatistics, int direction)
         {
-            foreach (var fieldTokenCount in documentStatistics.TokenCountByField)
+            foreach (var (fieldId, stats) in documentStatistics.StatisticsByField)
             {
-                this.tokenCountByField.TryGetValue(fieldTokenCount.Key, out var previousCount);
-                this.tokenCountByField[fieldTokenCount.Key] = previousCount + (fieldTokenCount.Value * direction);
+                this.tokenCountByField.TryGetValue(fieldId, out var previousCount);
+                this.tokenCountByField[fieldId] = previousCount + (stats.TokenCount * direction);
             }
 
             this.TotalTokenCount += documentStatistics.TotalTokenCount * direction;

@@ -10,7 +10,7 @@ namespace Lifti.Serialization.Binary
 {
     internal class IndexWriter<TKey> : IndexSerializerBase<TKey>
     {
-        private const ushort Version = 6;
+        private const ushort Version = 7;
         private readonly Stream underlyingStream;
         private readonly bool disposeStream;
         private readonly IKeySerializer<TKey> keySerializer;
@@ -86,11 +86,14 @@ namespace Lifti.Serialization.Binary
                 // read from an object
                 this.writer.WriteNonNegativeVarInt32(documentMetadata.Id);
                 this.keySerializer.Write(this.writer, documentMetadata.Key);
-                this.writer.WriteNonNegativeVarInt32(documentMetadata.DocumentStatistics.TokenCountByField.Count);
-                foreach (var fieldTokenCount in documentMetadata.DocumentStatistics.TokenCountByField)
+
+                // Write field statistics (new unified format in V7)
+                this.writer.WriteNonNegativeVarInt32(documentMetadata.DocumentStatistics.StatisticsByField.Count);
+                foreach (var (fieldId, stats) in documentMetadata.DocumentStatistics.StatisticsByField)
                 {
-                    this.writer.Write(fieldTokenCount.Key);
-                    this.writer.WriteNonNegativeVarInt32(fieldTokenCount.Value);
+                    this.writer.Write(fieldId);
+                    this.writer.WriteNonNegativeVarInt32(stats.TokenCount);
+                    this.writer.WriteNonNegativeVarInt32(stats.LastTokenIndex);
                 }
 
                 // If the object is associated to an object type, write the object type id and any

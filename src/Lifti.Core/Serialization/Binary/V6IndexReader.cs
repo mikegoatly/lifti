@@ -40,33 +40,48 @@ namespace Lifti.Serialization.Binary
                     totalTokenCount += wordCount;
                 }
 
-                var documentStatistics = new DocumentStatistics(fieldTokenCounts, totalTokenCount);
-
-                // Now read the object type information, if any
-                var objectBitMaskInfo = this.reader.ReadByte();
-                if (objectBitMaskInfo != 0)
+                // Convert to unified FieldStatistics format (V6 doesn't have LastTokenIndex, so use -1)
+                var statisticsByField = new Dictionary<byte, FieldStatistics>(fieldTokenCounts.Count);
+                foreach (var (fieldId, tokenCount) in fieldTokenCounts)
                 {
-                    // The object bit mask is:
-                    // 0-4: The object type id
-                    // 5: 1 - the object has a scoring freshness date
-                    // 6: 1 - the object has a scoring magnitude
-                    // 7: RESERVED for now
-                    var objectTypeId = (byte)(objectBitMaskInfo & 0x1F);
-                    var hasScoringFreshnessDate = (objectBitMaskInfo & 0x20) != 0;
-                    var hasScoringMagnitude = (objectBitMaskInfo & 0x40) != 0;
-
-                    DateTime? freshnessDate = hasScoringFreshnessDate ? new DateTime(this.reader.ReadInt64()) : null;
-                    double? magnitude = hasScoringMagnitude ? this.reader.ReadDouble() : null;
-
-                    documentMetadataCollector.Add(DocumentMetadata.ForObject(objectTypeId, id, key, documentStatistics, freshnessDate, magnitude));
+                    statisticsByField.Add(fieldId, new FieldStatistics(tokenCount, -1));
                 }
-                else
-                {
-                    documentMetadataCollector.Add(DocumentMetadata.ForLooseText(id, key, documentStatistics));
-                }
+
+                var documentStatistics = new DocumentStatistics(statisticsByField, totalTokenCount);
+                this.ReadObjectTypeInformation(documentMetadataCollector, id, key, documentStatistics);
             }
 
             return new(documentMetadataCollector);
         }
+
+        protected void ReadObjectTypeInformation(
+            DocumentMetadataCollector<TKey> documentMetadataCollector,
+            int id,
+            TKey key,
+            DocumentStatistics documentStatistics)
+        {
+            var objectBitMaskInfo = this.reader.ReadByte();
+            if (objectBitMaskInfo != 0)
+            {
+                // The object bit mask is:
+                // 0-4: The object type id
+                // 5: 1 - the object has a scoring freshness date
+                // 6: 1 - the object has a scoring magnitude
+                // 7: RESERVED for now
+                var objectTypeId = (byte)(objectBitMaskInfo & 0x1F);
+                var hasScoringFreshnessDate = (objectBitMaskInfo & 0x20) != 0;
+                var hasScoringMagnitude = (objectBitMaskInfo & 0x40) != 0;
+
+                DateTime? freshnessDate = hasScoringFreshnessDate ? new DateTime(this.reader.ReadInt64()) : null;
+                double? magnitude = hasScoringMagnitude ? this.reader.ReadDouble() : null;
+
+                documentMetadataCollector.Add(DocumentMetadata.ForObject(objectTypeId, id, key, documentStatistics, freshnessDate, magnitude));
+            }
+            else
+            {
+                documentMetadataCollector.Add(DocumentMetadata.ForLooseText(id, key, documentStatistics));
+            }
+        }
+
     }
 }

@@ -183,6 +183,123 @@ namespace Lifti.Tests.Serialization
         }
 
         [Fact]
+        public async Task V7SerializationShouldPreserveLastTokenIndices()
+        {
+            var index = new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<DynamicFieldObject>(
+                    cfg => cfg
+                        .WithKey(x => x.Id)
+                        .WithField("Name", x => x.Name)
+                        .WithField("SomethingElse", x => x.SomethingElse))
+                .Build();
+
+            await index.AddAsync(new DynamicFieldObject
+            {
+                Id = 1,
+                Name = "Single",  // 1 token, last index = 0
+                SomethingElse = "Multiple tokens here"  // 3 tokens, last index = 2
+            });
+
+            await index.AddAsync(new DynamicFieldObject
+            {
+                Id = 2,
+                Name = "First Second Third Fourth",  // 4 tokens, last index = 3
+                SomethingElse = "One"  // 1 token, last index = 0
+            });
+
+            var deserializedIndex = new FullTextIndexBuilder<int>()
+                .WithObjectTokenization<DynamicFieldObject>(
+                    cfg => cfg
+                        .WithKey(x => x.Id)
+                        .WithField("Name", x => x.Name)
+                        .WithField("SomethingElse", x => x.SomethingElse))
+                .Build();
+
+            await SerializeAndDeserializeAsync(index, deserializedIndex);
+
+            // Verify last token indices are preserved
+            // Document IDs are 0 and 1, even though keys are 1 and 2
+            var doc1 = deserializedIndex.Metadata.GetDocumentMetadata(0);
+            doc1.DocumentStatistics.StatisticsByField.Should().NotBeEmpty();
+            doc1.DocumentStatistics.StatisticsByField.Should().HaveCount(2);
+            // Verify that LastTokenIndex values are set (not -1)
+            doc1.DocumentStatistics.StatisticsByField.Values.Should().AllSatisfy(s => s.LastTokenIndex.Should().BeGreaterOrEqualTo(0));
+
+            var doc2 = deserializedIndex.Metadata.GetDocumentMetadata(1);
+            doc2.DocumentStatistics.StatisticsByField.Should().NotBeEmpty();
+            doc2.DocumentStatistics.StatisticsByField.Should().HaveCount(2);
+            // Verify that LastTokenIndex values are set (not -1)
+            doc2.DocumentStatistics.StatisticsByField.Values.Should().AllSatisfy(s => s.LastTokenIndex.Should().BeGreaterOrEqualTo(0));
+
+            // Verify search still works
+            deserializedIndex.Search("Single").Should().HaveCount(1);
+            deserializedIndex.Search("Multiple").Should().HaveCount(1);
+        }
+
+        [Fact]
+        public async Task V7SerializationRoundTrip_ShouldPreserveAllData()
+        {
+            var index = await CreateWikipediaIndexAsync();
+            var deserializedIndex = new FullTextIndexBuilder<string>()
+                .WithTextExtractor<XmlTextExtractor>()
+                .WithDefaultTokenization(o => o.WithStemming())
+                .Build();
+
+            var serializer = new BinarySerializer<string>();
+            using var stream = new MemoryStream();
+            await serializer.SerializeAsync(index, stream, false);
+            stream.Position = 0;
+            await serializer.DeserializeAsync(deserializedIndex, stream);
+
+            // Verify all documents have last token index metadata
+            foreach (var doc in deserializedIndex.Metadata.GetIndexedDocuments())
+            {
+                doc.DocumentStatistics.StatisticsByField.Should().NotBeEmpty(
+                    $"document {doc.Key} should have field statistics");
+                // Verify that LastTokenIndex values are set (not -1)
+                doc.DocumentStatistics.StatisticsByField.Values.Should().AllSatisfy(s => s.LastTokenIndex.Should().BeGreaterOrEqualTo(0),
+                    $"document {doc.Key} should have last token index metadata");
+            }
+
+            // Verify searching works
+            deserializedIndex.Search("test").Should().NotBeEmpty();
+        }
+
+        [Fact]
+        public async Task ShouldDeserializeV7Index()
+        {
+            var index = CreateObjectIndex();
+
+            var serializer = new BinarySerializer<int>();
+            using (var stream = new MemoryStream(TestResources.v7Index))
+            {
+                await serializer.DeserializeAsync(index, stream);
+            }
+
+            index.Search("serialized").Should().HaveCount(1);
+            index.Search("亜").Should().HaveCount(1);
+
+            // V7 index should have field statistics metadata
+            // The index has 4 fields: Name, SomethingElse, Foo (dynamic), Bar (dynamic)
+            var doc1 = index.Metadata.GetDocumentMetadata(0);
+            doc1.DocumentStatistics.StatisticsByField.Should().NotBeEmpty();
+            doc1.DocumentStatistics.StatisticsByField.Should().HaveCount(4);
+
+            var doc2 = index.Metadata.GetDocumentMetadata(1);
+            doc2.DocumentStatistics.StatisticsByField.Should().NotBeEmpty();
+            doc2.DocumentStatistics.StatisticsByField.Should().HaveCount(4);
+
+            var objectScoreBoostMetadata = index.Metadata.GetObjectTypeScoreBoostMetadata(1);
+            // The first item in the index wins for both score boosts, each with a weighting of 10.
+            objectScoreBoostMetadata.CalculateScoreBoost(index.Metadata.GetDocumentMetadata(0))
+                .Should().Be(20D);
+
+            // The first item in the index is at the bottom end of both scales, so should return 2.
+            objectScoreBoostMetadata.CalculateScoreBoost(index.Metadata.GetDocumentMetadata(1))
+                .Should().Be(2D);
+        }
+
+        [Fact]
         public async Task ShouldDeserializeV6Index()
         {
             var index = CreateObjectIndex();
@@ -300,13 +417,6 @@ namespace Lifti.Tests.Serialization
             using (var stream = File.Open(fileName, FileMode.CreateNew))
             {
                 var stopwatch = Stopwatch.StartNew();
-
-/* Unmerged change from project 'Lifti.Tests (net8.0)'
-Before:
-                var index = await this.CreateWikipediaIndexAsync();
-After:
-                var index = await CreateWikipediaIndexAsync();
-*/
                 var index = await BinarySerializerTests.CreateWikipediaIndexAsync();
                 await serializer.SerializeAsync(index, stream, false);
 
@@ -452,7 +562,7 @@ After:
         //    });
 
         //    var serializer = new BinarySerializer<int>();
-        //    using var stream = File.Open("../../../V6.dat", FileMode.Create);
+        //    using var stream = File.Open("../../../V7.dat", FileMode.Create);
         //    await serializer.SerializeAsync(index, stream, true);
         //}
 

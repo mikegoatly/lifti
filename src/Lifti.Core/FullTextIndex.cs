@@ -390,9 +390,16 @@ namespace Lifti
         private void AddForDefaultField(IndexMutation<TKey> mutation, TKey key, List<Token> tokens)
         {
             var fieldId = this.FieldLookup.DefaultField;
+            var fieldStatistics = tokens.CalculateFieldStatistics();
+
+            var documentStatistics = new DocumentStatistics(
+                fieldId,
+                fieldStatistics.TokenCount,
+                fieldStatistics.LastTokenIndex);
+
             var documentId = this.GetUniqueIdForDocument(
                 key,
-                new DocumentStatistics(fieldId, tokens.CalculateTotalTokenCount()),
+                documentStatistics,
                 mutation);
 
             IndexTokens(mutation, documentId, fieldId, tokens);
@@ -526,10 +533,14 @@ namespace Lifti
                 }
             }
 
+            var statisticsByField = fieldTokens.ToDictionary(
+                t => t.Key,
+                t => t.Value.CalculateFieldStatistics());
+            var totalTokenCount = statisticsByField.Values.Sum(s => s.TokenCount);
+
             var documentStatistics = new DocumentStatistics(
-                fieldTokens.ToDictionary(
-                    t => t.Key,
-                    t => t.Value.CalculateTotalTokenCount()));
+                statisticsByField,
+                totalTokenCount);
 
             var documentId = this.GetUniqueIdForDocument(item, key, documentStatistics, options, indexMutation);
 
