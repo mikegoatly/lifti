@@ -184,7 +184,10 @@ namespace Lifti.Tests
 
         private static DocumentStatistics DocumentStatistics(params (byte fieldId, int tokenCount)[] fieldWordCounts)
         {
-            return new DocumentStatistics(fieldWordCounts.ToDictionary(f => f.fieldId, f => f.tokenCount));
+            var statisticsByField = fieldWordCounts.ToDictionary(
+                f => f.fieldId,
+                f => new FieldStatistics(f.tokenCount, f.tokenCount));
+            return new DocumentStatistics(statisticsByField, fieldWordCounts.Sum(f => f.tokenCount));
         }
 
         private static IndexStatistics IndexStatistics(params (byte fieldId, int wordCount)[] fieldTokenCounts)

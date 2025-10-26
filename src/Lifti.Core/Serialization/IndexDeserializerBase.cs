@@ -40,6 +40,10 @@ namespace Lifti.Serialization
             // Finally deserialize the index node hierarchy
             var rootNode = await this.DeserializeIndexNodeHierarchyAsync(fieldMap, index.IndexNodeFactory, cancellationToken).ConfigureAwait(false);
 
+            // Allow derived classes to update document metadata before restoring the index
+            // This is used by older format readers (V5, V6) to infer LastTokenIndex values
+            this.UpdateDocumentMetadata(documentMetadata);
+
             // Update the index with the deserialized information
             index.RestoreIndex(rootNode, documentMetadata);
 
@@ -69,6 +73,17 @@ namespace Lifti.Serialization
         protected virtual ValueTask OnDeserializationCompleteAsync(FullTextIndex<TKey> index, CancellationToken cancellationToken)
         {
             return default;
+        }
+
+        /// <summary>
+        /// Allows derived classes to update document metadata after deserialization but before the index is restored.
+        /// This is used by older format readers (V5, V6) to infer LastTokenIndex values that were not stored in those formats.
+        /// </summary>
+        /// <param name="documentMetadata">
+        /// The document metadata collection to update.
+        /// </param>
+        protected virtual void UpdateDocumentMetadata(DocumentMetadataCollector<TKey> documentMetadata)
+        {
         }
 
         /// <summary>

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,6 +16,7 @@ namespace Lifti.Serialization.Binary
         private readonly MemoryStream buffer;
         private long initialUnderlyingStreamOffset;
         protected readonly BinaryReader reader;
+        private Dictionary<(int documentId, byte fieldId), int> maxTokenIndices;
 
         public V5IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer)
         {
@@ -23,6 +26,22 @@ namespace Lifti.Serialization.Binary
 
             this.buffer = new MemoryStream((int)(this.underlyingStream.Length - this.underlyingStream.Position));
             this.reader = new BinaryReader(this.buffer);
+            this.maxTokenIndices = [];
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether LastTokenIndex values should be inferred from the index
+        /// structure during deserialization. Versions prior to V7 do not store LastTokenIndex, so it must be inferred.
+        /// </summary>
+        protected bool ShouldInferLastTokenIndices { get; init; } = true;
+
+        protected override void UpdateDocumentMetadata(DocumentMetadataCollector<TKey> documentMetadata)
+        {
+            if (this.ShouldInferLastTokenIndices)
+            {
+                // Update document metadata with inferred LastTokenIndex values
+                this.UpdateDocumentMetadataWithDerivedLastTokenIndices(documentMetadata);
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -98,7 +117,14 @@ namespace Lifti.Serialization.Binary
                     totalTokenCount += wordCount;
                 }
 
-                var documentStatistics = new DocumentStatistics(fieldTokenCounts, totalTokenCount);
+                // Convert to unified FieldStatistics format (V5 doesn't have LastTokenIndex, so use -1)
+                var statisticsByField = new Dictionary<byte, FieldStatistics>(fieldTokenCounts.Count);
+                foreach (var (fieldId, tokenCount) in fieldTokenCounts)
+                {
+                    statisticsByField.Add(fieldId, new FieldStatistics(tokenCount, -1));
+                }
+
+                var documentStatistics = new DocumentStatistics(statisticsByField, totalTokenCount);
 
                 // Using ForLooseText here because we don't know any of the new information associated to an object
                 // type, e.g. its id or score boost options. This is the closest we can get to the old format.
@@ -148,6 +174,12 @@ namespace Lifti.Serialization.Binary
                     this.ReadLocations(locationCount, locationMatches);
 
                     indexedTokens[fieldMatch] = new IndexedToken(fieldId, [.. locationMatches]);
+
+                    if (this.ShouldInferLastTokenIndices)
+                    {
+                        // Track the maximum token index for this (documentId, fieldId) pair
+                        this.CalculateDerivedMaxTokenIndex(documentId, fieldId, locationMatches);
+                    }
                 }
 
                 matches!.Add(documentId, indexedTokens);
@@ -157,6 +189,19 @@ namespace Lifti.Serialization.Binary
                 intraNodeText,
                 childNodes == null ? ChildNodeMap.Empty : new ChildNodeMap(childNodes),
                 matches == null ? DocumentTokenMatchMap.Empty : new DocumentTokenMatchMap(matches));
+        }
+
+        protected virtual void CalculateDerivedMaxTokenIndex(int documentId, byte fieldId, List<TokenLocation> locationMatches)
+        {
+            if (locationMatches.Count > 0)
+            {
+                var maxTokenIndexInThisMatch = locationMatches.Max(loc => loc.TokenIndex);
+                var key = (documentId, fieldId);
+                if (!this.maxTokenIndices.TryGetValue(key, out var currentMax) || maxTokenIndexInThisMatch > currentMax)
+                {
+                    this.maxTokenIndices[key] = maxTokenIndexInThisMatch;
+                }
+            }
         }
 
         /// <summary>
@@ -244,6 +289,54 @@ namespace Lifti.Serialization.Binary
             this.initialUnderlyingStreamOffset = this.underlyingStream.Position;
             await this.underlyingStream.CopyToAsync(this.buffer).ConfigureAwait(false);
             this.buffer.Position = 0;
+        }
+
+        /// <summary>
+        /// Updates the document metadata with inferred LastTokenIndex values from the tracked max token indices.
+        /// V5 format doesn't store LastTokenIndex, so we infer it from the index structure during deserialization.
+        /// </summary>
+        private void UpdateDocumentMetadataWithDerivedLastTokenIndices(DocumentMetadataCollector<TKey> documentMetadataCollector)
+        {
+            for (var i = 0; i < documentMetadataCollector.Collected.Count; i++)
+            {
+                var existingMetadata = documentMetadataCollector.Collected[i];
+                var existingStats = existingMetadata.DocumentStatistics;
+
+                // Build updated FieldStatistics with inferred LastTokenIndex values
+                var updatedStatsByField = new Dictionary<byte, FieldStatistics>();
+                foreach (var (fieldId, fieldStats) in existingStats.StatisticsByField)
+                {
+                    var key = (existingMetadata.Id, fieldId);
+                    var lastTokenIndex = this.maxTokenIndices.TryGetValue(key, out var maxIndex) ? maxIndex : -1;
+                    updatedStatsByField[fieldId] = new FieldStatistics(fieldStats.TokenCount, lastTokenIndex);
+                }
+
+                // Create new DocumentStatistics with updated field statistics
+                var updatedDocStats = new DocumentStatistics(updatedStatsByField, existingStats.TotalTokenCount);
+
+                // Recreate the DocumentMetadata with updated statistics, preserving object metadata if present
+                DocumentMetadata<TKey> updatedMetadata;
+                if (existingMetadata.ObjectTypeId.HasValue)
+                {
+                    updatedMetadata = DocumentMetadata.ForObject(
+                        existingMetadata.ObjectTypeId.Value,
+                        existingMetadata.Id,
+                        existingMetadata.Key,
+                        updatedDocStats,
+                        existingMetadata.ScoringFreshnessDate,
+                        existingMetadata.ScoringMagnitude);
+                }
+                else
+                {
+                    updatedMetadata = DocumentMetadata.ForLooseText(
+                        existingMetadata.Id,
+                        existingMetadata.Key,
+                        updatedDocStats);
+                }
+
+                // Replace in collection
+                documentMetadataCollector.Collected[i] = updatedMetadata;
+            }
         }
     }
 }

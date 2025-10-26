@@ -61,8 +61,8 @@ namespace Lifti.Querying
             else
             {
                 var documentMetadata = this.indexMetadata.GetDocumentMetadata(documentId);
-                var documentTokenCounts = documentMetadata.DocumentStatistics.TokenCountByField;
-                var tokensInDocument = documentTokenCounts[fieldId];
+                var fieldStats = documentMetadata.DocumentStatistics.StatisticsByField[fieldId];
+                var tokensInDocument = fieldStats.TokenCount;
                 tokensInDocumentWeighting = tokensInDocument / this.averageTokenCountByField[fieldId];
 
                 // We can cache the score boost for the field and object type (if applicable) because it won't
@@ -90,7 +90,7 @@ namespace Lifti.Querying
         {
             if (!this.idfCache.TryGetValue(matchedDocumentCount, out var idf))
             {
-                idf  = (this.documentCount - matchedDocumentCount + 0.5D)
+                idf = (this.documentCount - matchedDocumentCount + 0.5D)
                     / (matchedDocumentCount + 0.5D);
 
                 idf = Math.Log(1D + idf);

@@ -47,8 +47,6 @@ Lifti.DocumentPhrases<TKey>.SearchResult.get -> Lifti.SearchResult<TKey>!
 Lifti.DocumentPhrases<TKey>.SearchResult.init -> void
 Lifti.DocumentStatistics
 Lifti.DocumentStatistics.DocumentStatistics() -> void
-Lifti.DocumentStatistics.DocumentStatistics(System.Collections.Generic.IReadOnlyDictionary<byte, int>! tokenCountByField, int totalTokenCount) -> void
-Lifti.DocumentStatistics.TokenCountByField.get -> System.Collections.Generic.IReadOnlyDictionary<byte, int>!
 Lifti.DocumentStatistics.TotalTokenCount.get -> int
 Lifti.DocumentTokenMatchMap
 Lifti.DocumentTokenMatchMap.Count.get -> int

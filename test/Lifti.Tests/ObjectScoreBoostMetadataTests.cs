@@ -87,7 +87,7 @@ namespace Lifti.Tests
 
         private static DocumentMetadata<string> DocumentMetadata(DateTime? scoringFreshnessDate, double? scoringMagnitude)
         {
-            return Lifti.DocumentMetadata.ForObject(1, 1, "A", new DocumentStatistics(1, 2), scoringFreshnessDate, scoringMagnitude);
+            return Lifti.DocumentMetadata.ForObject(1, 1, "A", new DocumentStatistics(1, 2, 1), scoringFreshnessDate, scoringMagnitude);
         }
     }
 }
