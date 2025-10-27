@@ -29,6 +29,9 @@ west&nbsp;~3>&nbsp;wing|**west** must be [followed by](#near-following--and-n) *
 west&nbsp;>&nbsp;wing|**west** must [precede](#following-) **wing** anywhere in the text
 "the&nbsp;west&nbsp;wing"|The words **the west wing** must appear [in sequence](#sequential-text-) in the indexed text.
 "notr\*&nbsp;dam\*"|You can use [wildcards](#wildcard-matching) and [fuzzy matching](#fuzzy-match-) in a [sequential text](#sequential-text-) query. In this case, a word starting with **notr** must be immediately followed by a word starting with **dam**, e.g. **Notre Dame**.
+&lt;&lt;west|**west** must appear at the [start of a the text](#start-and-end-anchors--and-) (first token).
+east&gt;&gt;|**east** must appear at the [end of the text](#start-and-end-anchors--and-) (last token).
+&lt;&lt;single&gt;&gt;|The text must contain exactly the single word **single** [and nothing else](#start-and-end-anchors--and-).
 
 Search terms can be combined and placed in parenthesis:
 
@@ -80,6 +83,28 @@ Examples:
 * `*ing` would match `drifting` and `flying`
 * `%%%ld` would match `could` and `mould` (but **not** `should`, because it has 4 letters before the `ld`)
 * `%%p*` matches words starting with any two characters followed by `g`, then any zero or more characters, e.g. `map`, `caps`, `duped`
+
+---
+
+### Start and End anchors (`<<` and `>>`)
+
+> Applies to LIFTI v7 and later
+
+Anchor operators allow you to constrain matches to the start or end of content.
+
+* `<<term` matches only when `term` appears as the **first token** in the text (token index 0)
+* `term>>` matches only when `term` appears as the **last token** in the text
+* `<<term>>` matches only when `term` is both the first **and** last token (i.e., the text contains exactly that one term)
+
+Examples:
+
+* `<<Skoda` matches where any field starts with "Skoda", e.g. "Skoda Octavia" but not "New Skoda" or "My Skoda"
+* `Description=excellent>>` matches items where the Description field ends with "excellent", e.g. "quality is excellent" but not "excellent quality"
+* `Status=<<active>>` matches records where the Status field contains exactly "active" and nothing else
+* `Brand=<<Sk*` matches Brand fields starting with any word beginning with "Sk", e.g. "Skoda" or "Škoda"
+* `Name=<<?Smth>>` matches Name fields containing exactly one word that fuzzy matches "Smth", e.g. "Smith"
+* `Title=<<The & West` matches documents where Title starts with "The" and also contains "West" anywhere
+* `"<<The West"` matches documents where the text starts with the exact phrase "The West"
 
 ---
 

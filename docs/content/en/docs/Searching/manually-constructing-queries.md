@@ -165,6 +165,17 @@ var query = new Query(
 
 Searches the index for words that exactly match `word`.
 
+#### AnchoredWordQueryPart(string word, bool requireStart, bool requireEnd, double? scoreBoost = null)
+
+> `<<` and `>>` in LIFTI query syntax - introduced in LIFTI v7
+
+Searches the index for words that match `word` at specific positions within a field:
+
+* `requireStart`: When `true`, matches only when the word appears at the start of a field (index 0)
+* `requireEnd`: When `true`, matches only when the word appears at the end of a field (at the last token index)
+* Both `true`: Matches only when the word is the sole token in the field (field contains exactly that word)
+* `scoreBoost`: Optional score multiplier for ranking matches
+
 #### FuzzyMatchQueryPart(string word, ushort maxEditDistance = 4, ushort maxSequentialEdits = 1)
 
 > `?` in LIFTI query syntax
