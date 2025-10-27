@@ -51,6 +51,36 @@ LIFTI is a lightweight, in-memory full text search indexing library for .NET. Th
 - Use file-scoped namespaces (C# 10+) when appropriate
 - Enable and address all compiler warnings (`TreatWarningsAsErrors=True`)
 
+### Exception Handling
+
+**CRITICAL**: All exception messages must be defined in `ExceptionMessages.resx` resource file:
+
+1. **Never use hard-coded exception messages** - Always define them in `src/Lifti.Core/ExceptionMessages.resx`
+2. **Add the resource entry** with a descriptive name (e.g., `EndAnchorWithoutPrecedingText`)
+3. **Update the Designer.cs file** - Add the corresponding property to `src/Lifti.Core/ExceptionMessages.Designer.cs`:
+   ```csharp
+   /// <summary>
+   ///   Looks up a localized string similar to [Your message here].
+   /// </summary>
+   internal static string YourExceptionName {
+       get {
+           return ResourceManager.GetString("YourExceptionName", resourceCulture);
+       }
+   }
+   ```
+4. **Use the resource in code** - Reference it via `ExceptionMessages.YourExceptionName`
+5. **XML-encode special characters** in the resx file (e.g., `&lt;` for `<`, `&gt;` for `>`)
+
+Example:
+
+```csharp
+// ❌ WRONG - Hard-coded message
+throw new QueryParserException("End anchor (>>) must be preceded by text");
+
+// ✅ CORRECT - Using resource
+throw new QueryParserException(ExceptionMessages.EndAnchorWithoutPrecedingText);
+```
+
 ### Naming Conventions
 
 - Interfaces: `IFullTextIndex`, `IIndexNavigator`
