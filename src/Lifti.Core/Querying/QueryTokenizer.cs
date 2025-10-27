@@ -25,7 +25,8 @@ namespace Lifti.Querying
         {
             '&', // And operator
             '|', // Or operator
-            '>', // Preceding operator
+            '>', // Preceding operator / End anchor
+            '<', // Start anchor
             '=', // Field filter
             '(', // Open expression group
             ')', // Close expression group
@@ -151,25 +152,28 @@ namespace Lifti.Querying
                 if (tokenStart != null)
                 {
 
-                    string tokenText;
+                    ReadOnlyMemory<char> tokenText;
                     if (state.ScoreBoost == null)
                     {
-                        tokenText = queryText.Substring(tokenStart.Value, endIndex - tokenStart.Value);
+                        tokenText = queryText.AsMemory(tokenStart.Value, endIndex - tokenStart.Value);
                     }
                     else
                     {
                         // Don't return the score boost information as part of the token text
-                        tokenText = queryText.Substring(tokenStart.Value, state.ScoreBoostStartIndex - tokenStart.Value);
+                        tokenText = queryText.AsMemory(tokenStart.Value, state.ScoreBoostStartIndex - tokenStart.Value);
                     }
+
+                    (tokenText, var requireStart, var requireEnd) = StripStartAndEndAnchors(tokenText);
 
                     tokenText = StripEscapeIndicators(tokenText);
 
-                    var token = QueryToken.ForText(tokenText, state.IndexTokenizer, state.ScoreBoost);
+                    var token = QueryToken.ForText(tokenText.ToString(), state.IndexTokenizer, state.ScoreBoost, requireStart, requireEnd);
                     tokenStart = null;
 
                     state = state.UpdateForYieldedToken();
 
-                    if (tokenText.Length == 0 || (tokenText[0] == '?' && tokenText[tokenText.Length - 1] == '?'))
+                    var tokenLength = token.TokenText.Length;
+                    if (tokenLength == 0 || (token.TokenText[0] == '?' && token.TokenText[tokenLength - 1] == '?'))
                     {
                         // This is an edge case where we have a fuzzy search without any search term. It could be either
                         // just a "?" or a fuzzy search with parameters but no search term, e.g. "?4,1?"
@@ -228,7 +232,26 @@ namespace Lifti.Querying
                                     yield return QueryToken.ForOperator(QueryTokenType.OrOperator);
                                     break;
                                 case '>':
-                                    yield return QueryToken.ForOperator(QueryTokenType.PrecedingOperator);
+                                    if (tokenStart != null)
+                                    {
+                                        // We're already in a token, so > is part of the token text
+                                        // This handles the end anchor >> case
+                                        // Continue without yielding an operator
+                                    }
+                                    else if (PeekToken(i + 1, queryText) == '>')
+                                    {
+                                        // End anchor >> without preceding text is invalid
+                                        throw new QueryParserException(ExceptionMessages.EndAnchorWithoutPrecedingText);
+                                    }
+                                    else
+                                    {
+                                        // This is a standalone preceding operator
+                                        yield return QueryToken.ForOperator(QueryTokenType.PrecedingOperator);
+                                    }
+                                    break;
+                                case '<':
+                                    // < always starts or continues a token
+                                    tokenStart ??= i;
                                     break;
                                 case '?':
                                     // Possibly a wildcard token character, or part of a fuzzy match token
@@ -274,7 +297,7 @@ namespace Lifti.Querying
                                     }
 
                                     // Verify that the next character is an =
-                                    if (i + 1 == queryText.Length || queryText[i + 1] != '=')
+                                    if (PeekToken(i + 1, queryText) != '=')
                                     {
                                         throw new QueryParserException(ExceptionMessages.ExpectedEqualsAfterFieldName);
                                     }
@@ -405,15 +428,52 @@ namespace Lifti.Querying
             }
         }
 
-        private static string StripEscapeIndicators(string tokenText)
+        private static (ReadOnlyMemory<char> tokenText, bool requireStart, bool requireEnd) StripStartAndEndAnchors(ReadOnlyMemory<char> tokenText)
         {
-#if NETSTANDARD
-            if (tokenText.IndexOf('\\') >= 0)
-#else
-            if (tokenText.Contains('\\', StringComparison.Ordinal))
-#endif
+            // Check for start anchor (<<)
+            var requireStart = tokenText.Span.StartsWith("<<");
+            if (requireStart)
             {
-                return escapeCharacterReplacer.Replace(tokenText, "$1");
+                tokenText = tokenText.Slice(2);
+            }
+
+            // Check for end anchor (>>)
+            var requireEnd = tokenText.Span.EndsWith(">>");
+            if (requireEnd)
+            {
+                tokenText = tokenText.Slice(0, tokenText.Length - 2);
+            }
+
+            // Validate anchors - they must have text to anchor
+            if ((requireStart || requireEnd) && tokenText.Length == 0)
+            {
+                if (requireStart && requireEnd)
+                {
+                    throw new QueryParserException(ExceptionMessages.BothAnchorsWithoutText);
+                }
+                else if (requireStart)
+                {
+                    throw new QueryParserException(ExceptionMessages.StartAnchorWithoutFollowingText);
+                }
+                else
+                {
+                    throw new QueryParserException(ExceptionMessages.EndAnchorWithoutPrecedingText);
+                }
+            }
+
+            return (tokenText, requireStart, requireEnd);
+        }
+
+        private static char PeekToken(int index, string queryText)
+        {
+            return index < queryText.Length ? queryText[index] : '\0';
+        }
+
+        private static ReadOnlyMemory<char> StripEscapeIndicators(ReadOnlyMemory<char> tokenText)
+        {
+            if (tokenText.Span.Contains('\\'))
+            {
+                return escapeCharacterReplacer.Replace(tokenText.ToString(), "$1").AsMemory();
             }
 
             return tokenText;

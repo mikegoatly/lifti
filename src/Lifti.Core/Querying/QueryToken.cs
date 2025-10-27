@@ -13,13 +13,17 @@ namespace Lifti.Querying
             QueryTokenType tokenType,
             int tolerance,
             IIndexTokenizer? indexTokenizer,
-            double? scoreBoost = null)
+            double? scoreBoost = null,
+            bool requireStart = false,
+            bool requireEnd = false)
         {
             this.TokenText = tokenText;
             this.TokenType = tokenType;
             this.Tolerance = tolerance;
             this.ScoreBoost = scoreBoost;
             this.IndexTokenizer = indexTokenizer;
+            this.RequireStart = requireStart;
+            this.RequireEnd = requireEnd;
         }
 
         /// <summary>
@@ -53,6 +57,16 @@ namespace Lifti.Querying
         public QueryTokenType TokenType { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the search term must appear at the start of a field (first token, index 0).
+        /// </summary>
+        public bool RequireStart { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the search term must appear at the end of a field (last token).
+        /// </summary>
+        public bool RequireEnd { get; }
+
+        /// <summary>
         /// Creates a new <see cref="QueryToken"/> instance representing a textual part of the query.
         /// </summary>
         /// <param name="text">
@@ -65,9 +79,15 @@ namespace Lifti.Querying
         /// The score boost to apply to any documents matching the search term. This is multiplied with any score boosts
         /// applied to matching fields. A null value indicates that no additional score boost should be applied.
         /// </param>
-        public static QueryToken ForText(string text, IIndexTokenizer indexTokenizer, double? scoreBoost)
+        /// <param name="requireStart">
+        /// Indicates whether the search term must appear at the start of a field (first token, index 0).
+        /// </param>
+        /// <param name="requireEnd">
+        /// Indicates whether the search term must appear at the end of a field (last token).
+        /// </param>
+        public static QueryToken ForText(string text, IIndexTokenizer indexTokenizer, double? scoreBoost, bool requireStart = false, bool requireEnd = false)
         {
-            return new(text, QueryTokenType.Text, 0, indexTokenizer, scoreBoost);
+            return new(text, QueryTokenType.Text, 0, indexTokenizer, scoreBoost, requireStart, requireEnd);
         }
 
         /// <summary>
@@ -116,7 +136,12 @@ namespace Lifti.Querying
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.TokenText, this.TokenType, this.Tolerance);
+            return HashCode.Combine(
+                this.TokenText,
+                this.TokenType,
+                this.Tolerance,
+                this.RequireStart,
+                this.RequireEnd);
         }
 
         /// <inheritdoc />
@@ -141,7 +166,9 @@ namespace Lifti.Querying
 
             return this.TokenText == other.TokenText &&
                    this.TokenType == other.TokenType &&
-                   this.Tolerance == other.Tolerance;
+                   this.Tolerance == other.Tolerance &&
+                   this.RequireStart == other.RequireStart &&
+                   this.RequireEnd == other.RequireEnd;
         }
     }
 

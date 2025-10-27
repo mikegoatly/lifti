@@ -273,5 +273,184 @@ namespace Lifti.Tests.Querying
             Assert.Throws<QueryParserException>(() => this.sut.ParseQueryTokens(@"test =", this.tokenizerProvider).ToArray())
                 .Message.Should().Be("An unexpected operator was encountered: =");
         }
+
+        [Fact]
+        public void ShouldParseStartAnchor()
+        {
+            var tokens = this.sut.ParseQueryTokens("<<Skoda", this.tokenizerProvider).ToList();
+
+            tokens.Should().ContainSingle();
+            tokens[0].TokenText.Should().Be("Skoda");
+            tokens[0].RequireStart.Should().BeTrue();
+            tokens[0].RequireEnd.Should().BeFalse();
+        }
+
+        [Fact]
+        public void ShouldParseEndAnchor()
+        {
+            var tokens = this.sut.ParseQueryTokens("Skoda>>", this.tokenizerProvider).ToList();
+
+            tokens.Should().ContainSingle();
+            tokens[0].TokenText.Should().Be("Skoda");
+            tokens[0].RequireStart.Should().BeFalse();
+            tokens[0].RequireEnd.Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldParseBothAnchors()
+        {
+            var tokens = this.sut.ParseQueryTokens("<<Skoda>>", this.tokenizerProvider).ToList();
+
+            tokens.Should().ContainSingle();
+            tokens[0].TokenText.Should().Be("Skoda");
+            tokens[0].RequireStart.Should().BeTrue();
+            tokens[0].RequireEnd.Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldParseStartAnchorWithFieldFilter()
+        {
+            var tokens = this.sut.ParseQueryTokens("test=<<Skoda", this.tokenizerProvider).ToList();
+
+            tokens.Should().HaveCount(2);
+            tokens[0].Should().BeEquivalentTo(QueryToken.ForFieldFilter("test"));
+            tokens[1].TokenText.Should().Be("Skoda");
+            tokens[1].RequireStart.Should().BeTrue();
+            tokens[1].RequireEnd.Should().BeFalse();
+        }
+
+        [Fact]
+        public void ShouldParseEndAnchorWithFieldFilter()
+        {
+            var tokens = this.sut.ParseQueryTokens("test=Skoda>>", this.tokenizerProvider).ToList();
+
+            tokens.Should().HaveCount(2);
+            tokens[0].Should().BeEquivalentTo(QueryToken.ForFieldFilter("test"));
+            tokens[1].TokenText.Should().Be("Skoda");
+            tokens[1].RequireStart.Should().BeFalse();
+            tokens[1].RequireEnd.Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldParseBothAnchorsWithFieldFilter()
+        {
+            var tokens = this.sut.ParseQueryTokens("test=<<Skoda>>", this.tokenizerProvider).ToList();
+
+            tokens.Should().HaveCount(2);
+            tokens[0].Should().BeEquivalentTo(QueryToken.ForFieldFilter("test"));
+            tokens[1].TokenText.Should().Be("Skoda");
+            tokens[1].RequireStart.Should().BeTrue();
+            tokens[1].RequireEnd.Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldParseAnchorsWithScoreBoost()
+        {
+            var tokens = this.sut.ParseQueryTokens("<<Skoda>>^2", this.tokenizerProvider).ToList();
+
+            tokens.Should().ContainSingle();
+            tokens[0].TokenText.Should().Be("Skoda");
+            tokens[0].RequireStart.Should().BeTrue();
+            tokens[0].RequireEnd.Should().BeTrue();
+            tokens[0].ScoreBoost.Should().Be(2D);
+        }
+
+        [Fact]
+        public void ShouldParseAnchorsWithWildcard()
+        {
+            var tokens = this.sut.ParseQueryTokens("<<Sk*>>", this.tokenizerProvider).ToList();
+
+            tokens.Should().ContainSingle();
+            tokens[0].TokenText.Should().Be("Sk*");
+            tokens[0].RequireStart.Should().BeTrue();
+            tokens[0].RequireEnd.Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldParseAnchorsWithFuzzyMatch()
+        {
+            var tokens = this.sut.ParseQueryTokens("<<?Skda>>", this.tokenizerProvider).ToList();
+
+            tokens.Should().ContainSingle();
+            tokens[0].TokenText.Should().Be("?Skda");
+            tokens[0].RequireStart.Should().BeTrue();
+            tokens[0].RequireEnd.Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldParseMultipleAnchorsInOrQuery()
+        {
+            var tokens = this.sut.ParseQueryTokens("<<Ford | <<Skoda", this.tokenizerProvider).ToList();
+
+            tokens.Should().HaveCount(3);
+            tokens[0].TokenText.Should().Be("Ford");
+            tokens[0].RequireStart.Should().BeTrue();
+            tokens[0].RequireEnd.Should().BeFalse();
+            tokens[1].Should().BeEquivalentTo(QueryToken.ForOperator(QueryTokenType.OrOperator));
+            tokens[2].TokenText.Should().Be("Skoda");
+            tokens[2].RequireStart.Should().BeTrue();
+            tokens[2].RequireEnd.Should().BeFalse();
+        }
+
+        [Fact]
+        public void ShouldParseAnchorsInQuotedSection()
+        {
+            var tokens = this.sut.ParseQueryTokens("\"<<The West>>\"", this.tokenizerProvider).ToList();
+
+            tokens.Should().HaveCount(4);
+            tokens[0].Should().BeEquivalentTo(QueryToken.ForOperator(QueryTokenType.BeginAdjacentTextOperator));
+            tokens[1].TokenText.Should().Be("The");
+            tokens[1].RequireStart.Should().BeTrue();
+            tokens[1].RequireEnd.Should().BeFalse();
+            tokens[2].TokenText.Should().Be("West");
+            tokens[2].RequireStart.Should().BeFalse();
+            tokens[2].RequireEnd.Should().BeTrue();
+            tokens[3].Should().BeEquivalentTo(QueryToken.ForOperator(QueryTokenType.EndAdjacentTextOperator));
+        }
+
+        [Fact]
+        public void SingleAngleBracketsShouldNotBeTreatedAsAnchors()
+        {
+            // Single > should be treated as preceding operator
+            var tokens = this.sut.ParseQueryTokens("test1 > test2", this.tokenizerProvider).ToList();
+
+            tokens.Should().HaveCount(3);
+            tokens[0].TokenText.Should().Be("test1");
+            tokens[1].Should().BeEquivalentTo(QueryToken.ForOperator(QueryTokenType.PrecedingOperator));
+            tokens[2].TokenText.Should().Be("test2");
+        }
+
+        [Fact]
+        public void SingleLessThanShouldBeTreatedAsTokenCharacter()
+        {
+            // Single < should be part of the token
+            var tokens = this.sut.ParseQueryTokens("<test", this.tokenizerProvider).ToList();
+
+            tokens.Should().ContainSingle();
+            tokens[0].TokenText.Should().Be("<test");
+            tokens[0].RequireStart.Should().BeFalse();
+            tokens[0].RequireEnd.Should().BeFalse();
+        }
+
+        [Fact]
+        public void EndAnchorWithoutPrecedingTextShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => this.sut.ParseQueryTokens(">>test", this.tokenizerProvider).ToList())
+                .Message.Should().Be("End anchor (>>) encountered without any preceding text");
+        }
+
+        [Fact]
+        public void StartAnchorWithoutFollowingTextShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => this.sut.ParseQueryTokens("test=<<", this.tokenizerProvider).ToList())
+                .Message.Should().Be("Start anchor (<<) encountered without any following text");
+        }
+
+        [Fact]
+        public void BothAnchorsWithoutTextShouldThrowException()
+        {
+            Assert.Throws<QueryParserException>(() => this.sut.ParseQueryTokens("<<>>", this.tokenizerProvider).ToList())
+                .Message.Should().Be("Start and end anchors (<<>>) must have text between them");
+        }
     }
 }

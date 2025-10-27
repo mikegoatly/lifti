@@ -354,4 +354,19 @@
   <data name="WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition" xml:space="preserve">
     <value>WithScoreBoosting can only be called once per object builder</value>
   </data>
+  <data name="EndAnchorWithoutPrecedingText" xml:space="preserve">
+    <value>End anchor (&gt;&gt;) encountered without any preceding text</value>
+  </data>
+  <data name="StartAnchorWithoutFollowingText" xml:space="preserve">
+    <value>Start anchor (&lt;&lt;) encountered without any following text</value>
+  </data>
+  <data name="BothAnchorsWithoutText" xml:space="preserve">
+    <value>Start and end anchors (&lt;&lt;&gt;&gt;) must have text between them</value>
+  </data>
+  <data name="MustAnchorAtStartEndOrBoth" xml:space="preserve">
+    <value>At least one of requireStart or requireEnd must be true</value>
+	</data>
+	<data name="MissingLastTokenIndexMetadata" xml:space="preserve">
+		<value>Internal error: Index is missing last token index metadata</value>
+	</data>
 </root>

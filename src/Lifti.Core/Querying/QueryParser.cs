@@ -109,10 +109,12 @@ namespace Lifti.Querying
 
             var tokenText = queryToken.TokenText.AsSpan();
             var scoreBoost = queryToken.ScoreBoost;
+            var requireStart = queryToken.RequireStart;
+            var requireEnd = queryToken.RequireEnd;
             var fuzzyMatchInfo = ExplicitFuzzySearchTerm.Parse(tokenText);
 
             if (!fuzzyMatchInfo.IsFuzzyMatch && WildcardQueryPartParser.TryParse(
-                tokenText, 
+                tokenText,
                 indexTokenizer,
                 scoreBoost,
                 out var wildcardQueryPart))
@@ -135,6 +137,12 @@ namespace Lifti.Querying
                         fuzzyMatchInfo.MaxEditDistance ?? this.options.FuzzySearchMaxEditDistance(token.Value.Length),
                         fuzzyMatchInfo.MaxSequentialEdits ?? this.options.FuzzySearchMaxSequentialEdits(token.Value.Length),
                         scoreBoost));
+            }
+            else if (requireStart || requireEnd)
+            {
+                // Use anchored query part when start or end anchors are present
+                result = indexTokenizer.Process(tokenText)
+                     .Select(token => new AnchoredWordQueryPart(token.Value, requireStart, requireEnd, scoreBoost));
             }
             else
             {
