@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lifti.Querying
@@ -61,6 +62,12 @@ namespace Lifti.Querying
             foreach (var fieldMatch in this.fieldLookup)
             {
                 results[i++] = fieldMatch.Value.ToScoredToken(fieldMatch.Key);
+            }
+
+            if (results.Length > 1)
+            {
+                // Ensure that we're sorted in field order
+                Array.Sort(results, static (a, b) => a.FieldId.CompareTo(b.FieldId));
             }
 
             return results;
