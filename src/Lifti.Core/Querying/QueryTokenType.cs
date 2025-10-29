@@ -56,6 +56,11 @@
         PrecedingOperator,
 
         /// <summary>
+        /// The token is an AndNot operator - filters results to exclude documents matching the right operand.
+        /// </summary>
+        AndNotOperator,
+
+        /// <summary>
         /// The token is a field filter - the captured token is the field that results should be restricted to.
         /// </summary>
         FieldFilter

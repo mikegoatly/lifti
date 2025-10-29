@@ -23,7 +23,8 @@ namespace Lifti.Querying
         // are part of the LIFTI query syntax and processed on a case by case basis.
         private static readonly HashSet<char> generalNonSplitPunctuation = new(wildcardPunctuation)
         {
-            '&', // And operator
+            '&', // And operator / And-not operator
+            '!', // And-not operator (part of &!)
             '|', // Or operator
             '>', // Preceding operator / End anchor
             '<', // Start anchor
@@ -226,7 +227,15 @@ namespace Lifti.Querying
                                     state = state with { ScoreBoost = scoreBoost, ScoreBoostStartIndex = scoreBoostStart };
                                     break;
                                 case '&':
-                                    yield return QueryToken.ForOperator(QueryTokenType.AndOperator);
+                                    if (PeekToken(i + 1, queryText) == '!')
+                                    {
+                                        yield return QueryToken.ForOperator(QueryTokenType.AndNotOperator);
+                                        i++; // Skip the !
+                                    }
+                                    else
+                                    {
+                                        yield return QueryToken.ForOperator(QueryTokenType.AndOperator);
+                                    }
                                     break;
                                 case '|':
                                     yield return QueryToken.ForOperator(QueryTokenType.OrOperator);
