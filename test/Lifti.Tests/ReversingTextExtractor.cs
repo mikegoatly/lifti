@@ -9,11 +9,12 @@ namespace Lifti.Tests
     {
         public IEnumerable<DocumentTextFragment> Extract(ReadOnlyMemory<char> document, int startOffset = 0)
         {
+            var reversed = document.Span.ToArray();
+            reversed.Reverse();
+
             return new[]
             {
-                new DocumentTextFragment(
-                    0, 
-                    new ReadOnlyMemory<char>(document.ToArray().Reverse().ToArray()))
+                new DocumentTextFragment(0, reversed)
             };
         }
     }

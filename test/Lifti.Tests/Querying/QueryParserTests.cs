@@ -141,6 +141,71 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
+        public void ParsingTwoWordsWithAndNotOperator_ShouldComposeWithAndNotOperator()
+        {
+            var result = this.Parse("wordone &! wordtwo");
+            var expectedQuery = new AndNotQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo"));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingAndNotOperatorWithBracketedOrExpression_ShouldComposeCorrectly()
+        {
+            var result = this.Parse("wordone &! (wordtwo | wordthree)");
+            var expectedQuery = new AndNotQueryOperator(
+                new ExactWordQueryPart("wordone"),
+                new BracketedQueryPart(
+                    new OrQueryOperator(new ExactWordQueryPart("wordtwo"), new ExactWordQueryPart("wordthree"))));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingMultipleAndNotOperators_ShouldChainLeftToRight()
+        {
+            var result = this.Parse("wordone &! wordtwo &! wordthree");
+            var expectedQuery = new AndNotQueryOperator(
+                new AndNotQueryOperator(
+                    new ExactWordQueryPart("wordone"),
+                    new ExactWordQueryPart("wordtwo")),
+                new ExactWordQueryPart("wordthree"));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingAndNotWithOrOperator_ShouldRespectPrecedence()
+        {
+            // AND-NOT has same precedence as OR, lower than AND
+            // So "a | b &! c" should parse as "(a | b) &! c"
+            var result = this.Parse("wordone | wordtwo &! wordthree");
+            var expectedQuery = new AndNotQueryOperator(
+                new OrQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo")),
+                new ExactWordQueryPart("wordthree"));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingAndNotWithAndOperator_ShouldChainLeftToRight()
+        {
+            // AND has higher precedence than AND-NOT
+            // "a & b &! c" should parse as "(a & b) &! c"
+            var result = this.Parse("wordone & wordtwo &! wordthree");
+            var expectedQuery = new AndNotQueryOperator(
+                new AndQueryOperator(new ExactWordQueryPart("wordone"), new ExactWordQueryPart("wordtwo")),
+                new ExactWordQueryPart("wordthree"));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
+        public void ParsingAndNotWithFieldFilter_ShouldComposeCorrectly()
+        {
+            var result = this.Parse("testfield=wordone &! otherfield=wordtwo");
+            var expectedQuery = new AndNotQueryOperator(
+                new FieldFilterQueryOperator("testfield", TestFieldId, new ExactWordQueryPart("wordone")),
+                new FieldFilterQueryOperator("otherfield", OtherFieldId, new ExactWordQueryPart("wordtwo")));
+            VerifyResult(result, expectedQuery);
+        }
+
+        [Fact]
         public void ParsingSingleExactWord_ShouldReturnExactWordQueryPart()
         {
             var result = this.Parse("wordone");
