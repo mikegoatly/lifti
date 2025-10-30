@@ -46,15 +46,9 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
-            if (navigatorCreator == null)
-            {
-                throw new ArgumentNullException(nameof(navigatorCreator));
-            }
+            ArgumentNullException.ThrowIfNull(navigatorCreator);
 
-            if (queryContext is null)
-            {
-                throw new ArgumentNullException(nameof(queryContext));
-            }
+            ArgumentNullException.ThrowIfNull(queryContext);
 
             var timing = queryContext.ExecutionTimings.Start(this, queryContext);
             using var navigator = navigatorCreator();

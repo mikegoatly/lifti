@@ -165,9 +165,8 @@ namespace Lifti.Querying
         internal HashSet<int> ToDocumentIdLookup()
         {
             var lookup = new HashSet<int>();
-#if !NETSTANDARD
             lookup.EnsureCapacity(this.Matches.Count);
-#endif
+
             for (var i = 0; i < this.Matches.Count; i++)
             {
                 lookup.Add(this.Matches[i].DocumentId);

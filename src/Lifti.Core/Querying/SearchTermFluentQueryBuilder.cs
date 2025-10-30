@@ -98,12 +98,7 @@ namespace Lifti.Querying
         internal string NormalizeText(string text)
         {
             // Prepare the text for the index using the default tokenizer
-#if NETSTANDARD
-            text = this.CurrentTokenizer.Normalize(text.AsSpan());
-#else
-            text = this.CurrentTokenizer.Normalize(text);
-#endif
-            return text;
+            return this.CurrentTokenizer.Normalize(text);
         }
     }
 
@@ -124,10 +119,7 @@ namespace Lifti.Querying
         /// </summary>
         public FluentQueryBuilder<TKey> Adjacent(Func<BaseAdjacentSearchTermFluentQueryBuilder<TKey>, AdjacentSearchTermFluentQueryBuilder<TKey>> sequentialBuilder)
         {
-            if (sequentialBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(sequentialBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(sequentialBuilder);
 
             var builtQuery = sequentialBuilder(new AdjacentSearchTermFluentQueryBuilder<TKey>(this.ParentBuilder));
 
@@ -145,10 +137,7 @@ namespace Lifti.Querying
         /// </param>
         public FluentQueryBuilder<TKey> InField(string fieldName, Func<SearchTermFluentQueryBuilder<TKey>, FluentQueryBuilder<TKey>> fieldQueryBuilder)
         {
-            if (fieldQueryBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(fieldQueryBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(fieldQueryBuilder);
 
             // Find the field id for the field
             var fieldInfo = this.ParentBuilder.Index.FieldLookup.GetFieldInfo(fieldName);
@@ -174,10 +163,7 @@ namespace Lifti.Querying
         /// </param>
         public FluentQueryBuilder<TKey> Bracketed(Func<SearchTermFluentQueryBuilder<TKey>, FluentQueryBuilder<TKey>> bracketedQueryBuilder)
         {
-            if (bracketedQueryBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(bracketedQueryBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(bracketedQueryBuilder);
 
             var buildQuery = bracketedQueryBuilder(this.ParentBuilder.StartSubquery());
 
@@ -240,10 +226,7 @@ namespace Lifti.Querying
         /// </param>
         public FluentQueryBuilder<TKey> WildcardMatch(Func<BaseWildcardBuilder<TKey>, WildcardBuilder<TKey>> wildcardBuilder, double? scoreBoost = null)
         {
-            if (wildcardBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(wildcardBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(wildcardBuilder);
 
             var builtQuery = wildcardBuilder(new WildcardBuilder<TKey>(this.ParentBuilder));
 
@@ -266,11 +249,7 @@ namespace Lifti.Querying
                 throw new ArgumentException("The text to match cannot be null or empty.", nameof(text));
             }
 
-#if NETSTANDARD
-            if (!WildcardQueryPartParser.TryParse(text.AsSpan(), this.ParentBuilder.CurrentTokenizer, scoreBoost, out var parsedPart))
-#else
             if (!WildcardQueryPartParser.TryParse(text, this.ParentBuilder.CurrentTokenizer, scoreBoost, out var parsedPart))
-#endif
             {
                 throw new ArgumentException($"The wildcard query '{text}' could not be parsed.",nameof(text));
             }
@@ -418,10 +397,7 @@ namespace Lifti.Querying
         /// <inheritdoc cref="SearchTermFluentQueryBuilder{TKey}.WildcardMatch(Func{BaseWildcardBuilder{TKey}, WildcardBuilder{TKey}}, double?)"/>
         public AdjacentSearchTermFluentQueryBuilder<TKey> WildcardMatch(Func<BaseWildcardBuilder<TKey>, WildcardBuilder<TKey>> wildcardBuilder, double? scoreBoost = null)
         {
-            if (wildcardBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(wildcardBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(wildcardBuilder);
 
             var builtQuery = wildcardBuilder(new WildcardBuilder<TKey>(this.parentBuilder));
 
@@ -436,11 +412,7 @@ namespace Lifti.Querying
                 throw new ArgumentException("The text to match cannot be null or empty.", nameof(text));
             }
 
-#if NETSTANDARD
-            if (!WildcardQueryPartParser.TryParse(text.AsSpan(), this.parentBuilder.CurrentTokenizer, scoreBoost, out var parsedPart))
-#else
             if (!WildcardQueryPartParser.TryParse(text, this.parentBuilder.CurrentTokenizer, scoreBoost, out var parsedPart))
-#endif
             {
                 throw new ArgumentException($"The wildcard query '{text}' could not be parsed.", nameof(text));
             }

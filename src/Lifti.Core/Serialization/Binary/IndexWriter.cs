@@ -319,12 +319,7 @@ namespace Lifti.Serialization.Binary
         {
             this.writer.Flush();
             this.buffer.Position = 0L;
-#if NETSTANDARD
-            // 81920 is taken from DefaultCopyBufferSize of GetCopyBufferSize in Stream.cs
-            await this.buffer.CopyToAsync(this.underlyingStream, 81920, cancellationToken).ConfigureAwait(false);
-#else
             await this.buffer.CopyToAsync(this.underlyingStream, cancellationToken).ConfigureAwait(false);
-#endif
             this.buffer.SetLength(0L);
         }
     }

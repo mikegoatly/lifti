@@ -26,10 +26,7 @@ namespace Lifti
         /// </remarks>
         public virtual double CalculateScoreBoost(DocumentMetadata documentMetadata)
         {
-            if (documentMetadata is null)
-            {
-                throw new ArgumentNullException(nameof(documentMetadata));
-            }
+            ArgumentNullException.ThrowIfNull(documentMetadata);
 
             if (documentMetadata.ScoringFreshnessDate is null && documentMetadata.ScoringMagnitude is null)
             {

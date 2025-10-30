@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-#if NETSTANDARD
-using System.Linq;
-#endif
-
 namespace Lifti
 {
     /// <summary>
@@ -15,11 +11,7 @@ namespace Lifti
     {
         internal DocumentTokenMatchMap(IEnumerable<KeyValuePair<int, IReadOnlyList<IndexedToken>>> data)
         {
-#if NETSTANDARD
-            this.DocumentTokenLookup = data.ToDictionary(x => x.Key, x => x.Value);
-#else
             this.DocumentTokenLookup = new(data);
-#endif
         }
 
         /// <summary>

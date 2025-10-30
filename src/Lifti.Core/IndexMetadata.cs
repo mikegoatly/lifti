@@ -81,10 +81,7 @@ namespace Lifti
         /// <inheritdoc />
         public void Add(DocumentMetadata<TKey> documentMetadata)
         {
-            if (documentMetadata is null)
-            {
-                throw new ArgumentNullException(nameof(documentMetadata));
-            }
+            ArgumentNullException.ThrowIfNull(documentMetadata);
 
             // Make the ID pool aware of the ID we are using
             this.idPool.RegisterUsedId(documentMetadata.Id);

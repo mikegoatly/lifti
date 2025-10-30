@@ -18,10 +18,7 @@ namespace Lifti.Serialization
             FullTextIndex<TKey> index,
             CancellationToken cancellationToken)
         {
-            if (index is null)
-            {
-                throw new ArgumentNullException(nameof(index));
-            }
+            ArgumentNullException.ThrowIfNull(index);
 
             await this.OnDeserializationStartingAsync(cancellationToken).ConfigureAwait(false);
 

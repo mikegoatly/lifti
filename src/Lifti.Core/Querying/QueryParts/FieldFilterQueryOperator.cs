@@ -39,10 +39,7 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
-            if (queryContext is null)
-            {
-                throw new ArgumentNullException(nameof(queryContext));
-            }
+            ArgumentNullException.ThrowIfNull(queryContext);
 
             // A field filter query part doesn't actually contribute anything to timings or measurements, so we don't bother recording it.
             return this.Statement.Evaluate(

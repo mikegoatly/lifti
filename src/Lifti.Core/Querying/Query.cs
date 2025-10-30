@@ -31,10 +31,7 @@ namespace Lifti.Querying
         /// <inheritdoc />
         public IEnumerable<SearchResult<TKey>> Execute<TKey>(IIndexSnapshot<TKey> index)
         {
-            if (index is null)
-            {
-                throw new ArgumentNullException(nameof(index));
-            }
+            ArgumentNullException.ThrowIfNull(index);
 
             return this.Execute(index, QueryContext.Empty);
         }
@@ -42,10 +39,7 @@ namespace Lifti.Querying
         internal SearchResults<TKey> ExecuteWithTimings<TKey>(FullTextIndex<TKey> index)
             where TKey : notnull
         {
-            if (index is null)
-            {
-                throw new ArgumentNullException(nameof(index));
-            }
+            ArgumentNullException.ThrowIfNull(index);
 
             var queryContext = new QueryContext() { ExecutionTimings = new() };
             var results = this.Execute(index.Snapshot, queryContext);

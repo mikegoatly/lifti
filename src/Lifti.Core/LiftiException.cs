@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Runtime.Serialization;
 
 namespace Lifti
 {
@@ -21,12 +20,5 @@ namespace Lifti
 
         /// <inheritdoc />
         public LiftiException(string message, System.Exception inner) : base(message, inner) { }
-
-#if NETSTANDARD
-        /// <inheritdoc />
-        protected LiftiException(
-          SerializationInfo info,
-          StreamingContext context) : base(info, context) { }
-#endif
     }
 }

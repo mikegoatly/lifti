@@ -16,10 +16,7 @@ namespace Lifti.Serialization
         /// <inheritdoc />
         public async ValueTask WriteAsync(IIndexSnapshot<TKey> snapshot, CancellationToken cancellationToken)
         {
-            if (snapshot is null)
-            {
-                throw new ArgumentNullException(nameof(snapshot));
-            }
+            ArgumentNullException.ThrowIfNull(snapshot);
 
             await this.OnSerializationStart(snapshot, cancellationToken).ConfigureAwait(false);
 

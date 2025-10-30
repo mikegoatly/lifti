@@ -381,9 +381,7 @@ namespace Lifti
             if (this.HasMatches)
             {
                 builder.Append(
-#if !NETSTANDARD
                     System.Globalization.CultureInfo.InvariantCulture,
-#endif
                     $" [{this.original?.Matches.Count ?? 0} original match(es) - {this.DocumentTokenMatchMapMutation?.MutationCount ?? 0} mutated]");
             }
         }

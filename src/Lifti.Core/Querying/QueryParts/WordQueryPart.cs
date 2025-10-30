@@ -24,10 +24,7 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         protected override double RunWeightingCalculation(Func<IIndexNavigator> navigatorCreator)
         {
-            if (navigatorCreator is null)
-            {
-                throw new ArgumentNullException(nameof(navigatorCreator));
-            }
+            ArgumentNullException.ThrowIfNull(navigatorCreator);
 
             using var navigator = navigatorCreator();
             navigator.Process(this.Word.AsSpan());

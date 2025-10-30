@@ -18,10 +18,7 @@ namespace Lifti.Tokenization.Preprocessing
         /// </summary>
         public InputPreprocessorPipeline(TokenizationOptions options)
         {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+            ArgumentNullException.ThrowIfNull(options);
 
             if (options.IgnoreCharacters.Count > 0)
             {

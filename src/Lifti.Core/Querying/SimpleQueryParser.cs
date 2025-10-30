@@ -28,15 +28,9 @@ namespace Lifti.Querying
         /// <inheritdoc />
         public IQuery Parse(IIndexedFieldLookup fieldLookup, string queryText, IIndexTokenizerProvider tokenizerProvider)
         {
-            if (queryText is null)
-            {
-                throw new ArgumentNullException(nameof(queryText));
-            }
+            ArgumentNullException.ThrowIfNull(queryText);
 
-            if (tokenizerProvider is null)
-            {
-                throw new ArgumentNullException(nameof(tokenizerProvider));
-            }
+            ArgumentNullException.ThrowIfNull(tokenizerProvider);
 
             var tokens = tokenizerProvider.DefaultTokenizer.Process(queryText.AsSpan());
             if (tokens.Count == 0)

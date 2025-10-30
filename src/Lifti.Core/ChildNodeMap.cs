@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace Lifti
 {
@@ -34,10 +33,7 @@ namespace Lifti
         /// </param>
         public ChildNodeMap(ChildNodeMapEntry[] map)
         {
-            if (map is null)
-            {
-                throw new ArgumentNullException(nameof(map));
-            }
+            ArgumentNullException.ThrowIfNull(map);
 
             // Verify that the map is sorted
 #if DEBUG

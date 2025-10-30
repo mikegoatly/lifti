@@ -139,10 +139,7 @@ namespace Lifti.Querying
         /// <inheritdoc />
         public IEnumerable<QueryToken> ParseQueryTokens(string queryText, IIndexTokenizerProvider tokenizerProvider)
         {
-            if (queryText is null)
-            {
-                throw new ArgumentNullException(nameof(queryText));
-            }
+            ArgumentNullException.ThrowIfNull(queryText);
 
             var state = new QueryTokenizerState(tokenizerProvider.DefaultTokenizer);
             var tokenStart = (int?)null;

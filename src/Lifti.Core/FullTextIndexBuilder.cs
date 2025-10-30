@@ -74,10 +74,7 @@ namespace Lifti
         /// </param>
         public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, CancellationToken, Task> asyncAction)
         {
-            if (asyncAction is null)
-            {
-                throw new ArgumentNullException(nameof(asyncAction));
-            }
+            ArgumentNullException.ThrowIfNull(asyncAction);
 
             this.indexModifiedActions ??= [];
 
@@ -89,10 +86,7 @@ namespace Lifti
         /// <inheritdoc cref="WithIndexModificationAction(Func{IIndexSnapshot{TKey}, CancellationToken, Task})"/>
         public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, Task> asyncAction)
         {
-            if (asyncAction is null)
-            {
-                throw new ArgumentNullException(nameof(asyncAction));
-            }
+            ArgumentNullException.ThrowIfNull(asyncAction);
 
             return this.WithIndexModificationAction((snapshot, ct) => asyncAction(snapshot));
         }
@@ -109,10 +103,7 @@ namespace Lifti
         /// </remarks>
         public FullTextIndexBuilder<TKey> WithIndexModificationAction(Action<IIndexSnapshot<TKey>> action)
         {
-            if (action is null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
+            ArgumentNullException.ThrowIfNull(action);
 
             return this.WithIndexModificationAction(
                 (snapshot, ct) =>
@@ -131,10 +122,7 @@ namespace Lifti
         /// </param>
         public FullTextIndexBuilder<TKey> WithObjectTokenization<TObject>(Func<ObjectTokenizationBuilder<TObject, TKey>, ObjectTokenizationBuilder<TObject, TKey>> optionsBuilder)
         {
-            if (optionsBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(optionsBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(optionsBuilder);
 
             var builder = new ObjectTokenizationBuilder<TObject, TKey>();
             this.objectTokenizationBuilders.Add(optionsBuilder(builder));
@@ -148,10 +136,7 @@ namespace Lifti
         /// </summary>
         public FullTextIndexBuilder<TKey> WithDefaultTokenization(Func<TokenizerBuilder, TokenizerBuilder> optionsBuilder)
         {
-            if (optionsBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(optionsBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(optionsBuilder);
 
             this.defaultTokenizer = optionsBuilder.CreateTokenizer()!;
 
@@ -164,10 +149,7 @@ namespace Lifti
         /// </summary>
         public FullTextIndexBuilder<TKey> WithDefaultThesaurus(Func<ThesaurusBuilder, ThesaurusBuilder> thesaurusBuilder)
         {
-            if (thesaurusBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(thesaurusBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(thesaurusBuilder);
 
             this.defaultThesaurusBuilder = thesaurusBuilder(new ThesaurusBuilder());
             return this;
@@ -195,10 +177,7 @@ namespace Lifti
         /// </summary>
         public FullTextIndexBuilder<TKey> WithQueryParser(IQueryParser queryParser)
         {
-            if (queryParser is null)
-            {
-                throw new ArgumentNullException(nameof(queryParser));
-            }
+            ArgumentNullException.ThrowIfNull(queryParser);
 
             this.queryParser = queryParser;
 
@@ -218,10 +197,7 @@ namespace Lifti
         /// </summary>
         public FullTextIndexBuilder<TKey> WithSimpleQueryParser(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)
         {
-            if (optionsBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(optionsBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(optionsBuilder);
 
             var builder = new QueryParserBuilder(options => new SimpleQueryParser(options));
             this.queryParser = optionsBuilder(builder).Build();
@@ -234,10 +210,7 @@ namespace Lifti
         /// </summary>
         public FullTextIndexBuilder<TKey> WithQueryParser(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)
         {
-            if (optionsBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(optionsBuilder));
-            }
+            ArgumentNullException.ThrowIfNull(optionsBuilder);
 
             var builder = new QueryParserBuilder();
             this.queryParser = optionsBuilder(builder).Build();

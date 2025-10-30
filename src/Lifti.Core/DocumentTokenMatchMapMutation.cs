@@ -1,9 +1,5 @@
 ﻿using System.Collections.Generic;
 
-#if NETSTANDARD
-using System.Linq;
-#endif
-
 namespace Lifti
 {
     internal sealed class DocumentTokenMatchMapMutation
@@ -36,13 +32,11 @@ namespace Lifti
 
             if (this.mutated != null)
             {
-#if !NETSTANDARD
                 // Avoid re-allocations by ensuring the dictionary has enough capacity to hold all the new items
                 // In some situations this may actually be more than we need (A large number of documents have
                 // been reindexed), but this is better in most cases. We could track the number of "new" documents
                 // and only increase the capacity by that amount...
                 mutatedMatches.EnsureCapacity(mutatedMatches.Count + this.mutated.Count);
-#endif
 
                 foreach (var documentMutation in this.mutated)
                 {

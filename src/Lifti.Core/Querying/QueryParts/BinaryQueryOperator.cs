@@ -68,10 +68,7 @@ namespace Lifti.Querying.QueryParts
             Func<IIndexNavigator> navigatorCreator, 
             QueryContext queryContext)
         {
-            if (queryContext is null)
-            {
-                throw new ArgumentNullException(nameof(queryContext));
-            }
+            ArgumentNullException.ThrowIfNull(queryContext);
 
             // Work out which side is cheapest to evaluate first
             var leftWeighting = this.Left.CalculateWeighting(navigatorCreator);

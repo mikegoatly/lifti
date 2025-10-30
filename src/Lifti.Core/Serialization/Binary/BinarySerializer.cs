@@ -38,10 +38,7 @@ namespace Lifti.Serialization.Binary
         /// <inheritdoc/>
         public async Task SerializeAsync(IIndexSnapshot<TKey> snapshot, Stream stream, bool disposeStream = true, CancellationToken cancellationToken = default)
         {
-            if (snapshot is null)
-            {
-                throw new ArgumentNullException(nameof(snapshot));
-            }
+            ArgumentNullException.ThrowIfNull(snapshot);
 
             using var writer = new IndexWriter<TKey>(stream, disposeStream, this.keySerializer);
             await writer.WriteAsync(snapshot, cancellationToken).ConfigureAwait(false);
@@ -50,10 +47,7 @@ namespace Lifti.Serialization.Binary
         /// <inheritdoc/>
         public async Task SerializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true, CancellationToken cancellationToken = default)
         {
-            if (index is null)
-            {
-                throw new ArgumentNullException(nameof(index));
-            }
+            ArgumentNullException.ThrowIfNull(index);
 
             await this.SerializeAsync(index.Snapshot, stream, disposeStream, cancellationToken).ConfigureAwait(false);
         }
@@ -61,10 +55,7 @@ namespace Lifti.Serialization.Binary
         /// <inheritdoc/>
         public async Task DeserializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true, CancellationToken cancellationToken = default)
         {
-            if (index is null)
-            {
-                throw new ArgumentNullException(nameof(index));
-            }
+            ArgumentNullException.ThrowIfNull(index);
 
             if (index.Count > 0)
             {
