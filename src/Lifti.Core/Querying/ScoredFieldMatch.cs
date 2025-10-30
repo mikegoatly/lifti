@@ -93,10 +93,7 @@ namespace Lifti.Querying
             }
 
             var results = new HashSet<TokenLocation>();
-
-#if !NETSTANDARD
             results.EnsureCapacity(this.interfacedLocations!.Count);
-#endif
 
             foreach (var location in this.interfacedLocations!)
             {

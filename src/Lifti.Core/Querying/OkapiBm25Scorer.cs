@@ -33,10 +33,7 @@ namespace Lifti.Querying
         /// </param>
         internal OkapiBm25Scorer(double k1, double b, IIndexMetadata indexMetadata, IFieldScoreBoostProvider fieldScoreBoosts)
         {
-            if (indexMetadata is null)
-            {
-                throw new ArgumentNullException(nameof(indexMetadata));
-            }
+            ArgumentNullException.ThrowIfNull(indexMetadata);
 
             var documentCount = (double)indexMetadata.DocumentCount;
             this.averageTokenCountByField = indexMetadata.IndexStatistics.TokenCountByField.ToDictionary(k => k.Key, k => k.Value / documentCount);

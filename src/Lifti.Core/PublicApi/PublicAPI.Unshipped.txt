@@ -47,3 +47,5 @@ override Lifti.Querying.QueryParts.AndNotQueryOperator.ToString() -> string!
 Lifti.Querying.QueryTokenType.AndNotOperator = 10 -> Lifti.Querying.QueryTokenType
 Lifti.Querying.QueryTokenType.FieldFilter = 11 -> Lifti.Querying.QueryTokenType
 Lifti.QueryExecutionPlanNodeKind.Except = 8 -> Lifti.QueryExecutionPlanNodeKind
+*REMOVED*System.Runtime.CompilerServices.IsExternalInit
+*REMOVED*System.Runtime.CompilerServices.IsExternalInit.IsExternalInit() -> void

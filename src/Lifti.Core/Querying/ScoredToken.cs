@@ -92,10 +92,7 @@ namespace Lifti.Querying
 
         internal void ToString(StringBuilder builder)
         {
-            if (builder is null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
+            ArgumentNullException.ThrowIfNull(builder);
 
             builder.Append("Document: ").AppendLine(this.DocumentId.ToString(CultureInfo.InvariantCulture));
             builder.AppendLine("Field matches:");

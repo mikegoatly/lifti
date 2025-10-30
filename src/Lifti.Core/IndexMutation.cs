@@ -24,10 +24,7 @@ namespace Lifti
 
         internal void Add(int documentId, byte fieldId, Token token)
         {
-            if (token is null)
-            {
-                throw new ArgumentNullException(nameof(token));
-            }
+            ArgumentNullException.ThrowIfNull(token);
 
             this.root.Index(documentId, fieldId, token.Locations, token.Value.AsMemory());
         }

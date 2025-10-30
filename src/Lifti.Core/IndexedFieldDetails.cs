@@ -163,10 +163,7 @@ namespace Lifti
         /// <inheritdoc />
         public override ValueTask<IEnumerable<ReadOnlyMemory<char>>> ReadAsync(object item, CancellationToken cancellationToken)
         {
-            if (item is null)
-            {
-                throw new ArgumentNullException(nameof(item));
-            }
+            ArgumentNullException.ThrowIfNull(item);
 
             if (item is TObject typedItem)
             {

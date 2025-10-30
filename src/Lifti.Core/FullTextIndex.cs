@@ -254,10 +254,7 @@ namespace Lifti
         /// <inheritdoc />
         public async Task AddRangeAsync<TObject>(IEnumerable<TObject> items, CancellationToken cancellationToken = default)
         {
-            if (items is null)
-            {
-                throw new ArgumentNullException(nameof(items));
-            }
+            ArgumentNullException.ThrowIfNull(items);
 
             var options = this.ObjectTypeConfiguration.Get<TObject>();
             await this.PerformWriteLockedActionAsync(
@@ -336,10 +333,7 @@ namespace Lifti
         /// <inheritdoc />
         public ISearchResults<TKey> Search(IQuery query, QueryExecutionOptions options = QueryExecutionOptions.None)
         {
-            if (query is null)
-            {
-                throw new ArgumentNullException(nameof(query));
-            }
+            ArgumentNullException.ThrowIfNull(query);
 
             if (query is Query actualQuery && (options & QueryExecutionOptions.IncludeExecutionPlan) == QueryExecutionOptions.IncludeExecutionPlan)
             {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace Lifti.Querying
 {
@@ -20,12 +19,5 @@ namespace Lifti.Querying
 
         /// <inheritdoc />
         public QueryParserException(string message, Exception inner) : base(message, inner) { }
-
-#if NETSTANDARD
-        /// <inheritdoc />
-        protected QueryParserException(
-          SerializationInfo info,
-          StreamingContext context) : base(info, context) { }
-#endif
     }
 }

@@ -30,10 +30,7 @@ namespace Lifti.Querying.QueryParts
         public WildcardQueryPart(IEnumerable<WildcardQueryFragment> fragments, double? scoreBoost = null)
             : base(scoreBoost)
         {
-            if (fragments is null)
-            {
-                throw new ArgumentNullException(nameof(fragments));
-            }
+            ArgumentNullException.ThrowIfNull(fragments);
 
             this.Fragments = NormalizeFragmentSequence(fragments).ToList();
 
@@ -46,15 +43,9 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc />
         public override IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
-            if (navigatorCreator is null)
-            {
-                throw new ArgumentNullException(nameof(navigatorCreator));
-            }
+            ArgumentNullException.ThrowIfNull(navigatorCreator);
 
-            if (queryContext is null)
-            {
-                throw new ArgumentNullException(nameof(queryContext));
-            }
+            ArgumentNullException.ThrowIfNull(queryContext);
 
             var timing = queryContext.ExecutionTimings.Start(this, queryContext);
             using var navigator = navigatorCreator();

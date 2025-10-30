@@ -15,10 +15,7 @@ namespace Lifti
         /// </summary>
         public IndexNodeFactory(IndexOptions options)
         {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
+            ArgumentNullException.ThrowIfNull(options);
 
             this.supportIntraNodeTextAtDepth = options.SupportIntraNodeTextAfterIndexDepth;
         }

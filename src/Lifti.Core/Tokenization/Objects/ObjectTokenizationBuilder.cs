@@ -63,10 +63,7 @@ namespace Lifti.Tokenization.Objects
         /// </param>
         public ObjectTokenizationBuilder<TObject, TKey> WithKey(Func<TObject, TKey> keyReader)
         {
-            if (keyReader is null)
-            {
-                throw new ArgumentNullException(nameof(keyReader));
-            }
+            ArgumentNullException.ThrowIfNull(keyReader);
 
             this.keyReader = keyReader;
 
@@ -178,10 +175,7 @@ namespace Lifti.Tokenization.Objects
             Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
             double scoreBoost = 1D)
         {
-            if (dynamicFieldReader == null)
-            {
-                throw new ArgumentNullException(nameof(dynamicFieldReader));
-            }
+            ArgumentNullException.ThrowIfNull(dynamicFieldReader);
 
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.dynamicFieldReaderBuilders.Add(
@@ -207,10 +201,7 @@ namespace Lifti.Tokenization.Objects
             Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
             double scoreBoost = 1D)
         {
-            if (dynamicFieldReader == null)
-            {
-                throw new ArgumentNullException(nameof(dynamicFieldReader));
-            }
+            ArgumentNullException.ThrowIfNull(dynamicFieldReader);
 
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.dynamicFieldReaderBuilders.Add(
@@ -299,10 +290,7 @@ namespace Lifti.Tokenization.Objects
            Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
            double scoreBoost = 1D)
         {
-            if (dynamicFieldReader == null)
-            {
-                throw new ArgumentNullException(nameof(dynamicFieldReader));
-            }
+            ArgumentNullException.ThrowIfNull(dynamicFieldReader);
 
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.dynamicFieldReaderBuilders.Add(
@@ -356,10 +344,7 @@ namespace Lifti.Tokenization.Objects
             Func<ThesaurusBuilder, ThesaurusBuilder>? thesaurusOptions = null,
             double scoreBoost = 1D)
         {
-            if (dynamicFieldReader == null)
-            {
-                throw new ArgumentNullException(nameof(dynamicFieldReader));
-            }
+            ArgumentNullException.ThrowIfNull(dynamicFieldReader);
 
             var tokenizer = tokenizationOptions.CreateTokenizer();
             this.dynamicFieldReaderBuilders.Add(
@@ -616,10 +601,7 @@ namespace Lifti.Tokenization.Objects
         /// </exception>
         public ObjectTokenizationBuilder<TObject, TKey> WithScoreBoosting(Action<ObjectScoreBoostBuilder<TObject>> scoreBoostingOptions)
         {
-            if (scoreBoostingOptions is null)
-            {
-                throw new ArgumentNullException(nameof(scoreBoostingOptions));
-            }
+            ArgumentNullException.ThrowIfNull(scoreBoostingOptions);
 
             if (this.objectScoreBoostBuilder is not null)
             {
@@ -692,10 +674,7 @@ namespace Lifti.Tokenization.Objects
                 throw new ArgumentException(ExceptionMessages.FieldNameMustNotBeEmpty, nameof(name));
             }
 
-            if (fieldTextReader is null)
-            {
-                throw new ArgumentNullException(nameof(fieldTextReader));
-            }
+            ArgumentNullException.ThrowIfNull(fieldTextReader);
         }
     }
 }

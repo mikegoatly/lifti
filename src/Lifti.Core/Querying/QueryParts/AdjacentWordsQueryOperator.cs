@@ -18,10 +18,7 @@ namespace Lifti.Querying.QueryParts
         /// </param>
         public AdjacentWordsQueryOperator(IReadOnlyList<IQueryPart> words)
         {
-            if (words is null)
-            {
-                throw new ArgumentNullException(nameof(words));
-            }
+            ArgumentNullException.ThrowIfNull(words);
 
             if (words.Count == 0)
             {
@@ -39,10 +36,7 @@ namespace Lifti.Querying.QueryParts
         /// <inheritdoc/>
         public IntermediateQueryResult Evaluate(Func<IIndexNavigator> navigatorCreator, QueryContext queryContext)
         {
-            if (queryContext is null)
-            {
-                throw new ArgumentNullException(nameof(queryContext));
-            }
+            ArgumentNullException.ThrowIfNull(queryContext);
 
             var i = 0;
             var results = IntermediateQueryResult.Empty;

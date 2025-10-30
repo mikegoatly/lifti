@@ -26,10 +26,7 @@ namespace Lifti.Querying
         /// <inheritdoc />
         public IScorer CreateIndexScorer(IIndexSnapshot indexSnapshot)
         {
-            if (indexSnapshot is null)
-            {
-                throw new ArgumentNullException(nameof(indexSnapshot));
-            }
+            ArgumentNullException.ThrowIfNull(indexSnapshot);
 
             var cached = this.cachedScorer.GetValueOrDefault();
             if (cached.snapshot == indexSnapshot)

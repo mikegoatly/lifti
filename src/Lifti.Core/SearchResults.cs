@@ -67,10 +67,7 @@ namespace Lifti
             Func<IReadOnlyList<TKey>, CancellationToken, ValueTask<IReadOnlyList<TObject>>> loadItemsAsync,
             CancellationToken cancellationToken = default)
         {
-            if (loadItemsAsync is null)
-            {
-                throw new ArgumentNullException(nameof(loadItemsAsync));
-            }
+            ArgumentNullException.ThrowIfNull(loadItemsAsync);
 
             var itemTokenization = this.index.ObjectTypeConfiguration.Get<TObject>();
             var filteredResults = this.FilterFieldMatches<TObject>();

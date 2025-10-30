@@ -19,10 +19,7 @@ namespace Lifti.Querying
         /// </param>
         public FieldScoreBoostProvider(IIndexedFieldLookup fieldLookup)
         {
-            if (fieldLookup is null)
-            {
-                throw new ArgumentNullException(nameof(fieldLookup));
-            }
+            ArgumentNullException.ThrowIfNull(fieldLookup);
 
             this.fieldBoosts = fieldLookup.AllFieldNames
                 .Select(fieldName => fieldLookup.GetFieldInfo(fieldName))

@@ -94,10 +94,7 @@ namespace Lifti
         /// <inheritdoc cref="WithHyponyms(string, IEnumerable{string})"/>
         public ThesaurusBuilder WithHyponyms(string word, IEnumerable<string> hyponyms)
         {
-            if (hyponyms is null)
-            {
-                throw new ArgumentNullException(nameof(hyponyms));
-            }
+            ArgumentNullException.ThrowIfNull(hyponyms);
 
             // A hyponym is just a reversed hypernym relationship
             var hypernymsIncludingWord = new string[2];

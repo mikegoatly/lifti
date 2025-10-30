@@ -67,12 +67,7 @@
 		</EmbeddedResource>
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2'">
-		<AdditionalFiles Include="PublicAPI/netstandard2/PublicAPI.Shipped.txt" />
-		<AdditionalFiles Include="PublicAPI/netstandard2/PublicAPI.Unshipped.txt" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' != 'netstandard2'">
+	<ItemGroup>
 		<AdditionalFiles Include="PublicAPI/PublicAPI.Shipped.txt" />
 		<AdditionalFiles Include="PublicAPI/PublicAPI.Unshipped.txt" />
 	</ItemGroup>
