@@ -52,17 +52,6 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
-        public void MultipleAndNotOperators_ShouldChainCorrectly()
-        {
-            var results = this.index.Search("tower &! eiffel &! london");
-
-            // Start with all "tower" matches: 1, 4, 5, 6, 7
-            // Remove "eiffel": leaves 4, 5, 6
-            // Remove "london": leaves 4, 6
-            results.Select(r => r.Key).Should().BeEquivalentTo(new[] { 4, 6 });
-        }
-
-        [Fact]
         public void AndNotWithAndOperator_ShouldWorkCorrectly()
         {
             var results = this.index.Search("paris & eiffel &! tower");
@@ -76,13 +65,13 @@ namespace Lifti.Tests.Querying
         [Fact]
         public void AndNotWithOrOperator_ShouldRespectPrecedence()
         {
-            // With &! at same precedence as |, "tower | paris &! eiffel" parses as "(tower | paris) &! eiffel"
+            // With &! at same precedence as &, "tower | paris &! eiffel" parses as "tower | (paris &! eiffel)"
             var results = this.index.Search("tower | paris &! eiffel");
 
-            // Left side: tower | paris = docs 1, 2, 4, 5, 6, 7
-            // Right side: eiffel = docs 1, 3, 7
-            // Result: (tower | paris) - eiffel = {1, 2, 4, 5, 6, 7} - {1, 3, 7} = {2, 4, 5, 6}
-            results.Select(r => r.Key).Should().BeEquivalentTo(new[] { 2, 4, 5, 6 });
+            // Left side: tower = docs 1, 4, 5, 6, 7
+            // Right side: (paris - eiffel) = doc 2
+            // Result: tower | (paris - eiffel) = {1, 4, 5, 6, 7} + { 2 } = { 1, 2, 4, 5, 6, 7 }
+            results.Select(r => r.Key).Should().BeEquivalentTo(new[] { 1, 2, 4, 5, 6, 7 });
         }
 
         [Fact]

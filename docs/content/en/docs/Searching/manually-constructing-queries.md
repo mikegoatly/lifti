@@ -215,6 +215,12 @@ Would translate to the LIFTI query `%%d`, matching any words that start with any
 
 Intersects the results of two query parts. In other words, only matches that appear on **both** sides will be returned.
 
+#### `AndNotQueryOperator(IQueryPart left, IQueryPart right)`
+
+> `&!` in LIFTI query syntax (LIFTI v7+)
+
+Performs a difference operation, returning documents that match the left operand but exclude those that match the right operand. Only documents from the left side that do not appear in the right side will be returned.
+
 #### `OrQueryOperator(IQueryPart left, IQueryPart right)`
 
 > `|` in LIFTI query syntax

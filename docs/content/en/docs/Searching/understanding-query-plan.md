@@ -50,6 +50,10 @@ Typically introduced by an AND (&) operator. Only document results that are pres
 
 > Note the 3 document filters applied to the second search (SPECIES) - these are the 3 documents that were returned from the first search (ANIMAL). Without those document filters applied, searching for SPECIES would have returned many more documents.
 
+#### Except
+
+Introduced by the AND-NOT (&!) operator (LIFTI v7+). Performs a difference operation between two sets of results, returning only documents that exist in the left node but not in the right node. Like `Intersect`, document filters are applied to optimize performance by only evaluating the right side for documents that matched the left side.
+
 #### PositionalIntersect
 
 Introduced by the near (~), preceding near (~>) and adjacent words ("") operators. Like `Intersect`, but the locations of the matched tokens are taken into 

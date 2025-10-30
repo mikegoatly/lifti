@@ -21,6 +21,7 @@ The objective is to execute less costly parts first, reducing the document set s
     - **FuzzyMatchQueryPart**: Based on the ExactWordQueryPart's weighting, adding a factor for the number of edits allowed. Weight increases with more permissible edits.
     - **AdjacentWordsQueryPart**: Assumes the score of the first part of the query, adjusted by the inverse of the number of parts.
     - **Intersection Query Parts** (AndQueryPart, PrecedingNearQueryPart, NearQueryPart, PrecedingQueryPart): Promotes parts based on the lowest scoring part of the intersection, encouraging execution of the cheapest part first.
+    - **AndNotQueryOperator**: Uses the minimum of the left and right scores, similar to other intersection operations. Weight = `Min(Left Score, Right Score)`.
     - **OrQueryOperator**: A union operation always requires both sides to be evaluated, so weight = `Left Score + Right Score`.
     - **FieldFilterQueryOperator**: Applies additional filtering, thus promoted. Weight = `Child Part Score * 0.5`.
     - **BracketedQueryPart**: Reflects the score of the child part.

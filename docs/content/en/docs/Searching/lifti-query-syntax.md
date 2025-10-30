@@ -22,6 +22,7 @@ doc*|Words that starts with **doc**ument must appear in the text. [See wildcard 
 west&nbsp;&&nbsp;wing|The words **west** [and](#and-) **wing** must appear in the text.
 west&nbsp;wing|The words **west** [and](#and-) **wing** must appear in the text - the default operator is & if none is specified between search words.
 west&nbsp;\|&nbsp;wing|The words **west** [or](#or-) **wing** must appear in the text.
+west&nbsp;&!&nbsp;wing|Documents containing **west** but [not](#and-not-) **wing** must appear in the text.
 west&nbsp;~&nbsp;wing|**west** and **wing** must appear [near to each other](#near--and-n) (within 5 words - the default) in the text.
 west&nbsp;~3&nbsp;wing|**west** and **wing** must appear [near to each other](#near--and-n) (within **3** words) in the text.
 west&nbsp;~>&nbsp;wing|**west** must be [followed by](#near-following--and-n) **wing** closely (within 5 words - the default) in the text.
@@ -123,6 +124,23 @@ The and operator (`&`) Performs an intersection of two intermediate query result
 Performs a union of two intermediate query results. Where a document appears in both sets, word positions are combined into one list.
 
 Restricts results to same field by default: **false**
+
+---
+
+### And-Not (`&!`)
+
+> Applies to LIFTI v7 and later
+
+The and-not operator (`&!`) performs a difference operation, returning documents that match the left operand but exclude those that match the right operand.
+
+`Food &! Burger` searches for documents containing `"food"` but not `"burger"`.
+
+**Examples:**
+
+* `eiffel &! tower` - Documents containing "eiffel" but not "tower"
+* `(paris | london) &! museum` - Documents about Paris or London, excluding museums
+* `title=important &! content=spam` - Documents with "important" in title but not "spam" in content
+* `france &! (tower | museum)` - Documents about France excluding both towers and museums
 
 ---
 
