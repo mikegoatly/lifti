@@ -172,7 +172,14 @@ When modifying index state:
 2. Create query part classes in `Querying/QueryParts`
 3. Implement execution logic in query part
 4. Add appropriate scoring logic
-5. Test with various query combinations
+5. **Add query execution plan support** (if adding a new binary operator):
+   - Add new enum value to `QueryExecutionPlanNodeKind` in `QueryExecutionPlan.cs`
+   - Add case to `DeriveQueryPartSpecificInformation()` method to map operator to node kind
+   - Update `PublicAPI.Unshipped.txt` with new enum value
+   - Update `samples/Blazor/Pages/ExecutionPlanNode.razor`:
+     - Add SVG icon case in the switch statement for the new node kind
+     - Add text mapping in the `OnParametersSet` method
+6. Test with various query combinations
 
 ### Working with Tokenization
 
