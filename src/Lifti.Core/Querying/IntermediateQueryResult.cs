@@ -126,6 +126,30 @@ namespace Lifti.Querying
                 true);
         }
 
+        /// <summary>
+        /// Subtracts the specified results from this instance - equivalent to set difference.
+        /// Returns documents in this result set that are NOT in the specified result set.
+        /// This is the equivalent of an AND NOT statement.
+        /// </summary>
+        public IntermediateQueryResult Except(IntermediateQueryResult results)
+        {
+            // If this result set is empty, there's nothing to subtract from
+            if (this.Matches.Count == 0)
+            {
+                return Empty;
+            }
+
+            // If the exclusion set is empty, just return this unchanged
+            if (results.Matches.Count == 0)
+            {
+                return this;
+            }
+
+            return new IntermediateQueryResult(
+                ExceptMerger.Apply(this, results),
+                true);
+        }
+
         /// <inheritdoc />
         public override string ToString()
         {

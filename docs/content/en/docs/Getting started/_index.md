@@ -35,6 +35,12 @@ results = index.Search("Fizz | Buzz").ToList();
 
 // Outputs: Documents with Fizz or Buzz: 3
 Console.WriteLine($"Documents with Fizz or Buzz: {results.Count}");
+
+// Search for documents containing Fizz but *not* Buzz (LIFTI v7+)
+results = index.Search("Fizz &! Buzz").ToList();
+
+// Outputs: Documents with Fizz but not Buzz: 1
+Console.WriteLine($"Documents with Fizz but not Buzz: {results.Count}");
 ```
 
 Each set of results returns the keys that the text was indexed against. For example, the first set of results will return a key of 3, 

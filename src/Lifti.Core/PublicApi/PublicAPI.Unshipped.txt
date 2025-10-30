@@ -37,3 +37,13 @@ override Lifti.IndexedFieldDetails<TObject>.ReadAsync(object! item, System.Threa
 *REMOVED*override Lifti.IndexedFieldDetails<TObject>.ReadAsync(object! item, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IEnumerable<string!>!>
 override Lifti.QueryExecutionPlan.ToString() -> string!
 override Lifti.QueryExecutionPlanNode.ToString() -> string!
+*REMOVED*Lifti.Querying.QueryTokenType.FieldFilter = 10 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.IntermediateQueryResult.Except(Lifti.Querying.IntermediateQueryResult results) -> Lifti.Querying.IntermediateQueryResult
+Lifti.Querying.QueryParts.AndNotQueryOperator
+Lifti.Querying.QueryParts.AndNotQueryOperator.AndNotQueryOperator(Lifti.Querying.QueryParts.IQueryPart! left, Lifti.Querying.QueryParts.IQueryPart! right) -> void
+override Lifti.Querying.QueryParts.AndNotQueryOperator.Evaluate(System.Func<Lifti.Querying.IIndexNavigator!>! navigatorCreator, Lifti.Querying.QueryContext! queryContext) -> Lifti.Querying.IntermediateQueryResult
+override Lifti.Querying.QueryParts.AndNotQueryOperator.Precedence.get -> Lifti.Querying.OperatorPrecedence
+override Lifti.Querying.QueryParts.AndNotQueryOperator.ToString() -> string!
+Lifti.Querying.QueryTokenType.AndNotOperator = 10 -> Lifti.Querying.QueryTokenType
+Lifti.Querying.QueryTokenType.FieldFilter = 11 -> Lifti.Querying.QueryTokenType
+Lifti.QueryExecutionPlanNodeKind.Except = 8 -> Lifti.QueryExecutionPlanNodeKind

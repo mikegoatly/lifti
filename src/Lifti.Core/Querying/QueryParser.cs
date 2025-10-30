@@ -64,6 +64,7 @@ namespace Lifti.Querying
 
                 case QueryTokenType.OrOperator:
                 case QueryTokenType.AndOperator:
+                case QueryTokenType.AndNotOperator:
                 case QueryTokenType.NearOperator:
                 case QueryTokenType.PrecedingNearOperator:
                 case QueryTokenType.PrecedingOperator:
@@ -201,6 +202,7 @@ namespace Lifti.Querying
             return tokenType switch
             {
                 QueryTokenType.AndOperator => new AndQueryOperator(leftPart, rightPart),
+                QueryTokenType.AndNotOperator => new AndNotQueryOperator(leftPart, rightPart),
                 QueryTokenType.OrOperator => new OrQueryOperator(leftPart, rightPart),
                 QueryTokenType.NearOperator => new NearQueryOperator(leftPart, rightPart, tolerance),
                 QueryTokenType.PrecedingNearOperator => new PrecedingNearQueryOperator(leftPart, rightPart, tolerance),
@@ -214,6 +216,7 @@ namespace Lifti.Querying
             return tokenType switch
             {
                 QueryTokenType.AndOperator => OperatorPrecedence.And,
+                QueryTokenType.AndNotOperator => OperatorPrecedence.And,
                 QueryTokenType.OrOperator => OperatorPrecedence.Or,
                 QueryTokenType.PrecedingNearOperator
                     or QueryTokenType.NearOperator
@@ -222,7 +225,7 @@ namespace Lifti.Querying
             };
         }
 
-        private class QueryParserState
+        private sealed class QueryParserState
         {
             private readonly IEnumerator<QueryToken> enumerator;
 
