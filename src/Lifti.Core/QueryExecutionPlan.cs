@@ -133,6 +133,12 @@ namespace Lifti
         /// No execution plan was recorded during execution - this node is a placeholder for the final results.
         /// </summary>
         ResultsOnly = 7,
+
+        /// <summary>
+        /// The node performs a difference operation, returning documents that match the left operand
+        /// but exclude those that match the right operand.
+        /// </summary>
+        Except = 8,
     }
 
     /// <summary>
@@ -211,6 +217,7 @@ namespace Lifti
                 PrecedingQueryOperator => (QueryExecutionPlanNodeKind.PrecedingIntersect, $">", null),
                 AdjacentWordsQueryOperator => (QueryExecutionPlanNodeKind.PositionalIntersect, $"~1>", null),
                 AndQueryOperator => (QueryExecutionPlanNodeKind.Intersect, null, null),
+                AndNotQueryOperator => (QueryExecutionPlanNodeKind.Except, null, null),
                 OrQueryOperator => (QueryExecutionPlanNodeKind.Union, null, null),
                 _ => (QueryExecutionPlanNodeKind.Unknown, "UNKNOWN", null),
             };
