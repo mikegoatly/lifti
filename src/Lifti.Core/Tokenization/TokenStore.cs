@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Lifti.Tokenization
@@ -9,23 +10,23 @@ namespace Lifti.Tokenization
     /// </summary>
     internal class TokenStore
     {
-        private readonly Dictionary<string, Token> materializedTokens = [];
+        private readonly Dictionary<ReadOnlyMemory<char>, Token> materializedTokens = new(ReadOnlyMemoryCharComparer.Instance);
 
         /// <summary>
         /// Captures a token at a location, merging the token with any locations
-        /// it previously matched at.
+        /// it previously matched at. This overload accepts a ReadOnlySpan&lt;char&gt; for improved performance.
         /// </summary>
-        public Token MergeOrAdd(StringBuilder tokenText, TokenLocation location)
+        public Token MergeOrAdd(ReadOnlyMemory<char> tokenText, TokenLocation location)
         {
-            var text = tokenText.ToString();
-            if (materializedTokens.TryGetValue(text, out var token))
+            if (this.materializedTokens.TryGetValue(tokenText, out var token))
             {
                 token.AddLocation(location);
             }
             else
             {
+                var text = tokenText.ToString();
                 token = new Token(text, location);
-                materializedTokens.Add(text, token);
+                this.materializedTokens.Add(text.AsMemory(), token);
             }
 
             return token;

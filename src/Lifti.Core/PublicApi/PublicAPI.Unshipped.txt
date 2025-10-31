@@ -48,4 +48,23 @@ Lifti.Querying.QueryTokenType.AndNotOperator = 10 -> Lifti.Querying.QueryTokenTy
 Lifti.Querying.QueryTokenType.FieldFilter = 11 -> Lifti.Querying.QueryTokenType
 Lifti.QueryExecutionPlanNodeKind.Except = 8 -> Lifti.QueryExecutionPlanNodeKind
 *REMOVED*System.Runtime.CompilerServices.IsExternalInit
+Lifti.Tokenization.CharacterBuffer
+Lifti.Tokenization.CharacterBuffer.CharacterBuffer() -> void
+Lifti.Tokenization.CharacterBuffer.CharacterBuffer(int initialCapacity) -> void
+Lifti.Tokenization.CharacterBuffer.CharacterBuffer(System.ReadOnlySpan<char> source) -> void
+Lifti.Tokenization.CharacterBuffer.Length.get -> int
+Lifti.Tokenization.CharacterBuffer.Length.set -> void
+Lifti.Tokenization.CharacterBuffer.Capacity.get -> int
+Lifti.Tokenization.CharacterBuffer.this[int index].get -> char
+Lifti.Tokenization.CharacterBuffer.this[int index].set -> void
+Lifti.Tokenization.CharacterBuffer.Append(char c) -> void
+Lifti.Tokenization.CharacterBuffer.Append(string! text) -> void
+Lifti.Tokenization.CharacterBuffer.Append(System.ReadOnlySpan<char> chars) -> void
+Lifti.Tokenization.CharacterBuffer.Clear() -> void
+Lifti.Tokenization.CharacterBuffer.AsSpan() -> System.ReadOnlySpan<char>
+Lifti.Tokenization.CharacterBuffer.AsMemory() -> System.ReadOnlyMemory<char>
+Lifti.Tokenization.CharacterBuffer.Dispose() -> void
+override Lifti.Tokenization.CharacterBuffer.ToString() -> string!
+Lifti.Tokenization.IStemmer.Stem(ref Lifti.Tokenization.CharacterBuffer buffer) -> void
 *REMOVED*System.Runtime.CompilerServices.IsExternalInit.IsExternalInit() -> void
+*REMOVED*Lifti.Tokenization.IStemmer.Stem(System.Text.StringBuilder! builder) -> void

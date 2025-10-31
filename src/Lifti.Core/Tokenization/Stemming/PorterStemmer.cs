@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Lifti.Tokenization.Stemming
 {
@@ -153,44 +152,49 @@ namespace Lifti.Tokenization.Stemming
         public bool RequiresAccentInsensitivity => true;
 
         /// <inheritdoc />
-        public void Stem(StringBuilder builder)
+        public void Stem(ref CharacterBuffer buffer)
         {
-            if (builder.Length < 3)
+            if (buffer.Length < 3)
             {
                 return;
             }
 
-            if (builder[0] == '\'')
+            if (buffer[0] == '\'')
             {
-                builder.Remove(0, 1);
+                // Remove the leading apostrophe by shifting left
+                for (var i = 0; i < buffer.Length - 1; i++)
+                {
+                    buffer[i] = buffer[i + 1];
+                }
+                buffer.Length--;
             }
 
-            if (MatchExceptionWord(builder, exceptions))
-            {
-                return;
-            }
-
-            var changedY = builder.ChangeY();
-            var stemRegion = builder.ComputeStemRegion();
-
-            Step0(builder);
-            Step1a(builder);
-
-            if (MatchExceptionWord(builder, exceptions2))
+            if (MatchExceptionWord(ref buffer, exceptions))
             {
                 return;
             }
 
-            Step1b(builder, stemRegion);
-            Step1c(builder);
-            Step2(builder, stemRegion);
-            Step3(builder, stemRegion);
-            Step4(builder, stemRegion);
-            Step5(builder, stemRegion);
+            var changedY = buffer.ChangeY();
+            var stemRegion = buffer.ComputeStemRegion();
+
+            Step0(ref buffer);
+            Step1a(ref buffer);
+
+            if (MatchExceptionWord(ref buffer, exceptions2))
+            {
+                return;
+            }
+
+            Step1b(ref buffer, stemRegion);
+            Step1c(ref buffer);
+            Step2(ref buffer, stemRegion);
+            Step3(ref buffer, stemRegion);
+            Step4(ref buffer, stemRegion);
+            Step5(ref buffer, stemRegion);
 
             if (changedY)
             {
-                builder.RevertY();
+                buffer.RevertY();
             }
         }
 
@@ -233,7 +237,58 @@ namespace Lifti.Tokenization.Stemming
                     select g).ToDictionary(r => r.Key, r => r.ToArray());
         }
 
-        private static void Step1a(StringBuilder word)
+        private static bool IsRemovableLiEnding(char letter)
+        {
+            return letter switch
+            {
+                'C' or 'D' or 'E' or 'G' or 'H' or 'K' or 'M' or 'N' or 'R' or 'T' => true,
+                _ => false,
+            };
+        }
+
+        private static bool IsRemovableIonEnding(char letter)
+        {
+            return letter switch
+            {
+                'S' or 'T' => true,
+                _ => false,
+            };
+        }
+
+        // CharacterBuffer overloads for all stemming methods
+        private static bool MatchExceptionWord(ref CharacterBuffer word, IEnumerable<WordReplacement> possibleExceptions)
+        {
+            foreach (var possibleException in possibleExceptions)
+            {
+                if (word.SequenceEqual(possibleException.MatchWord))
+                {
+                    if (possibleException.MatchResult == null)
+                    {
+                        word.Length -= possibleException.TrimCharacterCount;
+                    }
+                    else
+                    {
+                        word.Clear();
+                        word.Append(possibleException.MatchResult);
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static void Step0(ref CharacterBuffer word)
+        {
+            var endsWith = word.EndsWith(apostropheEnds);
+            if (endsWith != null)
+            {
+                word.Length -= endsWith.Length;
+            }
+        }
+
+        private static void Step1a(ref CharacterBuffer word)
         {
             if (word.EndsWith("SSES"))
             {
@@ -274,73 +329,7 @@ namespace Lifti.Tokenization.Stemming
             }
         }
 
-        private static void Step1c(StringBuilder word)
-        {
-            var length = word.Length;
-            if (length <= 2)
-            {
-                return;
-            }
-
-            var lastChar = word[length - 1];
-            if ((lastChar == 'y' || lastChar == 'Y') && !word.IsVowel(length - 2))
-            {
-                word[length - 1] = 'I';
-            }
-        }
-
-        private static void Step5(StringBuilder word, StemRegion stemRegion)
-        {
-            var length = word.Length;
-            if (length == 0)
-            {
-                return;
-            }
-
-            if (word[length - 1] == 'E' &&
-                (length - 1 >= stemRegion.R2 || (length - 1 >= stemRegion.R1 && !word.IsShortSyllable(length - 3))))
-            {
-                word.Length -= 1;
-            }
-            else if (length - 1 >= stemRegion.R2 && word.EndsWith("LL"))
-            {
-                word.Length -= 1;
-            }
-        }
-
-        private static bool MatchExceptionWord(StringBuilder word, IEnumerable<WordReplacement> possibleExceptions)
-        {
-            foreach (var possibleException in possibleExceptions)
-            {
-                if (word.SequenceEqual(possibleException.MatchWord))
-                {
-                    if (possibleException.MatchResult == null)
-                    {
-                        word.Length -= possibleException.TrimCharacterCount;
-                    }
-                    else
-                    {
-                        word.Length = 0;
-                        word.Append(possibleException.MatchResult);
-                    }
-
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static void Step0(StringBuilder word)
-        {
-            var endsWith = word.EndsWith(apostropheEnds);
-            if (endsWith != null)
-            {
-                word.Length -= endsWith.Length;
-            }
-        }
-
-        private static void Step1b(StringBuilder word, StemRegion stemRegion)
+        private static void Step1b(ref CharacterBuffer word, StemRegion stemRegion)
         {
             var replacement = word.EndsWith(step1bReplacements);
             var matchedWord = replacement.MatchWord;
@@ -374,7 +363,7 @@ namespace Lifti.Tokenization.Stemming
                             {
                                 word.Append('E');
                             }
-                            else if (HasDoubleLetterEnding(word))
+                            else if (HasDoubleLetterEnding(ref word))
                             {
                                 word.Length -= 1;
                             }
@@ -389,17 +378,22 @@ namespace Lifti.Tokenization.Stemming
             }
         }
 
-        private static bool HasDoubleLetterEnding(StringBuilder word)
+        private static void Step1c(ref CharacterBuffer word)
         {
-            var last = word[word.Length - 1];
-            return last switch
+            var length = word.Length;
+            if (length <= 2)
             {
-                'B' or 'D' or 'F' or 'G' or 'M' or 'N' or 'P' or 'R' or 'T' => word[word.Length - 2] == last,
-                _ => false,
-            };
+                return;
+            }
+
+            var lastChar = word[length - 1];
+            if ((lastChar == 'y' || lastChar == 'Y') && !word.IsVowel(length - 2))
+            {
+                word[length - 1] = 'I';
+            }
         }
 
-        private static void Step2(StringBuilder word, StemRegion stemRegion)
+        private static void Step2(ref CharacterBuffer word, StemRegion stemRegion)
         {
             var replacement = word.EndsWith(step2Replacements);
             var length = word.Length;
@@ -430,16 +424,7 @@ namespace Lifti.Tokenization.Stemming
             }
         }
 
-        private static bool IsRemovableLiEnding(char letter)
-        {
-            return letter switch
-            {
-                'C' or 'D' or 'E' or 'G' or 'H' or 'K' or 'M' or 'N' or 'R' or 'T' => true,
-                _ => false,
-            };
-        }
-
-        private static void Step3(StringBuilder word, StemRegion stemRegion)
+        private static void Step3(ref CharacterBuffer word, StemRegion stemRegion)
         {
             var replacement = word.EndsWith(step3Replacements);
             if (replacement.MatchWord != null && word.Length - replacement.MatchWord.Length >= stemRegion.R1)
@@ -458,7 +443,7 @@ namespace Lifti.Tokenization.Stemming
             }
         }
 
-        private static void Step4(StringBuilder word, StemRegion stemRegion)
+        private static void Step4(ref CharacterBuffer word, StemRegion stemRegion)
         {
             var replacement = word.EndsWith(step4Replacements);
             if (replacement.MatchWord != null && word.Length - replacement.MatchWord.Length >= stemRegion.R2)
@@ -477,11 +462,31 @@ namespace Lifti.Tokenization.Stemming
             }
         }
 
-        private static bool IsRemovableIonEnding(char letter)
+        private static void Step5(ref CharacterBuffer word, StemRegion stemRegion)
         {
-            return letter switch
+            var length = word.Length;
+            if (length == 0)
             {
-                'S' or 'T' => true,
+                return;
+            }
+
+            if (word[length - 1] == 'E' &&
+                (length - 1 >= stemRegion.R2 || (length - 1 >= stemRegion.R1 && !word.IsShortSyllable(length - 3))))
+            {
+                word.Length -= 1;
+            }
+            else if (length - 1 >= stemRegion.R2 && word.EndsWith("LL"))
+            {
+                word.Length -= 1;
+            }
+        }
+
+        private static bool HasDoubleLetterEnding(ref CharacterBuffer word)
+        {
+            var last = word[word.Length - 1];
+            return last switch
+            {
+                'B' or 'D' or 'F' or 'G' or 'M' or 'N' or 'P' or 'R' or 'T' => word[word.Length - 2] == last,
                 _ => false,
             };
         }
