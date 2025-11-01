@@ -138,9 +138,9 @@ namespace Lifti.Tokenization
             if (this.buffer != null)
             {
                 ArrayPool<char>.Shared.Return(this.buffer);
-                this.buffer = null!;
                 this.length = 0;
             }
+        }
         }
 
         /// <summary>
