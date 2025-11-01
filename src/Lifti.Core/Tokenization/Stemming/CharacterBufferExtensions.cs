@@ -199,33 +199,6 @@ namespace Lifti.Tokenization.Stemming
         }
 
         /// <summary>
-        /// Tests if the given substring appears at the start of the character buffer.
-        /// </summary>
-        /// <param name="buffer">The buffer to check within.</param>
-        /// <param name="substring">The substring to test.</param>
-        /// <returns>
-        ///     <c>true</c> if the given substring appears at the start of the character buffer, otherwise <c>false</c>.
-        /// </returns>
-        public static bool StartsWith(this ref CharacterBuffer buffer, string substring)
-        {
-            if (buffer.Length < substring.Length)
-            {
-                return false;
-            }
-
-            var length = substring.Length;
-            for (var i = 0; i < length; i++)
-            {
-                if (buffer[i] != substring[i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
         /// Determines whether there is a vowel followed by a consonant at the given index.
         /// </summary>
         /// <param name="buffer">The buffer to check within.</param>

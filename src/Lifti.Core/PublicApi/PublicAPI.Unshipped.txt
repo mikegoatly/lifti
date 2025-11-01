@@ -3,6 +3,7 @@
 *REMOVED*Lifti.DocumentStatistics.DocumentStatistics(System.Collections.Generic.IReadOnlyDictionary<byte, int>! tokenCountByField, int totalTokenCount, System.Collections.Generic.IReadOnlyDictionary<byte, int>? lastTokenIndexByField = null) -> void
 *REMOVED*Lifti.DocumentStatistics.LastTokenIndexByField.get -> System.Collections.Generic.IReadOnlyDictionary<byte, int>!
 Lifti.Tokenization.CharacterBuffer.EndsWith(System.ReadOnlySpan<char> suffix) -> bool
+Lifti.Tokenization.CharacterBuffer.StartsWith(System.ReadOnlySpan<char> prefix) -> bool
 virtual Lifti.Serialization.IndexDeserializerBase<TKey>.UpdateDocumentMetadata(Lifti.Serialization.DocumentMetadataCollector<TKey>! documentMetadata) -> void
 abstract Lifti.IndexedFieldDetails.ReadAsync(object! item, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IEnumerable<System.ReadOnlyMemory<char>>!>
 Lifti.DocumentStatistics.DocumentStatistics(System.Collections.Generic.IReadOnlyDictionary<byte, Lifti.FieldStatistics>! statisticsByField, int totalTokenCount) -> void

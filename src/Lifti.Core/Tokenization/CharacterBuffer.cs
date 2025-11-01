@@ -179,5 +179,21 @@ namespace Lifti.Tokenization
             return this.buffer.AsSpan().Slice(this.length - suffix.Length, suffix.Length)
                 .SequenceEqual(suffix);
         }
+
+        /// <summary>
+        /// Determines whether the current span begins with the specified prefix.
+        /// </summary>
+        /// <param name="prefix">The span to compare against the beginning of the current span. Must not be longer than the current span.</param>
+        /// <returns>true if the current span starts with the specified prefix; otherwise, false.</returns>
+        public bool StartsWith(ReadOnlySpan<char> prefix)
+        {
+            if (prefix.Length > this.length)
+            {
+                return false;
+            }
+
+            return this.buffer.AsSpan(0, prefix.Length)
+                .SequenceEqual(prefix);
+        }
     }
 }

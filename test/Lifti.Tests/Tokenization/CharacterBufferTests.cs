@@ -29,6 +29,16 @@ namespace Lifti.Tests.Tokenization
         }
 
         [Fact]
+        public void StartsWith_ShouldReturnTrueForMatchingPrefix()
+        {
+            var buffer = new CharacterBuffer("Hello World");
+            buffer.StartsWith("Hello").Should().BeTrue();
+            buffer.StartsWith("World").Should().BeFalse();
+            
+            buffer.Dispose();
+        }
+
+        [Fact]
         public void Constructor_WithReadOnlySpan_ShouldCopyContent()
         {
             var source = "Hello World";
