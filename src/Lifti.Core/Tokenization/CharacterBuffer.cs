@@ -163,5 +163,21 @@ namespace Lifti.Tokenization
             ArrayPool<char>.Shared.Return(this.buffer);
             this.buffer = newBuffer;
         }
+
+        /// <summary>
+        /// Determines whether the end of the current span matches the specified suffix.
+        /// </summary>
+        /// <param name="suffix">The span of characters to compare to the end of the current span. The comparison is case-sensitive.</param>
+        /// <returns>true if the end of the current span matches the specified suffix; otherwise, false.</returns>
+        public bool EndsWith(ReadOnlySpan<char> suffix)
+        {
+            if (suffix.Length > this.length)
+            {
+                return false;
+            }
+
+            return this.buffer.AsSpan().Slice(this.length - suffix.Length, suffix.Length)
+                .SequenceEqual(suffix);
+        }
     }
 }

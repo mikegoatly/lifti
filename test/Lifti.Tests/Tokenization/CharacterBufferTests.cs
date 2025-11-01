@@ -19,9 +19,19 @@ namespace Lifti.Tests.Tokenization
         }
 
         [Fact]
+        public void EndsWith_ShouldReturnTrueForMatchingSuffix()
+        {
+            var buffer = new CharacterBuffer("Hello World");
+            buffer.EndsWith("World").Should().BeTrue();
+            buffer.EndsWith("Hello").Should().BeFalse();
+            
+            buffer.Dispose();
+        }
+
+        [Fact]
         public void Constructor_WithReadOnlySpan_ShouldCopyContent()
         {
-            var source = "Hello World".AsSpan();
+            var source = "Hello World";
             var buffer = new CharacterBuffer(source);
 
             buffer.Length.Should().Be(11);
@@ -63,9 +73,9 @@ namespace Lifti.Tests.Tokenization
         {
             var buffer = new CharacterBuffer(10);
             
-            buffer.Append("Hello".AsSpan());
-            buffer.Append(" ".AsSpan());
-            buffer.Append("World".AsSpan());
+            buffer.Append("Hello");
+            buffer.Append(" ");
+            buffer.Append("World");
 
             buffer.Length.Should().Be(11);
             buffer.ToString().Should().Be("Hello World");
@@ -89,7 +99,7 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void Indexer_Get_ShouldReturnCorrectCharacter()
         {
-            var buffer = new CharacterBuffer("Test".AsSpan());
+            var buffer = new CharacterBuffer("Test");
 
             buffer[0].Should().Be('T');
             buffer[1].Should().Be('e');
@@ -102,7 +112,7 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void Indexer_Set_ShouldModifyCharacter()
         {
-            var buffer = new CharacterBuffer("Test".AsSpan());
+            var buffer = new CharacterBuffer("Test");
 
             buffer[0] = 'B';
             buffer[3] = 's';
@@ -115,7 +125,7 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void Length_Set_ShouldTruncateContent()
         {
-            var buffer = new CharacterBuffer("Hello World".AsSpan());
+            var buffer = new CharacterBuffer("Hello World");
 
             buffer.Length = 5;
 
@@ -127,7 +137,7 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void Length_SetToZero_ShouldClearContent()
         {
-            var buffer = new CharacterBuffer("Hello".AsSpan());
+            var buffer = new CharacterBuffer("Hello");
 
             buffer.Length = 0;
 
@@ -140,7 +150,7 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void Clear_ShouldResetLength()
         {
-            var buffer = new CharacterBuffer("Hello".AsSpan());
+            var buffer = new CharacterBuffer("Hello");
 
             buffer.Clear();
 
@@ -153,7 +163,7 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void Clear_ShouldAllowReuse()
         {
-            var buffer = new CharacterBuffer("Hello".AsSpan());
+            var buffer = new CharacterBuffer("Hello");
 
             buffer.Clear();
             buffer.Append("World");
@@ -166,7 +176,7 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void AsSpan_ShouldReturnCorrectContent()
         {
-            var buffer = new CharacterBuffer("Hello".AsSpan());
+            var buffer = new CharacterBuffer("Hello");
 
             var span = buffer.AsSpan();
 
@@ -179,7 +189,7 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void AsMemory_ShouldReturnCorrectContent()
         {
-            var buffer = new CharacterBuffer("Hello".AsSpan());
+            var buffer = new CharacterBuffer("Hello");
 
             var memory = buffer.AsMemory();
 
@@ -192,7 +202,7 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void AsSpan_AfterModification_ShouldReflectChanges()
         {
-            var buffer = new CharacterBuffer("Hello".AsSpan());
+            var buffer = new CharacterBuffer("Hello");
             buffer[0] = 'J';
             buffer.Append(" World");
 
@@ -219,7 +229,7 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void Dispose_ShouldAllowSafeCleanup()
         {
-            var buffer = new CharacterBuffer("Hello".AsSpan());
+            var buffer = new CharacterBuffer("Hello");
             
             buffer.Dispose();
 

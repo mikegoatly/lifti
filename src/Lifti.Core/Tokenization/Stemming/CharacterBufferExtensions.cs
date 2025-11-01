@@ -111,30 +111,6 @@ namespace Lifti.Tokenization.Stemming
             return changed;
         }
 
-        public static bool EndsWith(this ref CharacterBuffer buffer, string substring)
-        {
-            return buffer.EndsWith(substring, buffer.Length);
-        }
-
-        private static bool EndsWith(this ref CharacterBuffer buffer, string substring, int endOffset)
-        {
-            var length = buffer.Length;
-            if (length < substring.Length)
-            {
-                return false;
-            }
-
-            for (int i = length - substring.Length, j = 0; i < endOffset; i++, j++)
-            {
-                if (buffer[i] != substring[j])
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         /// <summary>
         /// Tests if any of the given substrings appear at the end of the character buffer.
         /// </summary>
@@ -189,10 +165,9 @@ namespace Lifti.Tokenization.Stemming
             if (length > 0 &&
                 substringLookup.TryGetValue(buffer[length - 1], out var potentialSubstrings))
             {
-                var endTestOffset = length - 1;
                 foreach (var potentialMatch in potentialSubstrings)
                 {
-                    if (buffer.EndsWith(potentialMatch, endTestOffset))
+                    if (buffer.EndsWith(potentialMatch))
                     {
                         return potentialMatch;
                     }
