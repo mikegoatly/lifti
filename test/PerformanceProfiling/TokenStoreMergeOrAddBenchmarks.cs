@@ -10,7 +10,7 @@ namespace PerformanceProfiling
     public class TokenStoreMergeOrAddBenchmarks : IndexBenchmarkBase
     {
         private TokenStore tokenStore = new();
-        private string[] tokenTexts = [.. Enumerable.Range(0, 10000).Select(i => $"token{i}")];
+        private readonly string[] tokenTexts = [.. Enumerable.Range(0, 10000).Select(i => $"token{i}")];
         private readonly TokenLocation sampleLocation = new(1, 1, 1);
 
         [IterationSetup]
