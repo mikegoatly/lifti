@@ -162,10 +162,8 @@ namespace Lifti.Tokenization.Stemming
             if (buffer[0] == '\'')
             {
                 // Remove the leading apostrophe by shifting left
-                for (var i = 0; i < buffer.Length - 1; i++)
-                {
-                    buffer[i] = buffer[i + 1];
-                }
+                // Remove the leading apostrophe by shifting left efficiently
+                buffer.AsSpan().Slice(1, buffer.Length - 1).CopyTo(buffer.AsSpan());
                 buffer.Length--;
             }
 
