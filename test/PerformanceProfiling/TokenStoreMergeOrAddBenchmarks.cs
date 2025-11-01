@@ -9,10 +9,15 @@ namespace PerformanceProfiling
 {
     public class TokenStoreMergeOrAddBenchmarks : IndexBenchmarkBase
     {
-        private readonly TokenStore tokenStore = new();
+        private TokenStore tokenStore = new();
         private string[] tokenTexts = [.. Enumerable.Range(0, 10000).Select(i => $"token{i}")];
         private readonly TokenLocation sampleLocation = new(1, 1, 1);
 
+        [IterationSetup]
+        public void IterationSetup()
+        {
+            this.tokenStore = new TokenStore();
+        }
         [Benchmark]
         public object MergeOrAddTokens_AllUnique()
         {
