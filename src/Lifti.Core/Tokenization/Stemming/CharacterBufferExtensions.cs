@@ -257,31 +257,5 @@ namespace Lifti.Tokenization.Stemming
 
             return new StemRegion(r1, r2);
         }
-
-        /// <summary>
-        /// Determines whether the character buffer content is equal to the given string.
-        /// </summary>
-        /// <param name="buffer">The buffer to check.</param>
-        /// <param name="chars">The string to compare against.</param>
-        /// <returns>
-        ///     <c>true</c> if the character buffer content equals the given string; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool SequenceEqual(this ref CharacterBuffer buffer, string chars)
-        {
-            if (chars.Length != buffer.Length)
-            {
-                return false;
-            }
-
-            for (var i = 0; i < chars.Length; i++)
-            {
-                if (chars[i] != buffer[i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
     }
 }

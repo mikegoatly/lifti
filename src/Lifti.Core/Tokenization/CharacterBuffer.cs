@@ -195,5 +195,22 @@ namespace Lifti.Tokenization
             return this.buffer.AsSpan(0, prefix.Length)
                 .SequenceEqual(prefix);
         }
+
+        /// <summary>
+        /// Determines whether the sequence of characters in the current instance is equal to the sequence in the
+        /// specified read-only character span.
+        /// </summary>
+        /// <param name="other">A read-only span of characters to compare with the current instance.</param>
+        /// <returns>true if the sequences are equal in length and contain the same characters in the same order; otherwise,
+        /// false.</returns>
+        public bool SequenceEqual(ReadOnlySpan<char> other)
+        {
+            if (other.Length != this.length)
+            {
+                return false;
+            }
+
+            return this.buffer.AsSpan(0, this.length).SequenceEqual(other);
+        }
     }
 }
