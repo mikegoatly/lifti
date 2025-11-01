@@ -16,7 +16,6 @@ namespace PerformanceProfiling
         [Benchmark]
         public object MergeOrAddTokens_AllUnique()
         {
-            Console.WriteLine(this.tokenTexts.Length);
             foreach (var tokenText in this.tokenTexts)
             {
                 this.tokenStore.MergeOrAdd(tokenText.AsMemory(), this.sampleLocation);
