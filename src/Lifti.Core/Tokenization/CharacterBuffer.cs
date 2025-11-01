@@ -141,7 +141,6 @@ namespace Lifti.Tokenization
                 this.length = 0;
             }
         }
-        }
 
         /// <summary>
         /// Converts the buffer to a string.
