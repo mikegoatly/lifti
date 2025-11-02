@@ -149,6 +149,11 @@ namespace Lifti.Tests
             {
                 builder.Length = 1;
             }
+
+            public void Stem(ref CharacterBuffer buffer)
+            {
+                buffer.Length = 1;
+            }
         }
     }
 }

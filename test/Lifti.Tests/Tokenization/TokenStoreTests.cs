@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Lifti.Tokenization;
-using System.Text;
+using System;
 using Xunit;
 
 namespace Lifti.Tests.Tokenization
@@ -19,7 +19,7 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void ShouldCreateEntryForFirstCall()
         {
-            this.sut.MergeOrAdd(new StringBuilder("test"), this.location1);
+            this.sut.MergeOrAdd("test".AsMemory(), this.location1);
 
             this.sut.ToList().Should().BeEquivalentTo(
                 new[]
@@ -31,8 +31,8 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void ShouldCreateSeparateEntryForNovelHash()
         {
-            this.sut.MergeOrAdd(new StringBuilder("test"), this.location1);
-            this.sut.MergeOrAdd(new StringBuilder("test7"), this.location2);
+            this.sut.MergeOrAdd("test".AsMemory(), this.location1);
+            this.sut.MergeOrAdd("test7".AsMemory(), this.location2);
 
             this.sut.ToList().Should().BeEquivalentTo(
                 new[]
@@ -45,8 +45,8 @@ namespace Lifti.Tests.Tokenization
         [Fact]
         public void ShouldCombineEntriesForMatchingHashAndText()
         {
-            this.sut.MergeOrAdd(new StringBuilder("test"), this.location1);
-            this.sut.MergeOrAdd(new StringBuilder("test"), this.location2);
+            this.sut.MergeOrAdd("test".AsMemory(), this.location1);
+            this.sut.MergeOrAdd("test".AsMemory(), this.location2);
 
             this.sut.ToList().Should().BeEquivalentTo(
                 new[]

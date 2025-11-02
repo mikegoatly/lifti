@@ -1,0 +1,92 @@
+name: Build and Publish
+
+on:
+  push:
+    paths:
+      - "src/**"
+      - "test/**"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "src/**"
+      - "test/**"
+
+env:
+  MAJOR_VERSION: 7
+  MINOR_VERSION: 0
+  PATCH_VERSION: 0
+  PROJECT_PATH: src/Lifti.Core/Lifti.Core.csproj
+  TEST_PROJECT_PATH: test/Lifti.Tests/Lifti.Tests.csproj
+  DOTNET_VERSION_8: "8.0.x"
+  DOTNET_VERSION_9: "9.0.x"
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for proper versioning
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION_8 }}
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION_9 }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-build --verbosity normal
+
+      - name: Pack NuGet package
+        run: |
+          if ("${{ github.ref }}" -eq "refs/heads/master") {
+            $version = "${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ env.PATCH_VERSION }}"
+          } else {
+            $version = "${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ env.PATCH_VERSION }}-ci.${{ github.run_number }}"
+          }
+          dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ./packages -p:PackageVersion=$version
+        shell: pwsh
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./packages/*.nupkg
+          retention-days: 90
+
+  publish:
+    name: Publish to NuGet
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    environment:
+      name: Nuget
+      url: https://www.nuget.org/packages/Lifti.Core
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./packages
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION_9 }}
+
+      - name: Push to NuGet
+        run: dotnet nuget push ./packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate

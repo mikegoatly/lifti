@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
+using Lifti.Tokenization;
 using Lifti.Tokenization.Stemming;
 using System;
 using System.IO;
-using System.Text;
 using Xunit;
 
 namespace Lifti.Tests.Tokenization.Stemming
@@ -18,7 +18,7 @@ namespace Lifti.Tests.Tokenization.Stemming
         {
             var stemmer = new PorterStemmer();
 
-            var builder = new StringBuilder();
+            var builder = new CharacterBuffer(256);
             using var stream = typeof(PorterStemmerTests).Assembly.GetManifestResourceStream(typeof(PorterStemmerTests), "StemmerTestCases.txt");
             using var reader = new StreamReader(stream!);
             string? line;
@@ -34,7 +34,7 @@ namespace Lifti.Tests.Tokenization.Stemming
 
                 builder.Length = 0;
                 builder.Append(testCase[0]);
-                stemmer.Stem(builder);
+                stemmer.Stem(ref builder);
                 builder.ToString().Should().Be(testCase[1], because: "Stemming {0}", testCase[0]);
             }
         }

@@ -1,7 +1,6 @@
 ﻿using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Lifti.Tests
 {
@@ -10,7 +9,7 @@ namespace Lifti.Tests
         public IEnumerable<DocumentTextFragment> Extract(ReadOnlyMemory<char> document, int startOffset = 0)
         {
             var reversed = document.Span.ToArray();
-            reversed.Reverse();
+            Array.Reverse(reversed);
 
             return new[]
             {

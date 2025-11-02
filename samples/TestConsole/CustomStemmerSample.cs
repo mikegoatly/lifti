@@ -11,11 +11,11 @@ namespace TestConsole
 
         public bool RequiresAccentInsensitivity => false;
 
-        public void Stem(StringBuilder builder)
+        public void Stem(ref CharacterBuffer buffer)
         {
-            if (builder.Length > 3)
+            if (buffer.Length > 3)
             {
-                builder.Length = 3;
+                buffer.Length = 3;
             }
         }
     }
