@@ -96,12 +96,10 @@ stages:
       artifact: 'packages'
 
     - task: DotNetCoreCLI@2
-      displayName: 'Push NuGet Package'
       inputs:
-        command: 'push'
-        packagesToPush: '$(Pipeline.Workspace)/packages/ci/*.nupkg'
-        nuGetFeedType: 'external'
-        publishFeedCredentials: 'NuGet'
+        command: 'custom'
+        custom: 'nuget'
+        arguments: 'push $(Pipeline.Workspace)/packages/ci/*.nupkg --api-key $(NUGET_API_KEY)'
 
 - stage: 'PublishReleaseNuGetPackage'
   displayName: 'Publish Release NuGet Package'
@@ -117,9 +115,7 @@ stages:
        deploy:
          steps:
           - task: DotNetCoreCLI@2
-            displayName: 'Push NuGet Package'
             inputs:
-              command: 'push'
-              packagesToPush: '$(Pipeline.Workspace)/packages/release/*.nupkg'
-              nuGetFeedType: 'external'
-              publishFeedCredentials: 'NuGet'
+              command: 'custom'
+              custom: 'nuget'
+              arguments: 'push $(Pipeline.Workspace)/packages/release/*.nupkg --api-key $(NUGET_API_KEY)'
