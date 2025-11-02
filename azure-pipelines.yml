@@ -96,7 +96,8 @@ stages:
       artifact: 'packages'
 
     - task: NuGetAuthenticate@1  
-      nuGetServiceCredentials: 'NuGet'
+      inputs:
+        nuGetServiceConnections: 'NuGet'
     - task: DotNetCoreCLI@2
       displayName: 'Push NuGet Package'
       inputs:
@@ -117,8 +118,9 @@ stages:
      runOnce:
        deploy:
          steps:
-         - task: NuGetAuthenticate@1
-           nuGetServiceCredentials: 'NuGet'
+          - task: NuGetAuthenticate@1
+            inputs:
+              nuGetServiceConnections: 'NuGet'
           - task: DotNetCoreCLI@2
             displayName: 'Push NuGet Package'
             inputs:
