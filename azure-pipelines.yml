@@ -95,15 +95,13 @@ stages:
     - download: current
       artifact: 'packages'
 
-    - task: NuGetAuthenticate@1  
-      inputs:
-        nuGetServiceConnections: 'NuGet'
     - task: DotNetCoreCLI@2
       displayName: 'Push NuGet Package'
       inputs:
         command: 'push'
         packagesToPush: '$(Pipeline.Workspace)/packages/ci/*.nupkg'
-        publishVstsFeed: 'NuGet'
+        nuGetFeedType: 'external'
+        publishFeedCredentials: 'NuGet'
 
 - stage: 'PublishReleaseNuGetPackage'
   displayName: 'Publish Release NuGet Package'
@@ -118,12 +116,10 @@ stages:
      runOnce:
        deploy:
          steps:
-          - task: NuGetAuthenticate@1
-            inputs:
-              nuGetServiceConnections: 'NuGet'
           - task: DotNetCoreCLI@2
             displayName: 'Push NuGet Package'
             inputs:
               command: 'push'
               packagesToPush: '$(Pipeline.Workspace)/packages/release/*.nupkg'
-              publishVstsFeed: 'NuGet'
+              nuGetFeedType: 'external'
+              publishFeedCredentials: 'NuGet'
