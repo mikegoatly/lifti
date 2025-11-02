@@ -33,8 +33,9 @@ namespace Lifti.Tokenization
         }
 
         /// <summary>
-        /// Gets or sets the length of the buffer.
+        /// Gets or sets the length of the buffer. This will not resize the buffer, only adjust the logical length.
         /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when setting a length less than zero or greater than the buffer capacity.</exception>"
         public int Length
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -131,14 +132,66 @@ namespace Lifti.Tokenization
         }
 
         /// <summary>
+        /// Determines whether the end of the current span matches the specified suffix.
+        /// </summary>
+        /// <param name="suffix">The span of characters to compare to the end of the current span. The comparison is case-sensitive.</param>
+        /// <returns>true if the end of the current span matches the specified suffix; otherwise, false.</returns>
+        public readonly bool EndsWith(ReadOnlySpan<char> suffix)
+        {
+            if (suffix.Length > this.length)
+            {
+                return false;
+            }
+
+            return this.buffer.AsSpan().Slice(this.length - suffix.Length, suffix.Length)
+                .SequenceEqual(suffix);
+        }
+
+        /// <summary>
+        /// Determines whether the current span begins with the specified prefix.
+        /// </summary>
+        /// <param name="prefix">The span to compare against the beginning of the current span. Must not be longer than the current span.</param>
+        /// <returns>true if the current span starts with the specified prefix; otherwise, false.</returns>
+        public readonly bool StartsWith(ReadOnlySpan<char> prefix)
+        {
+            if (prefix.Length > this.length)
+            {
+                return false;
+            }
+
+            return this.buffer.AsSpan(0, prefix.Length)
+                .SequenceEqual(prefix);
+        }
+
+        /// <summary>
+        /// Determines whether the sequence of characters in the current instance is equal to the sequence in the
+        /// specified read-only character span.
+        /// </summary>
+        /// <param name="other">A read-only span of characters to compare with the current instance.</param>
+        /// <returns>true if the sequences are equal in length and contain the same characters in the same order; otherwise,
+        /// false.</returns>
+        public readonly bool SequenceEqual(ReadOnlySpan<char> other)
+        {
+            if (other.Length != this.length)
+            {
+                return false;
+            }
+
+            return this.buffer.AsSpan(0, this.length).SequenceEqual(other);
+        }
+
+        /// <summary>
         /// Returns the buffer to the pool and resets the state.
         /// </summary>
         public void Dispose()
         {
-            if (this.buffer != null)
+            if (this.buffer is not null)
             {
                 ArrayPool<char>.Shared.Return(this.buffer);
                 this.length = 0;
+
+                // Prevent double return and guard against use after dispose
+                this.buffer = null!;
             }
         }
 
@@ -162,55 +215,6 @@ namespace Lifti.Tokenization
             Array.Copy(this.buffer, newBuffer, this.length);
             ArrayPool<char>.Shared.Return(this.buffer);
             this.buffer = newBuffer;
-        }
-
-        /// <summary>
-        /// Determines whether the end of the current span matches the specified suffix.
-        /// </summary>
-        /// <param name="suffix">The span of characters to compare to the end of the current span. The comparison is case-sensitive.</param>
-        /// <returns>true if the end of the current span matches the specified suffix; otherwise, false.</returns>
-        public bool EndsWith(ReadOnlySpan<char> suffix)
-        {
-            if (suffix.Length > this.length)
-            {
-                return false;
-            }
-
-            return this.buffer.AsSpan().Slice(this.length - suffix.Length, suffix.Length)
-                .SequenceEqual(suffix);
-        }
-
-        /// <summary>
-        /// Determines whether the current span begins with the specified prefix.
-        /// </summary>
-        /// <param name="prefix">The span to compare against the beginning of the current span. Must not be longer than the current span.</param>
-        /// <returns>true if the current span starts with the specified prefix; otherwise, false.</returns>
-        public bool StartsWith(ReadOnlySpan<char> prefix)
-        {
-            if (prefix.Length > this.length)
-            {
-                return false;
-            }
-
-            return this.buffer.AsSpan(0, prefix.Length)
-                .SequenceEqual(prefix);
-        }
-
-        /// <summary>
-        /// Determines whether the sequence of characters in the current instance is equal to the sequence in the
-        /// specified read-only character span.
-        /// </summary>
-        /// <param name="other">A read-only span of characters to compare with the current instance.</param>
-        /// <returns>true if the sequences are equal in length and contain the same characters in the same order; otherwise,
-        /// false.</returns>
-        public bool SequenceEqual(ReadOnlySpan<char> other)
-        {
-            if (other.Length != this.length)
-            {
-                return false;
-            }
-
-            return this.buffer.AsSpan(0, this.length).SequenceEqual(other);
         }
     }
 }
