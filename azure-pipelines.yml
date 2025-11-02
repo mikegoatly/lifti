@@ -99,7 +99,7 @@ stages:
       inputs:
         command: 'custom'
         custom: 'nuget'
-        arguments: 'push $(Pipeline.Workspace)/packages/ci/*.nupkg --api-key $(NUGET_API_KEY)'
+        arguments: 'push -s $(Pipeline.Workspace)/packages/ci/*.nupkg --api-key $(NUGET_API_KEY)'
 
 - stage: 'PublishReleaseNuGetPackage'
   displayName: 'Publish Release NuGet Package'
@@ -118,4 +118,4 @@ stages:
             inputs:
               command: 'custom'
               custom: 'nuget'
-              arguments: 'push $(Pipeline.Workspace)/packages/release/*.nupkg --api-key $(NUGET_API_KEY)'
+              arguments: 'push -s $(Pipeline.Workspace)/packages/release/*.nupkg --api-key $(NUGET_API_KEY)'
