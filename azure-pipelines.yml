@@ -99,7 +99,8 @@ stages:
 
     - download: current
       artifact: 'packages'
-      
+
+    - task: NuGetAuthenticate@1  
     - task: NuGetCommand@2
       displayName: 'Push NuGet Package'
       inputs:
@@ -121,6 +122,7 @@ stages:
      runOnce:
        deploy:
          steps:
+         - task: NuGetAuthenticate@1
          - task: NuGetCommand@2
            displayName: 'Push NuGet Package'
            inputs:
