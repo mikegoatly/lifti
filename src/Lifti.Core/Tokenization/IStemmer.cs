@@ -21,8 +21,8 @@ namespace Lifti.Tokenization
         bool RequiresAccentInsensitivity { get; }
 
         /// <summary>
-        /// Applies stemming to the word in the given <see cref="StringBuilder"/>.
+        /// Applies stemming to the word in the given <see cref="CharacterBuffer"/>.
         /// </summary>
-        void Stem(StringBuilder builder);
+        void Stem(ref CharacterBuffer buffer);
     }
 }

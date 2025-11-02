@@ -51,19 +51,26 @@ namespace Lifti.Tokenization
 
             var processedTokens = new TokenStore();
             var tokenIndex = 0;
-            var tokenBuilder = new StringBuilder();
+            var tokenBuffer = new CharacterBuffer(256);
 
-            foreach (var documentFragment in input)
+            try
             {
-                this.Process(
-                    documentFragment.Text.Span,
-                    ref tokenIndex,
-                    documentFragment.Offset,
-                    processedTokens,
-                    tokenBuilder);
-            }
+                foreach (var documentFragment in input)
+                {
+                    this.Process(
+                        documentFragment.Text.Span,
+                        ref tokenIndex,
+                        documentFragment.Offset,
+                        processedTokens,
+                        ref tokenBuffer);
+                }
 
-            return processedTokens.ToList();
+                return processedTokens.ToList();
+            }
+            finally
+            {
+                tokenBuffer.Dispose();
+            }
         }
 
         /// <inheritdoc />
@@ -71,27 +78,41 @@ namespace Lifti.Tokenization
         {
             var processedTokens = new TokenStore();
             var tokenIndex = 0;
-            var tokenBuilder = new StringBuilder();
+            var tokenBuffer = new CharacterBuffer(256);
 
-            this.Process(input, ref tokenIndex, 0, processedTokens, tokenBuilder);
+            try
+            {
+                this.Process(input, ref tokenIndex, 0, processedTokens, ref tokenBuffer);
 
-            return processedTokens.ToList();
+                return processedTokens.ToList();
+            }
+            finally
+            {
+                tokenBuffer.Dispose();
+            }
         }
 
         /// <inheritdoc />
         public string Normalize(ReadOnlySpan<char> tokenText)
         {
-            var tokenBuilder = new StringBuilder(tokenText.Length);
+            var tokenBuffer = new CharacterBuffer(tokenText.Length);
 
-            foreach (var character in tokenText)
+            try
             {
-                foreach (var processed in this.inputPreprocessorPipeline.Process(character))
+                foreach (var character in tokenText)
                 {
-                    tokenBuilder.Append(processed);
+                    foreach (var processed in this.inputPreprocessorPipeline.Process(character))
+                    {
+                        tokenBuffer.Append(processed);
+                    }
                 }
-            }
 
-            return tokenBuilder.ToString();
+                return tokenBuffer.ToString();
+            }
+            finally
+            {
+                tokenBuffer.Dispose();
+            }
         }
 
         private void Process(
@@ -99,7 +120,7 @@ namespace Lifti.Tokenization
             ref int tokenIndex,
             int startOffset,
             TokenStore processedTokens,
-            StringBuilder tokenBuilder)
+            ref CharacterBuffer tokenBuffer)
         {
             var start = startOffset;
             for (var i = 0; i < input.Length; i++)
@@ -107,9 +128,9 @@ namespace Lifti.Tokenization
                 var current = input[i];
                 if (this.IsSplitCharacter(current))
                 {
-                    if (tokenBuilder.Length > 0)
+                    if (tokenBuffer.Length > 0)
                     {
-                        this.CaptureToken(processedTokens, ref tokenIndex, start, i + startOffset, tokenBuilder);
+                        this.CaptureToken(processedTokens, ref tokenIndex, start, i + startOffset, ref tokenBuffer);
                     }
 
                     start = i + startOffset + 1;
@@ -118,14 +139,14 @@ namespace Lifti.Tokenization
                 {
                     foreach (var processed in this.inputPreprocessorPipeline.Process(current))
                     {
-                        tokenBuilder.Append(processed);
+                        tokenBuffer.Append(processed);
                     }
                 }
             }
 
-            if (tokenBuilder.Length > 0)
+            if (tokenBuffer.Length > 0)
             {
-                this.CaptureToken(processedTokens, ref tokenIndex, start, input.Length + startOffset, tokenBuilder);
+                this.CaptureToken(processedTokens, ref tokenIndex, start, input.Length + startOffset, ref tokenBuffer);
             }
         }
 
@@ -148,7 +169,7 @@ namespace Lifti.Tokenization
                );
         }
 
-        private void CaptureToken(TokenStore processedTokens, ref int tokenIndex, int start, int end, StringBuilder tokenBuilder)
+        private void CaptureToken(TokenStore processedTokens, ref int tokenIndex, int start, int end, ref CharacterBuffer tokenBuffer)
         {
             var length = end - start;
 
@@ -157,12 +178,12 @@ namespace Lifti.Tokenization
                 throw new LiftiException(ExceptionMessages.MaxTokenLengthExceeded, ushort.MaxValue);
             }
 
-            this.stemmer?.Stem(tokenBuilder);
+            this.stemmer?.Stem(ref tokenBuffer);
 
-            processedTokens.MergeOrAdd(tokenBuilder, new TokenLocation(tokenIndex, start, (ushort)length));
+            processedTokens.MergeOrAdd(tokenBuffer.AsMemory(), new TokenLocation(tokenIndex, start, (ushort)length));
 
             tokenIndex++;
-            tokenBuilder.Length = 0;
+            tokenBuffer.Clear();
         }
     }
 }

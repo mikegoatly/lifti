@@ -27,11 +27,6 @@ stages:
 
     steps:
     - task: UseDotNet@2
-      displayName: "Use .NET 6"
-      inputs:
-        packageType: 'sdk'
-        version: '6.0.x'
-    - task: UseDotNet@2
       displayName: "Use .NET 8"
       inputs:
         packageType: 'sdk'
@@ -99,14 +94,12 @@ stages:
 
     - download: current
       artifact: 'packages'
-      
-    - task: NuGetCommand@2
-      displayName: 'Push NuGet Package'
+
+    - task: DotNetCoreCLI@2
       inputs:
-        command: 'push'
-        packagesToPush: '$(Pipeline.Workspace)/packages/ci/*.nupkg'
-        nuGetFeedType: 'external'
-        publishFeedCredentials: 'NuGet'
+        command: 'custom'
+        custom: 'nuget'
+        arguments: 'push -s $(Pipeline.Workspace)/packages/ci/*.nupkg --api-key $(NUGET_API_KEY)'
 
 - stage: 'PublishReleaseNuGetPackage'
   displayName: 'Publish Release NuGet Package'
@@ -121,10 +114,8 @@ stages:
      runOnce:
        deploy:
          steps:
-         - task: NuGetCommand@2
-           displayName: 'Push NuGet Package'
-           inputs:
-             command: 'push'
-             packagesToPush: '$(Pipeline.Workspace)/packages/release/*.nupkg'
-             nuGetFeedType: 'external'
-             publishFeedCredentials: 'NuGet'
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: 'custom'
+              custom: 'nuget'
+              arguments: 'push -s $(Pipeline.Workspace)/packages/release/*.nupkg --api-key $(NUGET_API_KEY)'
