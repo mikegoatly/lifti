@@ -124,6 +124,49 @@ namespace Lifti.Querying
 
         public bool Process(ReadOnlySpan<char> text)
         {
+            if (text.IsEmpty)
+            {
+                return true;
+            }
+
+            if (this.currentNode == null)
+            {
+                return false;
+            }
+
+            // Fast path: bulk comparison when processing intra-node text
+            if (HasIntraNodeTextLeftToProcess(this.intraNodeTextPosition, this.currentNode))
+            {
+                var remainingIntraNodeText = this.currentNode.IntraNodeText.Span.Slice(this.intraNodeTextPosition);
+                var compareLength = Math.Min(text.Length, remainingIntraNodeText.Length);
+
+                // Use SIMD-accelerated SequenceEqual for bulk comparison
+                var matchSlice = text.Slice(0, compareLength);
+                if (!matchSlice.SequenceEqual(remainingIntraNodeText.Slice(0, compareLength)))
+                {
+                    this.currentNode = null;
+                    return false;
+                }
+
+                // Update navigation tracking
+                if (this.bookmarkApplied == false)
+                {
+                    this.navigatedWith.Append(matchSlice);
+                }
+
+                this.intraNodeTextPosition += compareLength;
+
+                // If we consumed all input, we're done
+                if (compareLength == text.Length)
+                {
+                    return true;
+                }
+
+                // Continue processing remaining text
+                return this.Process(text.Slice(compareLength));
+            }
+
+            // Slow path: character-by-character for child node navigation
             foreach (var next in text)
             {
                 if (!this.Process(next))
