@@ -269,16 +269,13 @@ namespace Lifti
                 // Test the current intra-node text against the remaining token text to see if
                 // we can index here or need to split
                 var testLength = Math.Min(remainingTokenText.Length, this.IntraNodeText.Length);
-                var intraNodeSpan = this.IntraNodeText.Span;
-                var tokenSpan = remainingTokenText.Span;
-                for (var i = 0; i < testLength; i++)
+                var commonPrefixLength = remainingTokenText.Span.CommonPrefixLength(this.IntraNodeText.Span);
+
+                if (commonPrefixLength < testLength)
                 {
-                    if (tokenSpan[i] != intraNodeSpan[i])
-                    {
-                        this.SplitIntraNodeText(i);
-                        this.ContinueIndexingAtChild(documentId, fieldId, locations, remainingTokenText, i);
-                        return;
-                    }
+                    this.SplitIntraNodeText(commonPrefixLength);
+                    this.ContinueIndexingAtChild(documentId, fieldId, locations, remainingTokenText, commonPrefixLength);
+                    return;
                 }
 
                 if (this.IntraNodeText.Length > testLength)
