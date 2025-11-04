@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using Lifti;
 using Lifti.Serialization.Binary;
 using System;
 using System.IO;
@@ -10,23 +11,38 @@ namespace PerformanceProfiling
     {
         private readonly BinarySerializer<int> serializer = new();
         private readonly string fileName = $"{Guid.NewGuid()}.dat";
+        private readonly FullTextIndex<int> populatedIndex = CreateNewIndex(4);
 
         [GlobalSetup]
         public async Task Setup()
         {
-            var index = CreateNewIndex(2);
-            await this.PopulateIndexAsync(index);
+            await this.PopulateIndexAsync(this.populatedIndex);
 
             using var stream = File.OpenWrite(this.fileName);
-            await this.serializer.SerializeAsync(index, stream, true);
+            await this.serializer.SerializeAsync(this.populatedIndex, stream, true);
         }
 
         [Benchmark()]
         public async Task IndexDeserialization()
         {
-            var index = CreateNewIndex(2);
+            var index = CreateNewIndex(4);
             using var stream = File.OpenRead(this.fileName);
             await this.serializer.DeserializeAsync(index, stream, true);
+        }
+
+        [Benchmark()]
+        public async Task IndexSerialization()
+        {
+            var temporaryFile = Path.GetTempFileName();
+            try
+            {
+                using var stream = File.OpenWrite(temporaryFile);
+                await this.serializer.SerializeAsync(this.populatedIndex, stream, true);
+            }
+            finally
+            {
+                File.Delete(temporaryFile);
+            }
         }
     }
 }
