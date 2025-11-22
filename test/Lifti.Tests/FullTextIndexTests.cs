@@ -268,7 +268,7 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public async void ObjectsWithMultipleDynamicFieldsShouldGenerateCorrectPrefixedFieldNames()
+        public async Task ObjectsWithMultipleDynamicFieldsShouldGenerateCorrectPrefixedFieldNames()
         {
             var index = await CreateDynamicObjectTestIndexAsync(true);
 
@@ -284,7 +284,7 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public async void SearchesCanBePerformedForDynamicFieldsWithPrefixes()
+        public async Task SearchesCanBePerformedForDynamicFieldsWithPrefixes()
         {
             var index = await CreateDynamicObjectTestIndexAsync(true);
 
@@ -297,7 +297,7 @@ namespace Lifti.Tests
         }
 
         [Fact]
-        public async void ObjectsWithMultipleDynamicFieldsUsingTheSameFieldNamesShouldRaiseError()
+        public async Task ObjectsWithMultipleDynamicFieldsUsingTheSameFieldNamesShouldRaiseError()
         {
             var exception = await Assert.ThrowsAsync<LiftiException>(
                 async () => await CreateDynamicObjectTestIndexAsync(false));
