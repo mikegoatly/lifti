@@ -167,7 +167,6 @@ namespace Lifti
             Func<TKey, CancellationToken, ValueTask<ReadOnlyMemory<char>>> loadTextAsync,
             CancellationToken cancellationToken = default)
         {
-            var objectTokenization = this.index.DefaultTokenizer;
             var objectResults = this.FilterFieldMatches(field => field == IndexedFieldLookup.DefaultFieldName);
 
             return await this.CreateMatchPhrasesAsync(loadTextAsync, objectResults, cancellationToken).ConfigureAwait(false);
