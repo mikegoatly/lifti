@@ -21,7 +21,7 @@ namespace Lifti.Serialization.Binary
         /// Used to track max token indices for each (documentId, fieldId) pair during deserialization
         /// so we can populate accurate LastTokenIndex values added in V7 of the index.
         /// </summary>
-        private Dictionary<(int documentId, byte fieldId), int> maxTokenIndices;
+        private readonly Dictionary<(int documentId, byte fieldId), int> maxTokenIndices;
 
         public V2IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer)
         {
