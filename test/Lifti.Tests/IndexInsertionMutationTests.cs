@@ -13,7 +13,7 @@ namespace Lifti.Tests
             this.Sut.Add(Item1, FieldId1, new Token("test", this.Locations1.Locations));
             var result = this.Sut.Apply();
 
-            VerifyResult(result, "test", new[] { (Item1, this.Locations1) });
+            VerifyResult(result, "test", [(Item1, this.Locations1)]);
         }
 
         [Theory]
@@ -38,10 +38,10 @@ namespace Lifti.Tests
             var result = this.Sut.Apply();
 
             VerifyResult(result, null, expectedChildNodes: ['a', 'b']);
-            VerifyResult(result, ['a'], null, new[] { (Item4, this.Locations4) }, ['b', 'p']);
-            VerifyResult(result, ['b'], "anana", new[] { (Item3, this.Locations3) });
-            VerifyResult(result, ['a', 'b'], "le", new[] { (Item2, this.Locations2) });
-            VerifyResult(result, ['a', 'p'], "ple", new[] { (Item1, this.Locations1) });
+            VerifyResult(result, ['a'], null, [(Item4, this.Locations4)], ['b', 'p']);
+            VerifyResult(result, ['b'], "anana", [(Item3, this.Locations3)]);
+            VerifyResult(result, ['a', 'b'], "le", [(Item2, this.Locations2)]);
+            VerifyResult(result, ['a', 'p'], "ple", [(Item1, this.Locations1)]);
         }
 
         [Fact]
@@ -53,9 +53,9 @@ namespace Lifti.Tests
             var result = this.Sut.Apply();
 
             VerifyResult(result, "fre", expectedChildNodes: ['d', 'e']);
-            VerifyResult(result, ['e'], "dom", new[] { (Item1, this.Locations1) });
-            VerifyResult(result, ['d'], null, new[] { (Item2, this.Locations2) }, ['d']);
-            VerifyResult(result, ['d', 'd'], "y", new[] { (Item3, this.Locations3) });
+            VerifyResult(result, ['e'], "dom", [(Item1, this.Locations1)]);
+            VerifyResult(result, ['d'], null, [(Item2, this.Locations2)], ['d']);
+            VerifyResult(result, ['d', 'd'], "y", [(Item3, this.Locations3)]);
         }
 
         [Fact]
@@ -66,9 +66,9 @@ namespace Lifti.Tests
             this.Sut.Add(Item3, FieldId1, new Token("tester", this.Locations3.Locations));
             var result = this.Sut.Apply();
 
-            VerifyResult(result, "test", new[] { (Item1, this.Locations1) }, ['e', 'i']);
-            VerifyResult(result, ['i'], "ng", new[] { (Item2, this.Locations2) });
-            VerifyResult(result, ['e'], "r", new[] { (Item3, this.Locations3) });
+            VerifyResult(result, "test", [(Item1, this.Locations1)], ['e', 'i']);
+            VerifyResult(result, ['i'], "ng", [(Item2, this.Locations2)]);
+            VerifyResult(result, ['e'], "r", [(Item3, this.Locations3)]);
         }
 
         [Fact]
@@ -80,9 +80,9 @@ namespace Lifti.Tests
             var result = this.Sut.Apply();
 
             VerifyResult(result, "broke", expectedChildNodes: ['n', 'r']);
-            VerifyResult(result, ['r'], "", new[] { (Item1, this.Locations1) }, ['a']);
-            VerifyResult(result, ['n'], "", new[] { (Item2, this.Locations2) });
-            VerifyResult(result, ['r', 'a'], "ge", new[] { (Item3, this.Locations3) });
+            VerifyResult(result, ['r'], "", [(Item1, this.Locations1)], ['a']);
+            VerifyResult(result, ['n'], "", [(Item2, this.Locations2)]);
+            VerifyResult(result, ['r', 'a'], "ge", [(Item3, this.Locations3)]);
         }
 
         [Theory]
@@ -93,9 +93,9 @@ namespace Lifti.Tests
             string indexText,
             char originalSplitChar,
             char newSplitChar,
-            string remainingIntraText,
-            string splitIntraText,
-            string newIntraText)
+            string? remainingIntraText,
+            string? splitIntraText,
+            string? newIntraText)
         {
             this.Sut.Add(Item1, FieldId1, new Token("test", this.Locations1.Locations));
             this.Sut.Add(Item2, FieldId1, new Token(indexText, this.Locations2.Locations));
@@ -107,8 +107,8 @@ namespace Lifti.Tests
             Array.Sort(expectedChildNodes);
 
             VerifyResult(result, remainingIntraText, expectedChildNodes: expectedChildNodes);
-            VerifyResult(result, [originalSplitChar], splitIntraText, new[] { (Item1, this.Locations1) });
-            VerifyResult(result, [newSplitChar], newIntraText, new[] { (Item2, this.Locations2) });
+            VerifyResult(result, [originalSplitChar], splitIntraText, [(Item1, this.Locations1)]);
+            VerifyResult(result, [newSplitChar], newIntraText, [(Item2, this.Locations2)]);
         }
 
         [Fact]
@@ -118,8 +118,8 @@ namespace Lifti.Tests
             this.Sut.Add(Item2, FieldId1, new Token("NOITA", this.Locations2.Locations));
             var result = this.Sut.Apply();
 
-            VerifyResult(result, "NOITA", new[] { (Item2, this.Locations2) }, expectedChildNodes: ['Z']);
-            VerifyResult(result, ['Z'], "I", new[] { (Item1, this.Locations1) });
+            VerifyResult(result, "NOITA", [(Item2, this.Locations2)], expectedChildNodes: ['Z']);
+            VerifyResult(result, ['Z'], "I", [(Item1, this.Locations1)]);
         }
 
         [Fact]
@@ -131,9 +131,9 @@ namespace Lifti.Tests
             var result = this.Sut.Apply();
 
             VerifyResult(result, "w", expectedChildNodes: ['3', 'w']);
-            VerifyResult(result, ['w'], "w", new[] { (Item1, this.Locations1) });
-            VerifyResult(result, ['3'], null, new[] { (Item3, this.Locations3) }, ['c']);
-            VerifyResult(result, ['3', 'c'], null, new[] { (Item2, this.Locations2) });
+            VerifyResult(result, ['w'], "w", [(Item1, this.Locations1)]);
+            VerifyResult(result, ['3'], null, [(Item3, this.Locations3)], ['c']);
+            VerifyResult(result, ['3', 'c'], null, [(Item2, this.Locations2)]);
         }
     }
 }
