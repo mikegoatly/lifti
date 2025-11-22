@@ -23,6 +23,7 @@ env:
   TEST_PROJECT_PATH: test/Lifti.Tests/Lifti.Tests.csproj
   DOTNET_VERSION_8: "8.0.x"
   DOTNET_VERSION_9: "9.0.x"
+  DOTNET_VERSION_10: "10.0.x"
 
 jobs:
   build-and-test:
@@ -44,6 +45,11 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION_9 }}
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION_10 }}
 
       - name: Restore dependencies
         run: dotnet restore
