@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<RootNamespace>Lifti</RootNamespace>
 		<Authors>Mike Goatly</Authors>
 		<Product>LIFTI</Product>
