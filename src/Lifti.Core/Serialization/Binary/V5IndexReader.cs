@@ -16,7 +16,7 @@ namespace Lifti.Serialization.Binary
         private readonly MemoryStream buffer;
         private long initialUnderlyingStreamOffset;
         protected readonly BinaryReader reader;
-        private Dictionary<(int documentId, byte fieldId), int> maxTokenIndices;
+        private readonly Dictionary<(int documentId, byte fieldId), int> maxTokenIndices;
 
         public V5IndexReader(Stream stream, bool disposeStream, IKeySerializer<TKey> keySerializer)
         {
