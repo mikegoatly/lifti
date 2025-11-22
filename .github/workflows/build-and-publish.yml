@@ -58,6 +58,9 @@ jobs:
         run: |
           if ("${{ github.ref }}" -eq "refs/heads/master") {
             $version = "${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ env.PATCH_VERSION }}"
+          } elseif ("${{ github.event_name }}" -eq "pull_request") {
+            $timestamp = (Get-Date).ToUniversalTime().ToString("yyyyMMdd-HHmm")
+            $version = "${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ env.PATCH_VERSION }}-pr-${{ github.event.pull_request.number }}-$timestamp"
           } else {
             $version = "${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ env.PATCH_VERSION }}-ci.${{ github.run_number }}"
           }
