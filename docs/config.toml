@@ -49,6 +49,10 @@ anchor = "smart"
 # Comment out the next line to disable GA tracking. Also disables the feature described in [params.ui.feedback].
 #id = "UA-00000000-0"
 
+[services.disqus]
+# Disqus comments disabled - set shortname if you want to enable
+shortname = ""
+
 # Language configuration
 
 description = "A Lightweight Full Text Indexer for .NET"
