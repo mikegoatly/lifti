@@ -1,0 +1,244 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.152.2">
+<link rel="alternate" type="application/rss&#43;xml" href="https://mikegoatly.github.io/lifti/index.xml">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/lifti/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/lifti/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/lifti/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/lifti/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/lifti/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/lifti/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/lifti/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/lifti/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/lifti/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
+
+<title>LIFTI</title>
+<meta name="description" content="">
+<meta property="og:url" content="https://mikegoatly.github.io/lifti/">
+  <meta property="og:site_name" content="LIFTI">
+  <meta property="og:title" content="LIFTI - A Lightweight Full Text Indexing library for .NET">
+  <meta property="og:description" content="LIFTI Learn More Source Code Try it out A fast, in-memory, full-text indexer for .NET (netstandard 2.0)
+You’re just one package away from indexing your text Install-Package Lifti.Core">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="website">
+    <meta property="og:image" content="https://mikegoatly.github.io/lifti/featured-background.jpg">
+
+  <meta itemprop="name" content="LIFTI - A Lightweight Full Text Indexing library for .NET">
+  <meta itemprop="description" content="LIFTI Learn More Source Code Try it out A fast, in-memory, full-text indexer for .NET (netstandard 2.0)
+You’re just one package away from indexing your text Install-Package Lifti.Core">
+  <meta itemprop="dateModified" content="2024-01-16T22:43:44+00:00">
+  <meta itemprop="wordCount" content="63">
+  <meta itemprop="image" content="https://mikegoatly.github.io/lifti/featured-background.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://mikegoatly.github.io/lifti/featured-background.jpg">
+  <meta name="twitter:title" content="LIFTI - A Lightweight Full Text Indexing library for .NET">
+  <meta name="twitter:description" content="LIFTI Learn More Source Code Try it out A fast, in-memory, full-text indexer for .NET (netstandard 2.0)
+You’re just one package away from indexing your text Install-Package Lifti.Core">
+
+
+
+
+<link rel="preload" href="/lifti/scss/main.min.06a34647e931da2a1d4d6c3a00b2f06d828e435d928120e9127c33df50da888e.css" as="style">
+<link href="/lifti/scss/main.min.06a34647e931da2a1d4d6c3a00b2f06d828e435d928120e9127c33df50da888e.css" rel="stylesheet" integrity="">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
+  crossorigin="anonymous"></script>
+<script defer
+  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
+  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
+  crossorigin="anonymous"></script>
+
+  </head>
+  <body class="td-home">
+    <header>
+      <nav class="td-navbar js-navbar-scroll td-navbar-cover" data-bs-theme="dark">
+<div class="container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/lifti/"><span class="navbar-brand__logo navbar-logo"><svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg"><defs/><path d="M38.225 8.178h96.774l31.117 31.117v131.5H38.225V88.826h87.587V71.35h24.422V59.722H125.812L126.216 41.408H38.225V8.178zM54.049 116.715h96.185V105.087H54.049v11.628zm0 37.076h96.185V142.163H54.049v11.628z" style="stroke-width:0;stroke:#020f0e;fill:#14a89b"/><rect x="11.244" y="51.461" width="106.346" height="28.227" style="stroke-width:5px;fill:#1adbca;stroke:#0e756c" rx="11.718" ry="11.718"/></svg></span><span class="navbar-brand__name">LIFTI</span></a>
+  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="/lifti/about/"><span>About</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/lifti/docs/"><span>Documentation</span></a>
+      </li>
+      </ul>
+  </div>
+  <div class="d-none d-lg-block">
+    <div class="td-search td-search--offline">
+  <div class="td-search__icon"></div>
+  <input
+    type="search"
+    class="td-search__input form-control"
+    placeholder="Search this site…"
+    aria-label="Search this site…"
+    autocomplete="off"
+    
+    data-offline-search-index-json-src="/lifti/offline-search-index.497cbe3e06f6028c75c359a51d4aaebc.json"
+    data-offline-search-base-href="/"
+    data-offline-search-max-results="10"
+  >
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-default td-outer">
+      <main role="main" class="td-main">
+        
+
+
+<link rel="preload" as="image" href="/lifti/featured-background_hu_3d7af9c5c755406a.jpg" media="(max-width: 1200px)">
+<link rel="preload" as="image" href="/lifti/featured-background_hu_beee3d18bc9f996d.jpg" media="(min-width: 1200px)">
+<style>
+#td-cover-block-0 {
+  background-image: url(/lifti/featured-background_hu_3d7af9c5c755406a.jpg);
+}
+@media only screen and (min-width: 1200px) {
+  #td-cover-block-0 {
+    background-image: url(/lifti/featured-background_hu_beee3d18bc9f996d.jpg);
+  }
+}
+</style>
+<section id="td-cover-block-0" class="row td-cover-block td-cover-block--height-full js-td-cover td-overlay td-overlay--dark -bg-dark">
+  <div class="col-12">
+    <div class="container td-overlay__inner">
+      <div class="text-center">
+        <h1 class="display-1 mt-0 mt-md-5 pb-4">LIFTI</h1>
+        
+        <div class="pt-3 lead">
+          
+              
+<div class="mx-auto">
+	<a class="btn btn-lg btn-primary mr-3 mb-4" href="/lifti/docs/">
+		Learn More <i class="fas fa-arrow-alt-circle-right ml-2"></i>
+	</a>
+	<a class="btn btn-lg btn-secondary mr-3 mb-4" href="https://github.com/mikegoatly/lifti">
+		Source Code <i class="fab fa-github ml-2 "></i>
+	</a>
+	<a class="btn btn-lg btn-success mr-3 mb-4" href="blazor-sample">
+		Try it out <i class="fas fa-lightbulb ml-2 "></i>
+	</a>
+	<p class="lead mt-5">A fast, in-memory, full-text indexer for .NET (netstandard 2.0)</p>
+</div>
+
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</section>
+
+
+<div><a id="td-block-1" class="td-offset-anchor"></a></div>
+<section class="row td-box td-box--dark td-box--height-auto">
+<div class="col">
+<div class="container">
+
+
+<div class="col-lg-4 mb-5 mb-lg-0 text-center">
+<div class="mb-4 h1">
+  <i class="fas fa-cube"></i>
+</div>
+<h4 class="h3">You&rsquo;re just one package away from indexing your text</h4>
+<div class="mb-0">
+<p><code>Install-Package Lifti.Core</code></p>
+
+</div>
+<p><a href="https://nuget.org/packages/lifti.core">Read more</a></p>
+</div>
+
+
+
+<div class="col-lg-4 mb-5 mb-lg-0 text-center">
+<div class="mb-4 h1">
+  <i class="fab fa-github"></i>
+</div>
+<h4 class="h3">Contributions welcome!</h4>
+<div class="mb-0">
+<p>Want to help? New users are welcome to get involved in raising issues, but even better getting stuck in with maintaining
+the code!</p>
+
+</div>
+<p><a href="https://github.com/mikegoatly/lifti">Read more</a></p>
+</div>
+
+
+
+<div class="col-lg-4 mb-5 mb-lg-0 text-center">
+<div class="mb-4 h1">
+  <i class="fab fa-mastodon"></i>
+</div>
+<h4 class="h3">Follow us on Mastodon!</h4>
+<div class="mb-0">
+
+</div>
+<p><a href="https://toot.community/@mikegoatly">Read more</a></p>
+</div>
+
+
+
+</div>
+</div>
+</section>
+
+
+
+      </main>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Twitter" aria-label="Twitter">
+    <a target="_blank" rel="noopener" href="https://twitter.com/mikegoatly" aria-label="Twitter">
+      <i class="fab fa-twitter"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Stack Overflow" aria-label="Stack Overflow">
+    <a target="_blank" rel="noopener" href="https://stackoverflow.com/tags/lifti" aria-label="Stack Overflow">
+      <i class="fab fa-stack-overflow"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/mikegoatly/lifti" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2025
+    <span class="td-footer__authors">Mike Goatly</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span><p class="td-footer__about mt-2"><a href="/lifti/about/">About LIFTI</a></p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script src="/lifti/js/main.min.6991eba38706396d2049f1288a00109f83dc38e4799e68f0cd8ae694fcc5e078.js" integrity="sha256-aZHro4cGOW0gSfEoigAQn4PcOOR5nmjwzYrmlPzF4Hg=" crossorigin="anonymous"></script>
+<script defer src="/lifti/js/click-to-copy.min.73478a7d4807698aed7e355eb23f9890ca18fea3158604c8471746d046702bad.js" integrity="sha256-c0eKfUgHaYrtfjVesj&#43;YkMoY/qMVhgTIRxdG0EZwK60=" crossorigin="anonymous"></script>
+<script src='/lifti/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
