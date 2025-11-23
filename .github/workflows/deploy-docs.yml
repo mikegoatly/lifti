@@ -1,0 +1,83 @@
+name: Deploy Documentation
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "docs/**"
+      - "samples/Blazor/**"
+  workflow_dispatch:
+
+jobs:
+  deploy-docs:
+    name: Build and Deploy Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.152.2'
+          extended: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install npm dependencies
+        working-directory: ./docs
+        run: |
+          npm install
+          cd themes/docsy
+          npm install
+
+      - name: Checkout Docsy to stable version
+        working-directory: ./docs/themes/docsy
+        run: |
+          git checkout v0.10.0
+          npm install
+
+      - name: Build Hugo site
+        working-directory: ./docs
+        run: hugo --minify
+
+      - name: Build Blazor sample
+        run: |
+          dotnet publish ./samples/Blazor/Blazor.csproj -o ./blazor-temp/ -c release -p:BlazorEnableCompression=false
+
+      - name: Copy Blazor sample to docs
+        run: |
+          mkdir -p ./docs/public/blazor-sample
+          cp -r ./blazor-temp/wwwroot/* ./docs/public/blazor-sample/
+
+      - name: Fix Blazor sample paths
+        working-directory: ./docs/public/blazor-sample
+        run: |
+          sed -i 's|<base href="/" />|<base href="/lifti/blazor-sample/" />|g' index.html
+          sed -i 's|_framework|framework|g' index.html
+          mv _framework framework || true
+          sed -i 's|_framework|framework|g' framework/blazor.webassembly.js
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/public
+          publish_branch: gh-pages
+          commit_message: ${{ github.event.head_commit.message }}
