@@ -1,26 +1,11 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Search Results on LIFTI</title>
-    <link>https://mikegoatly.github.io/lifti/docs/searching/search-results/</link>
-    <description>Recent content in Search Results on LIFTI</description>
-    <generator>Hugo</generator>
-    <language>en</language>
-    <lastBuildDate>Tue, 16 Jan 2024 22:43:44 +0000</lastBuildDate>
-    <atom:link href="https://mikegoatly.github.io/lifti/docs/searching/search-results/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Extracting matched phrases</title>
-      <link>https://mikegoatly.github.io/lifti/docs/searching/search-results/extracting-matched-phrases/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://mikegoatly.github.io/lifti/docs/searching/search-results/extracting-matched-phrases/</guid>
-      <description>&lt;h2 id=&#34;creatematchphrasesasync-and-creatematchphrases&#34;&gt;&lt;code&gt;CreateMatchPhrasesAsync&lt;/code&gt; and &lt;code&gt;CreateMatchPhrases&lt;/code&gt;&lt;/h2&gt;&#xA;&lt;p&gt;The intent of the &lt;code&gt;ISearchResults&amp;lt;T&amp;gt;.CreateMatchPhrasesAsync&lt;/code&gt; methods is to allow you to provide a mechanism by which&#xA;LIFTI can retrieve the original source text, from objects or loosely indexed text, and automatically&#xA;extract phrases for the matched token locations. Where a multiple tokens are matched in a sequence, they will be combined into&#xA;a single phrase.&lt;/p&gt;&#xA;&lt;p&gt;For the &lt;code&gt;CreateMatchPhrasesAsync&amp;lt;TObject&amp;gt;&lt;/code&gt; overloads that create the matched phrases from an indexed object of type &lt;code&gt;TObject&lt;/code&gt;,&#xA;you can either fetch the objects one at a time, or be provided with a list of keys and fetch all the relevant objects&#xA;in bulk. The latter is more efficient if you are having to go to an external source for the data, e.g. using a database&#xA;query.&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>Search result scoring</title>
-      <link>https://mikegoatly.github.io/lifti/docs/searching/search-results/scoring/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://mikegoatly.github.io/lifti/docs/searching/search-results/scoring/</guid>
-      <description>&lt;p&gt;LIFTI uses a version of the &lt;a href=&#34;https://en.wikipedia.org/wiki/Okapi_BM25&#34;&gt;Okapi BM25&lt;/a&gt; algorithm to score search results. At the simplest level this means that search results will come back ordered by relevance. Fuzzy matching affects the&#xA;scores for search results depending on the distance between the target word and the search term.&lt;/p&gt;&#xA;&lt;p&gt;Once nice feature of LIFTI is that in you also get each field scored independently. The overall score for a document is just a sum of these, but you could easily just re-order the results by one field over another should you so wish.&lt;/p&gt;</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Search Results on LIFTI</title><link>https://mikegoatly.github.io/lifti/docs/searching/search-results/</link><description>Recent content in Search Results on LIFTI</description><generator>Hugo</generator><language>en</language><lastBuildDate>Tue, 16 Jan 2024 22:43:44 +0000</lastBuildDate><atom:link href="https://mikegoatly.github.io/lifti/docs/searching/search-results/index.xml" rel="self" type="application/rss+xml"/><item><title>Extracting matched phrases</title><link>https://mikegoatly.github.io/lifti/docs/searching/search-results/extracting-matched-phrases/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mikegoatly.github.io/lifti/docs/searching/search-results/extracting-matched-phrases/</guid><description>&lt;h2 id="creatematchphrasesasync-and-creatematchphrases"&gt;&lt;code&gt;CreateMatchPhrasesAsync&lt;/code&gt; and &lt;code&gt;CreateMatchPhrases&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;The intent of the &lt;code&gt;ISearchResults&amp;lt;T&amp;gt;.CreateMatchPhrasesAsync&lt;/code&gt; methods is to allow you to provide a mechanism by which
+LIFTI can retrieve the original source text, from objects or loosely indexed text, and automatically
+extract phrases for the matched token locations. Where a multiple tokens are matched in a sequence, they will be combined into
+a single phrase.&lt;/p&gt;
+&lt;p&gt;For the &lt;code&gt;CreateMatchPhrasesAsync&amp;lt;TObject&amp;gt;&lt;/code&gt; overloads that create the matched phrases from an indexed object of type &lt;code&gt;TObject&lt;/code&gt;,
+you can either fetch the objects one at a time, or be provided with a list of keys and fetch all the relevant objects
+in bulk. The latter is more efficient if you are having to go to an external source for the data, e.g. using a database
+query.&lt;/p&gt;</description></item><item><title>Search result scoring</title><link>https://mikegoatly.github.io/lifti/docs/searching/search-results/scoring/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://mikegoatly.github.io/lifti/docs/searching/search-results/scoring/</guid><description>&lt;p&gt;LIFTI uses a version of the &lt;a href="https://en.wikipedia.org/wiki/Okapi_BM25"&gt;Okapi BM25&lt;/a&gt; algorithm to score search results. At the simplest level this means that search results will come back ordered by relevance. Fuzzy matching affects the
+scores for search results depending on the distance between the target word and the search term.&lt;/p&gt;
+&lt;p&gt;Once nice feature of LIFTI is that in you also get each field scored independently. The overall score for a document is just a sum of these, but you could easily just re-order the results by one field over another should you so wish.&lt;/p&gt;</description></item></channel></rss>

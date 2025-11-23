@@ -1,24 +1,24 @@
 /* /Shared/MainLayout.razor.rz.scp.css */
-.page[b-r0yqwuvdyg] {
+.page[b-qt6tgh2907] {
     position: relative;
     display: flex;
     flex-direction: column;
 }
 
-main[b-r0yqwuvdyg] {
+main[b-qt6tgh2907] {
     flex: 1;
 }
 
-.sidebar[b-r0yqwuvdyg] {
+.sidebar[b-qt6tgh2907] {
     background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
 }
 
 @media (min-width: 641px) {
-    .page[b-r0yqwuvdyg] {
+    .page[b-qt6tgh2907] {
         flex-direction: row;
     }
 
-    .sidebar[b-r0yqwuvdyg] {
+    .sidebar[b-qt6tgh2907] {
         width: 250px;
         height: 100vh;
         position: sticky;

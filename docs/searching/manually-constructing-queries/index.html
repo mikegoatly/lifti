@@ -1,520 +1,82 @@
-<!doctype html>
-<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js">
-  <head>
-    <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.152.2">
-<meta name="robots" content="index, follow">
-
-
-<link rel="shortcut icon" href="/lifti/favicons/favicon.ico" >
-<link rel="apple-touch-icon" href="/lifti/favicons/apple-touch-icon-180x180.png" sizes="180x180">
-<link rel="icon" type="image/png" href="/lifti/favicons/favicon-16x16.png" sizes="16x16">
-<link rel="icon" type="image/png" href="/lifti/favicons/favicon-32x32.png" sizes="32x32">
-<link rel="icon" type="image/png" href="/lifti/favicons/android-36x36.png" sizes="36x36">
-<link rel="icon" type="image/png" href="/lifti/favicons/android-48x48.png" sizes="48x48">
-<link rel="icon" type="image/png" href="/lifti/favicons/android-72x72.png" sizes="72x72">
-<link rel="icon" type="image/png" href="/lifti/favicons/android-96x96.png" sizes="96x96">
-<link rel="icon" type="image/png" href="/lifti/favicons/android-144x144.png" sizes="144x144">
-<link rel="icon" type="image/png" href="/lifti/favicons/android-192x192.png" sizes="192x192">
-
-<title>Manually Constructing Queries | LIFTI</title>
-<meta name="description" content="Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index.">
-<meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/searching/manually-constructing-queries/">
-  <meta property="og:site_name" content="LIFTI">
-  <meta property="og:title" content="Manually Constructing Queries">
-  <meta property="og:description" content="Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index.">
-  <meta property="og:locale" content="en">
-  <meta property="og:type" content="article">
-    <meta property="article:section" content="docs">
-    <meta property="article:published_time" content="2022-02-12T00:00:00+00:00">
-    <meta property="article:modified_time" content="2025-10-30T17:17:44+00:00">
-
-  <meta itemprop="name" content="Manually Constructing Queries">
-  <meta itemprop="description" content="Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index.">
-  <meta itemprop="datePublished" content="2022-02-12T00:00:00+00:00">
-  <meta itemprop="dateModified" content="2025-10-30T17:17:44+00:00">
-  <meta itemprop="wordCount" content="1074">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Manually Constructing Queries">
-  <meta name="twitter:description" content="Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index.">
-
-
-
-
-<link rel="preload" href="/lifti/scss/main.min.06a34647e931da2a1d4d6c3a00b2f06d828e435d928120e9127c33df50da888e.css" as="style">
-<link href="/lifti/scss/main.min.06a34647e931da2a1d4d6c3a00b2f06d828e435d928120e9127c33df50da888e.css" rel="stylesheet" integrity="">
-
-<script
-  src="https://code.jquery.com/jquery-3.6.3.min.js"
-  integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
-  crossorigin="anonymous"></script>
-<script defer
-  src="https://unpkg.com/lunr@2.3.9/lunr.min.js"
-  integrity="sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli"
-  crossorigin="anonymous"></script>
-
-  </head>
-  <body class="td-page">
-    <header>
-      <nav class="td-navbar js-navbar-scroll" data-bs-theme="dark">
-<div class="container-fluid flex-column flex-md-row">
-  <a class="navbar-brand" href="/lifti/"><span class="navbar-brand__logo navbar-logo"><svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg"><defs/><path d="M38.225 8.178h96.774l31.117 31.117v131.5H38.225V88.826h87.587V71.35h24.422V59.722H125.812L126.216 41.408H38.225V8.178zM54.049 116.715h96.185V105.087H54.049v11.628zm0 37.076h96.185V142.163H54.049v11.628z" style="stroke-width:0;stroke:#020f0e;fill:#14a89b"/><rect x="11.244" y="51.461" width="106.346" height="28.227" style="stroke-width:5px;fill:#1adbca;stroke:#0e756c" rx="11.718" ry="11.718"/></svg></span><span class="navbar-brand__name">LIFTI</span></a>
-  <div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" href="/lifti/about/"><span>About</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link active" href="/lifti/docs/"><span>Documentation</span></a>
-      </li>
-      </ul>
-  </div>
-  <div class="d-none d-lg-block">
-    <div class="td-search td-search--offline">
-  <div class="td-search__icon"></div>
-  <input
-    type="search"
-    class="td-search__input form-control"
-    placeholder="Search this site…"
-    aria-label="Search this site…"
-    autocomplete="off"
-    
-    data-offline-search-index-json-src="/lifti/offline-search-index.497cbe3e06f6028c75c359a51d4aaebc.json"
-    data-offline-search-base-href="/"
-    data-offline-search-max-results="10"
-  >
-</div>
-  </div>
-</div>
-</nav>
-    </header>
-    <div class="container-fluid td-outer">
-      <div class="td-main">
-        <div class="row flex-xl-nowrap">
-          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
-            <div id="td-sidebar-menu" class="td-sidebar__inner">
-  <form class="td-sidebar__search d-flex align-items-center">
-    <div class="td-search td-search--offline">
-  <div class="td-search__icon"></div>
-  <input
-    type="search"
-    class="td-search__input form-control"
-    placeholder="Search this site…"
-    aria-label="Search this site…"
-    autocomplete="off"
-    
-    data-offline-search-index-json-src="/lifti/offline-search-index.497cbe3e06f6028c75c359a51d4aaebc.json"
-    data-offline-search-base-href="/"
-    data-offline-search-max-results="10"
-  >
-</div>
-    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
-    </button>
-  </form>
-  <nav class="td-sidebar-nav collapse" id="td-section-nav">
-    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
-      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-liftidocs-li">
-  <a href="/lifti/docs/" title="LIFTI" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-liftidocs"><span class="">Documentation</span></a>
-  <ul class="ul-1">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-liftidocsgetting-started-li">
-  <a href="/lifti/docs/getting-started/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsgetting-started"><span class="">Getting Started</span></a>
-  <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsgetting-startedindexing-objects-li">
-  <a href="/lifti/docs/getting-started/indexing-objects/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsgetting-startedindexing-objects"><span class="">Indexing Objects</span></a>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocsrecipes-li">
-  <a href="/lifti/docs/recipes/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsrecipes"><span class="">Recipes</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-liftidocsindex-construction-li">
-  <a href="/lifti/docs/index-construction/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsindex-construction"><span class="">Index Construction</span></a>
-  <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsindex-constructionwithdefaulttokenization-li">
-  <a href="/lifti/docs/index-construction/withdefaulttokenization/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsindex-constructionwithdefaulttokenization"><span class="">Default tokenization</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsindex-constructionwithobjecttokenization-li">
-  <a href="/lifti/docs/index-construction/withobjecttokenization/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsindex-constructionwithobjecttokenization"><span class="">Object tokenization</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsindex-constructionwithduplicatekeybehavior-li">
-  <a href="/lifti/docs/index-construction/withduplicatekeybehavior/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsindex-constructionwithduplicatekeybehavior"><span class="">Managing duplicate keys</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsindex-constructionwithqueryparser-li">
-  <a href="/lifti/docs/index-construction/withqueryparser/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsindex-constructionwithqueryparser"><span class="">Query parser configuration</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsindex-constructionwithdefaultthesaurus-li">
-  <a href="/lifti/docs/index-construction/withdefaultthesaurus/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsindex-constructionwithdefaultthesaurus"><span class="">Thesaurus synonyms</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsindex-constructionwithtextextraction-li">
-  <a href="/lifti/docs/index-construction/withtextextraction/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsindex-constructionwithtextextraction"><span class="">Document text extraction</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsindex-constructionwithsimplequeryparser-li">
-  <a href="/lifti/docs/index-construction/withsimplequeryparser/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsindex-constructionwithsimplequeryparser"><span class="">Using the simple query parser</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsindex-constructionwithindexmodificationaction-li">
-  <a href="/lifti/docs/index-construction/withindexmodificationaction/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsindex-constructionwithindexmodificationaction"><span class="">Adding index modification actions</span></a>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-liftidocsindexing-mutations-li">
-  <a href="/lifti/docs/indexing-mutations/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsindexing-mutations"><span class="">Indexing Data</span></a>
-  <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsindexing-mutationsbatch-mutations-li">
-  <a href="/lifti/docs/indexing-mutations/batch-mutations/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsindexing-mutationsbatch-mutations"><span class="">Batch Mutations</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsindexing-mutationsremoving-data-li">
-  <a href="/lifti/docs/indexing-mutations/removing-data/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsindexing-mutationsremoving-data"><span class="">Removing Data</span></a>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id="m-liftidocssearching-li">
-  <a href="/lifti/docs/searching/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocssearching"><span class="">Searching</span></a>
-  <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchinglifti-query-syntax-li">
-  <a href="/lifti/docs/searching/lifti-query-syntax/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchinglifti-query-syntax"><span class="">The LIFTI Query Syntax</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingquery-execution-li">
-  <a href="/lifti/docs/searching/query-execution/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingquery-execution"><span class="">Query execution</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingfuzzy-matching-li">
-  <a href="/lifti/docs/searching/fuzzy-matching/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingfuzzy-matching"><span class="">Fuzzy Matching</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingsimple-queries-li">
-  <a href="/lifti/docs/searching/simple-queries/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingsimple-queries"><span class="">Simple Queries</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id="m-liftidocssearchingmanually-constructing-queries-li">
-  <a href="/lifti/docs/searching/manually-constructing-queries/" class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingmanually-constructing-queries"><span class="td-sidebar-nav-active-item">Manually Constructing Queries</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingfield-information-li">
-  <a href="/lifti/docs/searching/field-information/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingfield-information"><span class="">Field Information</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingusing-the-index-navigator-li">
-  <a href="/lifti/docs/searching/using-the-index-navigator/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingusing-the-index-navigator"><span class="">IndexNavigator</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocssearchingunderstanding-query-plan-li">
-  <a href="/lifti/docs/searching/understanding-query-plan/" title="Understanding Query Execution Plans" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingunderstanding-query-plan"><span class="">Understanding query plans</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-liftidocssearchingsearch-results-li">
-  <a href="/lifti/docs/searching/search-results/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocssearchingsearch-results"><span class="">Search Results</span></a>
-  <ul class="ul-3 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocssearchingsearch-resultsextracting-matched-phrases-li">
-  <a href="/lifti/docs/searching/search-results/extracting-matched-phrases/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingsearch-resultsextracting-matched-phrases"><span class="">Extracting matched phrases</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocssearchingsearch-resultsscoring-li">
-  <a href="/lifti/docs/searching/search-results/scoring/" title="Search result scoring" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocssearchingsearch-resultsscoring"><span class="">Scoring</span></a>
-</li>
-  </ul>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-liftidocsserialization-li">
-  <a href="/lifti/docs/serialization/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsserialization"><span class="">Serialization</span></a>
-  <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsserializationkey-serialization-li">
-  <a href="/lifti/docs/serialization/key-serialization/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsserializationkey-serialization"><span class="">Key Serialization</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsserializationautomatic-serialization-li">
-  <a href="/lifti/docs/serialization/automatic-serialization/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsserializationautomatic-serialization"><span class="">Automatic Serialization</span></a>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocscustom-stemmers-li">
-  <a href="/lifti/docs/custom-stemmers/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocscustom-stemmers"><span class="">Custom stemmers</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-liftidocsreference-li">
-  <a href="/lifti/docs/reference/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsreference"><span class="">Reference</span></a>
-  <ul class="ul-2 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child collapse" id="m-liftidocsreferenceserialization-format-li">
-  <a href="/lifti/docs/reference/serialization-format/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsreferenceserialization-format"><span class="">Serialization File Format</span></a>
-  <ul class="ul-3 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsreferenceserialization-formatpreversion6-li">
-  <a href="/lifti/docs/reference/serialization-format/preversion6/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsreferenceserialization-formatpreversion6"><span class="">V5 Serialization File Format</span></a>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id="m-liftidocsreferenceserialization-formatpreversion5-li">
-  <a href="/lifti/docs/reference/serialization-format/preversion5/" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id="m-liftidocsreferenceserialization-formatpreversion5"><span class="">V2-4 Serialization File Format</span></a>
-</li>
-  </ul>
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-liftidocsfaq-li">
-  <a href="/lifti/docs/faq/" title="Frequently Asked Questions" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id="m-liftidocsfaq"><span class="">FAQ</span></a>
-</li>
-  </ul>
-</li>
-    </ul>
-  </nav>
-</div>
-
-          </aside>
-          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
-            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
-<a href="https://github.com/mikegoatly/lifti/tree/main/docs/C:%5cdev%5clifti%5cdocs%5ccontent%5cen%5cdocs%5cSearching%5cmanually-constructing-queries.md" class="td-page-meta--view td-page-meta__view" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines fa-fw"></i> View page source</a>
-  <a href="https://github.com/mikegoatly/lifti/edit/main/docs/C:%5cdev%5clifti%5cdocs%5ccontent%5cen%5cdocs%5cSearching%5cmanually-constructing-queries.md" class="td-page-meta--edit td-page-meta__edit" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> Edit this page</a>
-  <a href="https://github.com/mikegoatly/lifti/new/main/docs/C:/dev/lifti/docs/content/en/docs/Searching?filename=change-me.md&amp;value=---%0D%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0D%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0D%0Aweight%3A&#43;100%0D%0Adescription%3A&#43;%3E-%0D%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0D%0A---%0D%0A%0D%0A%23%23&#43;Heading%0D%0A%0D%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0D%0A%0D%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0D%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0D%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0D%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0D%0A" class="td-page-meta--child td-page-meta__child" target="_blank" rel="noopener"><i class="fa-solid fa-pen-to-square fa-fw"></i> Create child page</a>
-  <a href="https://github.com/mikegoatly/lifti/issues/new?title=Manually%20Constructing%20Queries" class="td-page-meta--issue td-page-meta__issue" target="_blank" rel="noopener"><i class="fa-solid fa-list-check fa-fw"></i> Create documentation issue</a>
-  
-</div>
-
-            <div class="td-toc">
-        <nav id="TableOfContents">
-  <ul>
-    <li><a href="#fluent-query-building">Fluent query building</a>
-      <ul>
-        <li><a href="#fluently-combining-search-terms">Fluently combining search terms</a></li>
-        <li><a href="#adjacent-words">Adjacent words</a></li>
-        <li><a href="#searching-in-a-specific-field">Searching in a specific field</a></li>
-        <li><a href="#bracketing-parts-of-the-query">Bracketing parts of the query</a></li>
-      </ul>
-    </li>
-    <li><a href="#manual-query-construction">Manual query construction</a>
-      <ul>
-        <li><a href="#textual-query-parts">Textual query parts</a></li>
-        <li><a href="#structural-query-parts">Structural query parts</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-      </div>
-    
-            
-
-          </aside>
-          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
-            
-  
-
-            <nav aria-label="breadcrumb" class="td-breadcrumbs">
-  <ol class="breadcrumb">
-  <li class="breadcrumb-item">
-    <a href="/lifti/docs/">Documentation</a></li>
-  <li class="breadcrumb-item">
-    <a href="/lifti/docs/searching/">Searching</a></li>
-  <li class="breadcrumb-item active" aria-current="page">
-    Manually Constructing Queries</li>
-  </ol>
-</nav>
-            
-<div class="td-content">
-	<h1>Manually Constructing Queries</h1>
-	<div class="lead">Instead of using a query parser to interpret your query, you can manually construct a <code>Query</code> object and execute it against the index.</div>
-	<header class="article-meta">
-		
-</header>
-	<p>There are two approaches you can take to constructing a <code>Query</code>, using the fluent builder syntax and manually creating the relevant query parts.</p>
-<p>The simplest is the fluent builder syntax as it takes care of automatically normalizing your search text to be in line with that expected in the index.</p>
-<h2 id="fluent-query-building">Fluent query building</h2>
-<p>All fluent query building starts from the index:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">().</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;text&#34;</span><span style="color:#000;font-weight:bold">);</span>
-</span></span></code></pre></div><p>You can immediately execute a built query:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">searchResults</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">().</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;text&#34;</span><span style="color:#000;font-weight:bold">).</span><span style="color:#000">Execute</span><span style="color:#000;font-weight:bold">();</span>
-</span></span></code></pre></div><p>Or just build an <code>IQuery</code> representing it:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">query</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">().</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;text&#34;</span><span style="color:#000;font-weight:bold">).</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
-</span></span></code></pre></div><p>You can exact match a search term, as in the above examples, fuzzy match or wildcard match:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Fuzzy match</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">searchResults</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">().</span><span style="color:#000">FuzzyMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;text&#34;</span><span style="color:#000;font-weight:bold">).</span><span style="color:#000">Execute</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Wildcard match, parsing from text</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">searchResults</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">().</span><span style="color:#000">WildcardMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;te%*&#34;</span><span style="color:#000;font-weight:bold">).</span><span style="color:#000">Execute</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Wildcard match, building explicitly</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">searchResults</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">().</span><span style="color:#000">WildcardMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">w</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">w</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Text</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;te&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">SingleCharacter</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">MultipleCharacters</span><span style="color:#000;font-weight:bold">())</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Execute</span><span style="color:#000;font-weight:bold">();</span>
-</span></span></code></pre></div><h3 id="fluently-combining-search-terms">Fluently combining search terms</h3>
-<p>Terms can be combined with and (<code>&amp;</code>)/or (<code>|</code>):</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Combine with And (&amp;)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;west&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">And</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;wing&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Execute</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Combine with Or (|)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;west&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Or</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;wing&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Execute</span><span style="color:#000;font-weight:bold">()</span>
-</span></span></code></pre></div><p>All other <a href="../lifti-query-syntax">LIFTI query operators</a> are also supported:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Combine with Preceding (&gt;)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;west&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Preceding</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;wing&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Execute</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Combine with Near (~)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;west&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Near</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">).</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;wing&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Execute</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Combine with Preceding Near (~&gt;)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;west&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">CloselyPreceding</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">).</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;wing&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Execute</span><span style="color:#000;font-weight:bold">()</span>
-</span></span></code></pre></div><h3 id="adjacent-words">Adjacent words</h3>
-<p>You can build a series of search terms that must follow each other sequentially (i.e. &ldquo;one two three&rdquo;):</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Adjacent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;west&#34;</span><span style="color:#000;font-weight:bold">).</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;wing&#34;</span><span style="color:#000;font-weight:bold">))</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Execute</span><span style="color:#000;font-weight:bold">()</span>
-</span></span></code></pre></div><p>Within an adjacent search you can also use fuzzy match or wildcard searches as well:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Adjacent</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">FuzzyMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;wst&#34;</span><span style="color:#000;font-weight:bold">).</span><span style="color:#000">WildcardMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;wi*&#34;</span><span style="color:#000;font-weight:bold">))</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Execute</span><span style="color:#000;font-weight:bold">()</span>
-</span></span></code></pre></div><h3 id="searching-in-a-specific-field">Searching in a specific field</h3>
-<p>Like in the LIFTI query syntax to restrict a search to a specific field (e.g. <code>[fieldName]=text</code>) you can do the same fluently:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">InField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;description&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">f</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">f</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">FuzzyMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;west&#34;</span><span style="color:#000;font-weight:bold">))</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Execute</span><span style="color:#000;font-weight:bold">()</span>
-</span></span></code></pre></div><p>Multiple search terms in an <code>InField</code> call will automatically be placed in parenthesis:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">query</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">InField</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;description&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">f</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">f</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;west&#34;</span><span style="color:#000;font-weight:bold">).</span><span style="color:#000">Or</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;wing&#34;</span><span style="color:#000;font-weight:bold">))</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">query</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ToString</span><span style="color:#000;font-weight:bold">());</span> <span style="color:#8f5902;font-style:italic">// [description]=(west | wing)</span>
-</span></span></code></pre></div><h3 id="bracketing-parts-of-the-query">Bracketing parts of the query</h3>
-<p>To logically group a section of a query together you can place them in a bracketed section:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">query</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Query</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;one&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Or</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Bracketed</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">b</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000">b</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;two&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">.</span><span style="color:#000">And</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ExactMatch</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;three&#34;</span><span style="color:#000;font-weight:bold">))</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">.</span><span style="color:#000">Build</span><span style="color:#000;font-weight:bold">();</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000">Console</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">WriteLine</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">query</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ToString</span><span style="color:#000;font-weight:bold">());</span> <span style="color:#8f5902;font-style:italic">// one | (two &amp; three)</span>
-</span></span></code></pre></div><h2 id="manual-query-construction">Manual query construction</h2>
-<p>You can manually construct a <code>Query</code> using any combination of <code>IQueryPart</code>s, but take care to normalize any text to match in the same way that it has been indexed. You can do this using either the <code>IIndexTokenizer</code> for the index, or if specific tokenization rules have been <a href="/lifti/docs/index-construction/withobjecttokenization/">configured for a field</a>, then the tokenizer for that field:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">tokenizer</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">index</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">DefaultTokenizer</span><span style="color:#000;font-weight:bold">;</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">query</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">Query</span><span style="color:#000;font-weight:bold">(</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">AndQueryOperator</span><span style="color:#000;font-weight:bold">(</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">ExactWordQueryPart</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">tokenizer</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Normalize</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;hello&#34;</span><span style="color:#000;font-weight:bold">)),</span> 
-</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">ExactWordQueryPart</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">tokenizer</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Normalize</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;there&#34;</span><span style="color:#000;font-weight:bold">))));</span>
-</span></span></code></pre></div><p><code>IQueryPart</code>s come in two flavors:</p>
-<ol>
-<li>Operators - these contain other <code>IQueryParts</code>, combining the results that they return according to certain rules, e.g. <code>AndQueryPart</code> and <code>OrQueryPart</code></li>
-<li>Textual - these work the <a href="../using-the-index-navigator/"><code>IIndexNavigator</code></a> to query the index for matches appropriate to them, e.g. <code>ExactWordQueryPart</code>, <code>FuzzyMatchQueryPart</code>.</li>
-</ol>
-<h3 id="textual-query-parts">Textual query parts</h3>
-<h4 id="exactwordquerypartstring-word">ExactWordQueryPart(string word)</h4>
-<p>Searches the index for words that exactly match <code>word</code>.</p>
-<h4 id="anchoredwordquerypartstring-word-bool-requirestart-bool-requireend-double-scoreboost--null">AnchoredWordQueryPart(string word, bool requireStart, bool requireEnd, double? scoreBoost = null)</h4>
-<blockquote>
-<p><code>&lt;&lt;</code> and <code>&gt;&gt;</code> in LIFTI query syntax - introduced in LIFTI v7</p>
-</blockquote>
-<p>Searches the index for words that match <code>word</code> at specific positions within a field:</p>
-<ul>
-<li><code>requireStart</code>: When <code>true</code>, matches only when the word appears at the start of a field (index 0)</li>
-<li><code>requireEnd</code>: When <code>true</code>, matches only when the word appears at the end of a field (at the last token index)</li>
-<li>Both <code>true</code>: Matches only when the word is the sole token in the field (field contains exactly that word)</li>
-<li><code>scoreBoost</code>: Optional score multiplier for ranking matches</li>
-</ul>
-<h4 id="fuzzymatchquerypartstring-word-ushort-maxeditdistance--4-ushort-maxsequentialedits--1">FuzzyMatchQueryPart(string word, ushort maxEditDistance = 4, ushort maxSequentialEdits = 1)</h4>
-<blockquote>
-<p><code>?</code> in LIFTI query syntax</p>
-</blockquote>
-<p>Performs a <a href="../lifti-query-syntax#fuzzy-match-">fuzzy match</a> against the index.</p>
-<ul>
-<li><code>maxEditDistance</code>: The maximum of edits allowed for any given match. The higher this value, the more divergent matches will be.</li>
-<li><code>maxSequentialEdits</code> The maximum number of edits that are allowed to appear sequentially. By default this is 1, which forces matches to be more similar to the search criteria</li>
-</ul>
-<h4 id="wildcardquerypartireadonlylistwildcardqueryfragment-fragments">WildcardQueryPart(IReadOnlyList&lt;WildcardQueryFragment&gt; fragments)</h4>
-<blockquote>
-<p><code>*</code> and <code>%</code> in LIFTI query syntax</p>
-</blockquote>
-<p>A <code>WildcardQueryPart</code> consists of multiple <code>WildcardQueryFragment</code>s that are processed sequentially to match tokens in the index. They can be constructed using the following methods:</p>
-<ul>
-<li><code>WildcardQueryFragment.MultiCharacter()</code> - matches zero or more characters in the index.</li>
-<li><code>WildcardQueryFragment.SingleCharacter()</code> - matches any single character in the index.</li>
-<li><code>WildcardQueryFragment.CreateText(string text)</code> - exact matches a fragment of text at whatever point has been reached in the index.</li>
-</ul>
-<p>For example:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">wildcard</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">WildcardQueryPart</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">new</span><span style="color:#000;font-weight:bold">[]</span> <span style="color:#000;font-weight:bold">{</span> 
-</span></span><span style="display:flex;"><span>    <span style="color:#000">WildcardQueryFragment</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SingleCharacter</span><span style="color:#000;font-weight:bold">(),</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">WildcardQueryFragment</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">SingleCharacter</span><span style="color:#000;font-weight:bold">(),</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">WildcardQueryFragment</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">CreateText</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;d&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">})</span>
-</span></span></code></pre></div><p>Would translate to the LIFTI query <code>%%d</code>, matching any words that start with any two letters followed by a <code>d</code>.</p>
-<h3 id="structural-query-parts">Structural query parts</h3>
-<h4 id="andqueryoperatoriquerypart-left-iquerypart-right"><code>AndQueryOperator(IQueryPart left, IQueryPart right)</code></h4>
-<blockquote>
-<p><code>&amp;</code> in LIFTI query syntax</p>
-</blockquote>
-<p>Intersects the results of two query parts. In other words, only matches that appear on <strong>both</strong> sides will be returned.</p>
-<h4 id="andnotqueryoperatoriquerypart-left-iquerypart-right"><code>AndNotQueryOperator(IQueryPart left, IQueryPart right)</code></h4>
-<blockquote>
-<p><code>&amp;!</code> in LIFTI query syntax (LIFTI v7+)</p>
-</blockquote>
-<p>Performs a difference operation, returning documents that match the left operand but exclude those that match the right operand. Only documents from the left side that do not appear in the right side will be returned.</p>
-<h4 id="orqueryoperatoriquerypart-left-iquerypart-right"><code>OrQueryOperator(IQueryPart left, IQueryPart right)</code></h4>
-<blockquote>
-<p><code>|</code> in LIFTI query syntax</p>
-</blockquote>
-<p>Unions the results of two query parts. In other words, a deduplicated set of matches on <strong>both</strong> sides will be returned.</p>
-<h4 id="bracketedquerypartiquerypart-statement"><code>BracketedQueryPart(IQueryPart statement)</code></h4>
-<blockquote>
-<p><code>(</code> and <code>)</code> in LIFTI query syntax</p>
-</blockquote>
-<p>This can be used to group other query parts together, ensure they are executed in the right order.</p>
-<h4 id="adjacentwordsquerypartireadonlylistiquerypart-matches"><code>AdjacentWordsQueryPart(IReadOnlyList&lt;IQueryPart&gt; matches)</code></h4>
-<blockquote>
-<p><code>&quot;</code> in LIFTI query syntax</p>
-</blockquote>
-<p>A query part requiring that a series of matches must appear in a document in sequence.</p>
-<h4 id="fieldfilterqueryoperatorstring-fieldname-byte-fieldid-iquerypart-statement"><code>FieldFilterQueryOperator(string fieldName, byte fieldId, IQueryPart statement)</code></h4>
-<blockquote>
-<p><code>field=</code> in LIFTI query syntax</p>
-</blockquote>
-<p>Restricts the resulting document matches to only those that include matching tokens in a specific field.</p>
-<h4 id="nearqueryoperatoriquerypart-left-iquerypart-right-int-tolerance--5"><code>NearQueryOperator(IQueryPart left, IQueryPart right, int tolerance = 5)</code></h4>
-<blockquote>
-<p><code>~n</code> in LIFTI query syntax</p>
-</blockquote>
-<p>Produces an intersection of two <code>IQueryPart</code>s, restricting an document&rsquo;s field matches such that the locations are close to one another.</p>
-<p>Documents that result in no field matches are filtered out.</p>
-<h4 id="precedingnearqueryoperatoriquerypart-left-iquerypart-right-int-tolerance--5"><code>PrecedingNearQueryOperator(IQueryPart left, IQueryPart right, int tolerance = 5)</code></h4>
-<blockquote>
-<p><code>~n&gt;</code> in LIFTI query syntax</p>
-</blockquote>
-<p>Produces an intersection of two <code>IQueryPart</code>s, restricting an document&rsquo;s field matches such that the locations of the first appear before the locations of the second and within a specified tolerance.</p>
-<p>Documents that result in no field matches are filtered out.</p>
-<h4 id="precedingqueryoperatoriquerypart-left-iquerypart-right"><code>PrecedingQueryOperator(IQueryPart left, IQueryPart right)</code></h4>
-<blockquote>
-<p><code>&gt;</code> in LIFTI query syntax</p>
-</blockquote>
-<p>Produces an intersection of two <code>IQueryPart</code>s, restricting an document&rsquo;s field matches such that the locations of the first appear before the locations of the second.</p>
-<p>Documents that result in no field matches are filtered out.</p>
-
-	<div class="td-page-meta__lastmod">
-  Last modified October 30, 2025: <a href="https://github.com/mikegoatly/lifti/commit/ef87b7e14cb061879f81333f3ae449c926de6a47">Updated docs (ef87b7e)</a>
-</div>
-
-</div>
-
-
-          </main>
-        </div>
-      </div>
-      <footer class="td-footer row d-print-none">
-  <div class="container-fluid">
-    <div class="row mx-md-2">
-      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
-        <ul class="td-footer__links-list">
-  
-  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Twitter" aria-label="Twitter">
-    <a target="_blank" rel="noopener" href="https://twitter.com/mikegoatly" aria-label="Twitter">
-      <i class="fab fa-twitter"></i>
-    </a>
-  </li>
-  
-  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Stack Overflow" aria-label="Stack Overflow">
-    <a target="_blank" rel="noopener" href="https://stackoverflow.com/tags/lifti" aria-label="Stack Overflow">
-      <i class="fab fa-stack-overflow"></i>
-    </a>
-  </li>
-  
-</ul>
-
-      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
-        <ul class="td-footer__links-list">
-  
-  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
-    <a target="_blank" rel="noopener" href="https://github.com/mikegoatly/lifti" aria-label="GitHub">
-      <i class="fab fa-github"></i>
-    </a>
-  </li>
-  
-</ul>
-
-      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
-        <span class="td-footer__copyright">&copy;
-    2025
-    <span class="td-footer__authors">Mike Goatly</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span><p class="td-footer__about mt-2"><a href="/lifti/about/">About LIFTI</a></p>
-      </div>
-    </div>
-  </div>
-</footer>
-
-    </div>
-    <script src="/lifti/js/main.min.6991eba38706396d2049f1288a00109f83dc38e4799e68f0cd8ae694fcc5e078.js" integrity="sha256-aZHro4cGOW0gSfEoigAQn4PcOOR5nmjwzYrmlPzF4Hg=" crossorigin="anonymous"></script>
-<script defer src="/lifti/js/click-to-copy.min.73478a7d4807698aed7e355eb23f9890ca18fea3158604c8471746d046702bad.js" integrity="sha256-c0eKfUgHaYrtfjVesj&#43;YkMoY/qMVhgTIRxdG0EZwK60=" crossorigin="anonymous"></script>
-<script src='/lifti/js/tabpane-persist.js'></script>
-
-  </body>
-</html>
+<!doctype html><html itemscope itemtype=http://schema.org/WebPage lang=en class=no-js><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=generator content="Hugo 0.152.2"><meta name=robots content="index, follow"><link rel="shortcut icon" href=/lifti/favicons/favicon.ico><link rel=apple-touch-icon href=/lifti/favicons/apple-touch-icon-180x180.png sizes=180x180><link rel=icon type=image/png href=/lifti/favicons/favicon-16x16.png sizes=16x16><link rel=icon type=image/png href=/lifti/favicons/favicon-32x32.png sizes=32x32><link rel=icon type=image/png href=/lifti/favicons/android-36x36.png sizes=36x36><link rel=icon type=image/png href=/lifti/favicons/android-48x48.png sizes=48x48><link rel=icon type=image/png href=/lifti/favicons/android-72x72.png sizes=72x72><link rel=icon type=image/png href=/lifti/favicons/android-96x96.png sizes=96x96><link rel=icon type=image/png href=/lifti/favicons/android-144x144.png sizes=144x144><link rel=icon type=image/png href=/lifti/favicons/android-192x192.png sizes=192x192><title>Manually Constructing Queries | LIFTI</title><meta name=description content="Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index."><meta property="og:url" content="https://mikegoatly.github.io/lifti/docs/searching/manually-constructing-queries/"><meta property="og:site_name" content="LIFTI"><meta property="og:title" content="Manually Constructing Queries"><meta property="og:description" content="Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index."><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="article:section" content="docs"><meta property="article:published_time" content="2022-02-12T00:00:00+00:00"><meta property="article:modified_time" content="2025-10-30T17:17:44+00:00"><meta itemprop=name content="Manually Constructing Queries"><meta itemprop=description content="Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index."><meta itemprop=datePublished content="2022-02-12T00:00:00+00:00"><meta itemprop=dateModified content="2025-10-30T17:17:44+00:00"><meta itemprop=wordCount content="1074"><meta name=twitter:card content="summary"><meta name=twitter:title content="Manually Constructing Queries"><meta name=twitter:description content="Instead of using a query parser to interpret your query, you can manually construct a `Query` object and execute it against the index."><link rel=preload href=/lifti/scss/main.min.06a34647e931da2a1d4d6c3a00b2f06d828e435d928120e9127c33df50da888e.css as=style><link href=/lifti/scss/main.min.06a34647e931da2a1d4d6c3a00b2f06d828e435d928120e9127c33df50da888e.css rel=stylesheet integrity><script src=https://code.jquery.com/jquery-3.6.3.min.js integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ==" crossorigin=anonymous></script><script defer src=https://unpkg.com/lunr@2.3.9/lunr.min.js integrity=sha384-203J0SNzyqHby3iU6hzvzltrWi/M41wOP5Gu+BiJMz5nwKykbkUx8Kp7iti0Lpli crossorigin=anonymous></script></head><body class=td-page><header><nav class="td-navbar js-navbar-scroll" data-bs-theme=dark><div class="container-fluid flex-column flex-md-row"><a class=navbar-brand href=/lifti/><span class="navbar-brand__logo navbar-logo"><svg viewBox="0 0 180 180"><defs/><path d="M38.225 8.178h96.774l31.117 31.117v131.5H38.225V88.826h87.587V71.35h24.422V59.722H125.812L126.216 41.408H38.225V8.178zM54.049 116.715h96.185V105.087H54.049v11.628zm0 37.076h96.185V142.163H54.049v11.628z" style="stroke-width:0;stroke:#020f0e;fill:#14a89b"/><rect x="11.244" y="51.461" width="106.346" height="28.227" style="stroke-width:5px;fill:#1adbca;stroke:#0e756c" rx="11.718" ry="11.718"/></svg></span><span class=navbar-brand__name>LIFTI</span></a><div class="td-navbar-nav-scroll ms-md-auto" id=main_navbar><ul class=navbar-nav><li class=nav-item><a class="nav-link active" href=/lifti/docs/><span>Documentation</span></a></li></ul></div><div class="d-none d-lg-block"><div class="td-search td-search--offline"><div class=td-search__icon></div><input type=search class="td-search__input form-control" placeholder="Search this site…" aria-label="Search this site…" autocomplete=off data-offline-search-index-json-src=/lifti/offline-search-index.d17358e7fb0ec77670b434e39173cd66.json data-offline-search-base-href=/ data-offline-search-max-results=10></div></div></div></nav></header><div class="container-fluid td-outer"><div class=td-main><div class="row flex-xl-nowrap"><aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none"><div id=td-sidebar-menu class=td-sidebar__inner><form class="td-sidebar__search d-flex align-items-center"><div class="td-search td-search--offline"><div class=td-search__icon></div><input type=search class="td-search__input form-control" placeholder="Search this site…" aria-label="Search this site…" autocomplete=off data-offline-search-index-json-src=/lifti/offline-search-index.d17358e7fb0ec77670b434e39173cd66.json data-offline-search-base-href=/ data-offline-search-max-results=10></div><button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type=button data-bs-toggle=collapse data-bs-target=#td-section-nav aria-controls=td-section-nav aria-expanded=false aria-label="Toggle section navigation"></button></form><nav class="td-sidebar-nav collapse" id=td-section-nav><ul class="td-sidebar-nav__section pe-md-3 ul-0"><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id=m-liftidocs-li><a href=/lifti/docs/ title=LIFTI class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id=m-liftidocs><span>Documentation</span></a><ul class=ul-1><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id=m-liftidocsgetting-started-li><a href=/lifti/docs/getting-started/ class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id=m-liftidocsgetting-started><span>Getting Started</span></a><ul class="ul-2 foldable"><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsgetting-startedindexing-objects-li><a href=/lifti/docs/getting-started/indexing-objects/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsgetting-startedindexing-objects><span>Indexing Objects</span></a></li></ul></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id=m-liftidocsrecipes-li><a href=/lifti/docs/recipes/ class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id=m-liftidocsrecipes><span>Recipes</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id=m-liftidocsindex-construction-li><a href=/lifti/docs/index-construction/ class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id=m-liftidocsindex-construction><span>Index Construction</span></a><ul class="ul-2 foldable"><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsindex-constructionwithdefaulttokenization-li><a href=/lifti/docs/index-construction/withdefaulttokenization/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsindex-constructionwithdefaulttokenization><span>Default tokenization</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsindex-constructionwithobjecttokenization-li><a href=/lifti/docs/index-construction/withobjecttokenization/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsindex-constructionwithobjecttokenization><span>Object tokenization</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsindex-constructionwithduplicatekeybehavior-li><a href=/lifti/docs/index-construction/withduplicatekeybehavior/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsindex-constructionwithduplicatekeybehavior><span>Managing duplicate keys</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsindex-constructionwithqueryparser-li><a href=/lifti/docs/index-construction/withqueryparser/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsindex-constructionwithqueryparser><span>Query parser configuration</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsindex-constructionwithdefaultthesaurus-li><a href=/lifti/docs/index-construction/withdefaultthesaurus/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsindex-constructionwithdefaultthesaurus><span>Thesaurus synonyms</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsindex-constructionwithtextextraction-li><a href=/lifti/docs/index-construction/withtextextraction/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsindex-constructionwithtextextraction><span>Document text extraction</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsindex-constructionwithsimplequeryparser-li><a href=/lifti/docs/index-construction/withsimplequeryparser/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsindex-constructionwithsimplequeryparser><span>Using the simple query parser</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsindex-constructionwithindexmodificationaction-li><a href=/lifti/docs/index-construction/withindexmodificationaction/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsindex-constructionwithindexmodificationaction><span>Adding index modification actions</span></a></li></ul></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id=m-liftidocsindexing-mutations-li><a href=/lifti/docs/indexing-mutations/ class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id=m-liftidocsindexing-mutations><span>Indexing Data</span></a><ul class="ul-2 foldable"><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsindexing-mutationsbatch-mutations-li><a href=/lifti/docs/indexing-mutations/batch-mutations/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsindexing-mutationsbatch-mutations><span>Batch Mutations</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsindexing-mutationsremoving-data-li><a href=/lifti/docs/indexing-mutations/removing-data/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsindexing-mutationsremoving-data><span>Removing Data</span></a></li></ul></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child active-path" id=m-liftidocssearching-li><a href=/lifti/docs/searching/ class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id=m-liftidocssearching><span>Searching</span></a><ul class="ul-2 foldable"><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id=m-liftidocssearchinglifti-query-syntax-li><a href=/lifti/docs/searching/lifti-query-syntax/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocssearchinglifti-query-syntax><span>The LIFTI Query Syntax</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id=m-liftidocssearchingquery-execution-li><a href=/lifti/docs/searching/query-execution/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocssearchingquery-execution><span>Query execution</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id=m-liftidocssearchingfuzzy-matching-li><a href=/lifti/docs/searching/fuzzy-matching/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocssearchingfuzzy-matching><span>Fuzzy Matching</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id=m-liftidocssearchingsimple-queries-li><a href=/lifti/docs/searching/simple-queries/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocssearchingsimple-queries><span>Simple Queries</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child active-path" id=m-liftidocssearchingmanually-constructing-queries-li><a href=/lifti/docs/searching/manually-constructing-queries/ class="align-left ps-0 active td-sidebar-link td-sidebar-link__page" id=m-liftidocssearchingmanually-constructing-queries><span class=td-sidebar-nav-active-item>Manually Constructing Queries</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id=m-liftidocssearchingfield-information-li><a href=/lifti/docs/searching/field-information/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocssearchingfield-information><span>Field Information</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id=m-liftidocssearchingusing-the-index-navigator-li><a href=/lifti/docs/searching/using-the-index-navigator/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocssearchingusing-the-index-navigator><span>IndexNavigator</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id=m-liftidocssearchingunderstanding-query-plan-li><a href=/lifti/docs/searching/understanding-query-plan/ title="Understanding Query Execution Plans" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocssearchingunderstanding-query-plan><span>Understanding query plans</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id=m-liftidocssearchingsearch-results-li><a href=/lifti/docs/searching/search-results/ class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id=m-liftidocssearchingsearch-results><span>Search Results</span></a><ul class="ul-3 foldable"><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocssearchingsearch-resultsextracting-matched-phrases-li><a href=/lifti/docs/searching/search-results/extracting-matched-phrases/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocssearchingsearch-resultsextracting-matched-phrases><span>Extracting matched phrases</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocssearchingsearch-resultsscoring-li><a href=/lifti/docs/searching/search-results/scoring/ title="Search result scoring" class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocssearchingsearch-resultsscoring><span>Scoring</span></a></li></ul></li></ul></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id=m-liftidocsserialization-li><a href=/lifti/docs/serialization/ class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id=m-liftidocsserialization><span>Serialization</span></a><ul class="ul-2 foldable"><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsserializationkey-serialization-li><a href=/lifti/docs/serialization/key-serialization/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsserializationkey-serialization><span>Key Serialization</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsserializationautomatic-serialization-li><a href=/lifti/docs/serialization/automatic-serialization/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsserializationautomatic-serialization><span>Automatic Serialization</span></a></li></ul></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id=m-liftidocscustom-stemmers-li><a href=/lifti/docs/custom-stemmers/ class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id=m-liftidocscustom-stemmers><span>Custom stemmers</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id=m-liftidocsreference-li><a href=/lifti/docs/reference/ class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id=m-liftidocsreference><span>Reference</span></a><ul class="ul-2 foldable"><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child collapse" id=m-liftidocsreferenceserialization-format-li><a href=/lifti/docs/reference/serialization-format/ class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id=m-liftidocsreferenceserialization-format><span>Serialization File Format</span></a><ul class="ul-3 foldable"><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsreferenceserialization-formatpreversion6-li><a href=/lifti/docs/reference/serialization-format/preversion6/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsreferenceserialization-formatpreversion6><span>V5 Serialization File Format</span></a></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child collapse" id=m-liftidocsreferenceserialization-formatpreversion5-li><a href=/lifti/docs/reference/serialization-format/preversion5/ class="align-left ps-0 td-sidebar-link td-sidebar-link__page" id=m-liftidocsreferenceserialization-formatpreversion5><span>V2-4 Serialization File Format</span></a></li></ul></li></ul></li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id=m-liftidocsfaq-li><a href=/lifti/docs/faq/ title="Frequently Asked Questions" class="align-left ps-0 td-sidebar-link td-sidebar-link__section" id=m-liftidocsfaq><span>FAQ</span></a></li></ul></li></ul></nav></div></aside><aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none"><div class="td-page-meta ms-2 pb-1 pt-2 mb-0"><a href=https://github.com/mikegoatly/lifti/tree/main/docs/content/en/docs/Searching/manually-constructing-queries.md class="td-page-meta--view td-page-meta__view" target=_blank rel=noopener><i class="fa-solid fa-file-lines fa-fw"></i> View page source</a>
+<a href=https://github.com/mikegoatly/lifti/edit/main/docs/content/en/docs/Searching/manually-constructing-queries.md class="td-page-meta--edit td-page-meta__edit" target=_blank rel=noopener><i class="fa-solid fa-pen-to-square fa-fw"></i> Edit this page</a>
+<a href="https://github.com/mikegoatly/lifti/new/main/docs/content/en/docs/Searching?filename=change-me.md&amp;value=---%0Atitle%3A+%22Long+Page+Title%22%0AlinkTitle%3A+%22Short+Nav+Title%22%0Aweight%3A+100%0Adescription%3A+%3E-%0A+++++Page+description+for+heading+and+indexes.%0A---%0A%0A%23%23+Heading%0A%0AEdit+this+template+to+create+your+new+page.%0A%0A%2A+Give+it+a+good+name%2C+ending+in+%60.md%60+-+e.g.+%60getting-started.md%60%0A%2A+Edit+the+%22front+matter%22+section+at+the+top+of+the+page+%28weight+controls+how+its+ordered+amongst+other+pages+in+the+same+directory%3B+lowest+number+first%29.%0A%2A+Add+a+good+commit+message+at+the+bottom+of+the+page+%28%3C80+characters%3B+use+the+extended+description+field+for+more+detail%29.%0A%2A+Create+a+new+branch+so+you+can+preview+your+new+file+and+request+a+review+via+Pull+Request.%0A" class="td-page-meta--child td-page-meta__child" target=_blank rel=noopener><i class="fa-solid fa-pen-to-square fa-fw"></i> Create child page</a>
+<a href="https://github.com/mikegoatly/lifti/issues/new?title=Manually%20Constructing%20Queries" class="td-page-meta--issue td-page-meta__issue" target=_blank rel=noopener><i class="fa-solid fa-list-check fa-fw"></i> Create documentation issue</a></div><div class=td-toc><nav id=TableOfContents><ul><li><a href=#fluent-query-building>Fluent query building</a><ul><li><a href=#fluently-combining-search-terms>Fluently combining search terms</a></li><li><a href=#adjacent-words>Adjacent words</a></li><li><a href=#searching-in-a-specific-field>Searching in a specific field</a></li><li><a href=#bracketing-parts-of-the-query>Bracketing parts of the query</a></li></ul></li><li><a href=#manual-query-construction>Manual query construction</a><ul><li><a href=#textual-query-parts>Textual query parts</a></li><li><a href=#structural-query-parts>Structural query parts</a></li></ul></li></ul></nav></div></aside><main class="col-12 col-md-9 col-xl-8 ps-md-5" role=main><nav aria-label=breadcrumb class=td-breadcrumbs><ol class=breadcrumb><li class=breadcrumb-item><a href=/lifti/docs/>Documentation</a></li><li class=breadcrumb-item><a href=/lifti/docs/searching/>Searching</a></li><li class="breadcrumb-item active" aria-current=page>Manually Constructing Queries</li></ol></nav><div class=td-content><h1>Manually Constructing Queries</h1><div class=lead>Instead of using a query parser to interpret your query, you can manually construct a <code>Query</code> object and execute it against the index.</div><header class=article-meta></header><p>There are two approaches you can take to constructing a <code>Query</code>, using the fluent builder syntax and manually creating the relevant query parts.</p><p>The simplest is the fluent builder syntax as it takes care of automatically normalizing your search text to be in line with that expected in the index.</p><h2 id=fluent-query-building>Fluent query building</h2><p>All fluent query building starts from the index:</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>().</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;text&#34;</span><span style=color:#000;font-weight:700>);</span>
+</span></span></code></pre></div><p>You can immediately execute a built query:</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#204a87;font-weight:700>var</span> <span style=color:#000>searchResults</span> <span style=color:#000;font-weight:700>=</span> <span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>().</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;text&#34;</span><span style=color:#000;font-weight:700>).</span><span style=color:#000>Execute</span><span style=color:#000;font-weight:700>();</span>
+</span></span></code></pre></div><p>Or just build an <code>IQuery</code> representing it:</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#204a87;font-weight:700>var</span> <span style=color:#000>query</span> <span style=color:#000;font-weight:700>=</span> <span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>().</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;text&#34;</span><span style=color:#000;font-weight:700>).</span><span style=color:#000>Build</span><span style=color:#000;font-weight:700>();</span>
+</span></span></code></pre></div><p>You can exact match a search term, as in the above examples, fuzzy match or wildcard match:</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#8f5902;font-style:italic>// Fuzzy match</span>
+</span></span><span style=display:flex><span><span style=color:#204a87;font-weight:700>var</span> <span style=color:#000>searchResults</span> <span style=color:#000;font-weight:700>=</span> <span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>().</span><span style=color:#000>FuzzyMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;text&#34;</span><span style=color:#000;font-weight:700>).</span><span style=color:#000>Execute</span><span style=color:#000;font-weight:700>();</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8f5902;font-style:italic>// Wildcard match, parsing from text</span>
+</span></span><span style=display:flex><span><span style=color:#204a87;font-weight:700>var</span> <span style=color:#000>searchResults</span> <span style=color:#000;font-weight:700>=</span> <span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>().</span><span style=color:#000>WildcardMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;te%*&#34;</span><span style=color:#000;font-weight:700>).</span><span style=color:#000>Execute</span><span style=color:#000;font-weight:700>();</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8f5902;font-style:italic>// Wildcard match, building explicitly</span>
+</span></span><span style=display:flex><span><span style=color:#204a87;font-weight:700>var</span> <span style=color:#000>searchResults</span> <span style=color:#000;font-weight:700>=</span> <span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>().</span><span style=color:#000>WildcardMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#000>w</span> <span style=color:#000;font-weight:700>=&gt;</span> <span style=color:#000>w</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Text</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;te&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>SingleCharacter</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>MultipleCharacters</span><span style=color:#000;font-weight:700>())</span>
+</span></span><span style=display:flex><span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Execute</span><span style=color:#000;font-weight:700>();</span>
+</span></span></code></pre></div><h3 id=fluently-combining-search-terms>Fluently combining search terms</h3><p>Terms can be combined with and (<code>&</code>)/or (<code>|</code>):</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#8f5902;font-style:italic>// Combine with And (&amp;)</span>
+</span></span><span style=display:flex><span><span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;west&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>And</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;wing&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Execute</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8f5902;font-style:italic>// Combine with Or (|)</span>
+</span></span><span style=display:flex><span><span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;west&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Or</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;wing&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Execute</span><span style=color:#000;font-weight:700>()</span>
+</span></span></code></pre></div><p>All other <a href=../lifti-query-syntax>LIFTI query operators</a> are also supported:</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#8f5902;font-style:italic>// Combine with Preceding (&gt;)</span>
+</span></span><span style=display:flex><span><span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;west&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Preceding</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;wing&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Execute</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8f5902;font-style:italic>// Combine with Near (~)</span>
+</span></span><span style=display:flex><span><span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;west&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Near</span><span style=color:#000;font-weight:700>(</span><span style=color:#0000cf;font-weight:700>3</span><span style=color:#000;font-weight:700>).</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;wing&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Execute</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#8f5902;font-style:italic>// Combine with Preceding Near (~&gt;)</span>
+</span></span><span style=display:flex><span><span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;west&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>CloselyPreceding</span><span style=color:#000;font-weight:700>(</span><span style=color:#0000cf;font-weight:700>3</span><span style=color:#000;font-weight:700>).</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;wing&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Execute</span><span style=color:#000;font-weight:700>()</span>
+</span></span></code></pre></div><h3 id=adjacent-words>Adjacent words</h3><p>You can build a series of search terms that must follow each other sequentially (i.e. &ldquo;one two three&rdquo;):</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Adjacent</span><span style=color:#000;font-weight:700>(</span><span style=color:#000>a</span> <span style=color:#000;font-weight:700>=&gt;</span> <span style=color:#000>a</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;west&#34;</span><span style=color:#000;font-weight:700>).</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;wing&#34;</span><span style=color:#000;font-weight:700>))</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Execute</span><span style=color:#000;font-weight:700>()</span>
+</span></span></code></pre></div><p>Within an adjacent search you can also use fuzzy match or wildcard searches as well:</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Adjacent</span><span style=color:#000;font-weight:700>(</span><span style=color:#000>a</span> <span style=color:#000;font-weight:700>=&gt;</span> <span style=color:#000>a</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>FuzzyMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;wst&#34;</span><span style=color:#000;font-weight:700>).</span><span style=color:#000>WildcardMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;wi*&#34;</span><span style=color:#000;font-weight:700>))</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Execute</span><span style=color:#000;font-weight:700>()</span>
+</span></span></code></pre></div><h3 id=searching-in-a-specific-field>Searching in a specific field</h3><p>Like in the LIFTI query syntax to restrict a search to a specific field (e.g. <code>[fieldName]=text</code>) you can do the same fluently:</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>InField</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;description&#34;</span><span style=color:#000;font-weight:700>,</span> <span style=color:#000>f</span> <span style=color:#000;font-weight:700>=&gt;</span> <span style=color:#000>f</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>FuzzyMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;west&#34;</span><span style=color:#000;font-weight:700>))</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Execute</span><span style=color:#000;font-weight:700>()</span>
+</span></span></code></pre></div><p>Multiple search terms in an <code>InField</code> call will automatically be placed in parenthesis:</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#204a87;font-weight:700>var</span> <span style=color:#000>query</span> <span style=color:#000;font-weight:700>=</span> <span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>InField</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;description&#34;</span><span style=color:#000;font-weight:700>,</span> <span style=color:#000>f</span> <span style=color:#000;font-weight:700>=&gt;</span> <span style=color:#000>f</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;west&#34;</span><span style=color:#000;font-weight:700>).</span><span style=color:#000>Or</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;wing&#34;</span><span style=color:#000;font-weight:700>))</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Build</span><span style=color:#000;font-weight:700>();</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#000>Console</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>WriteLine</span><span style=color:#000;font-weight:700>(</span><span style=color:#000>query</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>ToString</span><span style=color:#000;font-weight:700>());</span> <span style=color:#8f5902;font-style:italic>// [description]=(west | wing)</span>
+</span></span></code></pre></div><h3 id=bracketing-parts-of-the-query>Bracketing parts of the query</h3><p>To logically group a section of a query together you can place them in a bracketed section:</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#204a87;font-weight:700>var</span> <span style=color:#000>query</span> <span style=color:#000;font-weight:700>=</span> <span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Query</span><span style=color:#000;font-weight:700>()</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;one&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Or</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Bracketed</span><span style=color:#000;font-weight:700>(</span><span style=color:#000>b</span> <span style=color:#000;font-weight:700>=&gt;</span> <span style=color:#000>b</span>
+</span></span><span style=display:flex><span>        <span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;two&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span>        <span style=color:#000;font-weight:700>.</span><span style=color:#000>And</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>ExactMatch</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;three&#34;</span><span style=color:#000;font-weight:700>))</span>
+</span></span><span style=display:flex><span>    <span style=color:#000;font-weight:700>.</span><span style=color:#000>Build</span><span style=color:#000;font-weight:700>();</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#000>Console</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>WriteLine</span><span style=color:#000;font-weight:700>(</span><span style=color:#000>query</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>ToString</span><span style=color:#000;font-weight:700>());</span> <span style=color:#8f5902;font-style:italic>// one | (two &amp; three)</span>
+</span></span></code></pre></div><h2 id=manual-query-construction>Manual query construction</h2><p>You can manually construct a <code>Query</code> using any combination of <code>IQueryPart</code>s, but take care to normalize any text to match in the same way that it has been indexed. You can do this using either the <code>IIndexTokenizer</code> for the index, or if specific tokenization rules have been <a href=/lifti/docs/index-construction/withobjecttokenization/>configured for a field</a>, then the tokenizer for that field:</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#204a87;font-weight:700>var</span> <span style=color:#000>tokenizer</span> <span style=color:#000;font-weight:700>=</span> <span style=color:#000>index</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>DefaultTokenizer</span><span style=color:#000;font-weight:700>;</span>
+</span></span><span style=display:flex><span><span style=color:#204a87;font-weight:700>var</span> <span style=color:#000>query</span> <span style=color:#000;font-weight:700>=</span> <span style=color:#204a87;font-weight:700>new</span> <span style=color:#000>Query</span><span style=color:#000;font-weight:700>(</span>
+</span></span><span style=display:flex><span>    <span style=color:#204a87;font-weight:700>new</span> <span style=color:#000>AndQueryOperator</span><span style=color:#000;font-weight:700>(</span>
+</span></span><span style=display:flex><span>        <span style=color:#204a87;font-weight:700>new</span> <span style=color:#000>ExactWordQueryPart</span><span style=color:#000;font-weight:700>(</span><span style=color:#000>tokenizer</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Normalize</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;hello&#34;</span><span style=color:#000;font-weight:700>)),</span> 
+</span></span><span style=display:flex><span>        <span style=color:#204a87;font-weight:700>new</span> <span style=color:#000>ExactWordQueryPart</span><span style=color:#000;font-weight:700>(</span><span style=color:#000>tokenizer</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>Normalize</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;there&#34;</span><span style=color:#000;font-weight:700>))));</span>
+</span></span></code></pre></div><p><code>IQueryPart</code>s come in two flavors:</p><ol><li>Operators - these contain other <code>IQueryParts</code>, combining the results that they return according to certain rules, e.g. <code>AndQueryPart</code> and <code>OrQueryPart</code></li><li>Textual - these work the <a href=../using-the-index-navigator/><code>IIndexNavigator</code></a> to query the index for matches appropriate to them, e.g. <code>ExactWordQueryPart</code>, <code>FuzzyMatchQueryPart</code>.</li></ol><h3 id=textual-query-parts>Textual query parts</h3><h4 id=exactwordquerypartstring-word>ExactWordQueryPart(string word)</h4><p>Searches the index for words that exactly match <code>word</code>.</p><h4 id=anchoredwordquerypartstring-word-bool-requirestart-bool-requireend-double-scoreboost--null>AnchoredWordQueryPart(string word, bool requireStart, bool requireEnd, double? scoreBoost = null)</h4><blockquote><p><code>&lt;&lt;</code> and <code>>></code> in LIFTI query syntax - introduced in LIFTI v7</p></blockquote><p>Searches the index for words that match <code>word</code> at specific positions within a field:</p><ul><li><code>requireStart</code>: When <code>true</code>, matches only when the word appears at the start of a field (index 0)</li><li><code>requireEnd</code>: When <code>true</code>, matches only when the word appears at the end of a field (at the last token index)</li><li>Both <code>true</code>: Matches only when the word is the sole token in the field (field contains exactly that word)</li><li><code>scoreBoost</code>: Optional score multiplier for ranking matches</li></ul><h4 id=fuzzymatchquerypartstring-word-ushort-maxeditdistance--4-ushort-maxsequentialedits--1>FuzzyMatchQueryPart(string word, ushort maxEditDistance = 4, ushort maxSequentialEdits = 1)</h4><blockquote><p><code>?</code> in LIFTI query syntax</p></blockquote><p>Performs a <a href=../lifti-query-syntax#fuzzy-match->fuzzy match</a> against the index.</p><ul><li><code>maxEditDistance</code>: The maximum of edits allowed for any given match. The higher this value, the more divergent matches will be.</li><li><code>maxSequentialEdits</code> The maximum number of edits that are allowed to appear sequentially. By default this is 1, which forces matches to be more similar to the search criteria</li></ul><h4 id=wildcardquerypartireadonlylistwildcardqueryfragment-fragments>WildcardQueryPart(IReadOnlyList&lt;WildcardQueryFragment> fragments)</h4><blockquote><p><code>*</code> and <code>%</code> in LIFTI query syntax</p></blockquote><p>A <code>WildcardQueryPart</code> consists of multiple <code>WildcardQueryFragment</code>s that are processed sequentially to match tokens in the index. They can be constructed using the following methods:</p><ul><li><code>WildcardQueryFragment.MultiCharacter()</code> - matches zero or more characters in the index.</li><li><code>WildcardQueryFragment.SingleCharacter()</code> - matches any single character in the index.</li><li><code>WildcardQueryFragment.CreateText(string text)</code> - exact matches a fragment of text at whatever point has been reached in the index.</li></ul><p>For example:</p><div class=highlight><pre tabindex=0 style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-csharp data-lang=csharp><span style=display:flex><span><span style=color:#204a87;font-weight:700>var</span> <span style=color:#000>wildcard</span> <span style=color:#000;font-weight:700>=</span> <span style=color:#204a87;font-weight:700>new</span> <span style=color:#000>WildcardQueryPart</span><span style=color:#000;font-weight:700>(</span><span style=color:#204a87;font-weight:700>new</span><span style=color:#000;font-weight:700>[]</span> <span style=color:#000;font-weight:700>{</span> 
+</span></span><span style=display:flex><span>    <span style=color:#000>WildcardQueryFragment</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>SingleCharacter</span><span style=color:#000;font-weight:700>(),</span>
+</span></span><span style=display:flex><span>    <span style=color:#000>WildcardQueryFragment</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>SingleCharacter</span><span style=color:#000;font-weight:700>(),</span>
+</span></span><span style=display:flex><span>    <span style=color:#000>WildcardQueryFragment</span><span style=color:#000;font-weight:700>.</span><span style=color:#000>CreateText</span><span style=color:#000;font-weight:700>(</span><span style=color:#4e9a06>&#34;d&#34;</span><span style=color:#000;font-weight:700>)</span>
+</span></span><span style=display:flex><span><span style=color:#000;font-weight:700>})</span>
+</span></span></code></pre></div><p>Would translate to the LIFTI query <code>%%d</code>, matching any words that start with any two letters followed by a <code>d</code>.</p><h3 id=structural-query-parts>Structural query parts</h3><h4 id=andqueryoperatoriquerypart-left-iquerypart-right><code>AndQueryOperator(IQueryPart left, IQueryPart right)</code></h4><blockquote><p><code>&</code> in LIFTI query syntax</p></blockquote><p>Intersects the results of two query parts. In other words, only matches that appear on <strong>both</strong> sides will be returned.</p><h4 id=andnotqueryoperatoriquerypart-left-iquerypart-right><code>AndNotQueryOperator(IQueryPart left, IQueryPart right)</code></h4><blockquote><p><code>&!</code> in LIFTI query syntax (LIFTI v7+)</p></blockquote><p>Performs a difference operation, returning documents that match the left operand but exclude those that match the right operand. Only documents from the left side that do not appear in the right side will be returned.</p><h4 id=orqueryoperatoriquerypart-left-iquerypart-right><code>OrQueryOperator(IQueryPart left, IQueryPart right)</code></h4><blockquote><p><code>|</code> in LIFTI query syntax</p></blockquote><p>Unions the results of two query parts. In other words, a deduplicated set of matches on <strong>both</strong> sides will be returned.</p><h4 id=bracketedquerypartiquerypart-statement><code>BracketedQueryPart(IQueryPart statement)</code></h4><blockquote><p><code>(</code> and <code>)</code> in LIFTI query syntax</p></blockquote><p>This can be used to group other query parts together, ensure they are executed in the right order.</p><h4 id=adjacentwordsquerypartireadonlylistiquerypart-matches><code>AdjacentWordsQueryPart(IReadOnlyList&lt;IQueryPart> matches)</code></h4><blockquote><p><code>"</code> in LIFTI query syntax</p></blockquote><p>A query part requiring that a series of matches must appear in a document in sequence.</p><h4 id=fieldfilterqueryoperatorstring-fieldname-byte-fieldid-iquerypart-statement><code>FieldFilterQueryOperator(string fieldName, byte fieldId, IQueryPart statement)</code></h4><blockquote><p><code>field=</code> in LIFTI query syntax</p></blockquote><p>Restricts the resulting document matches to only those that include matching tokens in a specific field.</p><h4 id=nearqueryoperatoriquerypart-left-iquerypart-right-int-tolerance--5><code>NearQueryOperator(IQueryPart left, IQueryPart right, int tolerance = 5)</code></h4><blockquote><p><code>~n</code> in LIFTI query syntax</p></blockquote><p>Produces an intersection of two <code>IQueryPart</code>s, restricting an document&rsquo;s field matches such that the locations are close to one another.</p><p>Documents that result in no field matches are filtered out.</p><h4 id=precedingnearqueryoperatoriquerypart-left-iquerypart-right-int-tolerance--5><code>PrecedingNearQueryOperator(IQueryPart left, IQueryPart right, int tolerance = 5)</code></h4><blockquote><p><code>~n></code> in LIFTI query syntax</p></blockquote><p>Produces an intersection of two <code>IQueryPart</code>s, restricting an document&rsquo;s field matches such that the locations of the first appear before the locations of the second and within a specified tolerance.</p><p>Documents that result in no field matches are filtered out.</p><h4 id=precedingqueryoperatoriquerypart-left-iquerypart-right><code>PrecedingQueryOperator(IQueryPart left, IQueryPart right)</code></h4><blockquote><p><code>></code> in LIFTI query syntax</p></blockquote><p>Produces an intersection of two <code>IQueryPart</code>s, restricting an document&rsquo;s field matches such that the locations of the first appear before the locations of the second.</p><p>Documents that result in no field matches are filtered out.</p><div class=td-page-meta__lastmod>Last modified October 30, 2025: <a href=https://github.com/mikegoatly/lifti/commit/ef87b7e14cb061879f81333f3ae449c926de6a47>Updated docs (ef87b7e)</a></div></div></main></div></div><footer class="td-footer row d-print-none"><div class=container-fluid><div class="row mx-md-2"><div class="td-footer__left col-6 col-sm-4 order-sm-1"><ul class=td-footer__links-list><li class=td-footer__links-item data-bs-toggle=tooltip title=Twitter aria-label=Twitter><a target=_blank rel=noopener href=https://twitter.com/mikegoatly aria-label=Twitter><i class="fab fa-twitter"></i></a></li><li class=td-footer__links-item data-bs-toggle=tooltip title="Stack Overflow" aria-label="Stack Overflow"><a target=_blank rel=noopener href=https://stackoverflow.com/tags/lifti aria-label="Stack Overflow"><i class="fab fa-stack-overflow"></i></a></li></ul></div><div class="td-footer__right col-6 col-sm-4 order-sm-3"><ul class=td-footer__links-list><li class=td-footer__links-item data-bs-toggle=tooltip title=GitHub aria-label=GitHub><a target=_blank rel=noopener href=https://github.com/mikegoatly/lifti aria-label=GitHub><i class="fab fa-github"></i></a></li></ul></div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2"><span class=td-footer__copyright>&copy;
+2025
+<span class=td-footer__authors>Mike Goatly</span></span><span class=td-footer__all_rights_reserved>All Rights Reserved</span><p class="td-footer__about mt-2"><a href=/lifti/about/>About LIFTI</a></p></div></div></div></footer></div><script src=/lifti/js/main.min.6991eba38706396d2049f1288a00109f83dc38e4799e68f0cd8ae694fcc5e078.js integrity="sha256-aZHro4cGOW0gSfEoigAQn4PcOOR5nmjwzYrmlPzF4Hg=" crossorigin=anonymous></script><script defer src=/lifti/js/click-to-copy.min.73478a7d4807698aed7e355eb23f9890ca18fea3158604c8471746d046702bad.js integrity="sha256-c0eKfUgHaYrtfjVesj+YkMoY/qMVhgTIRxdG0EZwK60=" crossorigin=anonymous></script><script src=/lifti/js/tabpane-persist.js></script></body></html>

@@ -1,26 +1,6 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Serialization File Format on LIFTI</title>
-    <link>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/</link>
-    <description>Recent content in Serialization File Format on LIFTI</description>
-    <generator>Hugo</generator>
-    <language>en</language>
-    <lastBuildDate>Tue, 16 Jan 2024 22:43:44 +0000</lastBuildDate>
-    <atom:link href="https://mikegoatly.github.io/lifti/docs/reference/serialization-format/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>V5 Serialization File Format</title>
-      <link>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/preversion6/</link>
-      <pubDate>Sun, 14 Jan 2024 00:00:00 +0000</pubDate>
-      <guid>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/preversion6/</guid>
-      <description>&lt;h2 id=&#34;version-5-v500&#34;&gt;Version 5 (v5.0.0)&lt;/h2&gt;&#xA;&lt;p&gt;&lt;img src=&#34;../../../../images/v5-serialization.svg&#34; alt=&#34;LIFTI Serialization Format&#34;&gt;&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;New in version 5 is the list of fields in the index. This is used upon deserialization to rehydrate the dynamic fields and ensure that the field names in the index being deserialized into are mapped correctly to fields in the serialized index.&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
-    </item>
-    <item>
-      <title>V2-4 Serialization File Format</title>
-      <link>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/preversion5/</link>
-      <pubDate>Sun, 02 Jul 2023 00:00:00 +0000</pubDate>
-      <guid>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/preversion5/</guid>
-      <description>&lt;h2 id=&#34;version-4-v400&#34;&gt;Version 4 (v4.0.0)&lt;/h2&gt;&#xA;&lt;p&gt;&lt;img src=&#34;../../../../images/v2-serialization.svg&#34; alt=&#34;LIFTI Serialization Format&#34;&gt;&lt;/p&gt;</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Serialization File Format on LIFTI</title><link>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/</link><description>Recent content in Serialization File Format on LIFTI</description><generator>Hugo</generator><language>en</language><lastBuildDate>Tue, 16 Jan 2024 22:43:44 +0000</lastBuildDate><atom:link href="https://mikegoatly.github.io/lifti/docs/reference/serialization-format/index.xml" rel="self" type="application/rss+xml"/><item><title>V5 Serialization File Format</title><link>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/preversion6/</link><pubDate>Sun, 14 Jan 2024 00:00:00 +0000</pubDate><guid>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/preversion6/</guid><description>&lt;h2 id="version-5-v500"&gt;Version 5 (v5.0.0)&lt;/h2&gt;
+&lt;p&gt;&lt;img src="../../../../images/v5-serialization.svg" alt="LIFTI Serialization Format"&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;New in version 5 is the list of fields in the index. This is used upon deserialization to rehydrate the dynamic fields and ensure that the field names in the index being deserialized into are mapped correctly to fields in the serialized index.&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>V2-4 Serialization File Format</title><link>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/preversion5/</link><pubDate>Sun, 02 Jul 2023 00:00:00 +0000</pubDate><guid>https://mikegoatly.github.io/lifti/docs/reference/serialization-format/preversion5/</guid><description>&lt;h2 id="version-4-v400"&gt;Version 4 (v4.0.0)&lt;/h2&gt;
+&lt;p&gt;&lt;img src="../../../../images/v2-serialization.svg" alt="LIFTI Serialization Format"&gt;&lt;/p&gt;</description></item></channel></rss>
