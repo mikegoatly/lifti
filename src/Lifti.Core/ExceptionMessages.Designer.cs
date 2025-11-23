@@ -8,11 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Lifti
-{
+namespace Lifti {
     using System;
-
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -20,978 +19,801 @@ namespace Lifti
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class ExceptionMessages
-    {
-
+    internal class ExceptionMessages {
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal ExceptionMessages()
-        {
+        internal ExceptionMessages() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if (object.ReferenceEquals(resourceMan, null))
-                {
+        internal static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Lifti.ExceptionMessages", typeof(ExceptionMessages).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture
-        {
-            get
-            {
+        internal static global::System.Globalization.CultureInfo Culture {
+            get {
                 return resourceCulture;
             }
-            set
-            {
+            set {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to When fields are configured with async access methods the async Add methods must be used on the index.
         /// </summary>
-        internal static string AsyncAddMethodsMustBeUsed
-        {
-            get
-            {
+        internal static string AsyncAddMethodsMustBeUsed {
+            get {
                 return ResourceManager.GetString("AsyncAddMethodsMustBeUsed", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to At least one field must be configured for an object type.
         /// </summary>
-        internal static string AtLeastOneFieldMustBeIndexed
-        {
-            get
-            {
+        internal static string AtLeastOneFieldMustBeIndexed {
+            get {
                 return ResourceManager.GetString("AtLeastOneFieldMustBeIndexed", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to An attempt was made to read a dynamic field (&quot;{0}&quot;) from a provider that did not produce it..
         /// </summary>
-        internal static string AttemptToReadFieldUnknownToDynamicFieldReader
-        {
-            get
-            {
+        internal static string AttemptToReadFieldUnknownToDynamicFieldReader {
+            get {
                 return ResourceManager.GetString("AttemptToReadFieldUnknownToDynamicFieldReader", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Badly formatted variable length value encountered.
         /// </summary>
-        internal static string BadlyFormattedVariableLengthValueEncountered
-        {
-            get
-            {
+        internal static string BadlyFormattedVariableLengthValueEncountered {
+            get {
                 return ResourceManager.GetString("BadlyFormattedVariableLengthValueEncountered", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Cannot start a new batch change while another is already in progress..
         /// </summary>
-        internal static string BatchChangeAlreadyStarted
-        {
-            get
-            {
+        internal static string BatchChangeAlreadyStarted {
+            get {
                 return ResourceManager.GetString("BatchChangeAlreadyStarted", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Cannot apply a disposed bookmark.
         /// </summary>
-        internal static string BookmarkDisposed
-        {
-            get
-            {
+        internal static string BookmarkDisposed {
+            get {
                 return ResourceManager.GetString("BookmarkDisposed", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot combine an empty set of query parts.
-        /// </summary>
-        internal static string CannotCombineAnEmptySetOfQueryParts
-        {
-            get
-            {
-                return ResourceManager.GetString("CannotCombineAnEmptySetOfQueryParts", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot register a dynamic field with the same name as the statically registered field &quot;{0}&quot;. Consider using a field prefix when configuring the dynamic fields..
-        /// </summary>
-        internal static string CannotRegisterDynamicFieldWithSameNameAsStaticField
-        {
-            get
-            {
-                return ResourceManager.GetString("CannotRegisterDynamicFieldWithSameNameAsStaticField", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot register dynamic field with the same name &quot;{0}&quot; against different object types. Consider using a field prefix when configuring the dynamic fields..
-        /// </summary>
-        internal static string CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes
-        {
-            get
-            {
-                return ResourceManager.GetString("CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Duplicate dynamic field reader name encountered: {0}. Dynamic field readers must have unique names..
-        /// </summary>
-        internal static string DuplicateDynamicFieldReaderName
-        {
-            get
-            {
-                return ResourceManager.GetString("DuplicateDynamicFieldReaderName", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to A duplicate field &quot;{0}&quot; was encountered while indexing the object with key {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields..
-        /// </summary>
-        internal static string DuplicateFieldEncounteredOnObject
-        {
-            get
-            {
-                return ResourceManager.GetString("DuplicateFieldEncounteredOnObject", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI..
-        /// </summary>
-        internal static string EarlierVersionSerializedIndexNotSupported
-        {
-            get
-            {
-                return ResourceManager.GetString("EarlierVersionSerializedIndexNotSupported", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Adjacent text query parts cannot be empty.
-        /// </summary>
-        internal static string EmptyAdjacentTextPartsAreNotSupported
-        {
-            get
-            {
-                return ResourceManager.GetString("EmptyAdjacentTextPartsAreNotSupported", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot create an empty adjacent words query part.
-        /// </summary>
-        internal static string EmptyAdjacentWordsQueryPart
-        {
-            get
-            {
-                return ResourceManager.GetString("EmptyAdjacentWordsQueryPart", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Bracketed query parts cannot be empty.
-        /// </summary>
-        internal static string EmptyBracketedExpressionsAreNotSupported
-        {
-            get
-            {
-                return ResourceManager.GetString("EmptyBracketedExpressionsAreNotSupported", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Empty field name encountered.
-        /// </summary>
-        internal static string EmptyFieldNameEncountered
-        {
-            get
-            {
-                return ResourceManager.GetString("EmptyFieldNameEncountered", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Internal error - missing text value.
-        /// </summary>
-        internal static string EmptyOrMissingTextQueryFragmentValue
-        {
-            get
-            {
-                return ResourceManager.GetString("EmptyOrMissingTextQueryFragmentValue", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot create an empty wildcard query part.
-        /// </summary>
-        internal static string EmptyWildcardQuery
-        {
-            get
-            {
-                return ResourceManager.GetString("EmptyWildcardQuery", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Expected at least one query part to be parsed.
-        /// </summary>
-        internal static string ExpectedAtLeastOneQueryPartParsed
-        {
-            get
-            {
-                return ResourceManager.GetString("ExpectedAtLeastOneQueryPartParsed", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Expected = after bracketed field name.
-        /// </summary>
-        internal static string ExpectedEqualsAfterFieldName
-        {
-            get
-            {
-                return ResourceManager.GetString("ExpectedEqualsAfterFieldName", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Expected a fuzzy match token - got {0}.
-        /// </summary>
-        internal static string ExpectedFuzzyMatchToken
-        {
-            get
-            {
-                return ResourceManager.GetString("ExpectedFuzzyMatchToken", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to A text fragment must follow a multi-character wildcard in a wildcard expression.
-        /// </summary>
-        internal static string ExpectedTextQueryFragmentAfterMultiCharacterWildcard
-        {
-            get
-            {
-                return ResourceManager.GetString("ExpectedTextQueryFragmentAfterMultiCharacterWildcard", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Expected a text token - got {0}.
-        /// </summary>
-        internal static string ExpectedTextToken
-        {
-            get
-            {
-                return ResourceManager.GetString("ExpectedTextToken", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Token expected: {0}.
-        /// </summary>
-        internal static string ExpectedToken
-        {
-            get
-            {
-                return ResourceManager.GetString("ExpectedToken", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Field id {0} has no associated field name.
-        /// </summary>
-        internal static string FieldHasNoAssociatedFieldName
-        {
-            get
-            {
-                return ResourceManager.GetString("FieldHasNoAssociatedFieldName", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Duplicate field name used: {0}. Field names must be unique across all item types registered with an index..
-        /// </summary>
-        internal static string FieldNameAlreadyUsed
-        {
-            get
-            {
-                return ResourceManager.GetString("FieldNameAlreadyUsed", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Name must not be empty.
-        /// </summary>
-        internal static string FieldNameMustNotBeEmpty
-        {
-            get
-            {
-                return ResourceManager.GetString("FieldNameMustNotBeEmpty", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Max edit distance values must be in the range 0-65535.
-        /// </summary>
-        internal static string FuzzyMatchMaxEditDistanceOutOfRange
-        {
-            get
-            {
-                return ResourceManager.GetString("FuzzyMatchMaxEditDistanceOutOfRange", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Max sequential edit values must be in the range 0-65535.
-        /// </summary>
-        internal static string FuzzyMatchMaxSequentialEditsOutOfRange
-        {
-            get
-            {
-                return ResourceManager.GetString("FuzzyMatchMaxSequentialEditsOutOfRange", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Id {0} is already registered in the index..
-        /// </summary>
-        internal static string IdAlreadyUsed
-        {
-            get
-            {
-                return ResourceManager.GetString("IdAlreadyUsed", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to An index must be empty when attempting to deserialize its contents..
-        /// </summary>
-        internal static string IndexMustBeEmptyForDeserialization
-        {
-            get
-            {
-                return ResourceManager.GetString("IndexMustBeEmptyForDeserialization", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid score boost number encountered: {0}.
-        /// </summary>
-        internal static string InvalidScoreBoost
-        {
-            get
-            {
-                return ResourceManager.GetString("InvalidScoreBoost", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Expected a number to follow a score boost, e.g. &quot;Term^3&quot; would indicate that the search term &quot;Term&quot; should have a score boost of 3..
-        /// </summary>
-        internal static string InvalidScoreBoostExpectedNumber
-        {
-            get
-            {
-                return ResourceManager.GetString("InvalidScoreBoostExpectedNumber", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Document already indexed.
-        /// </summary>
-        internal static string ItemAlreadyIndexed
-        {
-            get
-            {
-                return ResourceManager.GetString("ItemAlreadyIndexed", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Item not found.
-        /// </summary>
-        internal static string ItemNotFound
-        {
-            get
-            {
-                return ResourceManager.GetString("ItemNotFound", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to A key reader must be specified with a call to WithKey wen configuring item tokenization options.
-        /// </summary>
-        internal static string KeyReaderMustBeProvided
-        {
-            get
-            {
-                return ResourceManager.GetString("KeyReaderMustBeProvided", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Malformed index data encountered - expected a full location entry.
-        /// </summary>
-        internal static string MalformedDataExpectedFullLocationEntry
-        {
-            get
-            {
-                return ResourceManager.GetString("MalformedDataExpectedFullLocationEntry", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Malformed parameters for a fuzzy match operator encountered: {0}.
-        /// </summary>
-        internal static string MalformedFuzzyMatchParameters
-        {
-            get
-            {
-                return ResourceManager.GetString("MalformedFuzzyMatchParameters", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Only 255 distinct fields can currently be indexed.
-        /// </summary>
-        internal static string MaximumDistinctFieldsIndexReached
-        {
-            get
-            {
-                return ResourceManager.GetString("MaximumDistinctFieldsIndexReached", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to An index can only have a maximum of 31 unique object types configured against it.
-        /// </summary>
-        internal static string MaximumNumberOfConfiguredObjectTypesReached
-        {
-            get
-            {
-                return ResourceManager.GetString("MaximumNumberOfConfiguredObjectTypesReached", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Only tokens up to {0} characters long can be indexed..
-        /// </summary>
-        internal static string MaxTokenLengthExceeded
-        {
-            get
-            {
-                return ResourceManager.GetString("MaxTokenLengthExceeded", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The index terminator was not found at the end of the file..
-        /// </summary>
-        internal static string MissingIndexTerminator
-        {
-            get
-            {
-                return ResourceManager.GetString("MissingIndexTerminator", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The expected header bytes could not be found in the stream - this is probably not a serialized index..
-        /// </summary>
-        internal static string MissingLiftiHeaderIndicatorBytes
-        {
-            get
-            {
-                return ResourceManager.GetString("MissingLiftiHeaderIndicatorBytes", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Multiplier values must be greater than one.
-        /// </summary>
-        internal static string MultiplierValueMustBeGreaterThanOne
-        {
-            get
-            {
-                return ResourceManager.GetString("MultiplierValueMustBeGreaterThanOne", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to No batch change in progress..
-        /// </summary>
-        internal static string NoBatchChangeInProgress
-        {
-            get
-            {
-                return ResourceManager.GetString("NoBatchChangeInProgress", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to No deserializer available for binary serialized version {0}..
-        /// </summary>
-        internal static string NoDeserializerAvailableForIndexVersion
-        {
-            get
-            {
-                return ResourceManager.GetString("NoDeserializerAvailableForIndexVersion", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Internal error: A dynamic field was missing its dynamic field reader name.
-        /// </summary>
-        internal static string NoDynamicFieldReaderNameInDynamicField
-        {
-            get
-            {
-                return ResourceManager.GetString("NoDynamicFieldReaderNameInDynamicField", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to No item was returned from the load item delegate when generating match phrases for item {0}..
-        /// </summary>
-        internal static string NoItemReturnedWhenGeneratingMatchPhrases
-        {
-            get
-            {
-                return ResourceManager.GetString("NoItemReturnedWhenGeneratingMatchPhrases", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to No reader delegates configured.
-        /// </summary>
-        internal static string NoReaderDelegatesConfigured
-        {
-            get
-            {
-                return ResourceManager.GetString("NoReaderDelegatesConfigured", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Attempting to score a query result with no scorer initialized.
-        /// </summary>
-        internal static string NoScorerInitialized
-        {
-            get
-            {
-                return ResourceManager.GetString("NoScorerInitialized", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Internal error: no snapshot initialized in navigator.
-        /// </summary>
-        internal static string NoSnapshotInitialized
-        {
-            get
-            {
-                return ResourceManager.GetString("NoSnapshotInitialized", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Not all requested items were returned. Tme missing ids were: {0}.
-        /// </summary>
-        internal static string NotAllRequestedItemsReturned
-        {
-            get
-            {
-                return ResourceManager.GetString("NotAllRequestedItemsReturned", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to No tokenization options have been provided for type {0}.
-        /// </summary>
-        internal static string NoTokenizationOptionsProvidedForType
-        {
-            get
-            {
-                return ResourceManager.GetString("NoTokenizationOptionsProvidedForType", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Internal error - attempted to calculate an item score boost without initialized score boost stats.
-        /// </summary>
-        internal static string ScoreBoostsNotCalculated
-        {
-            get
-            {
-                return ResourceManager.GetString("ScoreBoostsNotCalculated", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Single character wildcards (%) following a multi-character wildcard (*) are not currently supported..
-        /// </summary>
-        internal static string SingleCharacterWildcardsFollowingMultiCharacterNotSupported
-        {
-            get
-            {
-                return ResourceManager.GetString("SingleCharacterWildcardsFollowingMultiCharacterNotSupported", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Text tokens must have an associated index tokenizer.
-        /// </summary>
-        internal static string TextTokensMustHaveIndexTokenizers
-        {
-            get
-            {
-                return ResourceManager.GetString("TextTokensMustHaveIndexTokenizers", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Thesaurus entries cannot result in multiple words because each word will be considered equivalent which is probably not what you expect. The word was: {0} and was split into {1}.
-        /// </summary>
-        internal static string ThesaurusEntriesCannotResultInMultipleWords
-        {
-            get
-            {
-                return ResourceManager.GetString("ThesaurusEntriesCannotResultInMultipleWords", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The word &quot;{0}&quot; resulted in an empty value after tokenization..
-        /// </summary>
-        internal static string ThesaurusEntriesMustResultInACompleteWord
-        {
-            get
-            {
-                return ResourceManager.GetString("ThesaurusEntriesMustResultInACompleteWord", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to A timeout occurred waiting for index write lock.
-        /// </summary>
-        internal static string TimeoutWaitingForWriteLock
-        {
-            get
-            {
-                return ResourceManager.GetString("TimeoutWaitingForWriteLock", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to EnumerateIndexedTokens cannot be called after applying a bookmark.
-        /// </summary>
-        internal static string UnableToEnumerateIndexedTokensAfterApplyingBookmark
-        {
-            get
-            {
-                return ResourceManager.GetString("UnableToEnumerateIndexedTokensAfterApplyingBookmark", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Unable to read header data from serialized index content..
-        /// </summary>
-        internal static string UnableToReadHeaderInformation
-        {
-            get
-            {
-                return ResourceManager.GetString("UnableToReadHeaderInformation", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Unclosed [ encountered.
-        /// </summary>
-        internal static string UnclosedSquareBracket
-        {
-            get
-            {
-                return ResourceManager.GetString("UnclosedSquareBracket", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Unexpected close bracket encountered in query.
-        /// </summary>
-        internal static string UnexpectedCloseBracket
-        {
-            get
-            {
-                return ResourceManager.GetString("UnexpectedCloseBracket", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The query ended unexpectedly - a token was expected..
-        /// </summary>
-        internal static string UnexpectedEndOfQuery
-        {
-            get
-            {
-                return ResourceManager.GetString("UnexpectedEndOfQuery", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to An unexpected operator was encountered: {0}.
-        /// </summary>
-        internal static string UnexpectedOperator
-        {
-            get
-            {
-                return ResourceManager.GetString("UnexpectedOperator", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Internal error - An unexpected operator was encountered: {0}.
-        /// </summary>
-        internal static string UnexpectedOperatorInternal
-        {
-            get
-            {
-                return ResourceManager.GetString("UnexpectedOperatorInternal", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Unexpected OperatorParseState {0} encountered while tokenizing a query.
-        /// </summary>
-        internal static string UnexpectedOperatorParseStateEncountered
-        {
-            get
-            {
-                return ResourceManager.GetString("UnexpectedOperatorParseStateEncountered", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Internal error - unexpected value removal from score boost metadata.
-        /// </summary>
-        internal static string UnexpectedScoreBoostValueRemoval
-        {
-            get
-            {
-                return ResourceManager.GetString("UnexpectedScoreBoostValueRemoval", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Unexpected token encountered: {0}.
-        /// </summary>
-        internal static string UnexpectedTokenEncountered
-        {
-            get
-            {
-                return ResourceManager.GetString("UnexpectedTokenEncountered", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to An unknown dynamic field reader name was encountered: {0} - this would likely indicate that an index was serialized with a differently configured set of dynamic field readers..
-        /// </summary>
-        internal static string UnknownDynamicFieldReaderNameEncountered
-        {
-            get
-            {
-                return ResourceManager.GetString("UnknownDynamicFieldReaderNameEncountered", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown field &apos;{0}&apos;.
-        /// </summary>
-        internal static string UnknownField
-        {
-            get
-            {
-                return ResourceManager.GetString("UnknownField", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown FieldKind {0}.
-        /// </summary>
-        internal static string UnknownFieldKind
-        {
-            get
-            {
-                return ResourceManager.GetString("UnknownFieldKind", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Serialized index contains unknown field ids. Fields have most likely been removed from the FullTextIndexBuilder configuration..
-        /// </summary>
-        internal static string UnknownFieldsInSerializedIndex
-        {
-            get
-            {
-                return ResourceManager.GetString("UnknownFieldsInSerializedIndex", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown object type id {0}.
-        /// </summary>
-        internal static string UnknownObjectTypeId
-        {
-            get
-            {
-                return ResourceManager.GetString("UnknownObjectTypeId", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown operator encountered: {0}.
-        /// </summary>
-        internal static string UnknownOperatorEncountered
-        {
-            get
-            {
-                return ResourceManager.GetString("UnknownOperatorEncountered", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Unsupported index support level {0}.
-        /// </summary>
-        internal static string UnsupportedIndexSupportLevel
-        {
-            get
-            {
-                return ResourceManager.GetString("UnsupportedIndexSupportLevel", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Unsupported query joining operator: {0}.
-        /// </summary>
-        internal static string UnsupportedQueryJoiningOperator
-        {
-            get
-            {
-                return ResourceManager.GetString("UnsupportedQueryJoiningOperator", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Value must not be less than zero.
-        /// </summary>
-        internal static string ValueMustNotBeLessThanZero
-        {
-            get
-            {
-                return ResourceManager.GetString("ValueMustNotBeLessThanZero", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to WithScoreBoosting can only be called once per object builder.
-        /// </summary>
-        internal static string WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition
-        {
-            get
-            {
-                return ResourceManager.GetString("WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to End anchor (&gt;&gt;) encountered without any preceding text.
-        /// </summary>
-        internal static string EndAnchorWithoutPrecedingText
-        {
-            get
-            {
-                return ResourceManager.GetString("EndAnchorWithoutPrecedingText", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Start anchor (&lt;&lt;) encountered without any following text.
-        /// </summary>
-        internal static string StartAnchorWithoutFollowingText
-        {
-            get
-            {
-                return ResourceManager.GetString("StartAnchorWithoutFollowingText", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Start and end anchors (&lt;&lt;&gt;&gt;) must have text between them.
         /// </summary>
-        internal static string BothAnchorsWithoutText
-        {
-            get
-            {
+        internal static string BothAnchorsWithoutText {
+            get {
                 return ResourceManager.GetString("BothAnchorsWithoutText", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///  Looks up a localized string similar to An AnchoredWordQueryPart cannot have false for both requireStart and requireEnd.
+        ///   Looks up a localized string similar to Cannot combine an empty set of query parts.
         /// </summary>
-        internal static string MustAnchorAtStartEndOrBoth
-        {
-            get
-            {
+        internal static string CannotCombineAnEmptySetOfQueryParts {
+            get {
+                return ResourceManager.GetString("CannotCombineAnEmptySetOfQueryParts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot register a dynamic field with the same name as the statically registered field &quot;{0}&quot;. Consider using a field prefix when configuring the dynamic fields..
+        /// </summary>
+        internal static string CannotRegisterDynamicFieldWithSameNameAsStaticField {
+            get {
+                return ResourceManager.GetString("CannotRegisterDynamicFieldWithSameNameAsStaticField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot register dynamic field with the same name &quot;{0}&quot; against different object types. Consider using a field prefix when configuring the dynamic fields..
+        /// </summary>
+        internal static string CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes {
+            get {
+                return ResourceManager.GetString("CannotRegisterDynamicFieldWithSameNameForTwoDifferentObjectTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate dynamic field reader name encountered: {0}. Dynamic field readers must have unique names..
+        /// </summary>
+        internal static string DuplicateDynamicFieldReaderName {
+            get {
+                return ResourceManager.GetString("DuplicateDynamicFieldReaderName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A duplicate field &quot;{0}&quot; was encountered while indexing the object with key {1}. Most likely multiple dynamic field providers have been configured and the same field was produced by more than one of them. Consider using a field prefix when configuring the dynamic fields..
+        /// </summary>
+        internal static string DuplicateFieldEncounteredOnObject {
+            get {
+                return ResourceManager.GetString("DuplicateFieldEncounteredOnObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The index was serialized with binary serialization version {0} and is incompatible with this release of LIFTI..
+        /// </summary>
+        internal static string EarlierVersionSerializedIndexNotSupported {
+            get {
+                return ResourceManager.GetString("EarlierVersionSerializedIndexNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adjacent text query parts cannot be empty.
+        /// </summary>
+        internal static string EmptyAdjacentTextPartsAreNotSupported {
+            get {
+                return ResourceManager.GetString("EmptyAdjacentTextPartsAreNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot create an empty adjacent words query part.
+        /// </summary>
+        internal static string EmptyAdjacentWordsQueryPart {
+            get {
+                return ResourceManager.GetString("EmptyAdjacentWordsQueryPart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bracketed query parts cannot be empty.
+        /// </summary>
+        internal static string EmptyBracketedExpressionsAreNotSupported {
+            get {
+                return ResourceManager.GetString("EmptyBracketedExpressionsAreNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Empty field name encountered.
+        /// </summary>
+        internal static string EmptyFieldNameEncountered {
+            get {
+                return ResourceManager.GetString("EmptyFieldNameEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal error - missing text value.
+        /// </summary>
+        internal static string EmptyOrMissingTextQueryFragmentValue {
+            get {
+                return ResourceManager.GetString("EmptyOrMissingTextQueryFragmentValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot create an empty wildcard query part.
+        /// </summary>
+        internal static string EmptyWildcardQuery {
+            get {
+                return ResourceManager.GetString("EmptyWildcardQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to End anchor (&gt;&gt;) encountered without any preceding text.
+        /// </summary>
+        internal static string EndAnchorWithoutPrecedingText {
+            get {
+                return ResourceManager.GetString("EndAnchorWithoutPrecedingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected at least one query part to be parsed.
+        /// </summary>
+        internal static string ExpectedAtLeastOneQueryPartParsed {
+            get {
+                return ResourceManager.GetString("ExpectedAtLeastOneQueryPartParsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected = after bracketed field name.
+        /// </summary>
+        internal static string ExpectedEqualsAfterFieldName {
+            get {
+                return ResourceManager.GetString("ExpectedEqualsAfterFieldName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected a fuzzy match token - got {0}.
+        /// </summary>
+        internal static string ExpectedFuzzyMatchToken {
+            get {
+                return ResourceManager.GetString("ExpectedFuzzyMatchToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A text fragment must follow a multi-character wildcard in a wildcard expression.
+        /// </summary>
+        internal static string ExpectedTextQueryFragmentAfterMultiCharacterWildcard {
+            get {
+                return ResourceManager.GetString("ExpectedTextQueryFragmentAfterMultiCharacterWildcard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected a text token - got {0}.
+        /// </summary>
+        internal static string ExpectedTextToken {
+            get {
+                return ResourceManager.GetString("ExpectedTextToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Token expected: {0}.
+        /// </summary>
+        internal static string ExpectedToken {
+            get {
+                return ResourceManager.GetString("ExpectedToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Field id {0} has no associated field name.
+        /// </summary>
+        internal static string FieldHasNoAssociatedFieldName {
+            get {
+                return ResourceManager.GetString("FieldHasNoAssociatedFieldName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate field name used: {0}. Field names must be unique across all item types registered with an index..
+        /// </summary>
+        internal static string FieldNameAlreadyUsed {
+            get {
+                return ResourceManager.GetString("FieldNameAlreadyUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name must not be empty.
+        /// </summary>
+        internal static string FieldNameMustNotBeEmpty {
+            get {
+                return ResourceManager.GetString("FieldNameMustNotBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max edit distance values must be in the range 0-65535.
+        /// </summary>
+        internal static string FuzzyMatchMaxEditDistanceOutOfRange {
+            get {
+                return ResourceManager.GetString("FuzzyMatchMaxEditDistanceOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max sequential edit values must be in the range 0-65535.
+        /// </summary>
+        internal static string FuzzyMatchMaxSequentialEditsOutOfRange {
+            get {
+                return ResourceManager.GetString("FuzzyMatchMaxSequentialEditsOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Id {0} is already registered in the index..
+        /// </summary>
+        internal static string IdAlreadyUsed {
+            get {
+                return ResourceManager.GetString("IdAlreadyUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An index must be empty when attempting to deserialize its contents..
+        /// </summary>
+        internal static string IndexMustBeEmptyForDeserialization {
+            get {
+                return ResourceManager.GetString("IndexMustBeEmptyForDeserialization", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid score boost number encountered: {0}.
+        /// </summary>
+        internal static string InvalidScoreBoost {
+            get {
+                return ResourceManager.GetString("InvalidScoreBoost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected a number to follow a score boost, e.g. &quot;Term^3&quot; would indicate that the search term &quot;Term&quot; should have a score boost of 3..
+        /// </summary>
+        internal static string InvalidScoreBoostExpectedNumber {
+            get {
+                return ResourceManager.GetString("InvalidScoreBoostExpectedNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Document already indexed.
+        /// </summary>
+        internal static string ItemAlreadyIndexed {
+            get {
+                return ResourceManager.GetString("ItemAlreadyIndexed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Item not found.
+        /// </summary>
+        internal static string ItemNotFound {
+            get {
+                return ResourceManager.GetString("ItemNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A key reader must be specified with a call to WithKey wen configuring item tokenization options.
+        /// </summary>
+        internal static string KeyReaderMustBeProvided {
+            get {
+                return ResourceManager.GetString("KeyReaderMustBeProvided", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Malformed index data encountered - expected a full location entry.
+        /// </summary>
+        internal static string MalformedDataExpectedFullLocationEntry {
+            get {
+                return ResourceManager.GetString("MalformedDataExpectedFullLocationEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Malformed parameters for a fuzzy match operator encountered: {0}.
+        /// </summary>
+        internal static string MalformedFuzzyMatchParameters {
+            get {
+                return ResourceManager.GetString("MalformedFuzzyMatchParameters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only 255 distinct fields can currently be indexed.
+        /// </summary>
+        internal static string MaximumDistinctFieldsIndexReached {
+            get {
+                return ResourceManager.GetString("MaximumDistinctFieldsIndexReached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An index can only have a maximum of 31 unique object types configured against it.
+        /// </summary>
+        internal static string MaximumNumberOfConfiguredObjectTypesReached {
+            get {
+                return ResourceManager.GetString("MaximumNumberOfConfiguredObjectTypesReached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only tokens up to {0} characters long can be indexed..
+        /// </summary>
+        internal static string MaxTokenLengthExceeded {
+            get {
+                return ResourceManager.GetString("MaxTokenLengthExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The index terminator was not found at the end of the file..
+        /// </summary>
+        internal static string MissingIndexTerminator {
+            get {
+                return ResourceManager.GetString("MissingIndexTerminator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal error: Index is missing last token index metadata.
+        /// </summary>
+        internal static string MissingLastTokenIndexMetadata {
+            get {
+                return ResourceManager.GetString("MissingLastTokenIndexMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The expected header bytes could not be found in the stream - this is probably not a serialized index..
+        /// </summary>
+        internal static string MissingLiftiHeaderIndicatorBytes {
+            get {
+                return ResourceManager.GetString("MissingLiftiHeaderIndicatorBytes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiplier values must be greater than one.
+        /// </summary>
+        internal static string MultiplierValueMustBeGreaterThanOne {
+            get {
+                return ResourceManager.GetString("MultiplierValueMustBeGreaterThanOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to At least one of requireStart or requireEnd must be true.
+        /// </summary>
+        internal static string MustAnchorAtStartEndOrBoth {
+            get {
                 return ResourceManager.GetString("MustAnchorAtStartEndOrBoth", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///  Looks up a localized string similar to Index is missing last token index metadata.
+        ///   Looks up a localized string similar to No batch change in progress..
         /// </summary>
-        internal static string MissingLastTokenIndexMetadata
-        {
-            get
-            {
-                return ResourceManager.GetString("MissingLastTokenIndexMetadata", resourceCulture);
+        internal static string NoBatchChangeInProgress {
+            get {
+                return ResourceManager.GetString("NoBatchChangeInProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No deserializer available for binary serialized version {0}..
+        /// </summary>
+        internal static string NoDeserializerAvailableForIndexVersion {
+            get {
+                return ResourceManager.GetString("NoDeserializerAvailableForIndexVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal error: A dynamic field was missing its dynamic field reader name.
+        /// </summary>
+        internal static string NoDynamicFieldReaderNameInDynamicField {
+            get {
+                return ResourceManager.GetString("NoDynamicFieldReaderNameInDynamicField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No item was returned from the load item delegate when generating match phrases for item {0}..
+        /// </summary>
+        internal static string NoItemReturnedWhenGeneratingMatchPhrases {
+            get {
+                return ResourceManager.GetString("NoItemReturnedWhenGeneratingMatchPhrases", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No reader delegates configured.
+        /// </summary>
+        internal static string NoReaderDelegatesConfigured {
+            get {
+                return ResourceManager.GetString("NoReaderDelegatesConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attempting to score a query result with no scorer initialized.
+        /// </summary>
+        internal static string NoScorerInitialized {
+            get {
+                return ResourceManager.GetString("NoScorerInitialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal error: no snapshot initialized in navigator.
+        /// </summary>
+        internal static string NoSnapshotInitialized {
+            get {
+                return ResourceManager.GetString("NoSnapshotInitialized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not all requested items were returned. Tme missing ids were: {0}.
+        /// </summary>
+        internal static string NotAllRequestedItemsReturned {
+            get {
+                return ResourceManager.GetString("NotAllRequestedItemsReturned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No tokenization options have been provided for type {0}.
+        /// </summary>
+        internal static string NoTokenizationOptionsProvidedForType {
+            get {
+                return ResourceManager.GetString("NoTokenizationOptionsProvidedForType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal error - attempted to calculate an item score boost without initialized score boost stats.
+        /// </summary>
+        internal static string ScoreBoostsNotCalculated {
+            get {
+                return ResourceManager.GetString("ScoreBoostsNotCalculated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Single character wildcards (%) following a multi-character wildcard (*) are not currently supported..
+        /// </summary>
+        internal static string SingleCharacterWildcardsFollowingMultiCharacterNotSupported {
+            get {
+                return ResourceManager.GetString("SingleCharacterWildcardsFollowingMultiCharacterNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start anchor (&lt;&lt;) encountered without any following text.
+        /// </summary>
+        internal static string StartAnchorWithoutFollowingText {
+            get {
+                return ResourceManager.GetString("StartAnchorWithoutFollowingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text tokens must have an associated index tokenizer.
+        /// </summary>
+        internal static string TextTokensMustHaveIndexTokenizers {
+            get {
+                return ResourceManager.GetString("TextTokensMustHaveIndexTokenizers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thesaurus entries cannot result in multiple words because each word will be considered equivalent which is probably not what you expect. The word was: {0} and was split into {1}.
+        /// </summary>
+        internal static string ThesaurusEntriesCannotResultInMultipleWords {
+            get {
+                return ResourceManager.GetString("ThesaurusEntriesCannotResultInMultipleWords", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The word &quot;{0}&quot; resulted in an empty value after tokenization..
+        /// </summary>
+        internal static string ThesaurusEntriesMustResultInACompleteWord {
+            get {
+                return ResourceManager.GetString("ThesaurusEntriesMustResultInACompleteWord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A timeout occurred waiting for index write lock.
+        /// </summary>
+        internal static string TimeoutWaitingForWriteLock {
+            get {
+                return ResourceManager.GetString("TimeoutWaitingForWriteLock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EnumerateIndexedTokens cannot be called after applying a bookmark.
+        /// </summary>
+        internal static string UnableToEnumerateIndexedTokensAfterApplyingBookmark {
+            get {
+                return ResourceManager.GetString("UnableToEnumerateIndexedTokensAfterApplyingBookmark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to read header data from serialized index content..
+        /// </summary>
+        internal static string UnableToReadHeaderInformation {
+            get {
+                return ResourceManager.GetString("UnableToReadHeaderInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unclosed [ encountered.
+        /// </summary>
+        internal static string UnclosedSquareBracket {
+            get {
+                return ResourceManager.GetString("UnclosedSquareBracket", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected close bracket encountered in query.
+        /// </summary>
+        internal static string UnexpectedCloseBracket {
+            get {
+                return ResourceManager.GetString("UnexpectedCloseBracket", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The query ended unexpectedly - a token was expected..
+        /// </summary>
+        internal static string UnexpectedEndOfQuery {
+            get {
+                return ResourceManager.GetString("UnexpectedEndOfQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unexpected operator was encountered: {0}.
+        /// </summary>
+        internal static string UnexpectedOperator {
+            get {
+                return ResourceManager.GetString("UnexpectedOperator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal error - An unexpected operator was encountered: {0}.
+        /// </summary>
+        internal static string UnexpectedOperatorInternal {
+            get {
+                return ResourceManager.GetString("UnexpectedOperatorInternal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected OperatorParseState {0} encountered while tokenizing a query.
+        /// </summary>
+        internal static string UnexpectedOperatorParseStateEncountered {
+            get {
+                return ResourceManager.GetString("UnexpectedOperatorParseStateEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal error - unexpected value removal from score boost metadata.
+        /// </summary>
+        internal static string UnexpectedScoreBoostValueRemoval {
+            get {
+                return ResourceManager.GetString("UnexpectedScoreBoostValueRemoval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected token encountered: {0}.
+        /// </summary>
+        internal static string UnexpectedTokenEncountered {
+            get {
+                return ResourceManager.GetString("UnexpectedTokenEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unknown dynamic field reader name was encountered: {0} - this would likely indicate that an index was serialized with a differently configured set of dynamic field readers..
+        /// </summary>
+        internal static string UnknownDynamicFieldReaderNameEncountered {
+            get {
+                return ResourceManager.GetString("UnknownDynamicFieldReaderNameEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown field &apos;{0}&apos;.
+        /// </summary>
+        internal static string UnknownField {
+            get {
+                return ResourceManager.GetString("UnknownField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown FieldKind {0}.
+        /// </summary>
+        internal static string UnknownFieldKind {
+            get {
+                return ResourceManager.GetString("UnknownFieldKind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Serialized index contains unknown field ids. Fields have most likely been removed from the FullTextIndexBuilder configuration..
+        /// </summary>
+        internal static string UnknownFieldsInSerializedIndex {
+            get {
+                return ResourceManager.GetString("UnknownFieldsInSerializedIndex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown object type id {0}.
+        /// </summary>
+        internal static string UnknownObjectTypeId {
+            get {
+                return ResourceManager.GetString("UnknownObjectTypeId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown operator encountered: {0}.
+        /// </summary>
+        internal static string UnknownOperatorEncountered {
+            get {
+                return ResourceManager.GetString("UnknownOperatorEncountered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported index support level {0}.
+        /// </summary>
+        internal static string UnsupportedIndexSupportLevel {
+            get {
+                return ResourceManager.GetString("UnsupportedIndexSupportLevel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported query joining operator: {0}.
+        /// </summary>
+        internal static string UnsupportedQueryJoiningOperator {
+            get {
+                return ResourceManager.GetString("UnsupportedQueryJoiningOperator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value must not be less than zero.
+        /// </summary>
+        internal static string ValueMustNotBeLessThanZero {
+            get {
+                return ResourceManager.GetString("ValueMustNotBeLessThanZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WithScoreBoosting can only be called once per object builder.
+        /// </summary>
+        internal static string WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition {
+            get {
+                return ResourceManager.GetString("WithScoreBoostingCanOnlyBeCalledOncePerObjectDefinition", resourceCulture);
             }
         }
     }
 }
-
