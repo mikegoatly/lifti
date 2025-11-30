@@ -32,7 +32,7 @@ namespace Lifti.Serialization.Binary
                 var key = this.keySerializer.Read(this.reader);
 
                 // Read field statistics (unified in V7)
-                var fieldStatCount = (int)this.reader.ReadByte();
+                var fieldStatCount = this.reader.ReadNonNegativeVarInt32();
                 var statisticsByField = new Dictionary<byte, FieldStatistics>(fieldStatCount);
                 var totalTokenCount = 0;
                 for (var fieldIndex = 0; fieldIndex < fieldStatCount; fieldIndex++)
