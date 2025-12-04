@@ -39,7 +39,7 @@ namespace Lifti.Serialization.Binary
                 {
                     var fieldId = this.reader.ReadByte();
                     var tokenCount = this.reader.ReadNonNegativeVarInt32();
-                    var lastTokenIndex = this.reader.ReadNonNegativeVarInt32();
+                    var lastTokenIndex = this.reader.ReadVarInt32();
 
                     statisticsByField.Add(fieldId, new FieldStatistics(tokenCount, lastTokenIndex));
                     totalTokenCount += tokenCount;

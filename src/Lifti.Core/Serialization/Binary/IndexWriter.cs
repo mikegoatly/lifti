@@ -93,7 +93,7 @@ namespace Lifti.Serialization.Binary
                 {
                     this.writer.Write(fieldId);
                     this.writer.WriteNonNegativeVarInt32(stats.TokenCount);
-                    this.writer.WriteNonNegativeVarInt32(stats.LastTokenIndex);
+                    this.writer.WriteVarInt32(stats.LastTokenIndex);
                 }
 
                 // If the object is associated to an object type, write the object type id and any

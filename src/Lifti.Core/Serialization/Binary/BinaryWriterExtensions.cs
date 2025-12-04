@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace Lifti.Serialization.Binary
@@ -45,6 +46,8 @@ namespace Lifti.Serialization.Binary
 
         public static void WriteNonNegativeVarInt32(this BinaryWriter writer, int value)
         {
+            Debug.Assert(value >= 0);
+
             while (value > 0x7F)
             {
                 writer.Write((byte)((value & 0x7F) | 0x80));

@@ -23,6 +23,16 @@ namespace Lifti.Tests.Serialization
         }
 
         [Fact]
+        public async Task SerializingEntriesWithEmptyText()
+        {
+            var index = new FullTextIndexBuilder<string>().Build();
+            await index.AddAsync("A", "");
+            var deserializedIndex = new FullTextIndexBuilder<string>().Build();
+            await SerializeAndDeserializeAsync(index, deserializedIndex);
+            deserializedIndex.Count.Should().Be(1);
+        }
+
+        [Fact]
         public async Task ShouldSerializeEmojiWithSurrogatePairs()
         {
             var index = await SerializeAndDeserializeIndexWithTextAsync("🎶 🤷🏾‍♀️");
@@ -627,9 +637,10 @@ namespace Lifti.Tests.Serialization
             return index;
         }
 
-        private static async Task SerializeAndDeserializeAsync(FullTextIndex<int> index, FullTextIndex<int> deserializedIndex)
+        private static async Task SerializeAndDeserializeAsync<TKey>(FullTextIndex<TKey> index, FullTextIndex<TKey> deserializedIndex)
+            where TKey : notnull
         {
-            var serializer = new BinarySerializer<int>();
+            var serializer = new BinarySerializer<TKey>();
             using var stream = new MemoryStream();
             await serializer.SerializeAsync(index, stream, false);
             stream.Position = 0;
