@@ -8,7 +8,7 @@ description: >
 
 LIFTI ships with `BinarySerializer<TKey>`, which is the recommended default for most applications.
 
-If you need a different storage format (for example JSON), you can create your own serializer by implementing `IIndexSerializer<TKey>` and then plugging it into `IndexSerializerBase<TKey>`.
+If you need a different storage format (for example JSON), you can create your own serializer by implementing `Lifti.Serialization.Binary.IIndexSerializer<TKey>` and then plugging it into your persistence layer.
 
 ## Why use a custom serializer?
 
@@ -23,49 +23,62 @@ A custom serializer can be useful when you want to:
 
 At a high level:
 
-- `IIndexSerializer<TKey>` performs the low-level write of an `IIndexSnapshot<TKey>`.
-- `IndexSerializerBase<TKey>` orchestrates the standard serialize/deserialize flow and accepts custom serializer/deserializer implementations.
+- `IIndexSerializer<TKey>` provides `SerializeAsync` and `DeserializeAsync` methods to round-trip an index or snapshot.
+- Your persistence layer is responsible for choosing when/how to persist snapshots and for wiring up the serializer (and deserializer).
 
-That means a custom serializer can focus on its own output format, while `IndexSerializerBase<TKey>` still handles the overall snapshot lifecycle.
+That means your custom serializer can focus on its own format, while the persistence layer handles storage concerns (file, database, blob store, etc.).
 
 ## Minimal JSON serializer example
 
 Below is a minimal example that writes a snapshot as JSON text.
 
 ```csharp
+using System;
+using System.IO;
+using System.Linq;
 using System.Text.Json;
-using Lifti.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
+using Lifti;
+using Lifti.Serialization.Binary;
 
 public sealed class JsonIndexSerializer<TKey> : IIndexSerializer<TKey>
     where TKey : notnull
 {
-    private readonly Stream output;
-
-    public JsonIndexSerializer(Stream output)
+    public Task SerializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true, CancellationToken cancellationToken = default)
     {
-        this.output = output;
+        return SerializeAsync(index.CreateSnapshot(), stream, disposeStream, cancellationToken);
     }
 
-    public async ValueTask WriteAsync(IIndexSnapshot<TKey> snapshot, CancellationToken cancellationToken = default)
+    public async Task SerializeAsync(IIndexSnapshot<TKey> snapshot, Stream stream, bool disposeStream = true, CancellationToken cancellationToken = default)
     {
-        // Example payload shape - tailor to your own compatibility/versioning needs
-        var payload = new
+        try
         {
-            Version = 1,
-            Documents = snapshot.Documents.Select(d => new
+            var payload = new
             {
-                d.Key,
-                d.Fields
-            })
-        };
+                Version = 1,
+                Documents = snapshot.Metadata.GetIndexedDocuments().Select(d => new
+                {
+                    d.Key,
+                    d.ObjectTypeId,
+                    d.ScoreBoost
+                })
+            };
 
-        await JsonSerializer.SerializeAsync(this.output, payload, cancellationToken: cancellationToken);
-        await this.output.FlushAsync(cancellationToken);
+            await JsonSerializer.SerializeAsync(stream, payload, cancellationToken: cancellationToken);
+        }
+        finally
+        {
+            if (disposeStream)
+            {
+                await stream.DisposeAsync();
+            }
+        }
     }
 
-    public void Dispose()
+    public Task DeserializeAsync(FullTextIndex<TKey> index, Stream stream, bool disposeStream = true, CancellationToken cancellationToken = default)
     {
-        // No-op for this example. Dispose owned resources here if needed.
+        throw new NotImplementedException("Example only: implement deserialization for your chosen payload format.");
     }
 }
 ```
@@ -85,9 +98,8 @@ var index = new FullTextIndexBuilder<int>().Build();
 await index.AddAsync(1, "hello world");
 
 using var stream = File.Create("index.json");
-using var serializer = new JsonIndexSerializer<int>(stream);
-
-await serializer.WriteAsync(index.CreateSnapshot());
+var serializer = new JsonIndexSerializer<int>();
+await serializer.SerializeAsync(index.CreateSnapshot(), stream);
 ```
 
 ## Pairing with custom deserialization
