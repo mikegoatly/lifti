@@ -61,7 +61,7 @@ public sealed class JsonIndexSerializer<TKey> : IIndexSerializer<TKey>
                 {
                     d.Key,
                     d.ObjectTypeId,
-                    d.ScoreBoost
+                    d.ScoringMagnitude
                 })
             };
 
