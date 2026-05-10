@@ -40,7 +40,7 @@ namespace Lifti.Tests
         [Fact]
         public void ShouldReturnNestedHierarchyForPositionalIntersectQueries()
         {
-            var plan = this.index.Search("\"two three four\"", QueryExecutionOptions.IncludeExecutionPlan).GetExecutionPlan();
+            var plan = this.index.Search("\"two three four\"", new QueryExecutionOptions() { IncludeExecutionPlan = true }).GetExecutionPlan();
 
             plan.Root.Should().BeEquivalentTo(
                 new QueryExecutionPlanNode(
@@ -70,7 +70,7 @@ namespace Lifti.Tests
         {
             // One document matches "seven" and 2 documents match "two three four". A union of the two
             // should result in 3 documents because the documents are unique.
-            var plan = this.index.Search("seven | (two three four)", QueryExecutionOptions.IncludeExecutionPlan).GetExecutionPlan();
+            var plan = this.index.Search("seven | (two three four)", new QueryExecutionOptions() { IncludeExecutionPlan = true }).GetExecutionPlan();
 
             AssertionOptions.FormattingOptions.MaxDepth = 10;
 

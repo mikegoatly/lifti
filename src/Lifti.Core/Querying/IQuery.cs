@@ -1,5 +1,4 @@
 ﻿using Lifti.Querying.QueryParts;
-using System.Collections.Generic;
 
 namespace Lifti.Querying
 {
@@ -20,11 +19,15 @@ namespace Lifti.Querying
         /// The type of the key in the index.
         /// </typeparam>
         /// <param name="index">
-        /// The <see cref="IndexSnapshot{TKey}"/> to execute against.
+        /// The <see cref="FullTextIndex{TKey}"/> to execute against.
+        /// </param>
+        /// <param name="options">
+        /// Optional execution options to control the execution of the query.
         /// </param>
         /// <returns>
-        /// An enumerable of <see cref="SearchResult{T}"/> instances that matched the query.
+        /// The <see cref="SearchResults{TKey}"/> containing the results of the query.
         /// </returns>
-        IEnumerable<SearchResult<TKey>> Execute<TKey>(IIndexSnapshot<TKey> index);
+        ISearchResults<TKey> Execute<TKey>(FullTextIndex<TKey> index, QueryExecutionOptions? options = null)
+            where TKey : notnull;
     }
 }

@@ -1,1 +1,21 @@
-
+*REMOVED*Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.Default) -> Lifti.ISearchResults<TKey>!
+*REMOVED*Lifti.FullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.Default) -> Lifti.ISearchResults<TKey>!
+*REMOVED*Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.Default) -> Lifti.ISearchResults<TKey>!
+*REMOVED*Lifti.IFullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.Default) -> Lifti.ISearchResults<TKey>!
+*REMOVED*Lifti.QueryExecutionOptions.IncludeExecutionPlan = 1 -> Lifti.QueryExecutionOptions
+*REMOVED*Lifti.QueryExecutionOptions.Default = 0 -> Lifti.QueryExecutionOptions
+*REMOVED*Lifti.Querying.IQuery.Execute<TKey>(Lifti.IIndexSnapshot<TKey>! index) -> System.Collections.Generic.IEnumerable<Lifti.SearchResult<TKey>!>!
+*REMOVED*Lifti.Querying.Query.Execute<TKey>(Lifti.IIndexSnapshot<TKey>! index) -> System.Collections.Generic.IEnumerable<Lifti.SearchResult<TKey>!>!
+Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions? options = null) -> Lifti.ISearchResults<TKey>!
+Lifti.FullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions? options = null) -> Lifti.ISearchResults<TKey>!
+Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions? options = null) -> Lifti.ISearchResults<TKey>!
+Lifti.IFullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions? options = null) -> Lifti.ISearchResults<TKey>!
+Lifti.QueryExecutionOptions.IncludeExecutionPlan.get -> bool
+Lifti.QueryExecutionOptions.IncludeExecutionPlan.init -> void
+Lifti.QueryExecutionOptions.SearchInFields.get -> System.Collections.Generic.ICollection<string!>?
+Lifti.QueryExecutionOptions.SearchInFields.init -> void
+Lifti.Querying.IQuery.Execute<TKey>(Lifti.FullTextIndex<TKey>! index, Lifti.QueryExecutionOptions? options = null) -> Lifti.ISearchResults<TKey>!
+Lifti.Querying.Query.Execute<TKey>(Lifti.FullTextIndex<TKey>! index, Lifti.QueryExecutionOptions? options = null) -> Lifti.ISearchResults<TKey>!
+Lifti.Querying.QueryContext.GlobalFieldFilters.get -> System.Collections.Generic.IReadOnlySet<byte>?
+Lifti.Querying.QueryContext.GlobalFieldFilters.init -> void
+static readonly Lifti.QueryExecutionOptions.Default -> Lifti.QueryExecutionOptions!

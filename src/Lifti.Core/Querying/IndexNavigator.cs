@@ -355,6 +355,7 @@ namespace Lifti.Querying
             }
 
             var filterToFieldId = queryContext.FilterToFieldId;
+            var globalFieldFilters = queryContext.GlobalFieldFilters;
             var matchedDocumentCount = node.Matches.Count;
             var scorer = this.scorer;
             foreach (var (documentId, indexedTokens) in documentMatches)
@@ -363,6 +364,11 @@ namespace Lifti.Querying
                 {
                     var fieldId = indexedToken.FieldId;
                     if (filterToFieldId.HasValue && filterToFieldId.GetValueOrDefault() != fieldId)
+                    {
+                        continue;
+                    }
+
+                    if (globalFieldFilters != null && !globalFieldFilters.Contains(fieldId))
                     {
                         continue;
                     }

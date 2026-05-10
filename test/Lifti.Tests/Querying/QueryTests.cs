@@ -10,7 +10,7 @@ namespace Lifti.Tests.Querying
 {
     public class QueryTests : IAsyncLifetime
     {
-        private IFullTextIndex<string> index = null!;
+        private FullTextIndex<string> index = null!;
 
         public async Task InitializeAsync()
         {
@@ -27,7 +27,7 @@ namespace Lifti.Tests.Querying
         public void WithEmptyQueryPartRoot_ShouldReturnNoResults()
         {
             var query = new Query(EmptyQueryPart.Instance);
-            query.Execute(this.index.Snapshot).Should().HaveCount(0);
+            query.Execute(this.index).Should().HaveCount(0);
         }
 
         [Fact]
