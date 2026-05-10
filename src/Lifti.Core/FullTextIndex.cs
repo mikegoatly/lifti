@@ -334,7 +334,7 @@ namespace Lifti
         public ISearchResults<TKey> Search(IQuery query, QueryExecutionOptions? options = null)
         {
             ArgumentNullException.ThrowIfNull(query);
-            return new SearchResults<TKey>(this, query.Execute(this.currentSnapshot, options), null);
+            return query.Execute(this, options);
         }
 
         /// <inheritdoc />
