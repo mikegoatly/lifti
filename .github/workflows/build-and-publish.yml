@@ -16,9 +16,9 @@ on:
       - "test/**"
 
 env:
-  MAJOR_VERSION: 7
+  MAJOR_VERSION: 8
   MINOR_VERSION: 0
-  PATCH_VERSION: 2
+  PATCH_VERSION: 0
   PROJECT_PATH: src/Lifti.Core/Lifti.Core.csproj
   TEST_PROJECT_PATH: test/Lifti.Tests/Lifti.Tests.csproj
   DOTNET_VERSION_8: "8.0.x"
