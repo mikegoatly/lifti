@@ -23,6 +23,6 @@ namespace Lifti
         /// <summary>
         /// Gets or sets the collection of field names to restrict search operations to.
         /// </summary>
-        public ICollection<string>? SearchInFields { get; internal set; }
+        public ICollection<string>? SearchInFields { get; init; }
     }
 }

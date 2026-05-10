@@ -13,6 +13,7 @@ Lifti.IFullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOption
 Lifti.QueryExecutionOptions.IncludeExecutionPlan.get -> bool
 Lifti.QueryExecutionOptions.IncludeExecutionPlan.init -> void
 Lifti.QueryExecutionOptions.SearchInFields.get -> System.Collections.Generic.ICollection<string!>?
+Lifti.QueryExecutionOptions.SearchInFields.init -> void
 Lifti.Querying.IQuery.Execute<TKey>(Lifti.FullTextIndex<TKey>! index, Lifti.QueryExecutionOptions? options = null) -> Lifti.ISearchResults<TKey>!
 Lifti.Querying.Query.Execute<TKey>(Lifti.FullTextIndex<TKey>! index, Lifti.QueryExecutionOptions? options = null) -> Lifti.ISearchResults<TKey>!
 Lifti.Querying.QueryContext.GlobalFieldFilters.get -> System.Collections.Generic.IReadOnlySet<byte>?
