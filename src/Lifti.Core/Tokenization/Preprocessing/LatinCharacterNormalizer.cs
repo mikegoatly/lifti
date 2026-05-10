@@ -15,15 +15,22 @@
 
             switch (input)
             {
+                // Bulgarian Er Golyam (vowel, transliterated to A or U)
+                case 'Ъ':
+                    return 'A';
+                case 'ъ':
+                    return 'a';
+
+                // Russian/Ukrainian Soft Sign (Transliterated to Y)
+                case 'Ь':
+                    return 'Y';
+                case 'ь':
+                    return 'y';
                 case 'æ':
                 case 'ǽ':
                     return "ae";
                 case 'œ':
                     return "oe";
-                case 'Ü':
-                    return "Ue";
-                case 'Ö':
-                    return "Oe";
                 case 'À':
                 case 'Á':
                 case 'Â':
@@ -49,13 +56,12 @@
                 case 'Ẳ':
                 case 'Ặ':
                 case 'А':
-                case 'Ъ':
-                case 'Ь':
                     return 'A';
                 case 'à':
                 case 'á':
                 case 'â':
                 case 'ã':
+                case 'ä':
                 case 'å':
                 case 'ǻ':
                 case 'ā':
@@ -78,10 +84,9 @@
                 case 'ẳ':
                 case 'ặ':
                 case 'а':
-                case 'ъ':
-                case 'ь':
                     return 'a';
                 case 'Б':
+                case 'Β':
                     return 'B';
                 case 'б':
                 case 'β':
@@ -106,12 +111,12 @@
                 case 'Ď':
                 case 'Đ':
                 case 'Δ':
-                    return "D";
+                    return 'D';
                 case 'ð':
                 case 'ď':
                 case 'đ':
                 case 'δ':
-                    return "d";
+                    return 'd';
                 case 'È':
                 case 'É':
                 case 'Ê':
@@ -157,9 +162,33 @@
                 case 'э':
                     return 'e';
                 case 'Ф':
+                case 'Φ':
                     return 'F';
                 case 'ф':
+                case 'φ':
                     return 'f';
+                case 'Θ':
+                    return "Th";
+                case 'θ':
+                    return "th";
+                case 'Χ':
+                    return "Kh";
+                case 'χ':
+                    return "kh";
+                case 'Ξ':
+                    return "Ks";
+                case 'Ψ':
+                    return "Ps";
+                case 'Þ':
+                    return "Th";
+                case 'þ':
+                    return "th";
+                case 'Ŋ':
+                    return "Ng";
+                case 'ŋ':
+                    return "ng";
+                case 'ẞ':
+                    return "ss";
                 case 'Ĝ':
                 case 'Ğ':
                 case 'Ġ':
@@ -204,6 +233,7 @@
                 case 'Ỉ':
                 case 'Ị':
                 case 'И': // https://en.wikipedia.org/wiki/I_(Cyrillic)
+                case 'І': // Cyrillic dotted I
                     return 'I';
                 case 'ì':
                 case 'í':
@@ -221,7 +251,7 @@
                 case 'ỉ':
                 case 'ị':
                 case 'и': // https://en.wikipedia.org/wiki/I_(Cyrillic)
-                case 'ї':
+                case 'і': // Cyrillic dotted I
                     return 'i';
                 case 'Ĵ':
                     return 'J';
@@ -252,6 +282,7 @@
                 case 'л':
                     return 'l';
                 case 'М':
+                case 'Μ':
                     return 'M';
                 case 'м':
                 case 'μ': // https://en.wikipedia.org/wiki/Mu_(letter)
@@ -275,6 +306,7 @@
                 case 'Ó':
                 case 'Ô':
                 case 'Õ':
+                case 'Ö':
                 case 'Ō':
                 case 'Ŏ':
                 case 'Ǒ':
@@ -304,6 +336,7 @@
                 case 'ó':
                 case 'ô':
                 case 'õ':
+                case 'ö':
                 case 'ō':
                 case 'ŏ':
                 case 'ǒ':
@@ -331,6 +364,7 @@
                 case 'о':
                     return 'o';
                 case 'П': // https://en.wikipedia.org/wiki/Pe_(Cyrillic)
+                case 'Π': // Greek Pi
                     return 'P';
                 case 'п': // https://en.wikipedia.org/wiki/Pe_(Cyrillic)
                 case 'π': // https://en.wikipedia.org/wiki/Pi_(letter)
@@ -369,18 +403,20 @@
                 case 'Ţ':
                 case 'Ť':
                 case 'Ŧ':
-                case 'τ':
                 case 'Т':
+                case 'Τ':
                     return 'T';
                 case 'ț':
                 case 'ţ':
                 case 'ť':
                 case 'ŧ':
                 case 'т':
+                case 'τ':
                     return 't';
                 case 'Ù':
                 case 'Ú':
                 case 'Û':
+                case 'Ü':
                 case 'Ũ':
                 case 'Ū':
                 case 'Ŭ':
@@ -401,10 +437,12 @@
                 case 'Ử':
                 case 'Ự':
                 case 'У': // https://en.wikipedia.org/wiki/U_(Cyrillic)
+                case 'Ў':
                     return 'U';
                 case 'ù':
                 case 'ú':
                 case 'û':
+                case 'ü':
                 case 'ũ':
                 case 'ū':
                 case 'ŭ':
@@ -417,9 +455,6 @@
                 case 'ǘ':
                 case 'ǚ':
                 case 'ǜ':
-                case 'υ':
-                case 'ύ':
-                case 'ϋ':
                 case 'ủ':
                 case 'ụ':
                 case 'ừ':
@@ -428,6 +463,7 @@
                 case 'ử':
                 case 'ự':
                 case 'у': // https://en.wikipedia.org/wiki/U_(Cyrillic)
+                case 'ў':
                     return 'u';
                 case 'Ý':
                 case 'Ÿ':
@@ -449,6 +485,9 @@
                 case 'ỷ':
                 case 'ỵ':
                 case 'й': // https://en.wikipedia.org/wiki/Short_I
+                case 'υ':
+                case 'ύ':
+                case 'ϋ':
                     return 'y';
                 case 'В': // https://en.wikipedia.org/wiki/Ve_(Cyrillic)
                     return 'V';
@@ -501,6 +540,8 @@
                     return "ye";
                 case 'Ї': // https://en.wikipedia.org/wiki/Yi_(Cyrillic)
                     return "Yi";
+                case 'ї':
+                    return "yi";
                 case 'Ж':
                     return "Zh";
                 case 'ж':
