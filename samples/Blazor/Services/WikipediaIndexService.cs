@@ -84,7 +84,7 @@ namespace BlazorApp.Services
 
         public ISearchResults<string> Search(string query)
         {
-            return this.Index.Search(query, QueryExecutionOptions.IncludeExecutionPlan);
+            return this.Index.Search(query, new QueryExecutionOptions() { IncludeExecutionPlan = true });
         }
 
         public IEnumerable<string> GetIndexedKeys()

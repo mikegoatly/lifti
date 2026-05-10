@@ -145,7 +145,7 @@ namespace Lifti
         /// <returns>
         /// The matching search results.
         /// </returns>
-        ISearchResults<TKey> Search(string searchText, QueryExecutionOptions options = QueryExecutionOptions.None);
+        ISearchResults<TKey> Search(string searchText, QueryExecutionOptions? options);
 
         /// <summary>
         /// Performs a search against this index.
@@ -159,7 +159,7 @@ namespace Lifti
         /// <returns>
         /// The matching search results.
         /// </returns>
-        ISearchResults<TKey> Search(IQuery query, QueryExecutionOptions options = QueryExecutionOptions.None);
+        ISearchResults<TKey> Search(IQuery query, QueryExecutionOptions? options);
 
         /// <summary>
         /// Starts a batch change within the index so that any subsequent mutations that are made using AddAsync and RemoveAsync will

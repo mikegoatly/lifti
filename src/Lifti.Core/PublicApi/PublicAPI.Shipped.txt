@@ -106,9 +106,9 @@ Lifti.FullTextIndex<TKey>.Metadata.get -> Lifti.IIndexMetadata<TKey>!
 Lifti.FullTextIndex<TKey>.QueryParser.get -> Lifti.Querying.IQueryParser!
 Lifti.FullTextIndex<TKey>.RemoveAsync(TKey key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Lifti.FullTextIndex<TKey>.Root.get -> Lifti.IndexNode!
-Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
+Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.Default) -> Lifti.ISearchResults<TKey>!
 Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query) -> Lifti.ISearchResults<TKey>!
-Lifti.FullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
+Lifti.FullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.Default) -> Lifti.ISearchResults<TKey>!
 Lifti.FullTextIndex<TKey>.Search(string! searchText) -> Lifti.ISearchResults<TKey>!
 Lifti.FullTextIndex<TKey>.Snapshot.get -> Lifti.IIndexSnapshot<TKey>!
 Lifti.FullTextIndexBuilder<TKey>
@@ -148,9 +148,9 @@ Lifti.IFullTextIndex<TKey>.Items.get -> Lifti.IIndexMetadata<TKey>!
 Lifti.IFullTextIndex<TKey>.Metadata.get -> Lifti.IIndexMetadata<TKey>!
 Lifti.IFullTextIndex<TKey>.QueryParser.get -> Lifti.Querying.IQueryParser!
 Lifti.IFullTextIndex<TKey>.RemoveAsync(TKey key, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
-Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
+Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.Default) -> Lifti.ISearchResults<TKey>!
 Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query) -> Lifti.ISearchResults<TKey>!
-Lifti.IFullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.None) -> Lifti.ISearchResults<TKey>!
+Lifti.IFullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.Default) -> Lifti.ISearchResults<TKey>!
 Lifti.IFullTextIndex<TKey>.Search(string! searchText) -> Lifti.ISearchResults<TKey>!
 Lifti.IFullTextIndex<TKey>.Snapshot.get -> Lifti.IIndexSnapshot<TKey>!
 Lifti.IIndexedFieldLookup
@@ -277,7 +277,7 @@ Lifti.PreprocessedInput.Replacement.get -> string?
 Lifti.PreprocessedInput.Value.get -> char
 Lifti.QueryExecutionOptions
 Lifti.QueryExecutionOptions.IncludeExecutionPlan = 1 -> Lifti.QueryExecutionOptions
-Lifti.QueryExecutionOptions.None = 0 -> Lifti.QueryExecutionOptions
+Lifti.QueryExecutionOptions.Default = 0 -> Lifti.QueryExecutionOptions
 Lifti.QueryExecutionPlan
 Lifti.QueryExecutionPlan.Root.get -> Lifti.QueryExecutionPlanNode!
 Lifti.QueryExecutionPlanNode

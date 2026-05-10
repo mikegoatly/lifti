@@ -1,1 +1,13 @@
-
+*REMOVED*Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.Default) -> Lifti.ISearchResults<TKey>!
+*REMOVED*Lifti.FullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.Default) -> Lifti.ISearchResults<TKey>!
+*REMOVED*Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.Default) -> Lifti.ISearchResults<TKey>!
+*REMOVED*Lifti.IFullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions options = Lifti.QueryExecutionOptions.Default) -> Lifti.ISearchResults<TKey>!
+*REMOVED*Lifti.QueryExecutionOptions.IncludeExecutionPlan = 1 -> Lifti.QueryExecutionOptions
+*REMOVED*Lifti.QueryExecutionOptions.Default = 0 -> Lifti.QueryExecutionOptions
+Lifti.FullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions? options) -> Lifti.ISearchResults<TKey>!
+Lifti.FullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions? options) -> Lifti.ISearchResults<TKey>!
+Lifti.IFullTextIndex<TKey>.Search(Lifti.Querying.IQuery! query, Lifti.QueryExecutionOptions? options) -> Lifti.ISearchResults<TKey>!
+Lifti.IFullTextIndex<TKey>.Search(string! searchText, Lifti.QueryExecutionOptions? options) -> Lifti.ISearchResults<TKey>!
+Lifti.QueryExecutionOptions.IncludeExecutionPlan.get -> bool
+Lifti.QueryExecutionOptions.IncludeExecutionPlan.init -> void
+static readonly Lifti.QueryExecutionOptions.Default -> Lifti.QueryExecutionOptions!
