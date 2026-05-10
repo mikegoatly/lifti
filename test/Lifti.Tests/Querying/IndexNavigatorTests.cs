@@ -114,6 +114,26 @@ namespace Lifti.Tests.Querying
         }
 
         [Fact]
+        public async Task GettingExactMatches_WithGlobalFieldFilter_ShouldOnlyReturnFilteredDocuments()
+        {
+            await this.index.AddAsync(("B", "Elephant", "Ellie"));
+            await this.index.AddAsync(("C", "Elephant", "Elephant"));
+
+            this.sut = this.index.Snapshot.CreateNavigator();
+
+            this.sut.Process("ELEPHANT").Should().BeTrue();
+
+            var fieldId = this.index.FieldLookup.GetFieldInfo("Field2").Id;
+            var expectedDocumentId = this.index.Metadata.GetMetadata("C").Id;
+
+            var results = this.sut.GetExactMatches(new QueryContext() { GlobalFieldFilters = new HashSet<byte> { fieldId } });
+
+            results.Matches.Should().HaveCount(1);
+            results.Matches[0].DocumentId.Should().Be(expectedDocumentId);
+            results.Matches[0].FieldMatches.Should().AllSatisfy(x => x.FieldId.Should().Be(fieldId));
+        }
+
+        [Fact]
         public async Task GettingExactAndChildMatches_WithDocumentFilter_ShouldOnlyReturnFilteredDocuments()
         {
             await this.index.AddAsync(("B", "Elephant", "Ellie"));

@@ -22,9 +22,12 @@ namespace Lifti.Querying
         /// <param name="index">
         /// The <see cref="IndexSnapshot{TKey}"/> to execute against.
         /// </param>
+        /// <param name="options">
+        /// Optional execution options to control the execution of the query.
+        /// </param>
         /// <returns>
         /// An enumerable of <see cref="SearchResult{T}"/> instances that matched the query.
         /// </returns>
-        IEnumerable<SearchResult<TKey>> Execute<TKey>(IIndexSnapshot<TKey> index);
+        IEnumerable<SearchResult<TKey>> Execute<TKey>(IIndexSnapshot<TKey> index, QueryExecutionOptions? options = null);
     }
 }

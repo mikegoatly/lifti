@@ -38,6 +38,18 @@ namespace Lifti.Tests
         }
 
         [Fact]
+        public async Task SearchingInSpecificFields_ShouldNotReturnMatchesWithTextInExcludedFields()
+        {
+            await this.index.AddAsync(new TestObject("A", "Text One", "Text Two", "Text Three Drumming"));
+            await this.index.AddAsync(new TestObject("B", "Text One", "Text Two Drumming", "Text Three"));
+
+            var results = this.index.Search("drumming", new QueryExecutionOptions { SearchInFields = new[] { "Text2" } });
+
+            results.Should().HaveCount(1);
+            results.First().Key.Should().Be("B");
+        }
+
+        [Fact]
         public async Task SequentialWildcardMatches_ShouldResultInCorrectMatchedPhrases()
         {
             var data = new[] {

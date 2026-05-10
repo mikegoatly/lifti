@@ -29,11 +29,21 @@ namespace Lifti.Querying
         public static IQuery Empty { get; } = new Query(EmptyQueryPart.Instance);
 
         /// <inheritdoc />
-        public IEnumerable<SearchResult<TKey>> Execute<TKey>(IIndexSnapshot<TKey> index)
+        public IEnumerable<SearchResult<TKey>> Execute<TKey>(IIndexSnapshot<TKey> index, QueryExecutionOptions? options = null)
         {
             ArgumentNullException.ThrowIfNull(index);
 
-            return this.Execute(index, QueryContext.Empty);
+            var queryContext= options switch
+            {
+                null => QueryContext.Empty,
+                _ => new QueryContext 
+                { 
+                    ExecutionTimings = options.IncludeExecutionPlan == true ? new() : ExecutionTimings.NullTimings,
+                    GlobalFieldFilters = options.SearchInFields?.Select(f => index.FieldLookup.GetFieldInfo(f).Id).ToHashSet()
+                }
+            };
+
+            return this.Execute(index, queryContext);
         }
 
         internal SearchResults<TKey> ExecuteWithTimings<TKey>(FullTextIndex<TKey> index)

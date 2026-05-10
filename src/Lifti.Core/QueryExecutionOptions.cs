@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Lifti
 {
@@ -18,5 +19,10 @@ namespace Lifti
         /// Without this option, the execution plan will be empty if requested.
         /// </summary>
         public bool IncludeExecutionPlan { get; init; }
+
+        /// <summary>
+        /// Gets or sets the collection of field names to restrict search operations to.
+        /// </summary>
+        public ICollection<string>? SearchInFields { get; internal set; }
     }
 }
