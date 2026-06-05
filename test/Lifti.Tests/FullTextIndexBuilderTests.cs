@@ -2,9 +2,11 @@
 using Lifti.Querying;
 using Lifti.Tests.Fakes;
 using Lifti.Tokenization;
+using Lifti.Tokenization.TextExtraction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -237,15 +239,70 @@ namespace Lifti.Tests
         [Fact]
         public async Task WithConfiguredIntraNodeTextLength_ShouldPassValueAsConfigurationToIndexNodeFactory()
         {
-            this.sut.WithIntraNodeTextSupportedAfterIndexDepth(0);
-            var index = this.sut.Build();
+            var index = new FullTextIndexBuilder<int>()
+                .WithIntraNodeTextSupportedAfterIndexDepth(0)
+                .Build();
+
             await index.AddAsync(1, "Testing");
             index.Root.IntraNodeText.ToString().Should().BeEquivalentTo("TESTING");
 
-            this.sut.WithIntraNodeTextSupportedAfterIndexDepth(1);
-            index = this.sut.Build();
+            index = new FullTextIndexBuilder<int>()
+                .WithIntraNodeTextSupportedAfterIndexDepth(1)
+                .Build();
+
             await index.AddAsync(1, "Testing");
             index.Root.IntraNodeText.ToString().Should().BeEquivalentTo("");
+        }
+
+        [Fact]
+        public async Task WithIndexModifiedActions_AfterBuild_ShouldThrowWithoutAddingAction()
+        {
+            var actionCount = 0;
+
+            this.sut.WithIndexModificationAction(_ => actionCount++);
+            this.sut.Build();
+
+            var mutation = () => this.sut.WithIndexModificationAction(_ => actionCount += 10);
+
+            mutation.Should().Throw<InvalidOperationException>()
+                .WithMessage("A FullTextIndexBuilder instance cannot be modified after Build has completed.");
+
+            var index = this.sut.Build();
+
+            await index.AddAsync(9, "Test");
+
+            actionCount.Should().Be(1);
+        }
+
+        [Fact]
+        public void ConfigurationMethods_AfterBuild_ShouldThrow()
+        {
+            this.sut.Build();
+
+            Action[] mutations =
+            [
+                () => this.sut.WithTextExtractor<PlainTextExtractor>(),
+                () => this.sut.WithTextExtractor(new PlainTextExtractor()),
+                () => this.sut.WithDuplicateKeyBehavior(DuplicateKeyBehavior.ThrowException),
+                () => this.sut.WithScorerFactory(new OkapiBm25ScorerFactory()),
+                () => this.sut.WithIndexModificationAction((Action<IIndexSnapshot<int>>)(_ => { })),
+                () => this.sut.WithIndexModificationAction((Func<IIndexSnapshot<int>, Task>)(_ => Task.CompletedTask)),
+                () => this.sut.WithIndexModificationAction((Func<IIndexSnapshot<int>, CancellationToken, Task>)((_, _) => Task.CompletedTask)),
+                () => this.sut.WithObjectTokenization<TestObject1>(o => o.WithKey(i => i.Id).WithField("TextField", i => i.Text)),
+                () => this.sut.WithDefaultTokenization(o => o.CaseInsensitive(false)),
+                () => this.sut.WithDefaultThesaurus(o => o.WithSynonyms("a", "b")),
+                () => this.sut.WithIntraNodeTextSupportedAfterIndexDepth(0),
+                () => this.sut.WithQueryParser(new FakeQueryParser(Query.Empty)),
+                () => this.sut.WithSimpleQueryParser(),
+                () => this.sut.WithSimpleQueryParser(o => o),
+                () => this.sut.WithQueryParser(o => o)
+            ];
+
+            foreach (var mutation in mutations)
+            {
+                mutation.Should().Throw<InvalidOperationException>()
+                    .WithMessage("A FullTextIndexBuilder instance cannot be modified after Build has completed.");
+            }
         }
 
         [Fact]
