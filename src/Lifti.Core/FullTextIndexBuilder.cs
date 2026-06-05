@@ -24,6 +24,7 @@ namespace Lifti
         private IIndexTokenizer defaultTokenizer = IndexTokenizer.Default;
         private List<Func<IIndexSnapshot<TKey>, CancellationToken, Task>>? indexModifiedActions;
         private ITextExtractor? defaultTextExtractor;
+        private bool buildCompleted;
 
         /// <summary>
         /// Configures the index to use a text extraction process when indexing text. This is useful when
@@ -32,6 +33,8 @@ namespace Lifti
         public FullTextIndexBuilder<TKey> WithTextExtractor<T>()
             where T : ITextExtractor, new()
         {
+            this.ThrowIfBuildCompleted();
+
             return this.WithTextExtractor(new T());
         }
 
@@ -41,6 +44,8 @@ namespace Lifti
         /// </summary>
         public FullTextIndexBuilder<TKey> WithTextExtractor(ITextExtractor textExtractor)
         {
+            this.ThrowIfBuildCompleted();
+
             this.defaultTextExtractor = textExtractor;
             return this;
         }
@@ -51,6 +56,8 @@ namespace Lifti
         /// </summary>
         public FullTextIndexBuilder<TKey> WithDuplicateKeyBehavior(DuplicateKeyBehavior duplicateKeyBehavior)
         {
+            this.ThrowIfBuildCompleted();
+
             this.advancedOptions.DuplicateKeyBehavior = duplicateKeyBehavior;
             return this;
         }
@@ -61,6 +68,8 @@ namespace Lifti
         /// </summary>
         public FullTextIndexBuilder<TKey> WithScorerFactory(IIndexScorerFactory scorerFactory)
         {
+            this.ThrowIfBuildCompleted();
+
             this.scorerFactory = scorerFactory;
             return this;
         }
@@ -75,6 +84,7 @@ namespace Lifti
         public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, CancellationToken, Task> asyncAction)
         {
             ArgumentNullException.ThrowIfNull(asyncAction);
+            this.ThrowIfBuildCompleted();
 
             this.indexModifiedActions ??= [];
 
@@ -87,6 +97,7 @@ namespace Lifti
         public FullTextIndexBuilder<TKey> WithIndexModificationAction(Func<IIndexSnapshot<TKey>, Task> asyncAction)
         {
             ArgumentNullException.ThrowIfNull(asyncAction);
+            this.ThrowIfBuildCompleted();
 
             return this.WithIndexModificationAction((snapshot, ct) => asyncAction(snapshot));
         }
@@ -104,6 +115,7 @@ namespace Lifti
         public FullTextIndexBuilder<TKey> WithIndexModificationAction(Action<IIndexSnapshot<TKey>> action)
         {
             ArgumentNullException.ThrowIfNull(action);
+            this.ThrowIfBuildCompleted();
 
             return this.WithIndexModificationAction(
                 (snapshot, ct) =>
@@ -123,6 +135,7 @@ namespace Lifti
         public FullTextIndexBuilder<TKey> WithObjectTokenization<TObject>(Func<ObjectTokenizationBuilder<TObject, TKey>, ObjectTokenizationBuilder<TObject, TKey>> optionsBuilder)
         {
             ArgumentNullException.ThrowIfNull(optionsBuilder);
+            this.ThrowIfBuildCompleted();
 
             var builder = new ObjectTokenizationBuilder<TObject, TKey>();
             this.objectTokenizationBuilders.Add(optionsBuilder(builder));
@@ -137,6 +150,7 @@ namespace Lifti
         public FullTextIndexBuilder<TKey> WithDefaultTokenization(Func<TokenizerBuilder, TokenizerBuilder> optionsBuilder)
         {
             ArgumentNullException.ThrowIfNull(optionsBuilder);
+            this.ThrowIfBuildCompleted();
 
             this.defaultTokenizer = optionsBuilder.CreateTokenizer()!;
 
@@ -150,6 +164,7 @@ namespace Lifti
         public FullTextIndexBuilder<TKey> WithDefaultThesaurus(Func<ThesaurusBuilder, ThesaurusBuilder> thesaurusBuilder)
         {
             ArgumentNullException.ThrowIfNull(thesaurusBuilder);
+            this.ThrowIfBuildCompleted();
 
             this.defaultThesaurusBuilder = thesaurusBuilder(new ThesaurusBuilder());
             return this;
@@ -163,6 +178,8 @@ namespace Lifti
         /// </summary>
         public FullTextIndexBuilder<TKey> WithIntraNodeTextSupportedAfterIndexDepth(int depth)
         {
+            this.ThrowIfBuildCompleted();
+
             if (depth < 0)
             {
                 throw new ArgumentException(ExceptionMessages.ValueMustNotBeLessThanZero, nameof(depth));
@@ -178,6 +195,7 @@ namespace Lifti
         public FullTextIndexBuilder<TKey> WithQueryParser(IQueryParser queryParser)
         {
             ArgumentNullException.ThrowIfNull(queryParser);
+            this.ThrowIfBuildCompleted();
 
             this.queryParser = queryParser;
 
@@ -187,6 +205,8 @@ namespace Lifti
         /// <inheritdoc cref="WithSimpleQueryParser(Func{QueryParserBuilder, QueryParserBuilder})" />
         public FullTextIndexBuilder<TKey> WithSimpleQueryParser()
         {
+            this.ThrowIfBuildCompleted();
+
             return this.WithSimpleQueryParser(static o => o);
         }
 
@@ -198,6 +218,7 @@ namespace Lifti
         public FullTextIndexBuilder<TKey> WithSimpleQueryParser(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)
         {
             ArgumentNullException.ThrowIfNull(optionsBuilder);
+            this.ThrowIfBuildCompleted();
 
             var builder = new QueryParserBuilder(options => new SimpleQueryParser(options));
             this.queryParser = optionsBuilder(builder).Build();
@@ -211,6 +232,7 @@ namespace Lifti
         public FullTextIndexBuilder<TKey> WithQueryParser(Func<QueryParserBuilder, QueryParserBuilder> optionsBuilder)
         {
             ArgumentNullException.ThrowIfNull(optionsBuilder);
+            this.ThrowIfBuildCompleted();
 
             var builder = new QueryParserBuilder();
             this.queryParser = optionsBuilder(builder).Build();
@@ -256,7 +278,7 @@ namespace Lifti
                 objectTokenizers.Add(objectTokenizer);
             }
 
-            return new FullTextIndex<TKey>(
+            var index = new FullTextIndex<TKey>(
                 this.advancedOptions,
                 new ObjectTypeConfigurationLookup<TKey>(objectTokenizers),
                 fieldLookup,
@@ -267,6 +289,18 @@ namespace Lifti
                 this.defaultTokenizer,
                 thesaurusBuilder.Build(this.defaultTokenizer),
                 this.indexModifiedActions?.ToArray());
+
+            this.buildCompleted = true;
+
+            return index;
+        }
+
+        private void ThrowIfBuildCompleted()
+        {
+            if (this.buildCompleted)
+            {
+                throw new InvalidOperationException("A FullTextIndexBuilder instance cannot be modified after Build has completed.");
+            }
         }
     }
 }
