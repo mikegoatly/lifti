@@ -32,6 +32,8 @@ await serializer.SerializeAsync(index, stream, disposeStream: false);
 stream.Position = 0; 
 ```
 
+If you need to store the same index information in a format other than the built-in binary stream, you can implement a [custom index serializer](custom-index-serialization) using the serialization base classes.
+
 After you have created a new index instance, you can use the `BinarySerializer` class again to bring its state in line with the serialized index:
 
 ``` csharp
